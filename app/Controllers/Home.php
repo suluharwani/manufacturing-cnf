@@ -11,4 +11,9 @@ class Home extends BaseController
         $data['content'] = view('admin/content/dashboard');
         return view('admin/index',$data);
     }
+    public function material(){
+        $data['content'] = view('admin/content/material');
+        return view('admin/index',$data); 
+    }
+
 }

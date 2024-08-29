@@ -38,7 +38,6 @@ class CreateStockMovementsTable extends Migration
         ]);
 
         $this->forge->addKey('id', true);
-        $this->forge->addForeignKey('warehouse_id', 'warehouses', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('stock_movements');
     }
 

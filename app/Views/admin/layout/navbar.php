@@ -20,7 +20,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cube me-2"></i>Material</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="" class="dropdown-item">All Materials</a>
+                            <a href="<?=base_url('material')?>" class="dropdown-item">All Materials</a>
                             <a href="" class="dropdown-item">Track Material Inventory</a>
                             <a href="" class="dropdown-item">Scrap Management</a>
                         </div>
