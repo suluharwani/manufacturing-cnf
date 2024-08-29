@@ -8,7 +8,7 @@ class Home extends BaseController
     {   
         $d = new WarehouseController();       
    
-        $data['content'] = view('admin/content/blank');
+        $data['content'] = view('admin/content/dashboard');
         return view('admin/index',$data);
     }
 }
