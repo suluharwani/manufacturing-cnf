@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class MdlSatuan extends Model
 {
-    protected $table            = 'mdlsatuans';
+    protected $table            = 'satuan';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

@@ -4,13 +4,37 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
+use AllowDynamicProperties; 
 
 class MaterialController extends BaseController
 {
+    protected $changelog;
+    public function __construct()
+    {
+    //   parent::__construct();
+      $this->db      = \Config\Database::connect();
+      $this->session = session();
+      $this->uri = service('uri');
+      helper('form');
+      $this->form_validation = \Config\Services::validation();
+      $this->userValidation = new \App\Controllers\LoginValidation();
+      $this->changelog = new \App\Controllers\Changelog();
+
+      //if sesion habis
+      //check access
+      $check = new \App\Controllers\CheckAccess();
+      $check->logged();
+      //check access
+     
+}
     public function index()
     {
         //
     }
+    function access($page){
+        $check = new \App\Controllers\CheckAccess();
+        $check->access($_SESSION['auth']['id'],$page);
+        }
     public function listdataMaterial(){
         $this->access('operator');
         $serverside_model = new \App\Models\Mdl_datatables();
@@ -47,17 +71,16 @@ class MaterialController extends BaseController
       function tambah_tipe(){
         $this->access('operator');
         $userInfo = $_SESSION['auth'];
-        $userModel = new \App\Models\MdlClient();
-        $userdata = [
-          "email" =>  $_POST["email"],
-          "password" =>  $this->bcrypt->encrypt($_POST["password"],$this->bcrypt_version),
-          "status" => 1
+        $MdlType = new \App\Models\MdlType();
+        $dataType = [
+          "kode" =>  $_POST["kode"],
+          "nama" =>  $_POST["nama"]
         ];
-        if ($userModel->createNewUser($userdata)) {
-          $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_depan']." menambahkan client: ".$_POST['email']."sebagai client baru";
+        if ($MdlType->insert($dataType)) {
+          $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan client: ".$_POST['nama']."sebagai type baru";
           header('HTTP/1.1 200 OK');
         }else{
-          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan client: ".$_POST['email'];
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan type: ".$_POST['nama'];
           header('HTTP/1.1 500 Internal Server Error');
           header('Content-Type: application/json; charset=UTF-8');
           die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
@@ -69,11 +92,11 @@ class MaterialController extends BaseController
         $this->access('operator');
         $id = $_POST['id'];
         $nama = $_POST['nama'];
-        $mdl = new \App\Models\MdlClient();
+        $mdl = new \App\Models\MdlType();
         $mdl->where('id',$id);
         $mdl->delete();
         if ($mdl->affectedRows()!=0) {
-          $riwayat = "Menghapus user $nama";
+          $riwayat = "Menghapus type $nama";
           $this->changelog->riwayat($riwayat);
           header('HTTP/1.1 200 OK');
         }else {

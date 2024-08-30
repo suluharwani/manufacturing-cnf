@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class MdlType extends Model
 {
-    protected $table            = 'mdltypes';
+    protected $table            = 'type';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

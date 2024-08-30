@@ -113,7 +113,7 @@ $('.tambahJenisBarang').on('click',function(){
     }).then((result) => {
       $.ajax({
         type : "POST",
-        url  : base_url+'/material/jenis',
+        url  : base_url+'/material/tambah_tipe',
         async : false,
         // dataType : "JSON",
         data : {kode:result.value.kode,nama:result.value.nama},
@@ -169,7 +169,7 @@ $('.tambahJenisBarang').on('click',function(){
     }).then((result) => {
       $.ajax({
         type : "POST",
-        url  : base_url+'/material/satuan',
+        url  : base_url+'/material/tanbah_satuan',
         async : false,
         // dataType : "JSON",
         data : {kode:result.value.kode,nama:result.value.nama},
