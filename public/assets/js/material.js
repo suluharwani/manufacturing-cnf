@@ -84,3 +84,116 @@ function tabel(){
 
 });
 };
+
+$('.tambahJenisBarang').on('click',function(){
+
+    Swal.fire({
+      title: `Tambah Tipe/Jenis `,
+      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
+      html:`<form id="form_add_data">
+      <div class="form-group">
+      <label for="kode">Kode</label>
+      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+      </div>
+      <div class="form-group">
+      <label for="namaBarang">Nama Jenis/Tipe</label>
+      <input type="text" class="form-control" id="namaBarang" placeholder="Nama Tipe">
+      </div>
+      </form>`,
+      confirmButtonText: 'Confirm',
+      focusConfirm: false,
+      preConfirm: () => {
+        const kode = Swal.getPopup().querySelector('#kode').value
+        const nama = Swal.getPopup().querySelector('#namaBarang').value
+        if (!kode || !nama) {
+          Swal.showValidationMessage('Silakan lengkapi data')
+        }
+        return {kode:kode, nama: nama }
+      }
+    }).then((result) => {
+      $.ajax({
+        type : "POST",
+        url  : base_url+'/material/jenis',
+        async : false,
+        // dataType : "JSON",
+        data : {kode:result.value.kode,nama:result.value.nama},
+        success: function(data){
+          $('#tabel_serverside').DataTable().ajax.reload();
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `Jenis barang berhasil ditambahkan.`,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+  
+    })
+  })
+  
+  $('.tambahSatuanBarang').on('click',function(){
+
+    Swal.fire({
+      title: `Tambah Satuan `,
+      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
+      html:`<form id="form_add_data">
+      <div class="form-group">
+      <label for="kode">Kode</label>
+      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+      </div>
+      <div class="form-group">
+      <label for="namaSatuan">Nama Satuan</label>
+      <input type="text" class="form-control" id="namaSatuan" placeholder="Nama Satuan">
+      </div>
+      </form>`,
+      confirmButtonText: 'Confirm',
+      focusConfirm: false,
+      preConfirm: () => {
+        const kode = Swal.getPopup().querySelector('#kode').value
+        const nama = Swal.getPopup().querySelector('#namaSatuan').value
+        if (!kode || !nama) {
+          Swal.showValidationMessage('Silakan lengkapi data')
+        }
+        return {kode:kode, nama: nama }
+      }
+    }).then((result) => {
+      $.ajax({
+        type : "POST",
+        url  : base_url+'/material/satuan',
+        async : false,
+        // dataType : "JSON",
+        data : {kode:result.value.kode,nama:result.value.nama},
+        success: function(data){
+          $('#tabel_serverside').DataTable().ajax.reload();
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `Jenis barang berhasil ditambahkan.`,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+  
+    })
+  })
+  

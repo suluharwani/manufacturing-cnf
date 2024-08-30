@@ -43,4 +43,43 @@ class MaterialController extends BaseController
       
       return json_encode($output);
       }
+
+      function tambah_tipe(){
+        $this->access('operator');
+        $userInfo = $_SESSION['auth'];
+        $userModel = new \App\Models\MdlClient();
+        $userdata = [
+          "email" =>  $_POST["email"],
+          "password" =>  $this->bcrypt->encrypt($_POST["password"],$this->bcrypt_version),
+          "status" => 1
+        ];
+        if ($userModel->createNewUser($userdata)) {
+          $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_depan']." menambahkan client: ".$_POST['email']."sebagai client baru";
+          header('HTTP/1.1 200 OK');
+        }else{
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan client: ".$_POST['email'];
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
+        }
+        $this->changelog->riwayat($riwayat);
+      
+    }
+    function hapus_tipe(){
+        $this->access('operator');
+        $id = $_POST['id'];
+        $nama = $_POST['nama'];
+        $mdl = new \App\Models\MdlClient();
+        $mdl->where('id',$id);
+        $mdl->delete();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus user $nama";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
 }

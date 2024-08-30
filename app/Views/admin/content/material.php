@@ -19,7 +19,7 @@
                         <div class="bg-light text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <h6 class="mb-0">Jenis Barang</h6>
-                                <button class ="btn btn-primary">Tambah</button>
+                                <button class ="btn btn-primary tambahJenisBarang">Tambah</button>
                             </div>
                             <!-- jenis barang -->
                             <div class="table-responsive" style="max-height: 300px;">
@@ -111,7 +111,7 @@
                         <div class="bg-light text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <h6 class="mb-0">Satuan Barang</h6>
-                                <button class ="btn btn-primary">Tambah</button>
+                                <button class ="btn btn-primary tambahSatuanBarang">Tambah</button>
                             </div>
                                                        <!-- satuan barang -->
                                                        <div class="table-responsive" style="max-height: 300px;">
