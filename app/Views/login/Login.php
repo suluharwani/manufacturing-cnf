@@ -49,15 +49,26 @@
                             <h3>Sign In</h3>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                            <input type="email" name = "email" class="form-control" id="floatingInput" placeholder="name@example.com">
                             <label for="floatingInput">Email address</label>
                         </div>
                         <div class="form-floating mb-4">
-                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                            <input type="password" name = "password" class="form-control" id="floatingPassword" placeholder="Password">
                             <label for="floatingPassword">Password</label>
                         </div>
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                  
+                        <?php if (isset($_SESSION['login_error'])){
+                        ?>
+                        </br>
+                        <div class="alert alert-danger" role="alert">
+                        <ul>
+                        <?php foreach ($_SESSION['login_error'] as $error): ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach ?>
+                        
+                        </ul>
+                    </div>
+                    <?php }?>
                         </div>
                         <button type="submit" name='submit' value = 'login' class="btn btn-primary py-3 w-100 mb-4">Sign In</button>
                     </div>

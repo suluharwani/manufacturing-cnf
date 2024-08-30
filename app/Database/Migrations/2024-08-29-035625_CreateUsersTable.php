@@ -15,7 +15,11 @@ class CreateUsersTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'username' => [
+            'nama_depan' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+            ],
+            'nama_belakang' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
@@ -28,7 +32,11 @@ class CreateUsersTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'role' => [
+            'level' => [
+                'type' => 'VARCHAR',
+                'constraint' => '50',
+            ],
+            'status' => [
                 'type' => 'VARCHAR',
                 'constraint' => '50',
             ],

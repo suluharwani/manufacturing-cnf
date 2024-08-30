@@ -47,15 +47,19 @@
                             <h3>Sign Up</h3>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingText" placeholder="jhondoe">
-                            <label for="floatingText">Username</label>
+                            <input type="text" name ="nama_depan" class="form-control" id="floatingText" placeholder="jhondoe">
+                            <label for="floatingText">Nama Depan</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                            <input type="text" name ="nama_belakang" class="form-control" id="floatingText" placeholder="jhondoe">
+                            <label for="floatingText">Nama Belakang</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" name = "email" class="form-control" id="floatingInput" placeholder="name@example.com">
                             <label for="floatingInput">Email address</label>
                         </div>
                         <div class="form-floating mb-4">
-                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                            <input type="password" name = "password" class="form-control" id="floatingPassword" placeholder="Password">
                             <label for="floatingPassword">Password</label>
                         </div>
                         <div class="d-flex align-items-center justify-content-between mb-4">
