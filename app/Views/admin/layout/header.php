@@ -29,6 +29,9 @@
 
     <!-- Template Stylesheet -->
     <link href="<?=base_url('assets/dashmin-1.0.0/')?>css/style.css" rel="stylesheet">
+    <script type="text/javascript" src="<?=base_url('assets')?>/datatables/jQuery-3.6.0/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="<?=base_url('assets')?>/datatables/DataTables-1.13.1/js/jquery.dataTables.min.js"></script>
+  
 </head>
 
 <body>
