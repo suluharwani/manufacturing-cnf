@@ -112,7 +112,7 @@ $('.tambahWarehouse').on('click',function(){
     }).then((result) => {
       $.ajax({
         type : "POST",
-        url  : base_url+'/warehouse/buat_gudang_baru',
+        url  : base_url+'/WarehouseController/buat_gudang_baru',
         async : false,
         // dataType : "JSON",
         data : {location:result.value.location,name:result.value.name},

@@ -9,7 +9,7 @@ $routes->get('/', 'Home::index');
 $routes->get('/test', 'Home::test');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
-$routes->post('/warehouse/buat_gudang_baru', 'WarehouseController::buat_gudang_baru');
+$routes->post('/WarehouseController/buat_gudang_baru', 'WarehouseController::buat_gudang_baru');
 $routes->get('/login', 'Login');
 $routes->get('/signup', 'Login');
 $routes->post('/login', 'Login');

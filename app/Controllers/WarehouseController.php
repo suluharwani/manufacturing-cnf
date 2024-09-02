@@ -128,19 +128,19 @@ class WarehouseController extends BaseController
   
           return $this->response->setJSON($output);
       }
-      function tambah_tipe(){
+      function buat_gudang_baru(){
         $this->access('operator');
         $userInfo = $_SESSION['auth'];
-        $MdlType = new \App\Models\MdlType();
-        $dataType = [
-          "kode" =>  $_POST["kode"],
-          "nama" =>  $_POST["nama"]
+        $Mdl = new \App\Models\Warehouse();
+        $data = [
+          "location" =>  $_POST["location"],
+          "name" =>  $_POST["name"]
         ];
-        if ($MdlType->insert($dataType)) {
-          $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan client: ".$_POST['nama']."sebagai type baru";
+        if ($Mdl->insert($data)) {
+          $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan client: ".$_POST['name']."sebagai type baru";
           header('HTTP/1.1 200 OK');
         }else{
-          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan type: ".$_POST['nama'];
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan type: ".$_POST['name'];
           header('HTTP/1.1 500 Internal Server Error');
           header('Content-Type: application/json; charset=UTF-8');
           die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
