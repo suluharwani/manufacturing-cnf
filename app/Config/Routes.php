@@ -23,4 +23,5 @@ $routes->post('/material/satuan_list', 'MaterialController::satuan_list');
 $routes->post('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->get('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->post('/material/listdataMaterialJoin', 'MaterialController::listdataMaterialJoin');
+$routes->post('/warehousecontroller/gudang_list', 'warehousecontroller::gudang_list');
 

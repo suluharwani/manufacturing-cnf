@@ -27,12 +27,12 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Kode</th>
+                        <th scope="col">Lokasi</th>
                         <th scope="col">Nama</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
-                <tbody id="isiType">
+                <tbody id="isiGudang">
                  </tbody>
             </table>
         </div>

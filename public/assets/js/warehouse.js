@@ -117,7 +117,7 @@ $('.tambahWarehouse').on('click',function(){
         // dataType : "JSON",
         data : {location:result.value.location,name:result.value.name},
         success: function(data){
-          // dataTypeBarang()
+          dataGudang()
           console.log(data)
           Swal.fire({
             position: 'center',
@@ -142,14 +142,14 @@ $('.tambahWarehouse').on('click',function(){
   })
   
 
-  dataTypeBarang()
-  function dataTypeBarang(){
+  dataGudang()
+  function dataGudang(){
     $.ajax({
       type : "POST",
-      url  : base_url+"material/type_list",
+      url  : base_url+"warehousecontroller/gudang_list",
       async : false,
       success: function(data){
-       tableType(data);
+       tableGudang(data);
     
       },
       error: function(xhr){
@@ -163,7 +163,7 @@ $('.tambahWarehouse').on('click',function(){
       }
     });
   }
-  function tableType(data){
+  function tableGudang(data){
     d = JSON.parse(data);
     console.log(d)
     let no = 1;
@@ -171,11 +171,11 @@ $('.tambahWarehouse').on('click',function(){
     $.each(d, function(k, v){
             table+=     `<tr>`;
                 table+=   `<td>${no++}</td>`;
-                table+=   `<td>${d[k].kode}</td>`;
-                table+=   `<td>${d[k].nama}</td>`;
+                table+=   `<td>${d[k].location}</td>`;
+                table+=   `<td>${d[k].name}</td>`;
                 table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editType"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteType"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
             table+=   `</tr>`
  
           })
-   $('#isiType').html(table)
+   $('#isiGudang').html(table)
   }

@@ -148,7 +148,7 @@ class WarehouseController extends BaseController
         $this->changelog->riwayat($riwayat);
       
     }
-    function hapus_tipe(){
+    function hapus_gudang(){
         $this->access('operator');
         $id = $_POST['id'];
         $nama = $_POST['nama'];
@@ -165,9 +165,9 @@ class WarehouseController extends BaseController
           die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
        } 
-       function type_list(){
+       function gudang_list(){
         $this->access('operator');
-        $mdl = new \App\Models\MdlType();
+        $mdl = new \App\Models\Warehouse();
         $data = $mdl->get()
                 ->getResultArray();
         return json_encode($data);
