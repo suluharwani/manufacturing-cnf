@@ -23,6 +23,10 @@ class CreateMaterialDetTable extends Migration
                 'type'       => 'INT',
                 'constraint' => '11',
             ],
+            'satuan_id' => [
+                'type'       => 'INT',
+                'constraint' => '11',
+            ],
             'gambar' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',

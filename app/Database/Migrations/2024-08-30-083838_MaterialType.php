@@ -37,11 +37,11 @@ class MaterialType extends Migration
 
     ]);
     $this->forge->addPrimaryKey('id');
-    $this->forge->createTable('material');
+    $this->forge->createTable('type');
   }
 
   public function down()
   {
-    $this->forge->dropTable('material');
+    $this->forge->dropTable('type');
   }
 }

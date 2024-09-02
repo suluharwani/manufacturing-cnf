@@ -84,44 +84,45 @@ function tabel(){
 });
 };
 
-$('.tambahJenisBarang').on('click',function(){
+$('.tambahWarehouse').on('click',function(){
 
     Swal.fire({
-      title: `Tambah Tipe/Jenis `,
+      title: `Tambah Warehouse `,
       // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
       html:`<form id="form_add_data">
       <div class="form-group">
-      <label for="kode">Kode</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+      <label for="kode">Warehouse</label>
+      <input type="text" class="form-control" id="location" aria-describedby="locationHelp" placeholder="location">
       </div>
       <div class="form-group">
-      <label for="namaBarang">Nama Jenis/Tipe</label>
-      <input type="text" class="form-control" id="namaBarang" placeholder="Nama Tipe">
+      <label for="namaWarehouse">Nama Warehouse</label>
+      <input type="text" class="form-control" id="namaWarehouse" placeholder="Nama Tipe">
       </div>
       </form>`,
       confirmButtonText: 'Confirm',
       focusConfirm: false,
       preConfirm: () => {
-        const kode = Swal.getPopup().querySelector('#kode').value
-        const nama = Swal.getPopup().querySelector('#namaBarang').value
-        if (!kode || !nama) {
+        const location = Swal.getPopup().querySelector('#location').value
+        const name = Swal.getPopup().querySelector('#namaWarehouse').value
+        if (!location || !name) {
           Swal.showValidationMessage('Silakan lengkapi data')
         }
-        return {kode:kode, nama: nama }
+        return {location:location, name: name }
       }
     }).then((result) => {
       $.ajax({
         type : "POST",
-        url  : base_url+'/material/tambah_tipe',
+        url  : base_url+'/warehouse/buat_gudang_baru',
         async : false,
         // dataType : "JSON",
-        data : {kode:result.value.kode,nama:result.value.nama},
+        data : {location:result.value.location,name:result.value.name},
         success: function(data){
-          dataTypeBarang()
+          // dataTypeBarang()
+          console.log(data)
           Swal.fire({
             position: 'center',
             icon: 'success',
-            title: `Jenis barang berhasil ditambahkan.`,
+            title: `Warehouse berhasil ditambahkan.`,
             showConfirmButton: false,
             timer: 1500
           })
@@ -140,61 +141,7 @@ $('.tambahJenisBarang').on('click',function(){
     })
   })
   
-  $('.tambahSatuanBarang').on('click',function(){
 
-    Swal.fire({
-      title: `Tambah Satuan `,
-      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
-      html:`<form id="form_add_data">
-      <div class="form-group">
-      <label for="kode">Kode</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-      </div>
-      <div class="form-group">
-      <label for="namaSatuan">Nama Satuan</label>
-      <input type="text" class="form-control" id="namaSatuan" placeholder="Nama Satuan">
-      </div>
-      </form>`,
-      confirmButtonText: 'Confirm',
-      focusConfirm: false,
-      preConfirm: () => {
-        const kode = Swal.getPopup().querySelector('#kode').value
-        const nama = Swal.getPopup().querySelector('#namaSatuan').value
-        if (!kode || !nama) {
-          Swal.showValidationMessage('Silakan lengkapi data')
-        }
-        return {kode:kode, nama: nama }
-      }
-    }).then((result) => {
-      $.ajax({
-        type : "POST",
-        url  : base_url+'/material/tambah_satuan',
-        async : false,
-        // dataType : "JSON",
-        data : {kode:result.value.kode,nama:result.value.nama},
-        success: function(data){
-          dataSatuan()
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `Satuan ukuran barang berhasil ditambahkan.`,
-            showConfirmButton: false,
-            timer: 1500
-          })
-        },
-        error: function(xhr){
-          let d = JSON.parse(xhr.responseText);
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: `${d.message}`,
-            footer: '<a href="">Why do I have this issue?</a>'
-          })
-        }
-      });
-  
-    })
-  })
   dataTypeBarang()
   function dataTypeBarang(){
     $.ajax({
@@ -231,41 +178,4 @@ $('.tambahJenisBarang').on('click',function(){
  
           })
    $('#isiType').html(table)
-  }
-  dataSatuan()
-  function dataSatuan(){
-    $.ajax({
-      type : "POST",
-      url  : base_url+"material/satuan_list",
-      async : false,
-      success: function(data){
-       tableSatuan(data);
-    
-      },
-      error: function(xhr){
-        let d = JSON.parse(xhr.responseText);
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: `${d.message}`,
-          footer: '<a href="">Why do I have this issue?</a>'
-        })
-      }
-    });
-  }
-  function tableSatuan(data){
-    d = JSON.parse(data);
-    console.log(d)
-    let no = 1;
-    let table = ''
-    $.each(d, function(k, v){
-            table+=     `<tr>`;
-                table+=   `<td>${no++}</td>`;
-                table+=   `<td>${d[k].nama}</td>`;
-                table+=   `<td>${d[k].kode}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editSatuan"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteSatuan"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
-            table+=   `</tr>`
- 
-          })
-   $('#isiSatuan').html(table)
   }

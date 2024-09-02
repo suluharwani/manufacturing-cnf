@@ -36,7 +36,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cubes me-2"></i>Warehouse</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="" class="dropdown-item">All Warehouse</a>
+                            <a href="<?=base_url('warehouse')?>" class="dropdown-item">All Warehouse</a>
                             <a href="" class="dropdown-item">Stock</a>
                             <a href="" class="dropdown-item">Report</a>
                         </div>

@@ -46,5 +46,13 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material');
         return view('admin/index',$data); 
     }
+    public function warehouse(){
+        $data['content'] = view('admin/content/warehouse');
+        return view('admin/index',$data); 
+    }
+    public function test(){
+        $data = "asd";
+        echo "{$data}-00";
+    }
 
 }

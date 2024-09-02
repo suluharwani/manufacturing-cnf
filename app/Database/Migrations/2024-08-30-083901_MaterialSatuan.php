@@ -37,11 +37,11 @@ class MaterialSatuan extends Migration
   
       ]);
       $this->forge->addPrimaryKey('id');
-      $this->forge->createTable('type');
+      $this->forge->createTable('satuan');
     }
   
     public function down()
     {
-      $this->forge->dropTable('type');
+      $this->forge->dropTable('satuan');
     }
   }
