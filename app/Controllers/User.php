@@ -73,10 +73,10 @@ public function listdata_user(){
           // } 
           //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
           //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
-  $column_order = array(NULL,'user.nama_depan','user.profile_picture','user.level','user.status','user.id');
-  $column_search = array('user.nama_depan','user.nama_belakang','user.email','user.id');
-  $order = array('user.id' => 'desc');
-  $list = $list_data->get_datatables('user', $column_order, $column_search, $order, $where);
+  $column_order = array(NULL,'users.nama_depan','users.profile_picture','users.level','users.status','users.id');
+  $column_search = array('users.nama_depan','users.nama_belakang','users.email','users.id');
+  $order = array('users.id' => 'desc');
+  $list = $list_data->get_datatables('users', $column_order, $column_search, $order, $where);
   $data = array();
   $no = $request->getPost("start");
   foreach ($list as $lists) {
@@ -89,13 +89,13 @@ public function listdata_user(){
     $row[] = $lists->id;
     $row[] = $lists->level;
     $row[] = $lists->status;
-    $row[] = $lists->profile_picture;
+
     $data[] = $row;
 }
 $output = array(
     "draw" => $request->getPost("draw"),
-    "recordsTotal" => $list_data->count_all('user', $where),
-    "recordsFiltered" => $list_data->count_filtered('user', $column_order, $column_search, $order, $where),
+    "recordsTotal" => $list_data->count_all('users', $where),
+    "recordsFiltered" => $list_data->count_filtered('users', $column_order, $column_search, $order, $where),
     "data" => $data,
 );
 
@@ -107,6 +107,8 @@ return json_encode($output);
       $userInfo = $_SESSION['auth'];
       $userModel = new \App\Models\MdlUser();
       $userdata = [
+        "nama_depan"=>  $_POST["namaDepan"],
+        "nama_belakang"=> $_POST["namaBelakang"],
         "email" =>  $_POST["email"],
         "password" =>  $this->bcrypt->encrypt($_POST["password"],$this->bcrypt_version),
         "level" => 2,

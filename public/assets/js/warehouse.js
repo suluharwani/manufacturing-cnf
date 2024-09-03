@@ -61,7 +61,7 @@ function tabel(){
     return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersediaSalesOrder" id="'+row[1]+'" >Detail</a>`; 
     }},
     {mRender: function (data, type, row) {
-    return ``; 
+    return `${row[6]}|${row[7]}`; 
     }},
 
     {mRender: function (data, type, row) {

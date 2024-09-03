@@ -74,7 +74,7 @@ class WarehouseController extends BaseController
           $request = \Config\Services::request();
           
           // Define the columns to select
-          $select_columns = 'materials.*, materials_detail.type_id as type_id, type.nama as nama_type';
+          $select_columns = 'materials.*, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan';
           
           // Define the joins (you can add more joins as needed)
           $joins = [
@@ -115,6 +115,7 @@ class WarehouseController extends BaseController
               $row[] = $lists->kode;
               $row[] = $lists->type_id;
               $row[] = $lists->nama_type;
+              
 // From joined suppliers table
               $data[] = $row;
           }

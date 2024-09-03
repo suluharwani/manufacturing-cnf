@@ -13,41 +13,11 @@
 
 
 
-<!-- Sales Chart Start -->
-<div class="container-fluid pt-4 px-4">
-    <div class="row g-4">
-        <div class="col-sm-12 col-xl-12">
-            <div class="bg-light text-center rounded p-4">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Warehouse</h6>
-                    <button class="btn btn-primary tambahWarehouse">Tambah</button>
-                </div>
-                <!-- jenis barang -->
-                <div class="table-responsive" style="max-height: 300px;">
-                    <table class="table table-striped table-bordered">
-                        <thead class="table-dark">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Lokasi</th>
-                                <th scope="col">Nama</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="isiGudang">
-                        </tbody>
-                    </table>
-                </div>
-                <!-- end jenis barang -->
-            </div>
-        </div>
 
-    </div>
-</div>
-<!-- Sales Chart End -->
 
 
 <!-- Recent Sales Start -->
-<!-- <div class="container-fluid pt-4 px-4">
+<div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Persediaan Material</h6>
@@ -87,7 +57,7 @@
           </table>
                     </div>
                 </div>
-            </div> -->
+            </div>
 <!-- Recent Sales End -->
 
 
