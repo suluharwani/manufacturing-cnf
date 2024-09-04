@@ -202,4 +202,61 @@ class MaterialController extends BaseController
                 ->getResultArray();
         return json_encode($data);
        }
+
+       public function listdataProdukJoin()
+       {
+           $this->access('operator');
+           $serverside_model = new \App\Models\MdlDatatableJoin();
+           $request = \Config\Services::request();
+           
+           // Define the columns to select
+           $select_columns = 'product.*,';
+           
+           // Define the joins (you can add more joins as needed)
+           $joins = [
+ 
+           ];
+   
+           $where = ['product.id !=' => 0, 'product.deleted_at' => NULL];
+   
+           // Column Order Must Match Header Columns in View
+           $column_order = array(
+               NULL, 
+               'product.name', 
+               'product.kode', 
+               'product.id',
+           );
+           $column_search = array(
+               'product.name', 
+               'product.kode', 
+          
+           );
+           $order = array('product.id' => 'desc');
+   
+           // Call the method to get data with dynamic joins and select fields
+           $list = $serverside_model->get_datatables('product', $select_columns, $joins, $column_order, $column_search, $order, $where);
+           
+           $data = array();
+           $no = $request->getPost("start");
+           foreach ($list as $lists) {
+               $no++;
+               $row = array();
+               $row[] = $no;
+               $row[] = $lists->id;
+               $row[] = $lists->nama;
+               $row[] = $lists->kode;
+
+ // From joined suppliers table
+               $data[] = $row;
+           }
+   
+           $output = array(
+               "draw" => $request->getPost("draw"),
+               "recordsTotal" => $serverside_model->count_all('product', $where),
+               "recordsFiltered" => $serverside_model->count_filtered('product', $select_columns, $joins, $column_order, $column_search, $order, $where),
+               "data" => $data,
+           );
+   
+           return $this->response->setJSON($output);
+       }
 }

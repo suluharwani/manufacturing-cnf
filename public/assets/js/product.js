@@ -45,8 +45,11 @@ function tabel(){
         return row[2]
     }},
     {mRender: function (data, type, row) {
-     return row[5]
+     return row[1]
     }},
+    {mRender: function (data, type, row) {
+      return row[1]
+     }},
     {mRender: function (data, type, row) {
      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
     }},
@@ -54,20 +57,7 @@ function tabel(){
     {mRender: function (data, type, row) {
      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showSalesOrder" id="'+row[1]+'" >Detail</a>`; 
     }},
-    {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersedia" id="'+row[1]+'" >Detail</a>`; 
-    }},
-    {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersediaSalesOrder" id="'+row[1]+'" >Detail</a>`; 
-    }},
-    {mRender: function (data, type, row) {
-    return `(${row[6]}) ${row[7]}`; 
-    }},
-
-    {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
-    }
-    }
+   
   ],
   "columnDefs": [{
     "targets": [0],

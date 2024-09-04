@@ -34,6 +34,9 @@ $routes->get('/scrap_management', 'Home::scrap_management');
 $routes->get('/warehouse_report', 'Home::warehouse_report');
 $routes->post('/material/tambah_tipe', 'MaterialController::tambah_tipe');
 $routes->post('/material/tambah_satuan', 'MaterialController::tambah_satuan');
+//product
+$routes->post('/material/listdataProdukJoin', 'MaterialController::listdataProdukJoin');
+
 // $routes->post('/material/hapustype', 'MaterialController::material');
 $routes->post('/material/type_list', 'MaterialController::type_list');
 $routes->post('/material/satuan_list', 'MaterialController::satuan_list');

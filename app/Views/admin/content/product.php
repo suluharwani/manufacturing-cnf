@@ -1,14 +1,4 @@
 <link rel="stylesheet" type="text/css" href="<?= base_url('assets') ?>/datatables/datatables.min.css" />
-<style>
-    /* Tambahan minimal CSS untuk fixed header */
-    thead th {
-        position: sticky;
-        top: 0;
-        background-color: #343a40;
-        /* Warna background yang sama dengan header */
-        z-index: 100;
-    }
-</style>
 
 
 
@@ -59,5 +49,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/product.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
