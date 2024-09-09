@@ -87,7 +87,7 @@
                   <th style=" text-align: center;">Tersedia</th>
                   <th style=" text-align: center;">Tersedia Sales Order</th>
                   <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
@@ -101,7 +101,7 @@
                   <th style=" text-align: center;">Tersedia</th>
                   <th style=" text-align: center;">Tersedia Sales Order</th>
                   <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </tr>
             </tfoot>

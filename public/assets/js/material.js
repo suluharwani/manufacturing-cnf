@@ -65,7 +65,7 @@ function tabel(){
     }},
 
     {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+    return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" >Edit</a>`; 
     }
     }
   ],
@@ -385,3 +385,165 @@ $('.tambahJenisBarang').on('click',function(){
         });
     });
 });
+
+    // Function to handle material editing
+    $(document).on('click', '.editMaterial', function() {
+      const materialId = $(this).attr('id');
+
+      $.when(
+          $.ajax({
+              url: base_url + '/material/type_list',
+              method: 'POST',
+              dataType: 'json'
+          }),
+          $.ajax({
+              url: base_url + '/material/satuan_list',
+              method: 'POST',
+              dataType: 'json'
+          }),
+          $.ajax({
+              url: base_url + '/material/get_material/' + materialId, // Endpoint to get material details
+              method: 'GET',
+              dataType: 'json'
+          })
+      ).done(function(typesResponse, satuanUkuranResponse, materialResponse) {
+          const typesData = typesResponse[0];
+          const satuanUkuranData = satuanUkuranResponse[0];
+          const materialData = materialResponse[0]; // Material details
+
+          if (Array.isArray(typesData) && Array.isArray(satuanUkuranData) && materialData) {
+              let typeOptions = typesData.map(type => `<option value="${type.id}" ${type.id == materialData.type_id ? 'selected' : ''}>${type.nama}</option>`).join('');
+              let satuanUkuranOptions = satuanUkuranData.map(satuan => `<option value="${satuan.id}" ${satuan.id == materialData.satuan_id ? 'selected' : ''}>${satuan.nama}</option>`).join('');
+
+              Swal.fire({
+                  title: 'Edit Material',
+                  html: `
+                      <form id="form_edit_data">
+                          <div class="form-group">
+                              <label for="kode">Kode</label>
+                              <input type="text" class="form-control" id="kode" value="${materialData.kode}" placeholder="Kode">
+                          </div>
+                          <div class="form-group">
+                              <label for="namaMaterial">Nama Material</label>
+                              <input type="text" class="form-control" id="namaMaterial" value="${materialData.name}" placeholder="Nama Material">
+                          </div>
+                          <div class="form-group">
+                              <label for="type">Type</label>
+                              <select class="form-control" id="type">
+                                  ${typeOptions}
+                              </select>
+                          </div>
+                          <div class="form-group">
+                              <label for="satuanUkuran">Satuan Ukuran</label>
+                              <select class="form-control" id="satuanUkuran">
+                                  ${satuanUkuranOptions}
+                              </select>
+                          </div>
+                      </form>
+                  `,
+                  confirmButtonText: 'Update',
+                  focusConfirm: false,
+                  preConfirm: () => {
+                      const kode = Swal.getPopup().querySelector('#kode').value;
+                      const nama = Swal.getPopup().querySelector('#namaMaterial').value;
+                      const type = Swal.getPopup().querySelector('#type').value;
+                      const satuanUkuran = Swal.getPopup().querySelector('#satuanUkuran').value;
+
+                      if (!kode || !nama || !type || !satuanUkuran) {
+                          Swal.showValidationMessage('Silakan lengkapi data');
+                      }
+                      return { id: materialId, kode: kode, nama: nama, type: type, satuanUkuran: satuanUkuran };
+                  }
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                      $.ajax({
+                          type: "POST",
+                          url: base_url + '/material/update_material',
+                          data: {
+                              id: result.value.id,
+                              kode: result.value.kode,
+                              nama: result.value.nama,
+                              type: result.value.type,
+                              satuanUkuran: result.value.satuanUkuran
+                          },
+                          success: function(data) {
+                              dataSatuan(); // Update your data display here
+                              Swal.fire({
+                                  position: 'center',
+                                  icon: 'success',
+                                  title: 'Material berhasil diperbarui.',
+                                  showConfirmButton: false,
+                                  timer: 1500
+                              });
+                          },
+                          error: function(xhr) {
+                              let d = JSON.parse(xhr.responseText);
+                              Swal.fire({
+                                  icon: 'error',
+                                  title: 'Oops...',
+                                  text: `${d.message}`,
+                                  footer: '<a href="">Why do I have this issue?</a>'
+                              });
+                          }
+                      });
+                  }
+              });
+          } else {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Data tidak dalam format yang diharapkan.',
+                  footer: '<a href="">Why do I have this issue?</a>'
+              });
+          }
+      }).fail(function() {
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Gagal memuat data.',
+              footer: '<a href="">Why do I have this issue?</a>'
+          });
+      });
+  });
+
+  // Function to handle material deletion
+  $(document).on('click', '.deleteMaterial', function() {
+      const materialId = $(this).data('id');
+
+      Swal.fire({
+          title: 'Are you sure?',
+          text: "Material ini akan dihapus!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: base_url + '/material/delete_material',
+                  data: { id: materialId },
+                  success: function(data) {
+                      dataSatuan(); // Update your data display here
+                      Swal.fire({
+                          position: 'center',
+                          icon: 'success',
+                          title: 'Material berhasil dihapus.',
+                          showConfirmButton: false,
+                          timer: 1500
+                      });
+                  },
+                  error: function(xhr) {
+                      let d = JSON.parse(xhr.responseText);
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops...',
+                          text: `${d.message}`,
+                          footer: '<a href="">Why do I have this issue?</a>'
+                      });
+                  }
+              });
+          }
+      });
+  });

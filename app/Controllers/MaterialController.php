@@ -291,4 +291,47 @@ class MaterialController extends BaseController
         $this->changelog->riwayat($riwayat);
       
     }
+    public function get_material($id)
+    {
+        $model = new \App\Models\MdlMaterial();
+        $material = $model->getMaterialWithDetails($id);
+
+        if ($material) {
+            return $this->response->setJSON($material);
+        } else {
+            return $this->response->setJSON(['message' => 'Material not found'], 404);
+        }
+    }
+
+    // Function to update material details
+    public function update_material()
+    {
+        $model = new \App\Models\MdlMaterial();
+        $id = $this->request->getPost('id');
+        $data = [
+            'kode' => $this->request->getPost('kode'),
+            'name' => $this->request->getPost('nama'),
+            'type_id' => $this->request->getPost('type'),
+            'satuan_id' => $this->request->getPost('satuanUkuran')
+        ];
+
+        if ($model->update($id, $data)) {
+            return $this->response->setJSON(['message' => 'Material updated successfully']);
+        } else {
+            return $this->response->setJSON(['message' => 'Failed to update material'], 400);
+        }
+    }
+
+    // Function to delete a material
+    public function delete_material()
+    {
+        $model = new \App\Models\MdlMaterial();
+        $id = $this->request->getPost('id');
+
+        if ($model->delete($id)) {
+            return $this->response->setJSON(['message' => 'Material deleted successfully']);
+        } else {
+            return $this->response->setJSON(['message' => 'Failed to delete material'], 400);
+        }
+    }
 }
