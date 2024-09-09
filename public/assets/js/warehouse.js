@@ -91,7 +91,7 @@ $('.tambahWarehouse').on('click',function(){
       // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
       html:`<form id="form_add_data">
       <div class="form-group">
-      <label for="kode">Warehouse</label>
+      <label for="kode">lokasi Warehouse</label>
       <input type="text" class="form-control" id="location" aria-describedby="locationHelp" placeholder="location">
       </div>
       <div class="form-group">

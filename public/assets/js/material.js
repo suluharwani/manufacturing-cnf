@@ -269,3 +269,119 @@ $('.tambahJenisBarang').on('click',function(){
           })
    $('#isiSatuan').html(table)
   }
+
+  //MATERIAL
+  $('.tambahMaterial').on('click', function() {
+    $.when(
+        $.ajax({
+            url: base_url + '/material/type_list',
+            method: 'POST',
+            dataType: 'json' // Expecting JSON response
+        }),
+        $.ajax({
+            url: base_url + '/material/satuan_list',
+            method: 'POST',
+            dataType: 'json' // Expecting JSON response
+        })
+    ).done(function(typesResponse, satuanUkuranResponse) {
+        // Debugging: Log the responses to check their structure
+        console.log('Types Response:', typesResponse[0]);
+        console.log('Satuan Ukuran Response:', satuanUkuranResponse[0]);
+
+        // Extract data
+        const typesData = typesResponse[0]; // Array of types
+        const satuanUkuranData = satuanUkuranResponse[0]; // Array of satuan ukuran
+
+        if (Array.isArray(typesData) && Array.isArray(satuanUkuranData)) {
+            let typeOptions = typesData.map(type => `<option value="${type.id}">${type.nama}</option>`).join('');
+            let satuanUkuranOptions = satuanUkuranData.map(satuan => `<option value="${satuan.id}">${satuan.nama}</option>`).join('');
+
+            Swal.fire({
+                title: 'Tambah Material',
+                html: `
+                    <form id="form_add_data">
+                        <div class="form-group">
+                            <label for="kode">Kode</label>
+                            <input type="text" class="form-control" id="kode" placeholder="Kode">
+                        </div>
+                        <div class="form-group">
+                            <label for="namaMaterial">Nama Material</label>
+                            <input type="text" class="form-control" id="namaMaterial" placeholder="Nama Material">
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select class="form-control" id="type">
+                                ${typeOptions}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="satuanUkuran">Satuan Ukuran</label>
+                            <select class="form-control" id="satuanUkuran">
+                                ${satuanUkuranOptions}
+                            </select>
+                        </div>
+                    </form>
+                `,
+                confirmButtonText: 'Confirm',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const kode = Swal.getPopup().querySelector('#kode').value;
+                    const nama = Swal.getPopup().querySelector('#namaMaterial').value;
+                    const type = Swal.getPopup().querySelector('#type').value;
+                    const satuanUkuran = Swal.getPopup().querySelector('#satuanUkuran').value;
+
+                    if (!kode || !nama || !type || !satuanUkuran) {
+                        Swal.showValidationMessage('Silakan lengkapi data');
+                    }
+                    return { kode: kode, nama: nama, type: type, satuanUkuran: satuanUkuran };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: base_url + '/material/tambah_material',
+                        data: {
+                            kode: result.value.kode,
+                            nama: result.value.nama,
+                            type: result.value.type,
+                            satuanUkuran: result.value.satuanUkuran
+                        },
+                        success: function(data) {
+                            dataSatuan(); // Update your data display here
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Material berhasil ditambahkan.',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        },
+                        error: function(xhr) {
+                            let d = JSON.parse(xhr.responseText);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: `${d.message}`,
+                                footer: '<a href="">Why do I have this issue?</a>'
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Data tidak dalam format yang diharapkan.',
+                footer: '<a href="">Why do I have this issue?</a>'
+            });
+        }
+    }).fail(function() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Gagal memuat data.',
+            footer: '<a href="">Why do I have this issue?</a>'
+        });
+    });
+});

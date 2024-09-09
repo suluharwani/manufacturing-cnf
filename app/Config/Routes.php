@@ -37,12 +37,23 @@ $routes->post('/material/tambah_satuan', 'MaterialController::tambah_satuan');
 //product
 $routes->post('/material/listdataProdukJoin', 'MaterialController::listdataProdukJoin');
 
-// $routes->post('/material/hapustype', 'MaterialController::material');
+// material
 $routes->post('/material/type_list', 'MaterialController::type_list');
 $routes->post('/material/satuan_list', 'MaterialController::satuan_list');
 $routes->post('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->get('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->post('/material/listdataMaterialJoin', 'MaterialController::listdataMaterialJoin');
+$routes->post('/material/tambah_material', 'MaterialController::tambah_material');
+
+// $routes->post('/material/get_types', 'MaterialController::get_types');
+// $routes->post('/material/get_satuan_ukuran', 'MaterialController::get_satuan_ukuran');
+
+
+
+
+
+
+
 $routes->post('/warehousecontroller/gudang_list', 'warehousecontroller::gudang_list');
 
 //datatables post user admin

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MaterialModel extends Model
+class MdlMaterial extends Model
 {
     protected $table            = 'materials';
     protected $primaryKey       = 'id';
@@ -12,7 +12,7 @@ class MaterialModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['id','kode','name','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

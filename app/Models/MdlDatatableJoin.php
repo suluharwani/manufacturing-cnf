@@ -25,7 +25,7 @@ class MdlDatatableJoin extends Model
         // Apply the dynamic joins
         foreach ($joins as $join) {
             // $this->builder->join($join[0], $join[1], $join[2]);
-            $this->builder->join($join[0], $join[1]);
+            $this->builder->join($join[0], $join[1],$join[2]);
         }
         
         $i = 0;

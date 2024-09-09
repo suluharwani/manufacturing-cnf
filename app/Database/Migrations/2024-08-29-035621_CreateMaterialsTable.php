@@ -19,19 +19,12 @@ class CreateMaterialsTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'type_id' => [
-                'id_type'       => 'INT',
-                'constraint'     => 11,
-                'null'       => true,
-            ],
+           
             'kode' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'gambar' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
-            ],
+            
             'supplier_id' => [
                 'type'       => 'INT',
                 'constraint'     => 11,

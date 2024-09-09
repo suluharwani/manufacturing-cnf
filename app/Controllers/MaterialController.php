@@ -81,7 +81,7 @@ class MaterialController extends BaseController
           $joins = [
               ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
               ['type', 'type.id = materials_detail.type_id', 'left'],
-              ['satuan', 'type.id = materials_detail.satuan_id', 'left'],
+              ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
 
           ];
   
@@ -259,4 +259,36 @@ class MaterialController extends BaseController
    
            return $this->response->setJSON($output);
        }
+
+       function tambah_material(){
+        $this->access('operator');
+        $userInfo = $_SESSION['auth'];
+        $MdlMaterial = new \App\Models\MdlMaterial();
+        $MdlMaterialDet = new \App\Models\MdlMaterialDet();
+        $dataMaterial = [
+          "kode" =>  $_POST["kode"],
+          "name" =>  $_POST["nama"]
+          
+        ];
+
+        if ($MdlMaterial->insert($dataMaterial)) {
+          $query = $MdlMaterial->orderBy('id', 'DESC')->first();
+          $materialDet =["material_id" => $query['id'],
+                         "type_id"=>$_POST["type"],
+                         "satuan_id"=>$_POST["type"],
+                        ];
+          if ($MdlMaterialDet->insert($materialDet)) {
+            $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan material: ".$_POST['nama']."";
+            header('HTTP/1.1 200 OK');
+          }
+        
+        }else{
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan material: ".$_POST['nama'];
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
+        }
+        $this->changelog->riwayat($riwayat);
+      
+    }
 }
