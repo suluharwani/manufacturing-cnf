@@ -275,7 +275,7 @@ class MaterialController extends BaseController
           $query = $MdlMaterial->orderBy('id', 'DESC')->first();
           $materialDet =["material_id" => $query['id'],
                          "type_id"=>$_POST["type"],
-                         "satuan_id"=>$_POST["type"],
+                         "satuan_id"=>$_POST["satuanUkuran"],
                         ];
           if ($MdlMaterialDet->insert($materialDet)) {
             $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan material: ".$_POST['nama']."";
@@ -311,11 +311,12 @@ class MaterialController extends BaseController
         $data = [
             'kode' => $this->request->getPost('kode'),
             'name' => $this->request->getPost('nama'),
-            'type_id' => $this->request->getPost('type'),
-            'satuan_id' => $this->request->getPost('satuanUkuran')
+            // 'type_id' => $this->request->getPost('type'),
+            // 'satuan_id' => $this->request->getPost('satuanUkuran')
         ];
 
         if ($model->update($id, $data)) {
+            
             return $this->response->setJSON(['message' => 'Material updated successfully']);
         } else {
             return $this->response->setJSON(['message' => 'Failed to update material'], 400);
