@@ -2,8 +2,7 @@ var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
 
 
-tabel();
-function tabel(){
+$(document).ready(function() {
   var dataTable = $('#tabel_serverside').DataTable( {
     "processing" : true,
     "oLanguage": {
@@ -33,8 +32,11 @@ function tabel(){
     "ajax":{
       "url" :base_url+"material/listdataMaterialJoin" , // json datasource 
       "type": "post",  // method  , by default get
+      // "async": false,
+      "dataType": 'json',
       "data":{},
     },
+    
     columns: [
     {},
     {mRender: function (data, type, row) {
@@ -82,7 +84,7 @@ function tabel(){
   }
 
 });
-};
+})
 
 $('.tambahJenisBarang').on('click',function(){
 
@@ -285,10 +287,7 @@ $('.tambahJenisBarang').on('click',function(){
         })
     ).done(function(typesResponse, satuanUkuranResponse) {
         // Debugging: Log the responses to check their structure
-        console.log('Types Response:', typesResponse[0]);
-        console.log('Satuan Ukuran Response:', satuanUkuranResponse[0]);
-
-        // Extract data
+             // Extract data
         const typesData = typesResponse[0]; // Array of types
         const satuanUkuranData = satuanUkuranResponse[0]; // Array of satuan ukuran
 
@@ -340,6 +339,7 @@ $('.tambahJenisBarang').on('click',function(){
                     $.ajax({
                         type: "POST",
                         url: base_url + '/material/tambah_material',
+                        async : false,
                         data: {
                             kode: result.value.kode,
                             nama: result.value.nama,
@@ -347,7 +347,7 @@ $('.tambahJenisBarang').on('click',function(){
                             satuanUkuran: result.value.satuanUkuran
                         },
                         success: function(data) {
-                            dataSatuan(); // Update your data display here
+                          
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',
@@ -355,6 +355,9 @@ $('.tambahJenisBarang').on('click',function(){
                                 showConfirmButton: false,
                                 timer: 1500
                             });
+                            $('#tabel_serverside').DataTable().ajax.reload();
+                            // tabel()
+                            // $('#tabel_serverside').dataTable( ).api().ajax.reload();
                         },
                         error: function(xhr) {
                             let d = JSON.parse(xhr.responseText);

@@ -43,6 +43,7 @@ $routes->post('/material/satuan_list', 'MaterialController::satuan_list');
 $routes->post('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->get('/material/listdataMaterial', 'MaterialController::listdataMaterial');
 $routes->post('/material/listdataMaterialJoin', 'MaterialController::listdataMaterialJoin');
+$routes->get('/material/listdataMaterialJoin', 'MaterialController::listdataMaterialJoin');
 $routes->post('/material/tambah_material', 'MaterialController::tambah_material');
 $routes->get('/material/get_material/(:any)', 'MaterialController::get_material/$1');
 $routes->post('/material/update_material', 'MaterialController::update_material');

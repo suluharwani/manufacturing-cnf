@@ -90,10 +90,17 @@ class MaterialController extends BaseController
           // Column Order Must Match Header Columns in View
           $column_order = array(
               NULL, 
-              'materials.name', 
               'materials.kode', 
+              'materials.name', 
+              'type.id',
               'materials.id',
-              'type.nama'
+              'materials.id',
+              'materials.id',
+              'materials.id',
+              'materials.id',
+              'materials.id',
+              'materials.id',
+              'materials.id'
           );
           $column_search = array(
               'materials.name', 
@@ -129,7 +136,9 @@ class MaterialController extends BaseController
               "data" => $data,
           );
   
-          return $this->response->setJSON($output);
+        //   return $this->response->setJSON($output);
+        
+          return json_encode($output);
       }
       function tambah_tipe(){
         $this->access('operator');
@@ -256,7 +265,8 @@ class MaterialController extends BaseController
                "recordsFiltered" => $serverside_model->count_filtered('product', $select_columns, $joins, $column_order, $column_search, $order, $where),
                "data" => $data,
            );
-   
+          
+
            return $this->response->setJSON($output);
        }
 
