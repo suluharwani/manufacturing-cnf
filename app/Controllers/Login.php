@@ -66,7 +66,7 @@ class Login extends BaseController
                 if ($userModel->affectedRows() > 0) {
                   $riwayat = "User {$_POST['nama_depan']} {$_POST['nama_belakang']} berhasil mendaftar sebagai admin";
                   $this->changelog->riwayat($riwayat);
-                  return redirect()->to('/');
+                  return redirect()->to('/dashboard');
                 }
               } else {
                 //  validation not ok
@@ -119,7 +119,7 @@ class Login extends BaseController
                           $this->session->set('logged', true);
                           $this->session->set('auth', $data_user);
           
-                          return redirect()->to('/');
+                          return redirect()->to('/dashboard');
                         }else{
                           $this->session->setFlashdata('login_error',  array("failed"=>"Login Failed: Incorrect username or password"));
                         }
