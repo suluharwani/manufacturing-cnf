@@ -74,3 +74,6 @@ $routes->post('/user/tambah_client', 'User::tambah_client');
 $routes->post('/user/hapus_client', 'User::hapus_client');
 $routes->post('/user/reset_password_client', 'User::reset_password_client');
 $routes->post('/user/ubah_status_client', 'User::ubah_status_client');
+//datatables post orders
+$routes->post('/order/listdataOrder', 'OrderController::listdataOrder');
+

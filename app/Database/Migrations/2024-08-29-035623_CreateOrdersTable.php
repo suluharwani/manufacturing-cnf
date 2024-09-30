@@ -19,13 +19,17 @@ class CreateOrdersTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'product_name' => [
+            'customer_id' => [
+                'type'       => 'INT',
+                'constraint' => '10',
+            ],
+            'customer_name' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-            'quantity' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+            'due' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'status' => [
                 'type'       => 'VARCHAR',
@@ -39,14 +43,15 @@ class CreateOrdersTable extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
-            'created_at' => [
-                'type'       => 'DATETIME',
-                'null'       => true,
-            ],
-            'updated_at' => [
-                'type'       => 'DATETIME',
-                'null'       => true,
-            ],
+           'updated_at' => [
+        'type' => 'datetime',
+        'null' => true,
+      ],
+      'deleted_at' => [
+        'type' => 'datetime',
+        'null' => true,
+      ],
+      'created_at datetime default current_timestamp',
         ]);
 
         $this->forge->addKey('id', true);
