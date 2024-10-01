@@ -261,7 +261,7 @@ $('.tambahJenisBarang').on('click',function(){
   }
 
   //MATERIAL
-  $('.tambahMaterial').on('click', function() {
+  $('.tambahInvoice').on('click', function() {
     $.when(
         $.ajax({
             url: base_url + '/material/type_list',
@@ -284,7 +284,7 @@ $('.tambahJenisBarang').on('click',function(){
             let satuanUkuranOptions = satuanUkuranData.map(satuan => `<option value="${satuan.id}">${satuan.nama}</option>`).join('');
 
             Swal.fire({
-                title: 'Tambah Material',
+                title: 'Tambah Invoice',
                 html: `
                     <form id="form_add_data">
                         <div class="form-group">
