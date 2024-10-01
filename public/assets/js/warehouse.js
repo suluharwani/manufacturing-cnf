@@ -173,9 +173,51 @@ $('.tambahWarehouse').on('click',function(){
                 table+=   `<td>${no++}</td>`;
                 table+=   `<td>${d[k].location}</td>`;
                 table+=   `<td>${d[k].name}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editType"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteType"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].name}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].name}" >Delete</a>`;
             table+=   `</tr>`
  
           })
    $('#isiGudang').html(table)
   }
+$('#isiGudang').on('click','.delete',function(){
+  id = $(this).attr('id');
+  nama = $(this).attr('nama');
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: ""+nama+" akan dihapus!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, hapus!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      param = {id:id, name:nama}
+      data = ''
+      $.ajax({
+        type : "POST",
+        url  : base_url+"warehousecontroller/delete",
+        async : false,
+        data:{param:param},
+        success: function(data){
+          dataGudang()
+          Swal.fire(
+            'Deleted!',
+            ''+nama+' telah dihapus.',
+            'success'
+            )
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+    }
+  })
+
+})

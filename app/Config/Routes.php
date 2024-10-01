@@ -60,6 +60,7 @@ $routes->post('/material/delete_material', 'MaterialController::delete_material'
 
 
 $routes->post('/warehousecontroller/gudang_list', 'warehousecontroller::gudang_list');
+$routes->post('/warehousecontroller/delete', 'warehousecontroller::delete');
 
 //datatables post user admin
 $routes->post('/user/listdata_user', 'User::listdata_user');

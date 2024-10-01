@@ -149,15 +149,16 @@ class WarehouseController extends BaseController
         $this->changelog->riwayat($riwayat);
       
     }
-    function hapus_gudang(){
+    function delete(){
         $this->access('operator');
-        $id = $_POST['id'];
-        $nama = $_POST['nama'];
-        $mdl = new \App\Models\MdlType();
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\Warehouse();
         $mdl->where('id',$id);
         $mdl->delete();
         if ($mdl->affectedRows()!=0) {
-          $riwayat = "Menghapus type $nama";
+          $riwayat = "Menghapus gudang $name";
           $this->changelog->riwayat($riwayat);
           header('HTTP/1.1 200 OK');
         }else {
