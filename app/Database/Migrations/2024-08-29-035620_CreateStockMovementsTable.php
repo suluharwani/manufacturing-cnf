@@ -35,7 +35,11 @@ class CreateStockMovementsTable extends Migration
                 'type'       => 'DATETIME',
                 'null'       => true,
             ],
-        ]);
+            'deleted_at' => [
+              'type' => 'datetime',
+              'null' => true,
+          ],
+      ]);
 
         $this->forge->addKey('id', true);
         $this->forge->createTable('stock_movements');

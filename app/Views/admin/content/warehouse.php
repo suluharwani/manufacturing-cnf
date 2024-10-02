@@ -20,7 +20,11 @@
             <div class="bg-light text-center rounded p-4">
                 <div class="d-flex align-items-center justify-content-between mb-4">
                     <h6 class="mb-0">Warehouse</h6>
-                    <button class="btn btn-primary tambahWarehouse">Tambah</button>
+                    <div class="justify-content-end">
+                    <button class="btn btn-warning restoreData">Deleted Data</button>
+                    <button class="btn btn-primary tambahWarehouse">Add</button>
+                    </div>
+                    
                 </div>
                 <!-- jenis barang -->
                 <div class="table-responsive" style="max-height: 300px;">
@@ -28,8 +32,8 @@
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">Lokasi</th>
-                                <th scope="col">Nama</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Name</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
@@ -94,6 +98,24 @@
 <!-- Widgets Start -->
 
 <!-- Widgets End -->
+<div class="modal modal_restore" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Halaman dihapus</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table" id = "tabelRestore">
+  
+</table>
 
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

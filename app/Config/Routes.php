@@ -10,7 +10,7 @@ $routes->get('/dashboard', 'Home::index');
 $routes->get('/test', 'Home::test');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
-$routes->post('/WarehouseController/buat_gudang_baru', 'WarehouseController::buat_gudang_baru');
+
 $routes->get('/login', 'Login');
 $routes->get('/signup', 'Login');
 $routes->post('/login', 'Login');
@@ -59,9 +59,13 @@ $routes->post('/material/delete_material', 'MaterialController::delete_material'
 
 
 
-$routes->post('/warehousecontroller/gudang_list', 'warehousecontroller::gudang_list');
-$routes->post('/warehousecontroller/delete', 'warehousecontroller::delete');
-
+$routes->post('/warehouseController/gudang_list', 'WarehouseController::gudang_list');
+$routes->post('/warehouseController/delete', 'WarehouseController::delete');
+$routes->post('/warehouseController/deletedData', 'WarehouseController::deletedData');
+$routes->post('/warehouseController/restoreData', 'WarehouseController::restoreData');
+$routes->post('/warehouseController/purgeData', 'WarehouseController::purgeData');
+$routes->post('/warehouseController/update', 'WarehouseController::update');
+$routes->post('/warehouseController/create', 'WarehouseController::create');
 //datatables post user admin
 $routes->post('/user/listdata_user', 'User::listdata_user');
 $routes->post('/user/tambah_admin', 'User::tambah_admin');

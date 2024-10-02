@@ -31,6 +31,27 @@ class WarehouseController extends BaseController
     {
         //
     }
+    function update(){
+      $this->access('operator');
+        $param = $_POST['params'];
+        $id = $param['id'];
+        $data['name'] = $param['name'];
+        $data['location'] = $param['location'];
+        $mdl = new \App\Models\Warehouse();
+        
+        $mdl->set($data);
+        $mdl->where('id',$id);
+        $mdl->update();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "update gudang {$data['name']}";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+    }
     function access($page){
         $check = new \App\Controllers\CheckAccess();
         $check->access($_SESSION['auth']['id'],$page);
@@ -129,7 +150,7 @@ class WarehouseController extends BaseController
   
           return $this->response->setJSON($output);
       }
-      function buat_gudang_baru(){
+      function create(){
         $this->access('operator');
         $userInfo = $_SESSION['auth'];
         $Mdl = new \App\Models\Warehouse();
@@ -167,11 +188,53 @@ class WarehouseController extends BaseController
           die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
        } 
+       function purgeData(){
+        $this->access('operator');
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\Warehouse();
+        $mdl->where('id',$id);
+        $mdl->purgeDeleted();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus permanen gudang $name";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
+       function restoreData(){
+        $this->access('operator');
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\Warehouse();
+        $mdl->set('deleted_at',null);
+        $mdl->where('id',$id);
+        $mdl->update();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus gudang $name";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
+       function deletedData(){
+        $this->access('operator');
+        $mdl = new \App\Models\Warehouse();
+        $data = $mdl->onlyDeleted()->findAll();
+        return json_encode($data);
+       }
        function gudang_list(){
         $this->access('operator');
         $mdl = new \App\Models\Warehouse();
-        $data = $mdl->get()
-                ->getResultArray();
+        $data = $mdl->findAll();
         return json_encode($data);
        }
        function tambah_satuan(){

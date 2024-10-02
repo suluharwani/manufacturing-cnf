@@ -19,7 +19,7 @@ class CreateMaterialsTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
-           
+            
             'kode' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
@@ -31,15 +31,15 @@ class CreateMaterialsTable extends Migration
                 'null'       => true,
             ],
             'updated_at' => [
-          'type' => 'datetime',
-          'null' => true,
-        ],
-        'deleted_at' => [
-          'type' => 'datetime',
-          'null' => true,
-        ],
-        'created_at datetime default current_timestamp',
-        ]);
+              'type' => 'datetime',
+              'null' => true,
+          ],
+          'deleted_at' => [
+              'type' => 'datetime',
+              'null' => true,
+          ],
+          'created_at datetime default current_timestamp',
+      ]);
 
         $this->forge->addKey('id', true);
         $this->forge->createTable('materials');
