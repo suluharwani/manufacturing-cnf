@@ -48,8 +48,12 @@ $routes->get('/material/listdataMaterialJoin', 'MaterialController::listdataMate
 $routes->post('/material/tambah_material', 'MaterialController::tambah_material');
 $routes->get('/material/get_material/(:any)', 'MaterialController::get_material/$1');
 $routes->post('/material/update_material', 'MaterialController::update_material');
-$routes->post('/material/delete_material', 'MaterialController::delete_material');
-
+$routes->post('/material/satuanDelete', 'MaterialController::satuanDelete');
+$routes->post('/material/typeDelete', 'MaterialController::typeDelete');
+$routes->post('/material/delete', 'MaterialController::delete');
+$routes->post('/material/materialUpdate', 'MaterialController::materialUpdate');
+$routes->post('/material/satuanUpdate', 'MaterialController::satuanUpdate');
+$routes->post('/material/typeUpdate', 'MaterialController::typeUpdate');
 // $routes->post('/material/get_types', 'MaterialController::get_types');
 // $routes->post('/material/get_satuan_ukuran', 'MaterialController::get_satuan_ukuran');
 

@@ -29,7 +29,7 @@ class MaterialController extends BaseController
 }
     public function index()
     {
-        //
+        // 
     }
     function access($page){
         $check = new \App\Controllers\CheckAccess();
@@ -334,15 +334,122 @@ class MaterialController extends BaseController
     }
 
     // Function to delete a material
-    public function delete_material()
-    {
-        $model = new \App\Models\MdlMaterial();
-        $id = $this->request->getPost('id');
-
-        if ($model->delete($id)) {
-            return $this->response->setJSON(['message' => 'Material deleted successfully']);
-        } else {
-            return $this->response->setJSON(['message' => 'Failed to delete material'], 400);
+function delete(){
+        $this->access('operator');
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\MdlMaterial();
+        $mdl->where('id',$id);
+        $mdl->delete();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus material $name";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
+    function satuanDelete(){
+        $this->access('operator');
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\MdlSatuan();
+        $mdl->where('id',$id);
+        $mdl->delete();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus satuan $name";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
+       function typeDelete(){
+        $this->access('operator');
+        $param = $_POST['param'];
+        $id = $param['id'];
+        $name = $param['name'];
+        $mdl = new \App\Models\MdlType();
+        $mdl->where('id',$id);
+        $mdl->delete();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "Menghapus tipe $name";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+       } 
+           function materialUpdate(){
+      $this->access('operator');
+        $param = $_POST['params'];
+        $id = $param['id'];
+        $data['nama'] = $param['name'];
+        $data['kode'] = $param['code'];
+        $mdl = new \App\Models\MdlMaterial();
+        
+        $mdl->set($data);
+        $mdl->where('id',$id);
+        $mdl->update();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "update material {$data['nama']}";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+    }
+        function satuanUpdate(){
+      $this->access('operator');
+        $param = $_POST['params'];
+        $id = $param['id'];
+        $data['nama'] = $param['name'];
+        $data['kode'] = $param['code'];
+        $mdl = new \App\Models\MdlSatuan();
+        
+        $mdl->set($data);
+        $mdl->where('id',$id);
+        $mdl->update();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "update satuan {$data['name']}";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+    }
+        function typeUpdate(){
+      $this->access('operator');
+        $param = $_POST['params'];
+        $id = $param['id'];
+        $data['nama'] = $param['name'];
+        $data['kode'] = $param['code'];
+        $mdl = new \App\Models\MdlType();
+        
+        $mdl->set($data);
+        $mdl->where('id',$id);
+        $mdl->update();
+        if ($mdl->affectedRows()!=0) {
+          $riwayat = "update type {$data['nama']}";
+          $this->changelog->riwayat($riwayat);
+          header('HTTP/1.1 200 OK');
+        }else {
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
     }
 }
+ 

@@ -67,7 +67,7 @@ $(document).ready(function() {
     }},
 
     {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" >Edit</a>`; 
+    return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" >Delete</a>`; 
     }
     }
   ],
@@ -228,7 +228,7 @@ $('.tambahJenisBarang').on('click',function(){
                 table+=   `<td>${no++}</td>`;
                 table+=   `<td>${d[k].kode}</td>`;
                 table+=   `<td>${d[k].nama}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editType"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteType"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" code = "${d[k].kode}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
             table+=   `</tr>`
  
           })
@@ -263,9 +263,9 @@ $('.tambahJenisBarang').on('click',function(){
     $.each(d, function(k, v){
             table+=     `<tr>`;
                 table+=   `<td>${no++}</td>`;
-                table+=   `<td>${d[k].nama}</td>`;
                 table+=   `<td>${d[k].kode}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editSatuan"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteSatuan"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+                table+=   `<td>${d[k].nama}</td>`;
+                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" kode = "${d[k].kode}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
             table+=   `</tr>`
  
           })
@@ -510,43 +510,254 @@ $('.tambahJenisBarang').on('click',function(){
   });
 
   // Function to handle material deletion
-  $(document).on('click', '.deleteMaterial', function() {
-      const materialId = $(this).data('id');
 
-      Swal.fire({
-          title: 'Are you sure?',
-          text: "Material ini akan dihapus!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-          if (result.isConfirmed) {
-              $.ajax({
-                  type: "POST",
-                  url: base_url + '/material/delete_material',
-                  data: { id: materialId },
-                  success: function(data) {
-                      dataSatuan(); // Update your data display here
-                      Swal.fire({
-                          position: 'center',
-                          icon: 'success',
-                          title: 'Material berhasil dihapus.',
-                          showConfirmButton: false,
-                          timer: 1500
-                      });
-                  },
-                  error: function(xhr) {
-                      let d = JSON.parse(xhr.responseText);
-                      Swal.fire({
-                          icon: 'error',
-                          title: 'Oops...',
-                          text: `${d.message}`,
-                          footer: '<a href="">Why do I have this issue?</a>'
-                      });
-                  }
-              });
-          }
+$('#isiType').on('click','.delete',function(){
+  id = $(this).attr('id');
+  nama = $(this).attr('nama');
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: ""+nama+" akan dihapus!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, hapus!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      param = {id:id, name:nama}
+      data = ''
+      $.ajax({
+        type : "POST",
+        url  : base_url+"material/typeDelete",
+        async : false,
+        data:{param:param},
+        success: function(data){
+          dataTypeBarang()
+          Swal.fire(
+            'Deleted!',
+            ''+nama+' telah dihapus.',
+            'success'
+            )
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
       });
-  });
+    }
+  })
+
+})
+$('#isiSatuan').on('click','.delete',function(){
+  id = $(this).attr('id');
+  nama = $(this).attr('nama');
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: ""+nama+" akan dihapus!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, hapus!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      param = {id:id, name:nama}
+      data = ''
+      $.ajax({
+        type : "POST",
+        url  : base_url+"material/satuanDelete",
+        async : false,
+        data:{param:param},
+        success: function(data){
+          dataSatuan()
+          Swal.fire(
+            'Deleted!',
+            ''+nama+' telah dihapus.',
+            'success'
+            )
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+    }
+  })
+
+})
+$('#tabel_serverside').on('click','.delete',function(){
+  id = $(this).attr('id');
+  nama = $(this).attr('nama');
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: ""+nama+" akan dihapus!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, hapus!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      param = {id:id, name:nama}
+      data = ''
+      $.ajax({
+        type : "POST",
+        url  : base_url+"material/delete",
+        async : false,
+        data:{param:param},
+        success: function(data){
+          dataGudang()
+          Swal.fire(
+            'Deleted!',
+            ''+nama+' telah dihapus.',
+            'success'
+            )
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+    }
+  })
+
+})
+$('#isiType').on('click','.edit',function(){
+  let id = $(this).attr('id');
+  let nama = $(this).attr('nama');
+  let code = $(this).attr('code');
+
+  Swal.fire({
+    title: `Edit `,
+    html: `<form id="form_edit_data">
+      <div class="form-group">
+      <label for="kode">Code</label>
+      <input type="text" class="form-control" id="code" aria-describedby="code" placeholder="code" value= "${code}">
+
+      </div>
+      <div class="form-group">
+      <label for="namaWarehouse">WH Name</label>
+      <input type="text" class="form-control" id="name" aria-describedby="name" placeholder="name" value= "${nama}">
+
+      </div>
+      </form>
+    `,
+    confirmButtonText: 'Confirm',
+    focusConfirm: false,
+    preConfirm: () => {
+      const location = Swal.getPopup().querySelector('#location').value
+      const name = Swal.getPopup().querySelector('#name').value
+      if (!name||!location) {
+        Swal.showValidationMessage('Silakan lengkapi data')
+      }
+      
+      return {name:name, location:location  }
+    }
+  }).then((result) => {
+    params = {name:result.value.name,id:id,location:result.value.location}
+    $.ajax({
+      type : "POST",
+      url  : base_url+'/warehouseController/update',
+      async : false,
+      // dataType : "JSON",
+      data : {params},
+      success: function(data){
+        dataGudang()
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `Halaman ${nama} berhasil diubah menjadi ${result.value.name}.`,
+          showConfirmButton: false,
+          timer: 2500
+        })
+      },
+      error: function(xhr){
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        })
+      }
+    });
+
+  })
+});
+$('#isiSatuan').on('click','.edit',function(){
+  let id = $(this).attr('id');
+  let nama = $(this).attr('nama');
+  let kode = $(this).attr('kode');
+
+  Swal.fire({
+    title: `Edit Warehouse `,
+    html: `<form id="form_edit_data">
+      <div class="form-group">
+      <label for="kode">Code</label>
+      <input type="text" class="form-control" id="kode" aria-describedby="location" placeholder="location" value= "${kode}">
+
+      </div>
+      <div class="form-group">
+      <label for="namaWarehouse">WH Name</label>
+      <input type="text" class="form-control" id="name" aria-describedby="name" placeholder="name" value= "${nama}">
+
+      </div>
+      </form>
+    `,
+    confirmButtonText: 'Confirm',
+    focusConfirm: false,
+    preConfirm: () => {
+      const location = Swal.getPopup().querySelector('#location').value
+      const name = Swal.getPopup().querySelector('#name').value
+      if (!name||!location) {
+        Swal.showValidationMessage('Silakan lengkapi data')
+      }
+      
+      return {name:name, location:location  }
+    }
+  }).then((result) => {
+    params = {name:result.value.name,id:id,location:result.value.location}
+    $.ajax({
+      type : "POST",
+      url  : base_url+'/warehouseController/update',
+      async : false,
+      // dataType : "JSON",
+      data : {params},
+      success: function(data){
+        dataGudang()
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `Halaman ${nama} berhasil diubah menjadi ${result.value.name}.`,
+          showConfirmButton: false,
+          timer: 2500
+        })
+      },
+      error: function(xhr){
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        })
+      }
+    });
+
+  })
+});
