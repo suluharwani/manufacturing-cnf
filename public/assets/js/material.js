@@ -67,7 +67,7 @@ $(document).ready(function() {
     }},
 
     {mRender: function (data, type, row) {
-    return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" >Delete</a>`; 
+    return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" nama="${row[2]}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" nama="${row[2]}" >Delete</a>`; 
     }
     }
   ],
@@ -459,18 +459,21 @@ $('.tambahJenisBarang').on('click',function(){
                   }
               }).then((result) => {
                   if (result.isConfirmed) {
-                      $.ajax({
-                          type: "POST",
-                          url: base_url + '/material/update_material',
-                          data: {
+                    param = {
                               id: result.value.id,
                               kode: result.value.kode,
                               nama: result.value.nama,
                               type: result.value.type,
                               satuanUkuran: result.value.satuanUkuran
+                          }
+                      $.ajax({
+                          type: "POST",
+                          url: base_url + '/material/materialUpdate',
+                          data: {
+                             param
                           },
                           success: function(data) {
-                              dataSatuan(); // Update your data display here
+                              $('#tabel_serverside').DataTable().ajax.reload();
                               Swal.fire({
                                   position: 'center',
                                   icon: 'success',
@@ -616,7 +619,7 @@ $('#tabel_serverside').on('click','.delete',function(){
         async : false,
         data:{param:param},
         success: function(data){
-          dataGudang()
+          $('#tabel_serverside').DataTable().ajax.reload();
           Swal.fire(
             'Deleted!',
             ''+nama+' telah dihapus.',
@@ -660,24 +663,24 @@ $('#isiType').on('click','.edit',function(){
     confirmButtonText: 'Confirm',
     focusConfirm: false,
     preConfirm: () => {
-      const location = Swal.getPopup().querySelector('#location').value
+      const code = Swal.getPopup().querySelector('#code').value
       const name = Swal.getPopup().querySelector('#name').value
-      if (!name||!location) {
+      if (!name||!code) {
         Swal.showValidationMessage('Silakan lengkapi data')
       }
       
-      return {name:name, location:location  }
+      return {name:name, code:code  }
     }
   }).then((result) => {
-    params = {name:result.value.name,id:id,location:result.value.location}
+    params = {name:result.value.name,id:id,code:result.value.code}
     $.ajax({
       type : "POST",
-      url  : base_url+'/warehouseController/update',
+      url  : base_url+'/material/typeUpdate',
       async : false,
       // dataType : "JSON",
       data : {params},
       success: function(data){
-        dataGudang()
+        dataTypeBarang()
         Swal.fire({
           position: 'center',
           icon: 'success',
@@ -709,7 +712,7 @@ $('#isiSatuan').on('click','.edit',function(){
     html: `<form id="form_edit_data">
       <div class="form-group">
       <label for="kode">Code</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="location" placeholder="location" value= "${kode}">
+      <input type="text" class="form-control" id="code" aria-describedby="code" placeholder="code" value= "${kode}">
 
       </div>
       <div class="form-group">
@@ -719,27 +722,27 @@ $('#isiSatuan').on('click','.edit',function(){
       </div>
       </form>
     `,
-    confirmButtonText: 'Confirm',
+    confirmButtonText: 'Update',
     focusConfirm: false,
     preConfirm: () => {
-      const location = Swal.getPopup().querySelector('#location').value
+      const code = Swal.getPopup().querySelector('#code').value
       const name = Swal.getPopup().querySelector('#name').value
-      if (!name||!location) {
+      if (!name||!code) {
         Swal.showValidationMessage('Silakan lengkapi data')
       }
       
-      return {name:name, location:location  }
+      return {name:name, code:code  }
     }
   }).then((result) => {
-    params = {name:result.value.name,id:id,location:result.value.location}
+    params = {name:result.value.name,id:id,code:result.value.code}
     $.ajax({
       type : "POST",
-      url  : base_url+'/warehouseController/update',
+      url  : base_url+'/material/satuanUpdate',
       async : false,
       // dataType : "JSON",
       data : {params},
       success: function(data){
-        dataGudang()
+        dataSatuan()
         Swal.fire({
           position: 'center',
           icon: 'success',

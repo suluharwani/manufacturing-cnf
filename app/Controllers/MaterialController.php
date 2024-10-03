@@ -314,29 +314,13 @@ class MaterialController extends BaseController
     }
 
     // Function to update material details
-    public function update_material()
-    {
-        $model = new \App\Models\MdlMaterial();
-        $id = $this->request->getPost('id');
-        $data = [
-            'kode' => $this->request->getPost('kode'),
-            'name' => $this->request->getPost('nama'),
-            // 'type_id' => $this->request->getPost('type'),
-            // 'satuan_id' => $this->request->getPost('satuanUkuran')
-        ];
 
-        if ($model->update($id, $data)) {
-            
-            return $this->response->setJSON(['message' => 'Material updated successfully']);
-        } else {
-            return $this->response->setJSON(['message' => 'Failed to update material'], 400);
-        }
-    }
 
     // Function to delete a material
 function delete(){
         $this->access('operator');
         $param = $_POST['param'];
+
         $id = $param['id'];
         $name = $param['name'];
         $mdl = new \App\Models\MdlMaterial();
@@ -349,7 +333,7 @@ function delete(){
         }else {
           header('HTTP/1.1 500 Internal Server Error');
           header('Content-Type: application/json; charset=UTF-8');
-          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => $param)));
         }
        } 
     function satuanDelete(){
@@ -390,17 +374,26 @@ function delete(){
        } 
            function materialUpdate(){
       $this->access('operator');
-        $param = $_POST['params'];
+        $param = $_POST['param'];
         $id = $param['id'];
-        $data['nama'] = $param['name'];
-        $data['kode'] = $param['code'];
+        $data['name'] = $param['nama'];
+        $data['kode'] = $param['kode'];
+        $dataDet['type_id'] = $param['type'];
+        $dataDet['satuan_id'] = $param['satuanUkuran'];
+
         $mdl = new \App\Models\MdlMaterial();
-        
+        $mdlDet = new \App\Models\MdlMaterialDet();
         $mdl->set($data);
         $mdl->where('id',$id);
         $mdl->update();
+
+
+         $mdlDet->set($dataDet);
+            $mdlDet->where('material_id',$id);
+            $mdlDet->update();
         if ($mdl->affectedRows()!=0) {
-          $riwayat = "update material {$data['nama']}";
+           
+          $riwayat = "update material {$data['name']}";
           $this->changelog->riwayat($riwayat);
           header('HTTP/1.1 200 OK');
         }else {
@@ -421,7 +414,7 @@ function delete(){
         $mdl->where('id',$id);
         $mdl->update();
         if ($mdl->affectedRows()!=0) {
-          $riwayat = "update satuan {$data['name']}";
+          $riwayat = "update satuan {$data['nama']}";
           $this->changelog->riwayat($riwayat);
           header('HTTP/1.1 200 OK');
         }else {
