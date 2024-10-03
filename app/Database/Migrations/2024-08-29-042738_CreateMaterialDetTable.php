@@ -27,6 +27,10 @@ class CreateMaterialDetTable extends Migration
                 'type'       => 'INT',
                 'constraint' => '11',
             ],
+            'kite' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '20',
+            ],
             'gambar' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',

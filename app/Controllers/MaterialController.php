@@ -286,6 +286,7 @@ class MaterialController extends BaseController
           $materialDet =["material_id" => $query['id'],
                          "type_id"=>$_POST["type"],
                          "satuan_id"=>$_POST["satuanUkuran"],
+                         "kite" =>  $_POST["kite"]
                         ];
           if ($MdlMaterialDet->insert($materialDet)) {
             $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan material: ".$_POST['nama']."";
@@ -379,6 +380,7 @@ function delete(){
         $data['name'] = $param['nama'];
         $data['kode'] = $param['kode'];
         $dataDet['type_id'] = $param['type'];
+        $dataDet['kite'] = $param['kite'];
         $dataDet['satuan_id'] = $param['satuanUkuran'];
 
         $mdl = new \App\Models\MdlMaterial();
