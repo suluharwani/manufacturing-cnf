@@ -75,7 +75,7 @@ class MaterialController extends BaseController
           $request = \Config\Services::request();
           
           // Define the columns to select
-          $select_columns = 'materials.*, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan';
+          $select_columns = 'materials.*, materials_detail.kite as kite, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan';
           
           // Define the joins (you can add more joins as needed)
           $joins = [
@@ -93,7 +93,7 @@ class MaterialController extends BaseController
               'materials.kode', 
               'materials.name', 
               'type.id',
-              'materials.id',
+              'materials_detail.kite',
               'materials.id',
               'materials.id',
               'materials.id',
@@ -121,7 +121,7 @@ class MaterialController extends BaseController
               $row[] = $lists->id;
               $row[] = $lists->name;
               $row[] = $lists->kode;
-              $row[] = $lists->type_id;
+              $row[] = $lists->kite;
               $row[] = $lists->nama_type;
               $row[] = $lists->kode_satuan;
               $row[] = $lists->satuan;

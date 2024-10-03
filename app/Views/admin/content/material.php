@@ -82,7 +82,7 @@
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
+                  <th style=" text-align: center;">Import/Export</th>
                   <th style=" text-align: center;">Sales Order</th>
                   <th style=" text-align: center;">Tersedia</th>
                   <th style=" text-align: center;">Tersedia Sales Order</th>
@@ -96,7 +96,7 @@
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
+                  <th style=" text-align: center;">Import/Export</th>
                   <th style=" text-align: center;">Sales Order</th>
                   <th style=" text-align: center;">Tersedia</th>
                   <th style=" text-align: center;">Tersedia Sales Order</th>

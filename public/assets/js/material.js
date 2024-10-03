@@ -50,7 +50,7 @@ $(document).ready(function() {
        return row[5]
      }},
      {mRender: function (data, type, row) {
-       return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+       return row[4]; 
      }},
 
      {mRender: function (data, type, row) {
@@ -320,7 +320,7 @@ $('.tambahMaterial').on('click', function() {
             </select>
             </div>
             <div class="form-group">
-            <label for="type">EXIM status</label>
+            <label for="type">Import Export Status</label>
             <select class="form-control" id="kite">
             <option value="kite">KITE</option>
             <option value="non_kite">Non-KITE</option>
@@ -452,7 +452,7 @@ $(document).on('click', '.editMaterial', function() {
               </select>
               </div>
                <div class="form-group">
-            <label for="type">EXIM status</label>
+            <label for="type">Import Export Status</label>
             <select class="form-control" id="kite">
             <option value="kite" ${materialData.kite == 'kite' ? 'selected' : ''}>KITE</option>
             <option value="non_kite"${materialData.kite == 'non_kite' ? 'selected' : ''}>Non-KITE</option>
