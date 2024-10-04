@@ -7,6 +7,9 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Homepage::index');
 $routes->get('/dashboard', 'Home::index');
+$routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
+$routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
+
 $routes->get('/test', 'Home::test');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');

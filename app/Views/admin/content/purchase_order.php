@@ -21,7 +21,7 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Persediaan Material</h6>
-                        <button class= "btn btn-primary">Tambah</button>
+                        <button class= "btn btn-primary addPurchaseOrder">Tambah</button>
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">

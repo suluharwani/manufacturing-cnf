@@ -24,6 +24,11 @@ class CreateMaterialsTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => '255',
             ],
+             'picture' => [
+                'type'       => 'VARCHAR',
+                'constraint' => '255',
+            ],
+            
             
             'supplier_id' => [
                 'type'       => 'INT',

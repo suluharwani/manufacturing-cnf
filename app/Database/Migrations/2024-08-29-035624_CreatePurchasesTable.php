@@ -15,9 +15,9 @@ class CreatePurchasesTable extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'purchase_number' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
+            'invoice_id' => [
+                'type'       => 'INT',
+                'constraint' => 11,
             ],
             'material_id' => [
                 'type'       => 'INT',
@@ -25,16 +25,16 @@ class CreatePurchasesTable extends Migration
                 'unsigned'   => true,
             ],
             'quantity' => [
-                'type'       => 'INT',
-                'constraint' => 11,
+                'type'       => 'FLOAT',
+                'constraint' => 15,
             ],
             'status' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '50',
-                'default'    => 'ordered',
+                'constraint' => 55,
             ],
             'purchase_date' => [
                 'type' => 'DATETIME',
+                'null' => true,
             ],
             'delivery_date' => [
                 'type' => 'DATETIME',
@@ -49,10 +49,10 @@ class CreatePurchasesTable extends Migration
                 'null'       => true,
             ],
             'deleted_at' => [
-          'type' => 'datetime',
-          'null' => true,
-        ],
-        ]);
+              'type' => 'datetime',
+              'null' => true,
+          ],
+      ]);
 
         $this->forge->addKey('id', true);
         $this->forge->createTable('purchases');
