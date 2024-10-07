@@ -65,5 +65,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/purchase.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

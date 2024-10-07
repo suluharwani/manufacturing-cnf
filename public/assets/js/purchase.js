@@ -84,3 +84,59 @@ $(document).ready(function() {
 
 });
 })
+
+$('.addPurchaseOrder').on('click',function(){
+
+    Swal.fire({
+      title: `Tambah Invoice Masuk `,
+      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
+      html:`<form id="form_add_data">
+      <div class="form-group">
+      <label for="kode">Nomor Invoice</label>
+      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+      </div>
+      <div class="form-group">
+      <label for="namaBarang">Mata uang</label>
+      <input type="text" class="form-control" id="namaBarang" placeholder="Nama Tipe">
+      </div>
+      </form>`,
+      confirmButtonText: 'Confirm',
+      focusConfirm: false,
+      preConfirm: () => {
+        const kode = Swal.getPopup().querySelector('#kode').value
+        const nama = Swal.getPopup().querySelector('#namaBarang').value
+        if (!kode || !nama) {
+          Swal.showValidationMessage('Silakan lengkapi data')
+        }
+        return {kode:kode, nama: nama }
+      }
+    }).then((result) => {
+      $.ajax({
+        type : "POST",
+        url  : base_url+'/material/tambah_tipe',
+        async : false,
+        // dataType : "JSON",
+        data : {kode:result.value.kode,nama:result.value.nama},
+        success: function(data){
+          dataTypeBarang()
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `Jenis barang berhasil ditambahkan.`,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+  
+    })
+  })

@@ -75,7 +75,7 @@
                                     <th scope="col">Rate 1 IDR</th>
                                     <th scope="col">New Date</th>
                                     <th scope="col">Rate 1 IDR</th>
-                                    <th scope="col">Graph</th>
+                                    <th scope="col">Graph IDR</th>
                                 </tr>
                             </thead>
                             <tbody id="tableCurrency">
