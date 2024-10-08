@@ -344,5 +344,38 @@ return json_encode($output);
 
   }
 
+  function employeeData(){
 
+        $this->access('operator');
+        $serverside_model = new \App\Models\Mdl_datatables_2();
+        $request = \Config\Services::request();
+        $list_data = $serverside_model;
+        $where = ['pegawai_status !=' => 0];
+                //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
+                //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
+        $column_order = array(NULL,'pegawai.pegawai_nama','pegawai.pegawai_nip','pegawai.pegawai_id');
+        $column_search = array('pegawai.pegawai_nama','pegawai.pegawai_nip','pegawai.pegawai_id');
+        $order = array('pegawai.pegawai_id' => 'desc');
+        $list = $list_data->get_datatables('pegawai', $column_order, $column_search, $order, $where);
+        $data = array();
+        $no = $request->getPost("start");
+        foreach ($list as $lists) {
+          $no++;
+          $row    = array();
+          $row[] = $no;
+          $row[] = $lists->pegawai_id;
+          $row[] = $lists->pegawai_nama;
+          $row[] = $lists->pegawai_nip;
+        
+          $data[] = $row;
+      }
+      $output = array(
+          "draw" => $request->getPost("draw"),
+          "recordsTotal" => $list_data->count_all('pegawai', $where),
+          "recordsFiltered" => $list_data->count_filtered('pegawai', $column_order, $column_search, $order, $where),
+          "data" => $data,
+      );
+      return json_encode($output);
+
+}
 }

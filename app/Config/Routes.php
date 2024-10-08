@@ -13,6 +13,9 @@ $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData
 $routes->get('/test', 'Home::test');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
+$routes->get('/employee', 'Home::employee');
+$routes->post('/employeeData', 'User::employeeData');
+$routes->get('/employeeData', 'User::employeeData');
 
 $routes->get('/login', 'Login');
 $routes->get('/signup', 'Login');

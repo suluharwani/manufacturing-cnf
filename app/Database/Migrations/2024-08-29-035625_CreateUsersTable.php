@@ -17,20 +17,20 @@ class CreateUsersTable extends Migration
             ],
             'nama_depan' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '200',
             ],
             'nama_belakang' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '200',
             ],
             'email' => [
                 'type'       => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '200',
                 'unique'     => true,
             ],
             'password' => [
                 'type' => 'VARCHAR',
-                'constraint' => '255',
+                'constraint' => '200',
             ],
             'level' => [
                 'type' => 'VARCHAR',

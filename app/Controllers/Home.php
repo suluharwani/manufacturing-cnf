@@ -187,5 +187,12 @@ class Home extends BaseController
         $data['content'] = view('admin/content/track_purchase_delivery');
         return view('admin/index', $data);
     }
+        public function employee()
+    {
+        $data['group'] = 'Employee';
+        $data['title'] = 'Employee';
+        $data['content'] = view('admin/content/employee');
+        return view('admin/index', $data);
+    }
 
 }
