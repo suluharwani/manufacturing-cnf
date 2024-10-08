@@ -353,8 +353,8 @@ return json_encode($output);
         $where = ['pegawai_status !=' => 0];
                 //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
                 //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
-        $column_order = array(NULL,'pegawai.pegawai_nama','pegawai.pegawai_nip','pegawai.pegawai_id');
-        $column_search = array('pegawai.pegawai_nama','pegawai.pegawai_nip','pegawai.pegawai_id');
+        $column_order = array(NULL,'pegawai.pegawai_nip','pegawai.pegawai_nama','pegawai.pegawai_pin','pegawai.pegawai_id');
+        $column_search = array('pegawai.pegawai_nip','pegawai.pegawai_nama','pegawai.pegawai_pin','pegawai.pegawai_id');
         $order = array('pegawai.pegawai_id' => 'desc');
         $list = $list_data->get_datatables('pegawai', $column_order, $column_search, $order, $where);
         $data = array();
@@ -366,6 +366,8 @@ return json_encode($output);
           $row[] = $lists->pegawai_id;
           $row[] = $lists->pegawai_nama;
           $row[] = $lists->pegawai_nip;
+          $row[] = $lists->pegawai_pin;
+          $row[] = $lists->tgl_masuk_pertama;
         
           $data[] = $row;
       }
@@ -377,5 +379,18 @@ return json_encode($output);
       );
       return json_encode($output);
 
+}
+public function getPresensi()
+{
+    $pin = $this->request->getPost('pin');
+    $id = $this->request->getPost('id');
+    $startDate = $this->request->getPost('startDate');
+    $endDate = $this->request->getPost('endDate');
+
+    // Load model and fetch data
+    $model = new \App\Models\AttendanceModel();
+    $data = $model->getAttendanceData($pin, $id, $startDate, $endDate); // Implement this method in your model
+
+    return $this->response->setJSON(['data' => $data]);
 }
 }
