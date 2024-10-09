@@ -70,7 +70,7 @@
                             <a href="<?=base_url('role')?>" class="dropdown-item">Roles & Permissions</a>
                             <a href="<?=base_url('activitylog')?>" class="dropdown-item">User Activity logs</a>
                             <a href="<?=base_url('employee')?>" class="dropdown-item">Employee</a>
-                            
+                            <a href="<?=base_url('salary')?>" class="dropdown-item">Salary Setting</a>
                         </div>
                     </div>
 

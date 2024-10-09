@@ -85,7 +85,89 @@ $(document).ready(function() {
       return;
     }
 
+    refreshPopupContent(pin, id, startDate,endDate)
+  });
+});
+
+});
+
+
+function getDayName(input) {
+    let date;
+    
+    if (typeof input === 'string') {
+        date = new Date(input);
+    } else if (input instanceof Date) {
+        date = input;
+    } else {
+        throw new TypeError('Argument must be a Date object or a valid date string');
+    }
+    
+    const options = { weekday: 'long' };
+    return date.toLocaleDateString('id-ID', options);
+}
+$('#popupContent').on('click','.addAttendance',function(){
+  let id = $(this).attr('id');
+  let pin = $(this).attr('pin');
+  let date = $(this).attr('date');
+  let startDate = $(this).attr('startDate');
+  let endDate = $(this).attr('endDate');
+
+  Swal.fire({
+    title: `Edit `,
+    html: `<form id="form_edit_data">
+    <div class="form-group">
+    <label for="time">Jam Kerja Masuk/Pulang</label>
+    <input type="time" class="form-control" id="time" aria-describedby="time"  >
+    </div>
+    </form>
+    `,
+    confirmButtonText: 'Confirm',
+    focusConfirm: false,
+    preConfirm: () => {
+      const time = Swal.getPopup().querySelector('#time').value
+      if (!time) {
+        Swal.showValidationMessage('Silakan lengkapi data')
+      }
+      
+      return {time:time}
+    }
+  }).then((result) => {
+    params = {pin:pin,date:date,time:result.value.time}
+
     $.ajax({
+      type : "POST",
+      url  : base_url+'/user/updateAttendance',
+      async : false,
+      // dataType : "JSON",
+      data : {params},
+      success: function(data){
+
+        refreshPopupContent(pin, id,startDate, endDate); 
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `Jam kerja berhasil ditambahkan.`,
+          showConfirmButton: false,
+          timer: 2500
+        })
+      },
+      error: function(xhr){
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        })
+      }
+    });
+
+  })
+});
+function refreshPopupContent(pin, id, startDate,endDate) {
+$('#popupContent').empty();
+        $.ajax({
       url: base_url + 'user/getPresensi',
       type: 'POST',
       data: { pin: pin, id: id, startDate: startDate, endDate: endDate },
@@ -116,10 +198,17 @@ let totalDurationMinutes = 0;
 let workDay = 0;
 $.each(groupedData, function(date, entries) {
   let inTime, outTime;
-
+  let time1,time2;
   // Get the first entry as Jam Masuk and the last as Jam Keluar
-  inTime = new Date(entries[0].scan_date);
-  outTime = new Date(entries[entries.length - 1].scan_date);
+  time1 = new Date(entries[0].scan_date);
+  time2 = new Date(entries[entries.length - 1].scan_date);
+  if (time1<time2) {
+    inTime = time1;
+    outTime = time2
+  }else{
+    inTime = time2;
+    outTime = time1
+  }
 
   if (inTime && outTime) {
     const duration = (outTime - inTime) / (1000 * 60); // Duration in minutes
@@ -135,6 +224,7 @@ $.each(groupedData, function(date, entries) {
                <td>${formattedInTime}</td>
                <td>${formattedOutTime}</td>
                <td>${totalHours} jam ${parseInt(totalMinutes)} menit</td>
+               <td><a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" id = "${id}" startDate = "${startDate}" endDate = "${endDate}" pin = "${entries[0].pin}" date = "${date}">Tambah Data</a></td>
              </tr>`;
   }
 });
@@ -151,23 +241,4 @@ html += `<div>Hari kerja: ${workDay} hari, Total Durasi Kerja: ${Math.floor(tota
         alert("Error fetching data.");
       }
     });
-  });
-});
-
-});
-
-
-function getDayName(input) {
-    let date;
-    
-    if (typeof input === 'string') {
-        date = new Date(input);
-    } else if (input instanceof Date) {
-        date = input;
-    } else {
-        throw new TypeError('Argument must be a Date object or a valid date string');
-    }
-    
-    const options = { weekday: 'long' };
-    return date.toLocaleDateString('id-ID', options);
 }

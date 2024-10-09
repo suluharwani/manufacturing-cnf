@@ -1,21 +1,42 @@
 <?php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AttendanceModel extends Model
+class MdlEffectiveHours extends Model
 {
     protected $DBGroup          = 'tests';
-    protected $table = 'att_log';
+    protected $table            = 'effectivehours';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['sn', 'scan_date', 'pin', 'verifymode','inoutmode','reserved','work_code','att_id'];
+    protected $allowedFields = [
+        'id',
+        'day',
+        'work_start',
+        'work_end',
+        'overtime_start',
+        'overtime_end',
+        'work_break',
+        'work_break_end',
+        'overtime_break',
+        'overtime_break_end',
+        'updated_at',
+        'deleted_at',
+        'created_at'
+    ];
 
-        // Dates
-    protected $useTimestamps = false;
+    protected bool $allowEmptyInserts = false;
+    protected bool $updateOnlyChanged = true;
+
+    protected array $casts = [];
+    protected array $castHandlers = [];
+
+    // Dates
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -37,11 +58,4 @@ class AttendanceModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-public function getAttendanceData($pin, $id, $startDate, $endDate)
-{
-    return $this->where('pin', $pin)
-                ->where('scan_date >=', $startDate)
-                ->where('scan_date <=', $endDate)
-                ->findAll();
-}
 }

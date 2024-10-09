@@ -194,5 +194,11 @@ class Home extends BaseController
         $data['content'] = view('admin/content/employee');
         return view('admin/index', $data);
     }
-
+        public function salarySetting()
+    {
+        $data['group'] = 'Salary Setting';
+        $data['title'] = 'Salary Setting';
+        $data['content'] = view('admin/content/salarySetting');
+        return view('admin/index', $data);
+    }
 }

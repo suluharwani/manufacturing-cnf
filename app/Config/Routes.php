@@ -14,6 +14,7 @@ $routes->get('/test', 'Home::test');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
 $routes->get('/employee', 'Home::employee');
+$routes->get('/salary', 'Home::salarySetting');
 $routes->post('/employeeData', 'User::employeeData');
 $routes->get('/employeeData', 'User::employeeData');
 
@@ -90,6 +91,11 @@ $routes->post('/user/hapus_client', 'User::hapus_client');
 $routes->post('/user/reset_password_client', 'User::reset_password_client');
 $routes->post('/user/ubah_status_client', 'User::ubah_status_client');
 $routes->post('/user/getPresensi', 'User::getPresensi');
+$routes->post('/user/updateAttendance', 'User::updateAttendance');
+$routes->post('/user/addEffectiveHours', 'User::addEffectiveHours');
+$routes->post('/user/getDataWorkDay', 'User::getDataWorkDay');
+$routes->post('/user/deleteWorkDay', 'User::deleteWorkDay');
+
 
 //datatables post orders
 $routes->post('/order/listdataOrder', 'OrderController::listdataOrder');
