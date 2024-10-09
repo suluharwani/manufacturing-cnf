@@ -455,6 +455,8 @@ public function getDataWorkDay()
 
         return $this->response->setJSON($data);
     }
+
+    
   public function deleteWorkDay(){
      $id = $this->request->getPost('id');
     $model =new \App\Models\MdlEffectiveHours();
@@ -465,4 +467,45 @@ public function getDataWorkDay()
         return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data.']);
     }
   }
+   public function addSalaryCat()
+    {
+        $data = [
+            'Kode' => $this->request->getPost('Kode'),
+            'Nama' => $this->request->getPost('Nama'),
+            'Kategori' => $this->request->getPost('Kategori'),
+            'Gaji_Pokok' => $this->request->getPost('Gaji_Pokok'),
+            'Gaji_Per_Jam' => $this->request->getPost('Gaji_Per_Jam'),
+            'Gaji_Per_Jam_Hari_Minggu' => $this->request->getPost('Gaji_Per_Jam_Hari_Minggu')
+        ];
+
+        $model =new \App\Models\MdlSalaryCat();
+
+        if ($model->insert($data)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the record.'], 400);
+        }
+    }
+  public function getSalaryCat()
+    {
+        $model = new \App\Models\MdlSalaryCat();
+        $data = $model->findAll();
+
+        return $this->response->setJSON($data);
+    }
+
+      public function deleteSalaryCat(){
+     $id = $this->request->getPost('id');
+    $model =new \App\Models\MdlSalaryCat();
+
+    if ($model->delete($id)) {
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Data berhasil dihapus.']);
+    } else {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data.']);
+    }
+  }
+
+
+
+
 }

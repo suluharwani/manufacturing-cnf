@@ -95,6 +95,9 @@ $routes->post('/user/updateAttendance', 'User::updateAttendance');
 $routes->post('/user/addEffectiveHours', 'User::addEffectiveHours');
 $routes->post('/user/getDataWorkDay', 'User::getDataWorkDay');
 $routes->post('/user/deleteWorkDay', 'User::deleteWorkDay');
+$routes->post('/user/getSalaryCat', 'User::getSalaryCat');
+$routes->post('/user/deleteSalaryCat', 'User::deleteSalaryCat');
+$routes->post('/user/addSalaryCat', 'User::addSalaryCat');
 
 
 //datatables post orders

@@ -38,7 +38,7 @@
 
                     </tr>
                 </thead>
-                <tbody id="isiType">
+                <tbody>
                  </tbody>
             </table>
         </div>
@@ -49,21 +49,24 @@
                         <div class="bg-light text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <h6 class="mb-0">Rincian Gaji</h6>
-                                <button class ="btn btn-primary addSalaryVar">Tambah</button>
+                                <button class ="btn btn-primary addSalaryCat">Tambah</button>
                             </div>
                                                        <!-- satuan barang -->
                                                        <div class="table-responsive" style="max-height: 300px;">
-            <table class="table table-striped table-bordered">
+             <table class="table table-striped table-bordered" id="salaryCatTable">
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">#</th>
+                        <th scope="col">Kode</th>
                         <th scope="col">Nama</th>
                         <th scope="col">Kategori</th>
                         <th scope="col">Gaji Pokok</th>
                         <th scope="col">Gaji Per Jam</th>
+                        <th scope="col">Gaji Per Jam Hari Minggu</th>
+                        <th scope="col">Delete</th>
                     </tr>
                 </thead>
-                <tbody id= "isiSatuan"></tbody>
+                <tbody></tbody>
             </table>
         </div>
                              <!-- end satuan barang -->

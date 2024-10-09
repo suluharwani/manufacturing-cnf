@@ -112,6 +112,16 @@ CREATE TABLE employee_deduction_list (
     deleted_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT NULL
 );
+
+CREATE TABLE EmployeeSallaryCat (
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    Kode VARCHAR(50),
+    Nama VARCHAR(100),
+    Kategori VARCHAR(50),
+    Gaji_Pokok INT,
+    Gaji_Per_Jam INT,
+    Gaji_Per_Jam_Hari_Minggu INT
+);
 INSERT INTO `effectivehours` (`id`, `day`, `work_start`, `work_end`, `overtime_start`, `overtime_end`, `work_break`, `work_break_end`, `overtime_break`, `overtime_break_end`, `updated_at`, `deleted_at`, `created_at`) VALUES (1, 'Senin', '07:30:00', '04:30:00', '17:15:00', '00:00:00', '12:00:00', '13:00:00', '16:30:00', '17:15:00', '2024-10-09 15:11:33', NULL, '2024-10-09 15:11:33');
 INSERT INTO `effectivehours` (`id`, `day`, `work_start`, `work_end`, `overtime_start`, `overtime_end`, `work_break`, `work_break_end`, `overtime_break`, `overtime_break_end`, `updated_at`, `deleted_at`, `created_at`) VALUES (2, 'Selasa', '07:30:00', '04:30:00', '17:15:00', '00:00:00', '12:00:00', '13:00:00', '16:30:00', '17:15:00', '2024-10-09 15:11:33', NULL, '2024-10-09 15:11:33');
 INSERT INTO `effectivehours` (`id`, `day`, `work_start`, `work_end`, `overtime_start`, `overtime_end`, `work_break`, `work_break_end`, `overtime_break`, `overtime_break_end`, `updated_at`, `deleted_at`, `created_at`) VALUES (3, 'Rabu', '07:30:00', '04:30:00', '17:15:00', '00:00:00', '12:00:00', '13:00:00', '16:30:00', '17:15:00', '2024-10-09 15:11:33', NULL, '2024-10-09 15:11:33');

@@ -1,5 +1,66 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
+       $(document).ready(function() {
+            loadDataSC();
+            loadData();
+        });
+function loadData() {
+            $.ajax({
+                url: base_url + '/user/getDataWorkDay',
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    let no = 0
+                    const tbody = $('#workScheduleTable tbody');
+                    tbody.empty(); // Kosongkan tabel sebelum mengisi data baru
+                    $.each(data, function(index, item) {
+                        tbody.append(`
+                            <tr>
+                                <td>${no+=1}</td>
+                                <td>${item.day}</td>
+                                <td>${item.work_start}</td>
+                                <td>${item.work_break}</td>
+                                <td>${item.work_end}</td>
+                                <td>${item.overtime_break}</td>
+                                <td>${item.overtime_start}</td>
+                                <td>${item.overtime_end}</td>
+                                <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" day="${item.day}"   id="${item.id}" ">Hapus</a></td>
+                            </tr>
+                        `);
+                    });
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                }
+            });
+        }
+        $('#workScheduleTable tbody').on('click','.hapus',function(){
+                const id = $(this).attr('id');
+                const day = $(this).attr('day');
+                Swal.fire({
+                    title: 'Anda yakin ingin menghapus hari '+day+'?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: base_url + '/user/deleteWorkDay', 
+                            type: 'post',
+                            data: { id: id },
+                            success: function(response) {
+                                Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success');
+                                loadData(); // Panggil loadData untuk memperbarui tampilan
+                            },
+                            error: function(xhr) {
+                                let d = JSON.parse(xhr.responseText);
+                                Swal.fire('Oops...', d.message, 'error');
+                            }
+                        });
+                    }
+                });
+            });
 
 $('.addDay').on('click', function() {
     const dayOptions = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
@@ -102,65 +163,160 @@ $('.addDay').on('click', function() {
         }
     });
 });
-function loadData() {
+//SALARY CAT
+
+
+        // Panggil loadData saat halaman dimuat
+        function loadDataSC() {
+    $.ajax({
+        url: '/user/getSalaryCat',
+        type: 'POST',
+        dataType: 'json',
+        success: function(data) {
+            let no = 0;
+            const tbody = $('#salaryCatTable tbody');
+            tbody.empty(); // Empty the table before adding new data
+            $.each(data, function(index, item) {
+                tbody.append(`
+                    <tr>
+                        <td>${++no}</td>
+                        <td>${item.Kode}</td>
+                        <td>${item.Nama}</td>
+                        <td>${item.Kategori}</td>
+                        <td>${formatRupiah(item.Gaji_Pokok)}</td>
+                        <td>${formatRupiah(item.Gaji_Per_Jam)}</td>
+                        <td>${formatRupiah(item.Gaji_Per_Jam_Hari_Minggu)}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" nama="${item.Nama}" id="${item.id}">Hapus</a></td>
+                    </tr>
+                `);
+            });
+        },
+        error: function(xhr) {
+            console.error(xhr);
+        }
+    });
+}
+
+$('#salaryCatTable tbody').on('click', '.hapus', function() {
+    const id = $(this).attr('id');
+    const nama = $(this).attr('nama');
+    Swal.fire({
+        title: 'Anda yakin ingin menghapus kategori gaji ' + nama + '?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
             $.ajax({
-                url: base_url + '/user/getDataWorkDay',
-                type: 'post',
-                dataType: 'json',
-                success: function(data) {
-                    let no = 0
-                    const tbody = $('#workScheduleTable tbody');
-                    tbody.empty(); // Kosongkan tabel sebelum mengisi data baru
-                    $.each(data, function(index, item) {
-                        tbody.append(`
-                            <tr>
-                                <td>${no+=1}</td>
-                                <td>${item.day}</td>
-                                <td>${item.work_start}</td>
-                                <td>${item.work_break}</td>
-                                <td>${item.work_end}</td>
-                                <td>${item.overtime_break}</td>
-                                <td>${item.overtime_start}</td>
-                                <td>${item.overtime_end}</td>
-                                <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" day="${item.day}"   id="${item.id}" ">Hapus</a></td>
-                            </tr>
-                        `);
-                    });
+                url: '/user/deleteSalaryCat',
+                type: 'POST',
+                data: { id: id },
+                success: function(response) {
+                    Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success');
+                    loadDataSC(); // Reload data after deletion
                 },
                 error: function(xhr) {
-                    console.error(xhr);
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire('Oops...', d.message, 'error');
                 }
             });
         }
-        $('#workScheduleTable tbody').on('click','.hapus',function(){
-                const id = $(this).attr('id');
-                const day = $(this).attr('day');
-                Swal.fire({
-                    title: 'Anda yakin ingin menghapus hari '+day+'?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: base_url + '/user/deleteWorkDay', 
-                            type: 'post',
-                            data: { id: id },
-                            success: function(response) {
-                                Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success');
-                                loadData(); // Panggil loadData untuk memperbarui tampilan
-                            },
-                            error: function(xhr) {
-                                let d = JSON.parse(xhr.responseText);
-                                Swal.fire('Oops...', d.message, 'error');
-                            }
-                        });
-                    }
-                });
-            });
+    });
+});
 
-        // Panggil loadData saat halaman dimuat
-        $(document).ready(function() {
-            loadData();
-        });
+$('.addSalaryCat').on('click', function() {
+    const catOptions = ['Operator', 'Staf'];
+
+    Swal.fire({
+        title: 'Tambah Data Karyawan',
+        html: `
+            <form id="form_add_data">
+                <div class="form-group">
+                    <label for="Kode">Kode</label>
+                    <input type="text" class="form-control" id="Kode" required>
+                </div>
+                <div class="form-group">
+                    <label for="Nama">Nama</label>
+                    <input type="text" class="form-control" id="Nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="Kategori">Kategori</label>
+                    <select class="form-control" id="Kategori">
+                        ${catOptions.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="Gaji_Pokok">Gaji Pokok</label>
+                    <input type="number" class="form-control" id="Gaji_Pokok" required>
+                </div>
+                <div class="form-group">
+                    <label for="Gaji_Per_Jam">Gaji Per Jam</label>
+                    <input type="number" class="form-control" id="Gaji_Per_Jam" required>
+                </div>
+                <div class="form-group">
+                    <label for="Gaji_Per_Jam_Hari_Minggu">Gaji Per Jam Hari Minggu</label>
+                    <input type="number" class="form-control" id="Gaji_Per_Jam_Hari_Minggu" required>
+                </div>
+            </form>
+        `,
+        confirmButtonText: 'Tambah',
+        focusConfirm: false,
+        preConfirm: () => {
+            const Kode = Swal.getPopup().querySelector('#Kode').value;
+            const Nama = Swal.getPopup().querySelector('#Nama').value;
+            const Kategori = Swal.getPopup().querySelector('#Kategori').value;
+            const Gaji_Pokok = Swal.getPopup().querySelector('#Gaji_Pokok').value;
+            const Gaji_Per_Jam = Swal.getPopup().querySelector('#Gaji_Per_Jam').value;
+            const Gaji_Per_Jam_Hari_Minggu = Swal.getPopup().querySelector('#Gaji_Per_Jam_Hari_Minggu').value;
+
+            if (!Kode || !Nama || !Kategori || !Gaji_Pokok || !Gaji_Per_Jam || !Gaji_Per_Jam_Hari_Minggu) {
+                Swal.showValidationMessage('Semua data wajib diisi!');
+            }
+
+            return { Kode, Nama, Kategori, Gaji_Pokok, Gaji_Per_Jam, Gaji_Per_Jam_Hari_Minggu };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'POST',
+                url: '/user/addSalaryCat',
+                data: result.value,
+                success: function(data) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Data berhasil ditambahkan.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    loadDataSC(); // Reload data after adding
+                },
+                error: function(xhr) {
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire('Oops...', d.message, 'error');
+                }
+            });
+        }
+    });
+});
+function formatRupiah(amount) {
+    // Pastikan bahwa jumlah adalah angka atau dapat dikonversi menjadi angka
+    if (isNaN(amount)) {
+        return '0,00'; // Jika bukan angka, kembalikan default '0,00'
+    }
+    
+    // Konversi nilai menjadi fixed-point dengan 2 angka desimal
+    amount = parseFloat(amount).toFixed(2);
+
+    // Pisahkan bagian desimal dan bagian integer
+    let parts = amount.split('.');
+    let integerPart = parts[0];
+    let decimalPart = parts[1];
+
+    // Tambahkan tanda pemisah ribuan
+    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Gabungkan kembali bagian integer dan desimal
+    return 'Rp ' + integerPart + ',' + decimalPart;
+}
