@@ -99,6 +99,14 @@ $routes->post('/user/getSalaryCat', 'User::getSalaryCat');
 $routes->post('/user/deleteSalaryCat', 'User::deleteSalaryCat');
 $routes->post('/user/addSalaryCat', 'User::addSalaryCat');
 
+$routes->get('/user/getAllowanceData', 'User::getAllowanceData'); 
+$routes->post('/user/deleteAllowance', 'User::deleteAllowance');  
+$routes->post('/user/addAllowance', 'User::addAllowance');  
+$routes->get('/user/getDeductionData', 'User::getDeductionData'); 
+$routes->post('/user/deleteDeduction', 'User::deleteDeduction');  
+$routes->post('/user/addDeduction', 'User::addDeduction'); 
+$routes->post('/user/getSalarySetting', 'User::getSalarySetting'); 
+$routes->post('/user/getSalarySetting', 'User::getSalarySetting');
 
 //datatables post orders
 $routes->post('/order/listdataOrder', 'OrderController::listdataOrder');

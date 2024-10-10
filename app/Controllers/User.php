@@ -504,8 +504,92 @@ public function getDataWorkDay()
         return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data.']);
     }
   }
+  public function getAllowanceData()
+    {
+        $model = new \App\Models\AllowanceModel();
+        $data = $model->findAll(); // Fetch all allowance data from the table
+        return $this->response->setJSON($data); // Return as JSON
+    }
 
+    // Load all deduction data
+    public function getDeductionData()
+    {
+        $model = new \App\Models\DeductionModel();
+        $data = $model->findAll(); // Fetch all deduction data from the table
+        return $this->response->setJSON($data); // Return as JSON
+    }
 
+    // Delete allowance by Kode
+    public function deleteAllowance()
+    {
+        $id = $this->request->getPost('id');
+        $model = new \App\Models\AllowanceModel();
+        if ($model->delete($id)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
+        }
+    }
+
+    // Delete deduction by Kode
+    public function deleteDeduction()
+    {
+        $id = $this->request->getPost('id');
+        $model = new \App\Models\DeductionModel();
+        if ($model->delete($id)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the deduction.'], 400);
+        }
+    }
+
+    // Add new allowance
+    public function addAllowance()
+    {
+        $data = [
+            'Kode' => $this->request->getPost('Kode'),
+            'Nama' => $this->request->getPost('Nama'),
+            'Status' => $this->request->getPost('Status')
+        ];
+
+        $model = new \App\Models\AllowanceModel();
+        if ($model->insert($data)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the allowance.'], 400);
+        }
+    }
+
+    // Add new deduction
+    public function addDeduction()
+    {
+        $data = [
+            'Kode' => $this->request->getPost('Kode'),
+            'Nama' => $this->request->getPost('Nama'),
+            'Status' => $this->request->getPost('Status')
+        ];
+
+        $model = new \App\Models\DeductionModel();
+        if ($model->insert($data)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the deduction.'], 400);
+        }
+    }
+    public function getSalarySetting()
+{
+    $pin = $this->request->getPost('pin');
+    $id = $this->request->getPost('id');
+
+    // Fetch salary settings based on pin or id (replace with your actual logic)
+    $salarySettingsModel = new \App\Models\SalarySettingsModel();
+    $salarySettings = $salarySettingsModel->where('pin', $pin)->findAll();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $salarySettings,
+    ]);
+}
 
 
 }

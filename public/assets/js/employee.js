@@ -69,6 +69,56 @@ $(document).ready(function() {
       $("#tabel_serverside_processing").css("display", "none");
     }
   });
+    // Handle the click event for varGaji button
+    $(document).on('click', '.varGaji', function() {
+        var pin = $(this).attr('pin');
+        var id = $(this).attr('id');
+        
+        // Fetch salary setting data using AJAX
+        $.ajax({
+            url: base_url + '/user/getSalarySetting', // Define the controller URL
+            type: 'POST',
+            data: { pin: pin, id: id },
+            dataType: 'json',
+            success: function(response) {
+                var data = response.data;
+
+                // Dynamically generate HTML for the salary settings table
+                let html = `
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Nilai</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                $.each(data, function(index, item) {
+                    html += `<tr>
+                                <td>${item.kode}</td>
+                                <td>${item.nama}</td>
+                                <td>${item.nilai}</td>
+                                <td>${item.status}</td>
+                            </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+
+                // Inject the HTML into the modal body
+                $('#salaryTableContent').html(html);
+
+                // Show the modal
+                $('#salarySettingModal').modal('show');
+            },
+            error: function() {
+                alert("Error fetching salary settings.");
+            }
+        });
+    });
 
  $(document).on('click', '.showPresensi', function() {
   var pin = $(this).attr('pin');

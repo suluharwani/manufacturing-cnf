@@ -3,6 +3,8 @@ var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : ""
        $(document).ready(function() {
             loadDataSC();
             loadData();
+            loadAllowanceData();
+            loadDeductionData();
         });
 function loadData() {
             $.ajax({
@@ -169,7 +171,7 @@ $('.addDay').on('click', function() {
         // Panggil loadData saat halaman dimuat
         function loadDataSC() {
     $.ajax({
-        url: '/user/getSalaryCat',
+        url:  base_url + '/user/getSalaryCat',
         type: 'POST',
         dataType: 'json',
         success: function(data) {
@@ -209,7 +211,7 @@ $('#salaryCatTable tbody').on('click', '.hapus', function() {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/user/deleteSalaryCat',
+                url:  base_url +'/user/deleteSalaryCat',
                 type: 'POST',
                 data: { id: id },
                 success: function(response) {
@@ -295,6 +297,223 @@ $('.addSalaryCat').on('click', function() {
                 error: function(xhr) {
                     let d = JSON.parse(xhr.responseText);
                     Swal.fire('Oops...', d.message, 'error');
+                }
+            });
+        }
+    });
+});
+
+// Load Allowance Data
+function loadAllowanceData() {
+    $.ajax({
+        url:  base_url + '/user/getAllowanceData',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            let no = 0;
+            const tbody = $('#allowanceTable tbody');
+            tbody.empty(); // Empty the table before adding new data
+            $.each(data, function(index, item) {
+                tbody.append(`
+                    <tr>
+                        <td>${++no}</td>
+                        <td>${item.Kode}</td>
+                        <td>${item.Nama}</td>
+                        <td>${item.Status}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-danger btn-sm deleteAllowance" id="${item.id}">Delete</a></td>
+                    </tr>
+                `);
+            });
+        },
+        error: function(xhr) {
+            console.error(xhr);
+        }
+    });
+}
+
+// Load Deduction Data
+function loadDeductionData() {
+    $.ajax({
+        url:  base_url + '/user/getDeductionData',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            let no = 0;
+            const tbody = $('#deductionTable tbody');
+            tbody.empty(); // Empty the table before adding new data
+            $.each(data, function(index, item) {
+                tbody.append(`
+                    <tr>
+                        <td>${++no}</td>
+                        <td>${item.Kode}</td>
+                        <td>${item.Nama}</td>
+                        <td>${item.Status}</td>
+                        <td><a href="javascript:void(0);" class="btn btn-danger btn-sm deleteDeduction" id="${item.id}">Delete</a></td>
+                    </tr>
+                `);
+            });
+        },
+        error: function(xhr) {
+            console.error(xhr);
+        }
+    });
+}
+
+// Delete Allowance
+$('#allowanceTable tbody').on('click', '.deleteAllowance', function() {
+    const id = $(this).attr('id');
+    Swal.fire({
+        title: 'Are you sure you want to delete this allowance?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url:  base_url + '/user/deleteAllowance',
+                type: 'POST',
+                data: { id: id },
+                success: function(response) {
+                    Swal.fire('Deleted!', 'Allowance has been deleted.', 'success');
+                    loadAllowanceData(); // Reload data after deletion
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', 'Failed to delete the allowance.', 'error');
+                }
+            });
+        }
+    });
+});
+
+// Delete Deduction
+$('#deductionTable tbody').on('click', '.deleteDeduction', function() {
+    const id = $(this).attr('id');
+    Swal.fire({
+        title: 'Are you sure you want to delete this deduction?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url:  base_url + '/user/deleteDeduction',
+                type: 'POST',
+                data: { id: id },
+                success: function(response) {
+                    Swal.fire('Deleted!', 'Deduction has been deleted.', 'success');
+                    loadDeductionData(); // Reload data after deletion
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', 'Failed to delete the deduction.', 'error');
+                }
+            });
+        }
+    });
+});
+
+// Add Allowance
+$('.addAllowance').on('click', function() {
+    AllowanceStatus = ["Tetap","Temporary"];
+    Swal.fire({
+        title: 'Add Allowance',
+        html: `
+            <form id="form_add_allowance">
+                <div class="form-group">
+                    <label for="Kode">Kode</label>
+                    <input type="text" class="form-control" id="Kode" required>
+                </div>
+                <div class="form-group">
+                    <label for="Nama">Nama</label>
+                    <input type="text" class="form-control" id="Nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="Status">Status</label>
+                    <select class="form-control" id="Status">
+                        ${AllowanceStatus.map(st => `<option value="${st}">${st}</option>`).join('')}
+                    </select>
+                </div>
+            </form>
+        `,
+        confirmButtonText: 'Add',
+        focusConfirm: false,
+        preConfirm: () => {
+            const Kode = Swal.getPopup().querySelector('#Kode').value;
+            const Nama = Swal.getPopup().querySelector('#Nama').value;
+            const Status = Swal.getPopup().querySelector('#Status').value;
+
+            if (!Kode || !Nama || !Status) {
+                Swal.showValidationMessage('Please complete all fields!');
+            }
+            return { Kode, Nama, Status };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'POST',
+                url:  base_url + '/user/addAllowance',
+                data: result.value,
+                success: function(data) {
+                    Swal.fire('Success!', 'Allowance has been added.', 'success');
+                    loadAllowanceData(); // Reload data after adding
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', 'Failed to add allowance.', 'error');
+                }
+            });
+        }
+    });
+});
+
+// Add Deduction
+$('.addDeduction').on('click', function() {
+    deductionStatus = ["Tetap","Temporary"];
+
+    Swal.fire({
+        title: 'Add Deduction',
+        html: `
+            <form id="form_add_deduction">
+                <div class="form-group">
+                    <label for="Kode">Kode</label>
+                    <input type="text" class="form-control" id="Kode" required>
+                </div>
+                <div class="form-group">
+                    <label for="Nama">Nama</label>
+                    <input type="text" class="form-control" id="Nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="Status">Status</label>
+                    <select class="form-control" id="Status">
+                        ${deductionStatus.map(st => `<option value="${st}">${st}</option>`).join('')}
+                    </select>
+                </div>
+            </form>
+        `,
+        confirmButtonText: 'Add',
+        focusConfirm: false,
+        preConfirm: () => {
+            const Kode = Swal.getPopup().querySelector('#Kode').value;
+            const Nama = Swal.getPopup().querySelector('#Nama').value;
+            const Status = Swal.getPopup().querySelector('#Status').value;
+
+            if (!Kode || !Nama || !Status) {
+                Swal.showValidationMessage('Please complete all fields!');
+            }
+            return { Kode, Nama, Status };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'POST',
+                url:  base_url + '/user/addDeduction',
+                data: result.value,
+                success: function(data) {
+                    Swal.fire('Success!', 'Deduction has been added.', 'success');
+                    loadDeductionData(); // Reload data after adding
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', 'Failed to add deduction.', 'error');
                 }
             });
         }
