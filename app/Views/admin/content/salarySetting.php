@@ -54,7 +54,7 @@
                 <!-- satuan barang -->
                 <div class="table-responsive" style="max-height: 300px;">
                    <table class="table table-striped table-bordered" id="salaryCatTable">
-                    <thead class="table-dark">
+                    <thead class="table-dark"> 
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Kode</th>

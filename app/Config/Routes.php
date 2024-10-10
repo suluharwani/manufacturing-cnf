@@ -106,8 +106,9 @@ $routes->get('/user/getDeductionData', 'User::getDeductionData');
 $routes->post('/user/deleteDeduction', 'User::deleteDeduction');  
 $routes->post('/user/addDeduction', 'User::addDeduction'); 
 $routes->post('/user/getSalarySetting', 'User::getSalarySetting'); 
-$routes->post('/user/getSalarySetting', 'User::getSalarySetting');
-
+// $routes->post('/user/getSalarySetting', 'User::getSalarySetting');
+$routes->post('/user/saveSalarySettings', 'User::saveSalarySettings');
+$routes->post('/user/saveSalaryCategory', 'User::saveSalaryCategory');
 //datatables post orders
 $routes->post('/order/listdataOrder', 'OrderController::listdataOrder');
 

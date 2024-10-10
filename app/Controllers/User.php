@@ -486,24 +486,24 @@ public function getDataWorkDay()
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the record.'], 400);
         }
     }
-  public function getSalaryCat()
-    {
-        $model = new \App\Models\MdlSalaryCat();
-        $data = $model->findAll();
+public function getSalaryCat()
+{
+    $salaryModel = new \App\Models\MdlSalaryCat();
+    $salaryCategories = $salaryModel->findAll();
 
-        return $this->response->setJSON($data);
-    }
-
-      public function deleteSalaryCat(){
-     $id = $this->request->getPost('id');
-    $model =new \App\Models\MdlSalaryCat();
-
-    if ($model->delete($id)) {
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Data berhasil dihapus.']);
+    if ($salaryCategories) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $salaryCategories,
+        ]);
     } else {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data.']);
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No salary categories found.',
+        ]);
     }
-  }
+}
+
   public function getAllowanceData()
     {
         $model = new \App\Models\AllowanceModel();
@@ -530,6 +530,17 @@ public function getDataWorkDay()
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
         }
     }
+    public function deleteSalaryCat()
+    {
+        $id = $this->request->getPost('id');
+        $model = new \App\Models\MdlSalaryCat();
+        if ($model->delete($id)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete salary category.'], 400);
+        }
+    }
+    
 
     // Delete deduction by Kode
     public function deleteDeduction()
@@ -577,7 +588,7 @@ public function getDataWorkDay()
         }
     }
     public function getSalarySetting()
-{
+{ 
     $pin = $this->request->getPost('pin');
     $id = $this->request->getPost('id');
 
@@ -589,6 +600,59 @@ public function getDataWorkDay()
         'status' => 'success',
         'data' => $salarySettings,
     ]);
+}
+public function saveSalarySettings()
+{
+    $items = $this->request->getPost('items');
+
+    foreach ($items as $item) {
+        // Save each selected item with its nominal value (insert/update to database)
+        $data = [
+            'kode' => $item['kode'],
+            'nominal' => $item['nominal'],
+            // Add other necessary fields here
+        ];
+
+        // Save logic (update or insert into your table)
+        // Example: $this->salaryModel->save($data);
+    }
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Data berhasil disimpan'
+    ]);
+}
+public function saveSalaryCategory()
+{
+    $pin = $this->request->getPost('pin');
+    $salaryCategoryId = $this->request->getPost('salaryCategoryId');
+    $gajiPokok = $this->request->getPost('gajiPokok');
+    $gajiPerJam = $this->request->getPost('gajiPerJam');
+    $gajiPerJamMinggu = $this->request->getPost('gajiPerJamMinggu');
+
+    // Example logic to save the selected category and salary details to the database
+    // Use your own logic based on your database schema
+    $data = [
+        'pin' => $pin,
+        'salary_category_id' => $salaryCategoryId,
+        'gaji_pokok' => $gajiPokok,
+        'gaji_per_jam' => $gajiPerJam,
+        'gaji_per_jam_minggu' => $gajiPerJamMinggu
+    ];
+
+    $salaryModel = new SalaryModel();
+
+    if ($salaryModel->save($data)) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Salary category saved successfully.',
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to save salary category.',
+        ]);
+    }
 }
 
 

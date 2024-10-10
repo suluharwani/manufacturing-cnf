@@ -36,6 +36,13 @@ CREATE TABLE salary_allowance (
     deleted_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT NULL
 );
+CREATE TABLE salarysetting (
+    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT(10) DEFAULT NULL,
+    pin VARCHAR(32) DEFAULT NULL,
+    employee_salarycat_id INT(10) DEFAULT NULL,
+);
+
 
 CREATE TABLE salary_deduction (
    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

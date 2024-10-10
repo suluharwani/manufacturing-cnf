@@ -104,21 +104,47 @@
 </div>
 
 <!-- Modal for displaying Salary Setting -->
-<div class="modal fade" id="salarySettingModal" tabindex="-1" aria-labelledby="salarySettingModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<!-- Salary Category Modal -->
+<!-- Salary Category Modal -->
+<div class="modal fade" id="salaryCategoryModal" tabindex="-1" aria-labelledby="salaryCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="salarySettingModalLabel">Variabel Gaji</h5>
+        <h5 class="modal-title" id="salaryCategoryModalLabel">Pilih Kategori Gaji</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="salaryTableContent">
-          <!-- Table will be dynamically injected here -->
-        </div>
+        <form id="salaryCategoryForm">
+          <div class="mb-3">
+            <label for="salaryCategorySelect" class="form-label">Kategori Gaji</label>
+            <select class="form-select" id="salaryCategorySelect" required>
+              <!-- Options will be populated dynamically by AJAX -->
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="gajiPokok" class="form-label">Gaji Pokok</label>
+            <input type="text" class="form-control" id="gajiPokok" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="gajiPerJam" class="form-label">Gaji Per Jam</label>
+            <input type="text" class="form-control" id="gajiPerJam" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="gajiPerJamMinggu" class="form-label">Gaji Per Jam Hari Minggu</label>
+            <input type="text" class="form-control" id="gajiPerJamMinggu" readonly>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-primary" id="saveCategoryBtn">Simpan</button>
       </div>
     </div>
   </div>
 </div>
+
+
+
 
 
 

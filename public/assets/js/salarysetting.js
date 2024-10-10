@@ -169,35 +169,46 @@ $('.addDay').on('click', function() {
 
 
         // Panggil loadData saat halaman dimuat
-        function loadDataSC() {
+function loadDataSC() {
     $.ajax({
         url:  base_url + '/user/getSalaryCat',
         type: 'POST',
         dataType: 'json',
-        success: function(data) {
+        success: function(response) {
             let no = 0;
             const tbody = $('#salaryCatTable tbody');
             tbody.empty(); // Empty the table before adding new data
-            $.each(data, function(index, item) {
-                tbody.append(`
-                    <tr>
-                        <td>${++no}</td>
-                        <td>${item.Kode}</td>
-                        <td>${item.Nama}</td>
-                        <td>${item.Kategori}</td>
-                        <td>${formatRupiah(item.Gaji_Pokok)}</td>
-                        <td>${formatRupiah(item.Gaji_Per_Jam)}</td>
-                        <td>${formatRupiah(item.Gaji_Per_Jam_Hari_Minggu)}</td>
-                        <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" nama="${item.Nama}" id="${item.id}">Hapus</a></td>
-                    </tr>
-                `);
-            });
+
+            // Cek apakah respons berisi data yang benar
+            if (response.status === 'success' && response.data.length > 0) {
+                $.each(response.data, function(index, item) {
+                    console.log(item); // Debugging untuk melihat isi item
+
+                    // Pastikan bahwa properti item sesuai dengan yang diharapkan
+                    tbody.append(`
+                        <tr>
+                            <td>${++no}</td>
+                            <td>${item.Kode}</td>
+                            <td>${item.Nama}</td>
+                            <td>${item.Kategori}</td>
+                            <td>${formatRupiah(item.Gaji_Pokok)}</td>
+                            <td>${formatRupiah(item.Gaji_Per_Jam)}</td>
+                            <td>${formatRupiah(item.Gaji_Per_Jam_Hari_Minggu)}</td>
+                            <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" nama="${item.Nama}" id="${item.id}">Hapus</a></td>
+                        </tr>
+                    `);
+                });
+            } else {
+                // Jika tidak ada data yang ditemukan
+                tbody.append(`<tr><td colspan="8" class="text-center">Tidak ada data ditemukan.</td></tr>`);
+            }
         },
         error: function(xhr) {
-            console.error(xhr);
+            console.error(xhr); // Debugging untuk melihat error
         }
     });
 }
+
 
 $('#salaryCatTable tbody').on('click', '.hapus', function() {
     const id = $(this).attr('id');

@@ -7,13 +7,13 @@ use CodeIgniter\Model;
 class SalarySettingsModel extends Model
 {
     protected $DBGroup          = 'tests';
-    protected $table            = 'salarysettings';
+    protected $table            = 'salarysetting';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['id','employee_id','employee_salarycat_id'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
