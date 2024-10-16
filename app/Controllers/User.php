@@ -587,20 +587,20 @@ public function getSalaryCat()
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the deduction.'], 400);
         }
     }
-    public function getSalarySetting()
-{ 
-    $pin = $this->request->getPost('pin');
-    $id = $this->request->getPost('id');
+//     public function getSalarySetting()
+// { 
+//     $pin = $this->request->getPost('pin');
+//     $id = $this->request->getPost('id');
 
-    // Fetch salary settings based on pin or id (replace with your actual logic)
-    $salarySettingsModel = new \App\Models\SalarySettingsModel();
-    $salarySettings = $salarySettingsModel->where('pin', $pin)->findAll();
+//     // Fetch salary settings based on pin or id (replace with your actual logic)
+//     $salarySettingsModel = new \App\Models\SalarySettingsModel();
+//     $salarySettings = $salarySettingsModel->where('pin', $pin)->findAll();
 
-    return $this->response->setJSON([
-        'status' => 'success',
-        'data' => $salarySettings,
-    ]);
-}
+//     return $this->response->setJSON([
+//         'status' => 'success',
+//         'data' => $salarySettings,
+//     ]);
+// }
 public function saveSalarySettings()
 {
     $items = $this->request->getPost('items');
@@ -625,22 +625,17 @@ public function saveSalarySettings()
 public function saveSalaryCategory()
 {
     $pin = $this->request->getPost('pin');
+    $id = $this->request->getPost('id');
     $salaryCategoryId = $this->request->getPost('salaryCategoryId');
-    $gajiPokok = $this->request->getPost('gajiPokok');
-    $gajiPerJam = $this->request->getPost('gajiPerJam');
-    $gajiPerJamMinggu = $this->request->getPost('gajiPerJamMinggu');
 
     // Example logic to save the selected category and salary details to the database
     // Use your own logic based on your database schema
     $data = [
-        'pin' => $pin,
-        'salary_category_id' => $salaryCategoryId,
-        'gaji_pokok' => $gajiPokok,
-        'gaji_per_jam' => $gajiPerJam,
-        'gaji_per_jam_minggu' => $gajiPerJamMinggu
+        'id_employee' => $id,
+        'id_salary_pattern' => $salaryCategoryId,
     ];
 
-    $salaryModel = new SalaryModel();
+    $salaryModel = new \App\Models\MdlFsalaryPatternEmployee();
 
     if ($salaryModel->save($data)) {
         return $this->response->setJSON([
@@ -654,6 +649,55 @@ public function saveSalaryCategory()
         ]);
     }
 }
+public function getEmployeeNameByPin()
+{
+    // Get the pin from the AJAX request
+    $pin = $this->request->getPost('pin');
+    $mdl = new \App\Models\MdlEmployee();
+    // Find the employee by the pin
+    $employee = $mdl->where('pegawai_pin', $pin)->first();
+
+    if ($employee) {
+        // Return the employee's name as a JSON response
+        return $this->response->setJSON([
+            'success' => true,
+            'name' => $employee['pegawai_nama'] // assuming 'name' is the column for the employee's name
+        ]);
+    } else {
+        // If no employee is found
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Employee not found'
+        ]);
+    }
+}
+
+public function getSalarySetting()
+{
+    $id_employee = $this->request->getPost('id');
+
+    // Load your model
+    $salaryPatternModel = new \App\Models\MdlFsalaryPatternEmployee();
+
+    // Get all salary patterns for the specific employee
+    $existingPatterns = $salaryPatternModel
+        ->select('id_salary_pattern')
+        ->where('id_employee', $id_employee)
+        ->findAll();
+    $salarySettingsModel = new \App\Models\SalarySettingsModel();
+    // Convert the results to an array of `id_salary_pattern`
+    $existingPatternIds = array_column($existingPatterns, 'id_salary_pattern');
+
+    // Fetch all salary patterns (you would need to load the pattern model here)
+    $allPatterns = $salarySettingsModel->findAll();
+
+    // Send the data back as JSON
+    return $this->response->setJSON([
+        'existingPatterns' => $existingPatternIds,
+        'allPatterns' => $allPatterns,
+    ]);
+}
+
 
 
 }

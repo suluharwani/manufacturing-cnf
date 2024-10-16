@@ -39,6 +39,8 @@ class AttendanceModel extends Model
     protected $afterDelete    = [];
 public function getAttendanceData($pin, $id, $startDate, $endDate)
 {
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
+
     return $this->where('pin', $pin)
                 ->where('scan_date >=', $startDate)
                 ->where('scan_date <=', $endDate)

@@ -56,7 +56,7 @@ $(document).ready(function() {
           <a href="javascript:void(0);" class="btn btn-secondary btn-sm varGaji" id="${row[1]}" pin="${row[4]}">Tunjangan</a>
           <a href="javascript:void(0);" class="btn btn-secondary btn-sm varGaji" id="${row[1]}" pin="${row[4]}">Potongan</a>
           <a href="javascript:void(0);" class="btn btn-warning btn-sm showDet" id="${row[1]}" pin="${row[4]}">Detail</a>
-          <a href="javascript:void(0);" class="btn btn-primary btn-sm showPresensi" id="${row[1]}" pin="${row[4]}">Presensi</a>
+          <a href="javascript:void(0);" class="btn btn-primary btn-sm showPresensi" id="${row[1]}" pin="${row[4]}" nama="${row[2]}">Presensi</a>
           <a href="javascript:void(0);" class="btn btn-success btn-sm showGaji" id="${row[1]}" pin="${row[4]}">Gaji</a>`;
         }
       },
@@ -72,37 +72,96 @@ $(document).ready(function() {
     }
   });
     // Handle the click event for varGaji button
-  $(document).on('click', '.varGaji', function() {
-    var pin = $(this).attr('pin');
-    var id = $(this).attr('id');
-    
-    // Fetch salary setting data using AJAX 
-    $.ajax({
-        url: base_url + '/user/getSalarySetting', // Define the controller URL
-        type: 'POST',
-        data: { pin: pin, id: id },
-        dataType: 'json',
-        success: function(response) {
-          var data = response.data;
-            // Populate the available items table
-          let html = '';
-          $.each(data, function(index, item) {
-            html += `<tr data-id="${item.kode}">
-            <td>${item.kode}</td>
-            <td>${item.nama}</td>
-            <td><button class="btn btn-success selectItemBtn">Pilih</button></td>
-            </tr>`;
-          });
-          $('#availableItemsTable tbody').html(html);
+$(document).on('click', '.varGaji', function() {
+  var pin = $(this).attr('pin');
+  var id = $(this).attr('id');
 
-            // Show the modal
-          $('#salarySettingModal').modal('show');
-        },
-        error: function() {
-          alert("Error fetching salary settings.");
+  // Fetch salary setting data using AJAX 
+  $.ajax({
+    url: base_url + '/user/getSalarySetting', // Define the controller URL
+    type: 'POST',
+    data: { pin: pin, id: id },
+    dataType: 'json',
+    success: function(response) {
+      const existingPatterns = response.existingPatterns.map(Number); // Convert existing pattern IDs to numbers
+      const allPatterns = response.allPatterns; // All available patterns
+
+      let html = '';
+      $.each(allPatterns, function(index, pattern) {
+        const patternId = Number(pattern.id_salary_pattern); // Convert pattern ID to number for comparison
+
+        // Check if this pattern exists for the current employee
+        const isSelected = existingPatterns[0]
+   
+        if (isSelected) {
+          // If the pattern is already assigned, show an "Update" button
+          html += `<tr data-id="${pattern.id_salary_pattern}">
+            <td>${pattern.id_salary_pattern}</td>
+            <td>${pattern.nama}</td>
+            <td><button class="btn btn-warning updateItemBtn" data-kode="${pattern.id_salary_pattern}" data-nama="${pattern.nama}">Update</button></td>
+            </tr>`;
+        } else {
+          // Otherwise, show a "Pilih" button
+          html += `<tr data-id="${pattern.id_salary_pattern}">
+            <td>${pattern.id_salary_pattern}</td>
+            <td>${pattern.nama}</td>
+            <td><button class="btn btn-success selectItemBtn" data-kode="${pattern.id_salary_pattern}" data-nama="${pattern.nama}">Pilih</button></td>
+            </tr>`;
         }
       });
+
+      $('#availableItemsTable tbody').html(html);
+
+      // Show the modal
+      $('#salarySettingModal').modal('show');
+    },
+    error: function() {
+      alert("Error fetching salary settings.");
+    }
   });
+});
+
+
+// Event listener for selecting a new salary item
+$(document).on('click', '.selectItemBtn', function() {
+  var kode = $(this).data('kode');
+  var nama = $(this).data('nama');
+
+  // Send an AJAX request to insert the new salary data
+  $.ajax({
+    url: base_url + '/user/addSalarySetting', // Define the URL for adding a new item
+    type: 'POST',
+    data: { kode: kode, nama: nama },
+    success: function() {
+      alert('Salary item added successfully.');
+      $('#salarySettingModal').modal('hide');
+    },
+    error: function() {
+      alert('Failed to add salary item.');
+    }
+  });
+});
+
+// Event listener for updating an existing salary item
+$(document).on('click', '.updateItemBtn', function() {
+  var kode = $(this).data('kode');
+  var nama = $(this).data('nama');
+
+  // Send an AJAX request to update the salary data
+  $.ajax({
+    url: base_url + '/user/updateSalarySetting', // Define the URL for updating the item
+    type: 'POST',
+    data: { kode: kode, nama: nama },
+    success: function() {
+      alert('Salary item updated successfully.');
+      $('#salarySettingModal').modal('hide');
+    },
+    error: function() {
+      alert('Failed to update salary item.');
+    }
+  });
+});
+
 
 // Move selected item to the selected table (right)
   $(document).on('click', '.selectItemBtn', function() {
@@ -317,6 +376,7 @@ function getInOutTimes(entries) {
 }
 
 function refreshPopupContent(pin, id, startDate, endDate) {
+  fetchEmployeeNameByPin(pin)
     $('#popupContent').empty();
 
     // AJAX request to fetch attendance data
@@ -381,9 +441,10 @@ function getInOutTimes(entries) {
 
 // Function to generate HTML table for attendance data
 // Function to generate HTML table for attendance data
+// Function to generate HTML table for attendance data
 function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
     let html = `
-        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
@@ -392,23 +453,29 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
                         <th>Jam Keluar</th>
                         <th>Total Jam Kerja</th>
                         <th>Jam Normal</th>
-                        <th>Jam Lembur</th>
+                        <th>Jam Lembur 1</th>
+                        <th>Jam Lembur 2</th>
+                        <th>Jam Lembur 3</th>
+                        <th>Revisi Jam</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
     let totalDurationMinutes = 0;
     let workDayCount = 0;
-    let totalNormalWorkMinutes = 0; // Initialize total normal work minutes
+    let totalNormalWorkMinutes = 0;
+    let totalOvertime1Minutes = 0;
+    let totalOvertime2Minutes = 0;
+    let totalOvertime3Minutes = 0;
 
     // Process each date's entries
-    $.each(groupedData, function(date, entries) {
+    $.each(groupedData, function (date, entries) {
         const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
         let inTime = new Date(originalInTime); // Create a new variable for adjustment
         let outTime = new Date(originalOutTime); // Create a new variable for adjustment
         const dayOfWeek = getDayName(date);
         const workDaySetting = workDays.find(day => day.day === dayOfWeek);
-        
+
         if (inTime && outTime) {
             const duration = (outTime - inTime) / (1000 * 60); // Duration in minutes
             totalDurationMinutes += duration;
@@ -420,23 +487,28 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
             workDayCount++;
 
             // Calculate normal and overtime minutes
-            const { normalWorkMinutes, overtimeMinutes } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
+            const { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
             totalNormalWorkMinutes += normalWorkMinutes; // Add to total normal work minutes
+            totalOvertime1Minutes += overtimeMinutes1;
+            totalOvertime2Minutes += overtimeMinutes2;
+            totalOvertime3Minutes += overtimeMinutes3;
 
-            console.log(`Date: ${date}, In Time: ${formattedInTime}, Out Time: ${formattedOutTime}`);
-            console.log(`Normal Work Minutes: ${normalWorkMinutes}, Overtime Minutes: ${overtimeMinutes}`);
+            // Apply red background if totalHours == 0
+            const rowClass = totalHours <= 0 ? 'class="bg-danger"' : ''; // Assign class if totalHours is 0
 
             html += `
-                <tr>
+                <tr ${rowClass}>
                     <td>${date} - ${dayOfWeek}</td>
                     <td>${formattedInTime}</td>
                     <td>${formattedOutTime}</td>
                     <td>${totalHours} jam ${totalMinutes} menit</td>
                     <td>${Math.floor(normalWorkMinutes / 60)} jam ${Math.floor(normalWorkMinutes % 60)} menit</td>
-                    <td>${Math.floor(overtimeMinutes / 60)} jam ${Math.floor(overtimeMinutes % 60)} menit</td>
+                    <td>${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit</td>
+                    <td>${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2 % 60)} menit</td>
+                    <td>${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3 % 60)} menit</td>
                     <td>
                         <a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" 
-                           id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
+                        id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
                             Tambah Data
                         </a>
                     </td>
@@ -450,11 +522,44 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
 
     html += `</tbody></table></div>`;
     html += `
-        <div>
-            Hari kerja: ${workDayCount} hari, 
-            Total Durasi Kerja: ${Math.floor(totalDurationMinutes / 60)} jam ${Math.floor(totalDurationMinutes % 60)} menit, 
-            Total Kerja (Setelah Istirahat): ${totalNormalHours} jam ${totalNormalMinutes} menit
-        </div>`;
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Keterangan</th>
+                    <th>Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Periode</td>
+                    <td>${formatDateWithDayIndonesian(startDate)} - ${formatDateWithDayIndonesian(endDate)}</td>
+                </tr>
+                <tr>
+                    <td>Hari Kerja</td>
+                    <td>${workDayCount} hari</td>
+                </tr>
+                <tr>
+                    <td>Total Durasi Kerja</td>
+                    <td>${Math.floor(totalDurationMinutes / 60)} jam ${Math.floor(totalDurationMinutes % 60)} menit</td>
+                </tr>
+                <tr>
+                    <td>Total Kerja (Setelah Istirahat)</td>
+                    <td>${totalNormalHours} jam ${totalNormalMinutes} menit</td>
+                </tr>
+                <tr>
+                    <td>Total Lembur 1</td>
+                    <td>${Math.floor(totalOvertime1Minutes / 60)} jam ${Math.floor(totalOvertime1Minutes % 60)} menit</td>
+                </tr>
+                <tr>
+                    <td>Total Lembur 2</td>
+                    <td>${Math.floor(totalOvertime2Minutes / 60)} jam ${Math.floor(totalOvertime2Minutes % 60)} menit</td>
+                </tr>
+                <tr>
+                    <td>Total Lembur 3</td>
+                    <td>${Math.floor(totalOvertime3Minutes / 60)} jam ${Math.floor(totalOvertime3Minutes % 60)} menit</td>
+                </tr>
+            </tbody>
+        </table>`;
 
     return html;
 }
@@ -473,18 +578,24 @@ function formatDuration(duration) {
 }
 
 // Function to calculate normal work and overtime minutes
+// Function to calculate normal work and multiple overtime minutes (1, 2, and 3)
 function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
     let normalWorkMinutes = 0;
-    let overtimeMinutes = 0;
+    let overtimeMinutes1 = 0;
+    let overtimeMinutes2 = 0;
+    let overtimeMinutes3 = 0;
 
     if (workDaySetting) {
         const workStart = new Date(`${date} ${workDaySetting.work_start}`);
         const workEnd = new Date(`${date} ${workDaySetting.work_end}`);
-        const overtimeStart = new Date(`${date} ${workDaySetting.overtime_start}`);
+        const overtimeStart1 = new Date(`${date} ${workDaySetting.overtime_start_1}`);
+        const overtimeEnd1 = new Date(`${date} ${workDaySetting.overtime_end_1}`);
+        const overtimeStart2 = new Date(`${date} ${workDaySetting.overtime_start_2}`);
+        const overtimeEnd2 = new Date(`${date} ${workDaySetting.overtime_end_2}`);
+        const overtimeStart3 = new Date(`${date} ${workDaySetting.overtime_start_3}`);
+        const overtimeEnd3 = new Date(`${date} ${workDaySetting.overtime_end_3}`);
         const workBreakStart = new Date(`${date} ${workDaySetting.work_break}`);
         const workBreakEnd = new Date(`${date} ${workDaySetting.work_break_end}`);
-
-
 
         // Adjust inTime if needed
         if (inTime < workStart) {
@@ -497,10 +608,7 @@ function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
         } else {
             normalWorkMinutes = (outTime - inTime) / (1000 * 60); // Calculate from inTime to outTime
         }
-        console.log(workEnd)
-        console.log(inTime)
-        
-        console.log( (workEnd - inTime) / (1000 * 60))
+
         // Subtract break time from start of break until end of break
         if (inTime < workBreakEnd && outTime > workBreakStart) {
             const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Use the later time
@@ -508,25 +616,50 @@ function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
             normalWorkMinutes -= breakDuration; // Subtract break duration from normal work minutes
         }
 
-        // Calculate overtime
-        if (outTime > overtimeStart) {
-            overtimeMinutes = (outTime - overtimeStart) / (1000 * 60); // Calculate overtime if outTime is after overtime start
+        // Calculate overtime levels
+        if (outTime > overtimeStart1) {
+            overtimeMinutes1 = (outTime < overtimeEnd1 ? outTime : overtimeEnd1) - overtimeStart1;
+            overtimeMinutes1 = overtimeMinutes1 / (1000 * 60); // Convert to minutes
+        }
+        if (outTime > overtimeStart2) {
+            overtimeMinutes2 = (outTime < overtimeEnd2 ? outTime : overtimeEnd2) - overtimeStart2;
+            overtimeMinutes2 = overtimeMinutes2 / (1000 * 60); // Convert to minutes
+        }
+        if (outTime > overtimeStart3) {
+            overtimeMinutes3 = (outTime < overtimeEnd3 ? outTime : overtimeEnd3) - overtimeStart3;
+            overtimeMinutes3 = overtimeMinutes3 / (1000 * 60); // Convert to minutes
         }
 
         // Prevent negative values
         normalWorkMinutes = Math.max(normalWorkMinutes, 0);
-        overtimeMinutes = Math.max(overtimeMinutes, 0);
+        overtimeMinutes1 = Math.max(overtimeMinutes1, 0);
+        overtimeMinutes2 = Math.max(overtimeMinutes2, 0);
+        overtimeMinutes3 = Math.max(overtimeMinutes3, 0);
     }
 
-
-    return { normalWorkMinutes, overtimeMinutes };
+    return { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 };
 }
+
 
 // Helper function to get the day name in Indonesian
 function getDayName(dateString) {
   const date = new Date(dateString);
   const options = { weekday: 'long' };
   return date.toLocaleDateString('id-ID', options); // Output in Indonesian
+}
+function formatDateWithDayIndonesian(dateString) {
+    const dayName = getDayName(dateString);
+    const formattedDate = formatDateIndonesian(dateString);
+    
+    return `${dayName}, ${formattedDate}`;
+}
+function formatDateIndonesian(dateString) {
+    const date = new Date(dateString);
+    const day = ('0' + date.getDate()).slice(-2); // Two-digit day
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Two-digit month
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
 }
 
 
@@ -572,6 +705,8 @@ $(document).on('click', '.varGaji', function() {
   var id = $(this).attr('id');
 
         // Fetch categories when the modal is about to be shown
+  $('#id').val(id)
+  $('#pin').val(pin)
   $('#salaryCategoryModal').modal('show');
   fetchSalaryCategories();
 });
@@ -599,24 +734,21 @@ $('#saveCategoryBtn').on('click', function() {
   }
 
   var formData = {
-            pin: pin,  // Pass the pin from the clicked button (employee identifier)
-            id: id,    // Pass the id from the clicked button
+            pin: $('#pin').val(),  
+            id: $('#id').val(),    
             salaryCategoryId: selectedCategoryId,
-            gajiPokok: $('#gajiPokok').val(),
-            gajiPerJam: $('#gajiPerJam').val(),
-            gajiPerJamMinggu: $('#gajiPerJamMinggu').val()
           };
 
-        // Save data using AJAX
+     
           $.ajax({
-            url: base_url + '/user/saveSalaryCategory',  // URL to save the selected salary category
+            url: base_url + '/user/saveSalaryCategory',  
             type: 'POST',
             data: formData,
             dataType: 'json',
             success: function(response) {
               if (response.status === 'success') {
                 alert("Kategori gaji berhasil disimpan.");
-                    $('#salaryCategoryModal').modal('hide');  // Hide the modal
+                    $('#salaryCategoryModal').modal('hide');  
                   } else {
                     alert("Gagal menyimpan kategori gaji.");
                   }
@@ -626,3 +758,22 @@ $('#saveCategoryBtn').on('click', function() {
                 }
               });
         });
+
+function fetchEmployeeNameByPin(pin) {
+    $.ajax({
+        url: base_url + 'user/getEmployeeNameByPin', 
+        type: 'POST',
+        data: { pin: pin },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $('#employeeName').text(response.name); 
+            } else {
+                console.error('Error: ', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error: ', error);
+        }
+    });
+}

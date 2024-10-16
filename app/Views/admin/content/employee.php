@@ -87,10 +87,11 @@
 
 <!-- Popup Modal for displaying attendance details -->
 <div class="modal fade" id="popupModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">
-  <div class="modal-dialog  modal-lg" role="document">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="popupModalLabel">Detail Presensi</h5>
+        <h5 class="modal-title" id="popupModalLabel">Detail Presensi : <span id="employeeName"></span></h5>
+
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="popupContent">
@@ -116,9 +117,11 @@
       <div class="modal-body">
         <form id="salaryCategoryForm">
           <div class="mb-3">
+            <input type="text" class="form-control" name="id" id="id" hidden>
+            <input type="text" class="form-control" name="pin" id="pin" hidden>
             <label for="salaryCategorySelect" class="form-label">Kategori Gaji</label>
             <select class="form-select" id="salaryCategorySelect" required>
-              <!-- Options will be populated dynamically by AJAX -->
+                         <!-- Options will be populated dynamically by AJAX -->
             </select>
           </div>
           <div class="mb-3">

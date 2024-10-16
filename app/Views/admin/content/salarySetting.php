@@ -31,9 +31,15 @@
                                 <th scope="col">Mulai Kerja</th>
                                 <th scope="col">Istirahat</th>
                                 <th scope="col">Pulang</th>
-                                <th scope="col">Istirahat Lembur</th>
-                                <th scope="col">Mulai Lembur</th>
-                                <th scope="col">Pulang Lembur</th>
+                                <th scope="col">Istirahat Lembur 1</th>
+                                <th scope="col">Mulai Lembur 1</th>
+                                <th scope="col">Pulang Lembur 1</th>
+                                <th scope="col">Istirahat Lembur 2</th>
+                                <th scope="col">Mulai Lembur 2</th>
+                                <th scope="col">Pulang Lembur 2</th>
+                                <th scope="col">Istirahat Lembur 3</th>
+                                <th scope="col">Mulai Lembur 3</th>
+                                <th scope="col">Pulang Lembur 3</th>
                                 <th scope="col">Hapus</th>
 
                             </tr>

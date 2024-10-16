@@ -23,9 +23,15 @@ function loadData() {
                                 <td>${item.work_start}</td>
                                 <td>${item.work_break}</td>
                                 <td>${item.work_end}</td>
-                                <td>${item.overtime_break}</td>
-                                <td>${item.overtime_start}</td>
-                                <td>${item.overtime_end}</td>
+                                <td>${item.overtime_break_1}</td>
+                                <td>${item.overtime_start_1}</td>
+                                <td>${item.overtime_end_1}</td>
+                                <td>${item.overtime_break_2}</td>
+                                <td>${item.overtime_start_2}</td>
+                                <td>${item.overtime_end_2}</td>
+                                <td>${item.overtime_break_3}</td>
+                                <td>${item.overtime_start_3}</td>
+                                <td>${item.overtime_end_3}</td>
                                 <td><a href="javascript:void(0);" class="btn btn-danger btn-sm hapus" day="${item.day}"   id="${item.id}" ">Hapus</a></td>
                             </tr>
                         `);

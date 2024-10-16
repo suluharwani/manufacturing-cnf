@@ -109,6 +109,8 @@ $routes->post('/user/getSalarySetting', 'User::getSalarySetting');
 // $routes->post('/user/getSalarySetting', 'User::getSalarySetting');
 $routes->post('/user/saveSalarySettings', 'User::saveSalarySettings');
 $routes->post('/user/saveSalaryCategory', 'User::saveSalaryCategory');
+$routes->post('/user/getEmployeeNameByPin', 'User::getEmployeeNameByPin');
+
 //datatables post orders
 $routes->post('/order/listdataOrder', 'OrderController::listdataOrder');
 
