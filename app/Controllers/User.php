@@ -572,19 +572,19 @@ public function getSalaryCat()
     }
 
     // Add new deduction
-    public function addDeduction()
+    public function addDeductionList()
     {
-        $data = [
-            'Kode' => $this->request->getPost('Kode'),
-            'Nama' => $this->request->getPost('Nama'),
-            'Status' => $this->request->getPost('Status')
+       $data = [
+            'employee_id' => $this->request->getPost('employeeId'),
+            'deduction_id' => $this->request->getPost('deductionId'),
+            'amount' => $this->request->getPost('amount')
         ];
 
-        $model = new \App\Models\DeductionModel();
+        $model = new \App\Models\MdlFemployeeDeductionList();
         if ($model->insert($data)) {
             return $this->response->setJSON(['status' => 'success']);
         } else {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the deduction.'], 400);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the allowance.'], 400);
         }
     }
 //     public function getSalarySetting()
@@ -777,6 +777,22 @@ public function getAllowanceOptions()
     ]);
 }
     // Save a new allowance entry
+    public function addDeduction()
+    {
+        $data = [
+            'employee_id' => $this->request->getPost('employeeId'),
+            'allowance_id' => $this->request->getPost('allowanceId'),
+            'amount' => $this->request->getPost('amount')
+        ];
+
+        $model = new \App\Models\MdlFemployeeAllowanceList();
+        if ($model->insert($data)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add the allowance.'], 400);
+        }
+    }
+
     public function saveAllowance()
     {
 
@@ -809,5 +825,65 @@ public function getAllowanceOptions()
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
         }
     }
+
+
+
+
+// Deduction
+ public function fetchDeductions()
+    {
+
+        $allowanceModel = new \App\Models\MdlFsalaryAllowance();
+        $data = $allowanceModel->findAll();
+        return $this->response->setJSON($data);
+    }
+public function getDeductionOptions()
+{
+    $allowanceModel = new \App\Models\MdlFsalaryDeduction();
+
+    // Fetch all allowances from the database
+    $allowances = $allowanceModel->findAll();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $allowances
+    ]);
+}
+    // Save a new allowance entry
+    public function saveDeduction()
+    {
+
+       $deductionModel = new \App\Models\MdlFemployeeDeductionList();
+        $deductionData = $this->request->getPost();
+        $deductionModel->save($deductionData);
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Allowance saved successfully!']);
+    }
+
+    public function getEmployeeDeductions($employeeId = null)
+    {
+       $Mdl = new \App\Models\MdlFemployeeDeductionList();
+         $Mdl->select('employee_deduction_list.*, salary_deduction.Nama as deduction_name, salary_deduction.Kode as deduction_code')
+            ->join('salary_deduction', 'employee_deduction_list.deduction_id = salary_deduction.id', 'left');
+
+        if ($employeeId) {
+             $Mdl->where('employee_deduction_list.employee_id', $employeeId);
+        }
+
+        return  json_encode($Mdl->findAll());
+    }
+    public function deleteDeductionList($id=null)
+    {
+        // $id = $this->request->getPost('id');
+        $model = new \App\Models\MdlFemployeeDeductionList();
+        if ($model->where('id',$id)->delete()) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
+        }
+    }
+
+
+
 
 }

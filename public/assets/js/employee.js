@@ -797,7 +797,6 @@ function formatDateIndonesian(dateString) {
     var pin = $(this).attr('pin');
     var id = $(this).attr('id');
     var name = $(this).attr('name');
-    console.log(name)
           $('#AllowaceEmployeeName').val(name); 
           $('#AllowaceEmployeeId').val(id); 
           $('#AllowaceEmployeePin').val(pin); 
@@ -811,6 +810,13 @@ function formatDateIndonesian(dateString) {
   $(document).on('click', '.varPotongan', function() {
     var pin = $(this).attr('pin');
     var id = $(this).attr('id');
+    var name = $(this).attr('name');
+          $('#DeductionEmployeeName').val(name); 
+          $('#DeductionEmployeeId').val(id); 
+          $('#DeductionEmployeePin').val(pin); 
+
+    fetchDeductionOptions();
+    fetchDeductionsUser(id);
     $('#potonganModal').modal('show');
 
 
@@ -901,6 +907,8 @@ function formatDateIndonesian(dateString) {
       dataType: 'json',
       success: function(response) {
         if (response.status === 'success') {
+                      fetchAllowancesUser(employeeId)
+
 Swal.fire({
             position: 'center',
             icon: 'success',
@@ -936,7 +944,6 @@ function formatRupiah(amount) {
   $('#allowanceTable tbody').on('click', '.deleteAllowanceBtn', function() {
         const id = $(this).data('id');
         Swal.fire({
-            customClass: 'swal-wide',
             title: 'Apakah Anda yakin?',
             text: `Tunjangan ini akan dihapus!`,
             icon: 'warning',
@@ -951,6 +958,152 @@ function formatRupiah(amount) {
                     url: base_url + '/user/deleteAllowanceList/' + id,
                     success: function() {
                       fetchAllowancesUser(id)
+                        Swal.fire('Sukses', 'Tunjangan berhasil dihapus.', 'success');
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus tunjangan.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+
+//deduction
+
+  function fetchDeductionsUser(id){
+     $('#potonganTable tbody').empty();
+    $.ajax({
+      url: base_url+`user/getEmployeeDeductions/${id}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        let tbody = '';
+        if (data.length > 0) {
+          data.forEach(function(deduction, index) {
+            tbody += `
+            <tr>
+            <td>${index + 1}</td>
+            <td>${deduction.deduction_name}</td>
+            <td>${formatRupiah(deduction.amount)}</td>
+            <td>
+            <button class="btn btn-danger deleteDeductionBtn" data-id="${deduction.id}">Delete</button>
+            </td>
+            </tr>
+            `;
+          });
+        } else {
+          tbody = `<tr><td colspan="4" class="text-center">No Deduction Found</td></tr>`;
+        }
+        $('#potonganTable tbody').html(tbody);
+      },
+      error: function() {
+        alert('Failed to fetch deduction.');
+      }
+    });
+  }
+    // Fetch allowances and populate the table
+  function fetchDeductionOptions() {
+    $.ajax({
+            url: base_url+'user/getDeductionOptions', // Controller URL
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+              if (response.status === 'success' && response.data.length > 0) {
+                populateDeductionDropdown(response.data);
+              } else {
+                alert("No allowances found.");
+              }
+            },
+            error: function() {
+              alert("Failed to fetch allowances.");
+            }
+          });
+  }
+
+  function populateDeductionDropdown(deduction) {
+    let options = '<option value="">Select Deduction</option>';
+    $.each(deduction, function(index, deduction) {
+      options += `<option value="${deduction.id}" 
+      data-deduction="${deduction.Kode}">
+      ${deduction.Nama} - ${deduction.Status}
+      </option>`;
+    });
+    $('#deductionSelect').html(options);
+  }
+
+  $('#addPotonganBtn').on('click', function() {
+    let employeeId = $('#DeductionEmployeeId').val();
+    let deductionId = $('#deductionSelect').val();
+    let amount = $('#jumlahPotongan').val();
+
+    if (employeeId === '' || deductionId === ''|| amount === '') {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    $.ajax({
+      url: base_url+'user/addDeductionList', // Controller URL to add allowance
+      type: 'POST',
+      data: {
+        employeeId: employeeId,
+        deductionId: deductionId,
+        amount: amount
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.status === 'success') {
+                      fetchDeductionsUser(employeeId)
+          
+Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to add allowance.");
+      }
+    });
+  });
+
+function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR', 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+  $('#potonganTable tbody').on('click', '.deleteDeductionBtn', function() {
+        const id = $(this).data('id');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Tunjangan ini akan dihapus!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: base_url + '/user/deleteDeductionList/' + id,
+                    success: function() {
+                      fetchDeductionsUser(id)
                         Swal.fire('Sukses', 'Tunjangan berhasil dihapus.', 'success');
                     },
                     error: function() {

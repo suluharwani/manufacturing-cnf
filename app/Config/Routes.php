@@ -123,3 +123,10 @@ $routes->get('user/getEmployeeAllowances/(:any)', 'User::getEmployeeAllowances/$
 $routes->post('user/deleteAllowanceList/(:any)', 'User::deleteAllowanceList/$1');
 
  
+$routes->get('user/fetchDeductions', 'User::fetchDeductions');
+$routes->post('user/saveDeduction', 'User::saveDeduction');
+$routes->post('user/deleteDeduction/(:num)', 'User::deleteDeduction/$1');
+$routes->get('user/getDeductionOptions', 'User::getDeductionOptions');
+$routes->get('user/getEmployeeDeductions/(:any)', 'User::getEmployeeDeductions/$1');
+$routes->post('user/deleteDeductionList/(:any)', 'User::deleteDeductionList/$1');
+$routes->post('user/addDeductionList', 'User::addDeductionList');

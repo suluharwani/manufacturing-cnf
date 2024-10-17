@@ -237,9 +237,18 @@
             <div class="modal-body">
                 <form id="potonganForm">
                     <!-- Form for adding new potongan -->
+                        <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="DeductionEmployeeName" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">ID/PIN</label>
+                        <input type="number" class="form-control" id="DeductionEmployeeId" disabled>
+                        <input type="number" class="form-control" id="DeductionEmployeePin" disabled>
+                    </div>
                     <div class="mb-3">
                         <label for="namaPotongan" class="form-label">Nama Potongan</label>
-                        <input type="text" class="form-control" id="namaPotongan" placeholder="Enter Deduction Name" required>
+                        <select class="form-select" id="deductionSelect" required>
                     </div>
                     <div class="mb-3">
                         <label for="jumlahPotongan" class="form-label">Jumlah Potongan</label>
