@@ -110,7 +110,16 @@ $routes->post('/user/getSalarySetting', 'User::getSalarySetting');
 $routes->post('/user/saveSalarySettings', 'User::saveSalarySettings');
 $routes->post('/user/saveSalaryCategory', 'User::saveSalaryCategory');
 $routes->post('/user/getEmployeeNameByPin', 'User::getEmployeeNameByPin');
+$routes->post('/user/getAvailableItems', 'User::getAvailableItems');
 
 //datatables post orders
 $routes->post('/order/listdataOrder', 'OrderController::listdataOrder');
 
+$routes->get('user/fetchAllowances', 'User::fetchAllowances');
+$routes->post('user/saveAllowance', 'User::saveAllowance');
+$routes->post('user/deleteAllowance/(:num)', 'User::deleteAllowance/$1');
+$routes->get('user/getAllowanceOptions', 'User::getAllowanceOptions');
+$routes->get('user/getEmployeeAllowances/(:any)', 'User::getEmployeeAllowances/$1');
+$routes->post('user/deleteAllowanceList/(:any)', 'User::deleteAllowanceList/$1');
+
+ 

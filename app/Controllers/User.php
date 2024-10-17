@@ -558,12 +558,12 @@ public function getSalaryCat()
     public function addAllowance()
     {
         $data = [
-            'Kode' => $this->request->getPost('Kode'),
-            'Nama' => $this->request->getPost('Nama'),
-            'Status' => $this->request->getPost('Status')
+            'employee_id' => $this->request->getPost('employeeId'),
+            'allowance_id' => $this->request->getPost('allowanceId'),
+            'amount' => $this->request->getPost('amount')
         ];
 
-        $model = new \App\Models\AllowanceModel();
+        $model = new \App\Models\MdlFemployeeAllowanceList();
         if ($model->insert($data)) {
             return $this->response->setJSON(['status' => 'success']);
         } else {
@@ -625,30 +625,53 @@ public function saveSalarySettings()
 public function saveSalaryCategory()
 {
     $pin = $this->request->getPost('pin');
-    $id = $this->request->getPost('id');
-    $salaryCategoryId = $this->request->getPost('salaryCategoryId');
+    $id = $this->request->getPost('id');  // Employee ID
+    $salaryCategoryId = $this->request->getPost('salaryCategoryId');  // Salary Category ID
 
-    // Example logic to save the selected category and salary details to the database
-    // Use your own logic based on your database schema
+    // Load the salary model
+    $salaryModel = new \App\Models\MdlFsalaryPatternEmployee();
+
+    // Check if there is an existing record for this employee
+    $existingRecord = $salaryModel->where('id_employee', $id)
+                                  ->first();
+
+    // Prepare the data
     $data = [
         'id_employee' => $id,
         'id_salary_pattern' => $salaryCategoryId,
     ];
 
-    $salaryModel = new \App\Models\MdlFsalaryPatternEmployee();
+    // If record exists, update it
+    if ($existingRecord) {
+        $data['id'] = $existingRecord['id'];  // Set the primary key to update the record
 
-    if ($salaryModel->save($data)) {
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Salary category saved successfully.',
-        ]);
+        if ($salaryModel->save($data)) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Salary category updated successfully.',
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to update salary category.',
+            ]);
+        }
     } else {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Failed to save salary category.',
-        ]);
+        // Insert new record if no existing record found
+        if ($salaryModel->insert($data)) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Salary category inserted successfully.',
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to insert salary category.',
+            ]);
+        }
     }
 }
+
 public function getEmployeeNameByPin()
 {
     // Get the pin from the AJAX request
@@ -676,20 +699,26 @@ public function getSalarySetting()
 {
     $id_employee = $this->request->getPost('id');
 
-    // Load your model
+    // Load your models
     $salaryPatternModel = new \App\Models\MdlFsalaryPatternEmployee();
+    $salarySettingsModel = new \App\Models\SalarySettingsModel();
 
     // Get all salary patterns for the specific employee
     $existingPatterns = $salaryPatternModel
         ->select('id_salary_pattern')
         ->where('id_employee', $id_employee)
         ->findAll();
-    $salarySettingsModel = new \App\Models\SalarySettingsModel();
+
     // Convert the results to an array of `id_salary_pattern`
     $existingPatternIds = array_column($existingPatterns, 'id_salary_pattern');
 
-    // Fetch all salary patterns (you would need to load the pattern model here)
-    $allPatterns = $salarySettingsModel->findAll();
+    // Fetch all salary patterns with a join to employeesallarycat
+    $allPatterns =$salarySettingsModel
+    ->select('employeesallarycat.id, employeesallarycat.Nama as nama, employeesallarycat.Kode as kode, employeesallarycat.Kategori, employeesallarycat.Gaji_Pokok, employeesallarycat.Gaji_Per_Jam as perjam,  employeesallarycat.Gaji_Per_Jam_Hari_Minggu')
+    ->from('salary_pattern_employee')  // Base table is salary_pattern_employee
+    ->join('employeesallarycat', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id')  // Join employeesalarycat
+    ->where('salary_pattern_employee.id_employee', $id_employee)
+    ->findAll();
 
     // Send the data back as JSON
     return $this->response->setJSON([
@@ -697,7 +726,88 @@ public function getSalarySetting()
         'allPatterns' => $allPatterns,
     ]);
 }
+public function getAvailableItems()
+{
+    // Get the POST data (pin and id)
+    $pin = $this->request->getPost('pin');
+    $id = $this->request->getPost('id');
 
+    // Load your model that handles fetching the available items
+    $availableItemsModel = new \App\Models\AvailableItemsModel();
 
+    // Fetch the available items for the given employee (pin or id)
+    // You can modify the query logic based on your actual schema
+    $availableItems = $availableItemsModel
+        ->select('employeesallarycat.Nama, employeesallarycat.Kode, employeesallarycat.Gaji_Per_Jam')
+        ->join('salary_pattern_employee', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id')
+        ->where('salary_pattern_employee.id_employee', $id)
+        ->findAll();
+
+    // Check if any items were found
+    if (!empty($availableItems)) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $availableItems
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No items found for the provided employee.'
+        ]);
+    }
+}
+
+  public function fetchAllowances()
+    {
+
+        $allowanceModel = new \App\Models\MdlFsalaryAllowance();
+        $data = $allowanceModel->findAll();
+        return $this->response->setJSON($data);
+    }
+public function getAllowanceOptions()
+{
+    $allowanceModel = new \App\Models\MdlFsalaryAllowance();
+
+    // Fetch all allowances from the database
+    $allowances = $allowanceModel->findAll();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $allowances
+    ]);
+}
+    // Save a new allowance entry
+    public function saveAllowance()
+    {
+
+       $allowanceModel = new \App\Models\MdlFemployeeAllowanceList();
+        $allowanceData = $this->request->getPost();
+        $allowanceModel->save($allowanceData);
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Allowance saved successfully!']);
+    }
+
+    public function getEmployeeAllowances($employeeId = null)
+    {
+       $Mdl = new \App\Models\MdlFemployeeAllowanceList();
+         $Mdl->select('employee_allowance_list.*, salary_allowance.Nama as allowance_name, salary_allowance.Kode as allowance_code')
+            ->join('salary_allowance', 'employee_allowance_list.allowance_id = salary_allowance.id', 'left');
+
+        if ($employeeId) {
+             $Mdl->where('employee_allowance_list.employee_id', $employeeId);
+        }
+
+        return  json_encode($Mdl->findAll());
+    }
+    public function deleteAllowanceList($id=null)
+    {
+        // $id = $this->request->getPost('id');
+        $model = new \App\Models\MdlFemployeeAllowanceList();
+        if ($model->where('id',$id)->delete()) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
+        }
+    }
 
 }

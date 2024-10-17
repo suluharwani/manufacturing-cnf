@@ -108,6 +108,7 @@ CREATE TABLE employee_allowance_list (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     employee_id INT(11) DEFAULT NULL,
     allowance_id INT(11) DEFAULT NULL,
+    amount INT(11) DEFAULT NULL,
     updated_at DATETIME DEFAULT NULL,
     deleted_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT NULL
@@ -117,6 +118,7 @@ CREATE TABLE employee_deduction_list (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     employee_id INT(11) DEFAULT NULL,
     deduction_id INT(11) DEFAULT NULL,
+    amount INT(11) DEFAULT NULL,
     updated_at DATETIME DEFAULT NULL,
     deleted_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT NULL

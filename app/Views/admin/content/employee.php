@@ -107,7 +107,7 @@
 <!-- Modal for displaying Salary Setting -->
 <!-- Salary Category Modal -->
 <!-- Salary Category Modal -->
-<div class="modal fade" id="salaryCategoryModal" tabindex="-1" aria-labelledby="salaryCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="salaryCategoryModal" tabindex="-1" aria-labelledby="salaryCategoryModalLabel" aria-hidden>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -137,18 +137,142 @@
             <input type="text" class="form-control" id="gajiPerJamMinggu" readonly>
           </div>
         </form>
+        <div  class="table-responsive">
+        <button type="button" class="btn btn-primary" id="saveCategoryBtn">Simpan</button>
+        <div class="mb-3">
+             <table class="table table-bordered" id="availableItemsTable">
+
+        </div>
+        <div class="mb-3">
+        <thead>
+            <tr>
+                <th>Nama</th>
+
+                <th>Kode</th>
+                <th>perjam</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be dynamically populated here by AJAX -->
+        </tbody>
+    </table>
+  </div>
+</div>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        <button type="button" class="btn btn-primary" id="saveCategoryBtn">Simpan</button>
       </div>
     </div>
   </div>
 </div>
 
 
+<!-- Modal for managing tunjangan (allowance) -->
+<div class="modal fade" id="tunjanganModal" tabindex="-1" aria-labelledby="tunjanganModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tunjanganModalLabel">Manage Tunjangan (Allowance)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tunjanganForm">
+                    <!-- Form for adding new tunjangan -->
+                    <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="AllowaceEmployeeName" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">ID/PIN</label>
+                        <input type="number" class="form-control" id="AllowaceEmployeeId" disabled>
+                        <input type="number" class="form-control" id="AllowaceEmployeePin" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">Nama Tunjangan</label>
+                        <select class="form-select" id="allowanceSelect" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="jumlahTunjangan" class="form-label">Jumlah Tunjangan</label>
+                        <input type="number" class="form-control" id="jumlahTunjangan" placeholder="Rp. " required>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="saveTunjanganBtn">Add Tunjangan</button>
+                </form>
+
+                <hr>
+
+                <!-- Table to display and manage tunjangan -->
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="allowanceTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Tunjangan</th>
+                                <th>Jumlah</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
+<!-- Modal for managing potongan (deduction) -->
+<div class="modal fade" id="potonganModal" tabindex="-1" aria-labelledby="potonganModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="potonganModalLabel">Manage Potongan (Deductions)</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="potonganForm">
+                    <!-- Form for adding new potongan -->
+                    <div class="mb-3">
+                        <label for="namaPotongan" class="form-label">Nama Potongan</label>
+                        <input type="text" class="form-control" id="namaPotongan" placeholder="Enter Deduction Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="jumlahPotongan" class="form-label">Jumlah Potongan</label>
+                        <input type="number" class="form-control" id="jumlahPotongan" placeholder="Enter Deduction Amount" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addPotonganBtn">Add Potongan</button>
+                </form>
+
+                <hr>
+
+                <!-- Table to display and manage potongan -->
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="potonganTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Potongan</th>
+                                <th>Jumlah</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically populated here by AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
