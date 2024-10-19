@@ -130,3 +130,22 @@ $routes->get('user/getDeductionOptions', 'User::getDeductionOptions');
 $routes->get('user/getEmployeeDeductions/(:any)', 'User::getEmployeeDeductions/$1');
 $routes->post('user/deleteDeductionList/(:any)', 'User::deleteDeductionList/$1');
 $routes->post('user/addDeductionList', 'User::addDeductionList');
+
+//master salary
+$routes->get('/master_salary', 'Home::masterSalary');
+$routes->get('/detail_salary/(:any)', 'Home::detailSalary/$1');
+$routes->group('master_penggajian', function ($routes) {
+    $routes->get('/', 'MasterPenggajianController::index'); 
+    $routes->post('get_list', 'MasterPenggajianController::get_list'); 
+    $routes->post('add', 'MasterPenggajianController::add'); 
+    $routes->get('get/(:num)', 'MasterPenggajianController::get/$1');
+    $routes->post('update', 'MasterPenggajianController::update');
+    $routes->post('delete/(:num)', 'MasterPenggajianController::delete/$1'); 
+});
+
+
+$routes->group('MasterPenggajianDetailController', function ($routes) {
+    $routes->post('addEmployeeToPayroll', 'MasterPenggajianDetailController::addEmployeeToPayroll'); 
+    $routes->get('dataEmployeeMaster/(:any)', 'MasterPenggajianDetailController::dataEmployeeMaster/$1'); 
+
+});

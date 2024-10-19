@@ -1,21 +1,33 @@
 <?php
+
 namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AttendanceModel extends Model
+class MasterPenggajianDetailModel extends Model
 {
     protected $DBGroup          = 'tests';
-    protected $table = 'att_log';
+    protected $table            = 'master_penggajian_detail';
+    protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['sn', 'scan_date', 'pin', 'verifymode','inoutmode','reserved','work_code','att_id'];
+    protected $allowedFields    = [
+        'penggajian_id',
+        'karyawan_id',
+        'created_at',
+        'updated_at'
+    ];
 
-        // Dates
-    protected $useTimestamps = false;
+    protected bool $allowEmptyInserts = false;
+    protected bool $updateOnlyChanged = true;
+
+    protected array $casts = [];
+    protected array $castHandlers = [];
+
+    // Dates
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
@@ -37,22 +49,4 @@ class AttendanceModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-public function getAttendanceData($pin, $id, $startDate, $endDate)
-{
-    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
-
-    return $this->where('pin', $pin)
-                ->where('scan_date >=', $startDate)
-                ->where('scan_date <=', $endDate)
-                ->findAll();
-}
-public function getAttendance($pin, $id, $startDate, $endDate)
-{
-    // $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
-
-    return $this->where('pin', $pin)
-                ->where('scan_date >=', $startDate)
-                ->where('scan_date <=', $endDate)
-                ->findAll();
-}
 }

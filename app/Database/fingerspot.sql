@@ -1,3 +1,23 @@
+CREATE TABLE master_penggajian (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    kode_penggajian VARCHAR(50) DEFAULT NULL,
+    tanggal_awal_penggajian DATETIME NOT NULL,
+    `group` VARCHAR(50) DEFAULT NULL,
+    creator VARCHAR(50) DEFAULT NULL,
+    tanggal_akhir_penggajian DATETIME NOT NULL,
+    keterangan TEXT NULL,
+    updated_at DATETIME NULL,
+    deleted_at DATETIME NULL,
+    created_at DATETIME DEFAULT NULL
+);
+CREATE TABLE master_penggajian_detail (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    penggajian_id INT UNSIGNED NOT NULL,
+    karyawan_id INT UNSIGNED NOT NULL,
+    created_at DATETIME NULL,
+    updated_at DATETIME NULL
+);
+
 CREATE TABLE effectivehours (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     day VARCHAR(50) DEFAULT NULL,
@@ -75,25 +95,7 @@ CREATE TABLE salary_pattern (
     created_at DATETIME DEFAULT NULL
 );
 
-CREATE TABLE master_salary (
-    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) DEFAULT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    updated_at DATETIME DEFAULT NULL,
-    deleted_at DATETIME DEFAULT NULL,
-    created_at DATETIME DEFAULT NULL
-);
 
-CREATE TABLE master_salary_detail (
-    id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    id_master_salary INT(11) DEFAULT NULL,
-    id_employee INT(11) DEFAULT NULL,
-    id_salary_det INT(11) DEFAULT NULL,
-    updated_at DATETIME DEFAULT NULL,
-    deleted_at DATETIME DEFAULT NULL,
-    created_at DATETIME DEFAULT NULL
-);
 
 CREATE TABLE salary_pattern_employee (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

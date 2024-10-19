@@ -201,4 +201,18 @@ class Home extends BaseController
         $data['content'] = view('admin/content/salarySetting');
         return view('admin/index', $data);
     }
+     public function masterSalary()
+    {
+        $data['group'] = 'Master Salary';
+        $data['title'] = 'Master Salary';
+        $data['content'] = view('admin/content/master_salary');
+        return view('admin/index', $data);
+    }
+       public function detailSalary()
+    {
+        $data['group'] = 'Detail Salary';
+        $data['title'] = 'Detail Salary';
+        $data['content'] = view('admin/content/detail_salary');
+        return view('admin/index', $data);
+    }
 }

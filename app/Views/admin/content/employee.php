@@ -20,7 +20,7 @@
 <div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Persediaan Material</h6>
+                        <h6 class="mb-0">Employee</h6>
                         <!-- <button class= "btn btn-primary">Tambah</button> -->
                     </div>
                     <div class="table-responsive">
@@ -42,7 +42,6 @@
                   <th style=" text-align: left;">Pin</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
-              </tr>
             </tfoot>
           </table>
                     </div>

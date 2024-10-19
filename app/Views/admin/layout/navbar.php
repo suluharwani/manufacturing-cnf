@@ -71,6 +71,7 @@
                             <a href="<?=base_url('activitylog')?>" class="dropdown-item">User Activity logs</a>
                             <a href="<?=base_url('employee')?>" class="dropdown-item">Employee</a>
                             <a href="<?=base_url('salary')?>" class="dropdown-item">Salary Setting</a>
+                            <a href="<?=base_url('master_salary')?>" class="dropdown-item">Master Salary</a>
                         </div>
                     </div>
 
