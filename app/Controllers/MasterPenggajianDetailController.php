@@ -34,6 +34,7 @@ class MasterPenggajianDetailController extends BaseController
             ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
             ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
             ->where('master_penggajian_detail.penggajian_id', $penggajianId)
+            ->orderBy('pegawai.pegawai_nama', 'ASC')
             ->get()
             ->getResultArray();
 

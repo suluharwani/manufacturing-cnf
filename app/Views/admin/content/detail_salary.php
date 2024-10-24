@@ -54,7 +54,7 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">DetailMaster Payroll</h6>
+            <h6 class="mb-0">Detail Master Payroll</h6>
             <button class= "btn btn-primary create">Employee List</button>
         </div>
         <div class="table-responsive">
@@ -72,6 +72,7 @@
                     <th>Lembur 1 (Jam)</th>
                     <th>Lembur 2 (Jam)</th>
                     <th>Lembur 3 (Jam)</th>
+                    <th>Jam Kerja Hari Minggu</th>
                     <th>Jam Kerja Hari Minggu</th>
                 </tr>
             </thead>

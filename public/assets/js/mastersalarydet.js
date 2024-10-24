@@ -140,6 +140,7 @@ $(document).ready(function () {
                             <td>${item.total_overtime2_Hours}</td>
                             <td>${item.total_overtime3_Hours}</td>
                             <td>${item.sunday_work_Hours}</td>
+                            <td><button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Attendance</button><button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Print</button> <button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
                         tableBody.append(row);
                     });
