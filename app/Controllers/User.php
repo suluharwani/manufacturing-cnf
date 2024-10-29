@@ -354,7 +354,7 @@ function employeeData(){
                 //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
                 //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
   $column_order = array(NULL,'pegawai.pegawai_nip','pegawai.pegawai_nama','pegawai.pegawai_pin','pegawai.pegawai_id');
-  $column_search = array('pegawai.pegawai_nip','pegawai.pegawai_nama','pegawai.pegawai_pin','pegawai.pegawai_id');
+  $column_search = array('pegawai.pegawai_pin','pegawai.pegawai_nama','pegawai.pegawai_id');
   $order = array('pegawai.pegawai_id' => 'desc');
   $list = $list_data->get_datatables('pegawai', $column_order, $column_search, $order, $where);
   $data = array();

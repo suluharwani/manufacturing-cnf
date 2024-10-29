@@ -61,7 +61,8 @@
                    <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Karyawan ID</th>
+                    <th>#</th>
+                    <th>ID</th>
                     <th>Nama Pegawai</th>
                     <th>PIN Pegawai</th>
                     <th>Kode Penggajian</th>
@@ -106,5 +107,46 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="dateSelectionModal" tabindex="-1" role="dialog" aria-labelledby="dateSelectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dateSelectionModalLabel">Pilih Tanggal Presensi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="startDate">Tanggal Awal:</label>
+          <input type="date" id="startDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="endDate">Tanggal Akhir:</label>
+          <input type="date" id="endDate" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="fetchPresensi" class="btn btn-primary">Tampilkan Presensi</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="popupModal" tabindex="-1" role="dialog" aria-labelledby="popupModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="popupModalLabel">Detail Presensi : <span id="employeeName"></span></h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="popupContent">
+        <!-- Content will be dynamically populated -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/mastersalarydet.js"></script>
-<script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script> 

@@ -34,7 +34,7 @@ class MasterPenggajianDetailController extends BaseController
             ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
             ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
             ->where('master_penggajian_detail.penggajian_id', $penggajianId)
-            ->orderBy('pegawai.pegawai_nama', 'ASC')
+            ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
             ->get()
             ->getResultArray();
 
@@ -59,7 +59,7 @@ class MasterPenggajianDetailController extends BaseController
             $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
 
             // Hitung total gaji
-            $result['total_salary'] = $this->calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction);
+            $result['total_salary'] = $this->calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)['totalSalary'];
             $result['total_work_Hours'] = $workData['totalWorkHours'];
             $result['total_overtime1_Hours'] = $workData['totalOvertime1Hours'];
             $result['total_overtime2_Hours'] = $workData['totalOvertime2Hours'];
@@ -258,6 +258,7 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
     $sundayWorkHours = round($sundayWorkMinutes / 60, 2);
 
     return [
+        'outTime'=>$outTime,
         'totalWorkHours' => $totalWorkHours,
         'totalOvertime1Hours' => $totalOvertime1Hours,
         'totalOvertime2Hours' => $totalOvertime2Hours,
@@ -265,20 +266,26 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
         'sundayWorkHours' => $sundayWorkHours,
     ];
 }
-
 private function calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)
 {
     // Hitung gaji normal berdasarkan jam kerja
     $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
 
-    // Hitung gaji lembur level 1
-    $totalOvertime1Salary = $workData['totalOvertime1Hours'] * $salaryRate['Gaji_Per_Jam'];
+    // Konversi outTime menjadi timestamp untuk perbandingan waktu
+    $outTimeTimestamp = $workData['outTime']->getTimestamp();
+    $overtime1Threshold = strtotime('18:00:00');
 
-    // Hitung gaji lembur level 2
-    $totalOvertime2Salary = $workData['totalOvertime2Hours'] * $salaryRate['Gaji_Per_Jam'];
+    // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
+    $totalOvertime1Hours = ($outTimeTimestamp > $overtime1Threshold) ? $workData['totalOvertime1Hours'] : 0;
+    $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
 
-    // Hitung gaji lembur level 3, biasanya untuk hari Minggu atau hari libur
-    $totalOvertime3Salary = $workData['totalOvertime3Hours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+    // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
+    $totalOvertime2HoursRounded = ceil($workData['totalOvertime2Hours'] / 0.25) * 0.25;
+    $totalOvertime3HoursRounded = ceil($workData['totalOvertime3Hours'] / 0.25) * 0.25;
+
+    // Hitung gaji lembur level 2 dan 3 dengan waktu yang sudah dibulatkan
+    $totalOvertime2Salary = $totalOvertime2HoursRounded * $salaryRate['Gaji_Per_Jam'];
+    $totalOvertime3Salary = $totalOvertime3HoursRounded * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
 
     // Hitung total gaji sebelum tunjangan dan potongan
     $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
@@ -286,21 +293,54 @@ private function calculateSalary($workData, $salaryRate, $totalAllowance, $total
     // Hitung gaji total setelah menambahkan tunjangan dan mengurangi potongan
     $totalSalary = ($grossSalary + $totalAllowance) - $totalDeduction;
 
-    // Tentukan jam kerja yang diharapkan per hari (misal 8 jam)
-    $expectedWorkHoursPerDay = 8;
-    $daysWorked = $workData['daysWorked'] ?? 0;
-
-    // Hitung total jam kerja yang diharapkan berdasarkan jumlah hari kerja
-    $expectedWorkHours = $daysWorked * $expectedWorkHoursPerDay;
-
-    // Jika total jam kerja normal kurang dari jam kerja yang diharapkan, kurangi gaji sebesar satu jam
-    if ($workData['totalWorkHours'] < $expectedWorkHours) {
-        $totalSalary -= $salaryRate['Gaji_Per_Jam'];
-    }
-
-    return $totalSalary;
+    // Mengembalikan detail komponen gaji
+    return [
+        'totalSalary' => $totalSalary,
+        'totalNormalSalary' => $totalNormalSalary,
+        'totalOvertime1Salary' => $totalOvertime1Salary,
+        'totalOvertime2Salary' => $totalOvertime2Salary,
+        'totalOvertime3Salary' => $totalOvertime3Salary,
+        'grossSalary' => $grossSalary,
+        'totalAllowance' => $totalAllowance,
+        'totalDeduction' => $totalDeduction
+    ];
 }
 
+
+// private function calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)
+// {
+//     // Hitung gaji normal berdasarkan jam kerja
+//     $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+
+//     // Hitung gaji lembur level 1
+//     $totalOvertime1Salary = $workData['totalOvertime1Hours'] * $salaryRate['Gaji_Per_Jam'];
+
+//     // Hitung gaji lembur level 2
+//     $totalOvertime2Salary = $workData['totalOvertime2Hours'] * $salaryRate['Gaji_Per_Jam'];
+
+//     // Hitung gaji lembur level 3, biasanya untuk hari Minggu atau hari libur
+//     $totalOvertime3Salary = $workData['totalOvertime3Hours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+
+//     // Hitung total gaji sebelum tunjangan dan potongan
+//     $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
+
+//     // Hitung gaji total setelah menambahkan tunjangan dan mengurangi potongan
+//     $totalSalary = ($grossSalary + $totalAllowance) - $totalDeduction;
+
+//     // Tentukan jam kerja yang diharapkan per hari (misal 8 jam)
+//     // $expectedWorkHoursPerDay = 8;
+//     // $daysWorked = $workData['daysWorked'] ?? 0;
+
+//     // Hitung total jam kerja yang diharapkan berdasarkan jumlah hari kerja
+//     // $expectedWorkHours = $daysWorked * $expectedWorkHoursPerDay;
+
+//     // Jika total jam kerja normal kurang dari jam kerja yang diharapkan, kurangi gaji sebesar satu jam
+//     // if ($workData['totalWorkHours'] < $expectedWorkHours) {
+//     //     $totalSalary -= $salaryRate['Gaji_Per_Jam'];
+//     // }
+
+//     return $totalSalary;
+// }
 public function addEmployeeToPayroll()
 {
     $detailModel = new MasterPenggajianDetailModel();
@@ -311,12 +351,167 @@ public function addEmployeeToPayroll()
         'karyawan_id' => $_POST["employeeId"]
     ];
 
-    // Menyimpan data ke database
+    // Cek apakah karyawan sudah ada dalam daftar penggajian dengan penggajian_id yang sama
+    $existingEntry = $detailModel->where('penggajian_id', $data['penggajian_id'])
+                                  ->where('karyawan_id', $data['karyawan_id'])
+                                  ->first();
+
+    if ($existingEntry) {
+         header('HTTP/1.1 500 Internal Server Error');
+      header('Content-Type: application/json; charset=UTF-8');
+      die(json_encode(array('message' => 'Karyawan sudah terdaftar dalam daftar penggajian ini.', 'code' => 4)));
+    }
+
+    // Menyimpan data ke database jika belum ada
     if ($detailModel->insert($data)) {
         return $this->response->setJSON(['status' => 'success', 'message' => 'Karyawan berhasil ditambahkan ke daftar penggajian.']);
     } else {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menambahkan karyawan ke daftar penggajian.']);
+        header('HTTP/1.1 500 Internal Server Error');
+      header('Content-Type: application/json; charset=UTF-8');
+      die(json_encode(array('message' => 'Gagal menambahkan karyawan ke daftar penggajian.', 'code' => 4)));
     }
 }
- 
+public function deleteEmployeeFromPayroll()
+{
+    // Mendapatkan instance dari request
+    $request = \Config\Services::request();
+
+    // Mengambil data dari request
+    $employeeId = $request->getPost('employeeId');
+    $masterId = $request->getPost('masterId');
+
+    // Memastikan employeeId dan masterId diterima
+    if (!$employeeId || !$masterId) {
+        return $this->response->setStatusCode(400)->setJSON([
+            'success' => false,
+            'message' => 'ID karyawan atau ID master tidak ditemukan.'
+        ]);
+    }
+
+    // Memulai koneksi ke database
+    $mdl = new MasterPenggajianDetailModel();
+
+    // Menjalankan query untuk menghapus data berdasarkan employeeId dan masterId
+    try {
+        $mdl->where('karyawan_id', $employeeId);
+        $mdl->where('penggajian_id', $masterId);
+        $mdl->delete();
+
+        // Cek apakah data benar-benar dihapus
+        if ($mdl->affectedRows() > 0) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Data berhasil dihapus.'
+            ]);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON([
+                'success' => false,
+                'message' => 'Data tidak ditemukan atau sudah dihapus.'
+            ]);
+        }
+    } catch (\Exception $e) {
+        // Error handling jika terjadi kesalahan pada query
+        return $this->response->setStatusCode(500)->setJSON([
+            'success' => false,
+            'message' => 'Terjadi kesalahan pada server: ' . $e->getMessage()
+        ]);
+    }
+}
+
+ private function generateSalarySlipDetails($workData, $salaryRate, $totalAllowance, $totalDeduction)
+{
+    // Hitung gaji normal berdasarkan jam kerja
+    $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+
+    // Konversi outTime menjadi timestamp untuk perbandingan waktu lembur level 1 (jam 18:00)
+    $outTimeTimestamp = $workData['outTime']->getTimestamp();
+    $overtime1Threshold = strtotime('18:00:00');
+
+    // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
+    $totalOvertime1Hours = ($outTimeTimestamp > $overtime1Threshold) ? $workData['totalOvertime1Hours'] : 0;
+    $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
+
+    // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
+    $totalOvertime2HoursRounded = floor($workData['totalOvertime2Hours'] / 0.25) * 0.25;
+    $totalOvertime3HoursRounded = floor($workData['totalOvertime3Hours'] / 0.25) * 0.25;
+
+    // Hitung gaji lembur level 2 dan 3 dengan waktu yang sudah dibulatkan
+    $totalOvertime2Salary = $totalOvertime2HoursRounded * $salaryRate['Gaji_Per_Jam'];
+    $totalOvertime3Salary = $totalOvertime3HoursRounded * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+
+    // Hitung total gaji sebelum tunjangan dan potongan
+    $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
+
+    // Hitung total gaji setelah tunjangan dan potongan
+    $netSalary = ($grossSalary + $totalAllowance) - $totalDeduction;
+
+    // Struktur rincian untuk slip gaji
+    return [
+        'basic_salary' => number_format($totalNormalSalary, 2, ',', '.'), // Gaji Pokok
+        'overtime1_salary' => number_format($totalOvertime1Salary, 2, ',', '.'), // Gaji Lembur Level 1
+        'overtime2_salary' => number_format($totalOvertime2Salary, 2, ',', '.'), // Gaji Lembur Level 2
+        'overtime3_salary' => number_format($totalOvertime3Salary, 2, ',', '.'), // Gaji Lembur Level 3
+        'gross_salary' => number_format($grossSalary, 2, ',', '.'), // Gaji Kotor
+        'allowances' => number_format($totalAllowance, 2, ',', '.'), // Tunjangan
+        'deductions' => number_format($totalDeduction, 2, ',', '.'), // Potongan
+        'net_salary' => number_format($netSalary, 2, ',', '.') // Gaji Bersih
+    ];
+}
+public function getEmployeeSalarySlip($employeeId, $penggajianId)
+{
+    if (!$employeeId || !$penggajianId) {
+        return $this->response->setStatusCode(400)->setJSON([
+            'success' => false,
+            'message' => 'ID karyawan atau ID penggajian tidak ditemukan.'
+        ]);
+    }
+
+    // Inisialisasi model
+    $penggajianDetailModel = new MasterPenggajianDetailModel();
+    $allowanceModel = new MdlFemployeeAllowanceList();
+    $deductionModel = new MdlFemployeeDeductionList();
+    $effectiveHoursModel = new MdlEffectiveHours();
+    $attendanceModel = new AttendanceModel();
+    $salaryCatModel = new MdlSalaryCat();
+
+    // Ambil data penggajian dan karyawan
+    $result = $penggajianDetailModel
+        ->select('master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+        ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
+        ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+        ->where('master_penggajian_detail.penggajian_id', $penggajianId)
+        ->where('master_penggajian_detail.karyawan_id', $employeeId)
+        ->first();
+
+    if (!$result) {
+        return $this->response->setStatusCode(404)->setJSON([
+            'success' => false,
+            'message' => 'Data slip gaji tidak ditemukan untuk karyawan ini.'
+        ]);
+    }
+
+    // Hitung total allowance dan deduction
+    $totalAllowance = $this->calculateTotalAllowance($allowanceModel, $employeeId);
+    $totalDeduction = $this->calculateTotalDeduction($deductionModel, $employeeId);
+
+    // Dapatkan data tarif gaji
+    $salaryRate = $salaryCatModel->where('id', 11)->first();
+
+    // Mendapatkan data kehadiran dan memproses in_time dan out_time
+    $attendanceRecords = $attendanceModel->getAttendance($result['pegawai_pin'], $employeeId, $result['tanggal_awal_penggajian'], $result['tanggal_akhir_penggajian']);
+    $processedAttendance = $this->getInOutTimes($attendanceRecords);
+
+    // Hitung total jam kerja dan lembur
+    $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
+
+    // Hitung total gaji
+    $salaryDetails = $this->generateSalarySlipDetails($workData, $salaryRate, $totalAllowance, $totalDeduction);
+
+    // Gabungkan hasil dengan detail slip gaji
+    $result['salary_slip_details'] = $salaryDetails;
+
+    // Mengembalikan hasil dalam format JSON
+    return $this->response->setJSON($result);
+}
+
 }

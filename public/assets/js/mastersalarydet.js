@@ -124,10 +124,11 @@ $(document).ready(function () {
                     // Mengosongkan tabel sebelum memuat data baru
                     var tableBody = $('#data-body');
                     tableBody.empty();
-
+                    no = 0
                     // Menampilkan data ke dalam tabel
                     response.forEach(function(item) {
                         var row = `<tr>
+                            <td>${no++}</td>
                             <td>${item.karyawan_id}</td>
                             <td>${item.pegawai_nama}</td>
                             <td>${item.pegawai_pin}</td>
@@ -140,7 +141,7 @@ $(document).ready(function () {
                             <td>${item.total_overtime2_Hours}</td>
                             <td>${item.total_overtime3_Hours}</td>
                             <td>${item.sunday_work_Hours}</td>
-                            <td><button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Attendance</button><button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Print</button> <button class="btn btn-success btn-sm add-to-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
+                            <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button><button class="btn btn-success btn-sm print-slip" data-id="${item.karyawan_id}">Print</button> <button class="btn btn-success btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
                         tableBody.append(row);
                     });
@@ -175,5 +176,501 @@ function formatDate(datetime) {
     // Menggabungkan menjadi format 'YYYY-MM-DD'
     return `${year}-${month}-${day}`;
 }
+  $('#data-body').on('click', '.showPresensi', function() {
+    let pin = $(this).attr('pinKaryawan');
+    let id = $(this).attr('idKaryawan');
+    let startDate = $(this).attr('tglAwal');
+    let endDate = $(this).attr('tglAkhir');
+
+
+    // $('#dateSelectionModal').modal('show');
+
+    // $('#fetchPresensi').off('click').on('click', function() {
+    //   let startDate = $('#startDate').val();
+    //   let endDate = $('#endDate').val();
+
+    //   if (!startDate || !endDate) {
+    //     alert("Silakan pilih tanggal awal dan akhir.");
+    //     return;
+    //   }
+
+      refreshPopupContent(pin, id, startDate,endDate)
+
+  });
+
+
+
+  function refreshPopupContent(pin, id, startDate, endDate) {
+    fetchEmployeeNameByPin(pin)
+  $('#popupContent').empty();
+
+    // AJAX request to fetch attendance data
+  $.ajax({
+    url: base_url + 'user/getPresensi',
+    type: 'POST',
+    data: { pin: pin, id: id, startDate: startDate, endDate: endDate },
+    dataType: 'json',
+    success: function(response) {
+      const data = response.data;
+
+            // Check if response data is an array
+      if (!Array.isArray(data)) {
+        alert("Unexpected response format");
+        return;
+      }
+
+            // Fetch work day settings using AJAX
+      $.ajax({
+        url: base_url + 'user/getDataWorkDay',
+        type: 'POST',
+        dataType: 'json',
+        success: function(workDays) {
+          const groupedData = groupAttendanceData(data);
+
+          let html = generateAttendanceTable(groupedData, workDays, id, startDate, endDate);
+
+          $('#popupContent').html(html);
+          $('#popupModal').modal('show');
+          $('#dateSelectionModal').modal('hide');
+        },
+        error: function() {
+          alert("Error fetching work day settings.");
+        }
+      });
+    },
+    error: function() {
+      alert("Error fetching data.");
+    }
+  });
+}
+
+function groupAttendanceData(data) {
+  const groupedData = {};
+  $.each(data, function(index, item) {
+        const dateKey = item.scan_date.split(' ')[0]; // Get the date part only
+        if (!groupedData[dateKey]) {
+          groupedData[dateKey] = [];
+        }
+        groupedData[dateKey].push(item);
+      });
+  return groupedData;
+}
+  function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
+    let html = `
+    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+    <table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+    <th>Scan Date</th>
+    <th>Jam Masuk</th>
+    <th>Jam Keluar</th>
+    <th>Total Jam Kerja</th>
+    <th>Jam Normal</th>
+    <th>Jam Lembur 1</th>
+    <th>Jam Lembur 2</th>
+    <th>Jam Lembur 3</th>
+    <th>Revisi Jam</th>
+    </tr>
+    </thead>
+    <tbody>`;
+
+    let totalDurationMinutes = 0;
+    let workDayCount = 0;
+    let totalNormalWorkMinutes = 0;
+    let totalOvertime1Minutes = 0;
+    let totalOvertime2Minutes = 0;
+    let totalOvertime3Minutes = 0;
+
+    // Process each date's entries
+    $.each(groupedData, function (date, entries) {
+      const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
+        let inTime = new Date(originalInTime); // Create a new variable for adjustment
+        let outTime = new Date(originalOutTime); // Create a new variable for adjustment
+        const dayOfWeek = getDayName(date);
+        const workDaySetting = workDays.find(day => day.day === dayOfWeek);
+
+        if (inTime && outTime) {
+            const duration = (outTime - inTime) / (1000 * 60); // Duration in minutes
+            totalDurationMinutes += duration;
+
+            // Format times and durations
+            const formattedInTime = formatTime(inTime);
+            const formattedOutTime = formatTime(outTime);
+            const { totalHours, totalMinutes } = formatDuration(duration);
+            workDayCount++;
+
+            // Calculate normal and overtime minutes
+            const { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
+            totalNormalWorkMinutes += normalWorkMinutes; // Add to total normal work minutes
+            totalOvertime1Minutes += overtimeMinutes1;
+            totalOvertime2Minutes += overtimeMinutes2;
+            totalOvertime3Minutes += overtimeMinutes3;
+
+            // Apply red background if totalHours == 0
+            const rowClass = totalHours <= 0 ? 'class="bg-danger"' : ''; // Assign class if totalHours is 0
+
+            html += `
+            <tr ${rowClass}>
+            <td>${date} - ${dayOfWeek}</td>
+            <td>${formattedInTime}</td>
+            <td>${formattedOutTime}</td>
+            <td>${totalHours} jam ${totalMinutes} menit</td>
+            <td>${Math.floor(normalWorkMinutes / 60)} jam ${Math.floor(normalWorkMinutes % 60)} menit</td>
+            <td>${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit</td>
+            <td>${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2 % 60)} menit</td>
+            <td>${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3 % 60)} menit</td>
+            <td>
+            <a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" 
+            id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
+            Tambah Data
+            </a>
+            </td>
+            </tr>`;
+          }
+        });
+
+    // Format total normal work minutes for display
+    const totalNormalHours = Math.floor(totalNormalWorkMinutes / 60);
+    const totalNormalMinutes = Math.floor(totalNormalWorkMinutes % 60);
+
+    html += `</tbody></table></div>`;
+    html += `
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+    <th>Keterangan</th>
+    <th>Jumlah</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Periode</td>
+    <td>${formatDateWithDayIndonesian(startDate)} - ${formatDateWithDayIndonesian(endDate)}</td>
+    </tr>
+    <tr>
+    <td>Hari Kerja</td>
+    <td>${workDayCount} hari</td>
+    </tr>
+    <tr>
+    <td>Total Durasi Kerja</td>
+    <td>${Math.floor(totalDurationMinutes / 60)} jam ${Math.floor(totalDurationMinutes % 60)} menit</td>
+    </tr>
+    <tr>
+    <td>Total Kerja (Setelah Istirahat)</td>
+    <td>${totalNormalHours} jam ${totalNormalMinutes} menit</td>
+    </tr>
+    <tr>
+    <td>Total Lembur 1</td>
+    <td>${Math.floor(totalOvertime1Minutes / 60)} jam ${Math.floor(totalOvertime1Minutes % 60)} menit</td>
+    </tr>
+    <tr>
+    <td>Total Lembur 2</td>
+    <td>${Math.floor(totalOvertime2Minutes / 60)} jam ${Math.floor(totalOvertime2Minutes % 60)} menit</td>
+    </tr>
+    <tr>
+    <td>Total Lembur 3</td>
+    <td>${Math.floor(totalOvertime3Minutes / 60)} jam ${Math.floor(totalOvertime3Minutes % 60)} menit</td>
+    </tr>
+    </tbody>
+    </table>`;
+
+    return html;
+  }
+function getInOutTimes(entries) {
+    let inTime = new Date(entries[0].scan_date); // original inTime
+    let outTime = new Date(entries[entries.length - 1].scan_date); // original outTime
+
+    // Check if outTime is smaller than inTime, if so, swap them
+    if (outTime < inTime) {
+        [inTime, outTime] = [outTime, inTime]; // swap inTime and outTime
+    }
+
+    return { inTime, outTime };
+}
+function getDayName(dateString) {
+        const date = new Date(dateString);
+        const options = { weekday: 'long' };
+  return date.toLocaleDateString('id-ID', options); // Output in Indonesian
+}
+  function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  function formatDuration(duration) {
+    return {
+      totalHours: Math.floor(duration / 60),
+      totalMinutes: Math.floor(duration % 60)
+    };
+  }
+  function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
+    let normalWorkMinutes = 0;
+    let overtimeMinutes1 = 0;
+    let overtimeMinutes2 = 0;
+    let overtimeMinutes3 = 0;
+
+    if (workDaySetting) {
+      const workStart = new Date(`${date} ${workDaySetting.work_start}`);
+      const workEnd = new Date(`${date} ${workDaySetting.work_end}`);
+      const overtimeStart1 = new Date(`${date} ${workDaySetting.overtime_start_1}`);
+      const overtimeEnd1 = new Date(`${date} ${workDaySetting.overtime_end_1}`);
+      const overtimeStart2 = new Date(`${date} ${workDaySetting.overtime_start_2}`);
+      const overtimeEnd2 = new Date(`${date} ${workDaySetting.overtime_end_2}`);
+      const overtimeStart3 = new Date(`${date} ${workDaySetting.overtime_start_3}`);
+      const overtimeEnd3 = new Date(`${date} ${workDaySetting.overtime_end_3}`);
+      const workBreakStart = new Date(`${date} ${workDaySetting.work_break}`);
+      const workBreakEnd = new Date(`${date} ${workDaySetting.work_break_end}`);
+
+        // Adjust inTime if needed
+      if (inTime < workStart) {
+            inTime = workStart; // Set inTime to workStart if it's earlier
+          }
+
+        // Calculate normal work minutes
+          if (outTime > workEnd) {
+            normalWorkMinutes = (workEnd - inTime) / (1000 * 60); // Calculate from inTime to workEnd
+          } else {
+            normalWorkMinutes = (outTime - inTime) / (1000 * 60); // Calculate from inTime to outTime
+          }
+
+        // Subtract break time from start of break until end of break
+          if (inTime < workBreakEnd && outTime > workBreakStart) {
+            const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Use the later time
+            const breakDuration = (workBreakEnd - breakStartTime) / (1000 * 60); // Duration of break
+            normalWorkMinutes -= breakDuration; // Subtract break duration from normal work minutes
+          }
+
+        // Calculate overtime levels
+          if (outTime > overtimeStart1) {
+            overtimeMinutes1 = (outTime < overtimeEnd1 ? outTime : overtimeEnd1) - overtimeStart1;
+            overtimeMinutes1 = overtimeMinutes1 / (1000 * 60); // Convert to minutes
+          }
+          if (outTime > overtimeStart2) {
+            overtimeMinutes2 = (outTime < overtimeEnd2 ? outTime : overtimeEnd2) - overtimeStart2;
+            overtimeMinutes2 = overtimeMinutes2 / (1000 * 60); // Convert to minutes
+          }
+          if (outTime > overtimeStart3) {
+            overtimeMinutes3 = (outTime < overtimeEnd3 ? outTime : overtimeEnd3) - overtimeStart3;
+            overtimeMinutes3 = overtimeMinutes3 / (1000 * 60); // Convert to minutes
+          }
+
+        // Prevent negative values
+          normalWorkMinutes = Math.max(normalWorkMinutes, 0);
+          overtimeMinutes1 = Math.max(overtimeMinutes1, 0);
+          overtimeMinutes2 = Math.max(overtimeMinutes2, 0);
+          overtimeMinutes3 = Math.max(overtimeMinutes3, 0);
+        }
+
+        return { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 };
+      }
+function formatDateWithDayIndonesian(dateString) {
+  const dayName = getDayName(dateString);
+  const formattedDate = formatDateIndonesian(dateString);
+
+  return `${dayName}, ${formattedDate}`;
+}
+function formatDateIndonesian(dateString) {
+  const date = new Date(dateString);
+    const day = ('0' + date.getDate()).slice(-2); // Two-digit day
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Two-digit month
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  }
+
+  $('#popupContent').on('click','.addAttendance',function(){
+  let id = $(this).attr('id');
+  let pin = $(this).attr('pin');
+  let date = $(this).attr('date');
+  let startDate = $(this).attr('startDate');
+  let endDate = $(this).attr('endDate');
+
+  Swal.fire({
+    title: `Edit `,
+    html: `<form id="form_edit_data">
+    <div class="form-group">
+    <label for="time">Jam Kerja Masuk/Pulang</label>
+    <input type="time" class="form-control" id="time" aria-describedby="time"  >
+    </div>
+    </form>
+    `,
+    confirmButtonText: 'Confirm',
+    focusConfirm: false,
+    preConfirm: () => {
+      const time = Swal.getPopup().querySelector('#time').value
+      if (!time) {
+        Swal.showValidationMessage('Silakan lengkapi data')
+      }
+      
+      return {time:time}
+    }
+  }).then((result) => {
+    params = {pin:pin,date:date,time:result.value.time}
+
+    $.ajax({
+      type : "POST",
+      url  : base_url+'/user/updateAttendance',
+      async : false,
+      // dataType : "JSON",
+      data : {params},
+      success: function(data){
+
+        refreshPopupContent(pin, id,startDate, endDate); 
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `Jam kerja berhasil ditambahkan.`,
+          showConfirmButton: false,
+          timer: 2500
+        })
+      },
+      error: function(xhr){
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        })
+      }
+    });
+
+  })
+});
+    function fetchEmployeeNameByPin(pin) {
+    $.ajax({
+      url: base_url + 'user/getEmployeeNameByPin', 
+      type: 'POST',
+      data: { pin: pin },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          $('#employeeName').text(response.name); 
+        } else {
+          console.error('Error: ', response.message);
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('AJAX Error: ', error);
+      }
+    });
+  }
+  $(document).on('click', '.delete-from-payroll', function () {
+    let employeeId = $(this).data('id');
+
+    // Tampilkan dialog konfirmasi
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Data ini akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Kirim request AJAX untuk delete
+            $.ajax({
+                type: "POST",
+                url: base_url + '/MasterPenggajianDetailController/deleteEmployeeFromPayroll',
+                data: { employeeId: employeeId, masterId: masterId },
+                success: function(response) {
+                    loadPayrollData()
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Dihapus!',
+                        text: 'Data berhasil dihapus.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function(xhr) {
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${d.message}`,
+                        footer: '<a href="">Why do I have this issue?</a>'
+                    });
+                }
+            });
+        }
+    });
+});
+
+  // Fungsi untuk mengenerate HTML slip gaji
+// Fungsi untuk mengenerate HTML slip gaji
+function generateSalarySlipHTML(employeeData) {
+    const slipHTML = `
+        <div class="salary-slip">
+            <h1>Slip Gaji Karyawan</h1>
+            <p>Bulan: ${formatDate(new Date())}</p>
+            <hr>
+            <h3>Operator</h3>
+            <p><strong>Nama Karyawan:</strong> ${employeeData.pegawai_nama}</p>
+            <p><strong>ID Karyawan:</strong> ${employeeData.karyawan_id}</p>
+            <p><strong>Periode Gaji:</strong> ${formatDate(employeeData.tanggal_awal_penggajian)} - ${formatDate(employeeData.tanggal_akhir_penggajian)}</p>
+            
+            <h3>Rincian Gaji</h3>
+            <table>
+                <tr><td>Gaji Pokok</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
+                <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
+                <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
+                <tr><td>Gaji Lembur >20.00</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
+                <tr><td>Gaji Kotor</td><td>${employeeData.salary_slip_details.gross_salary}</td></tr>
+                <tr><td>Tunjangan</td><td>${employeeData.salary_slip_details.allowances}</td></tr>
+                <tr><td>Potongan</td><td>${employeeData.salary_slip_details.deductions}</td></tr>
+                <tr><td><strong>Gaji Bersih</strong></td><td><strong>${employeeData.salary_slip_details.net_salary}</strong></td></tr>
+            </table>
+            <hr>
+            <p>Slip gaji ini dihasilkan pada ${formatDate(new Date())}</p>
+        </div>
+    `;
+
+    const newWindow = window.open();
+    newWindow.document.write(`
+        <html>
+            <head>
+                <title>Slip Gaji</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .salary-slip { width: 500px; margin: auto; padding: 20px; border: 1px solid #000; }
+                    h1, h3 { text-align: center; }
+                    table { width: 100%; margin-top: 20px; }
+                    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 10px; text-align: left; }
+                </style>
+            </head>
+            <body onload="window.print();window.close();">
+                ${slipHTML}
+            </body>
+        </html>
+    `);
+}
+
+// Event listener untuk tombol Print
+$(document).on('click', '.print-slip', function () {
+    const employeeId = $(this).data('id');
+    $.ajax({
+        url: base_url + '/MasterPenggajianDetailController/getEmployeeSalarySlip/' + employeeId + '/' + masterId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response) {
+                generateSalarySlipHTML(response);
+            } else {
+                alert('Data karyawan tidak ditemukan.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error: ' + status + ' - ' + error);
+            alert('Gagal memuat data slip gaji.');
+        }
+    });
+});
+
+
+
+
 
 });
+
+// Event handler untuk delete
+

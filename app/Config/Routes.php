@@ -147,5 +147,7 @@ $routes->group('master_penggajian', function ($routes) {
 $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->post('addEmployeeToPayroll', 'MasterPenggajianDetailController::addEmployeeToPayroll'); 
     $routes->get('dataEmployeeMaster/(:any)', 'MasterPenggajianDetailController::dataEmployeeMaster/$1'); 
+    $routes->post('deleteEmployeeFromPayroll','MasterPenggajianDetailController::deleteEmployeeFromPayroll');
+    $routes->get('getEmployeeSalarySlip/(:num)/(:num)', 'MasterPenggajianDetailController::getEmployeeSalarySlip/$1/$2');
 
 });

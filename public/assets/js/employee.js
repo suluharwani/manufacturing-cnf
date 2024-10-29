@@ -376,10 +376,16 @@ function groupAttendanceData(data) {
 
 // Function to get in and out times from attendance entries
 function getInOutTimes(entries) {
-    const inTime = new Date(entries[0].scan_date); // original inTime
-    const outTime = new Date(entries[entries.length - 1].scan_date); // original outTime
+    let inTime = new Date(entries[0].scan_date); // original inTime
+    let outTime = new Date(entries[entries.length - 1].scan_date); // original outTime
+
+    // Check if outTime is smaller than inTime, if so, swap them
+    if (outTime < inTime) {
+        [inTime, outTime] = [outTime, inTime]; // swap inTime and outTime
+    }
+
     return { inTime, outTime };
-  }
+}
 
   function refreshPopupContent(pin, id, startDate, endDate) {
     fetchEmployeeNameByPin(pin)
