@@ -124,7 +124,7 @@ $(document).ready(function () {
                     // Mengosongkan tabel sebelum memuat data baru
                     var tableBody = $('#data-body');
                     tableBody.empty();
-                    no = 0
+                    no = 1
                     // Menampilkan data ke dalam tabel
                     response.forEach(function(item) {
                         var row = `<tr>
@@ -141,7 +141,11 @@ $(document).ready(function () {
                             <td>${item.total_overtime2_Hours}</td>
                             <td>${item.total_overtime3_Hours}</td>
                             <td>${item.sunday_work_Hours}</td>
-                            <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button><button class="btn btn-success btn-sm print-slip" data-id="${item.karyawan_id}">Print</button> <button class="btn btn-success btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
+                            <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button>
+                                <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
+                                <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
+                                <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print</button>
+                                <button class="btn btn-danger btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
                         tableBody.append(row);
                     });
@@ -666,6 +670,323 @@ $(document).on('click', '.print-slip', function () {
     });
 });
 
+
+  $(document).on('click', '.varTunjangan', function() {
+    var pin = $(this).attr('pin');
+    var id = $(this).attr('id');
+    var name = $(this).attr('name');
+          $('#AllowaceEmployeeName').val(name); 
+          $('#AllowaceEmployeeId').val(id); 
+          $('#AllowaceEmployeePin').val(pin); 
+
+    fetchAllowanceOptions();
+    fetchAllowancesUser(id);
+    $('#tunjanganModal').modal('show');
+
+
+  });
+  $(document).on('click', '.varPotongan', function() {
+    var pin = $(this).attr('pin');
+    var id = $(this).attr('id');
+    var name = $(this).attr('name');
+          $('#DeductionEmployeeName').val(name); 
+          $('#DeductionEmployeeId').val(id); 
+          $('#DeductionEmployeePin').val(pin); 
+
+    fetchDeductionOptions();
+    fetchDeductionsUser(id);
+    $('#potonganModal').modal('show');
+
+
+  });
+  function fetchAllowancesUser(id){
+     $('#allowanceTable tbody').empty();
+    $.ajax({
+      url: base_url+`user/getEmployeeAllowances/${id}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        let tbody = '';
+        if (data.length > 0) {
+          data.forEach(function(allowance, index) {
+            tbody += `
+            <tr>
+            <td>${index + 1}</td>
+            <td>${allowance.allowance_name}</td>
+            <td>${formatRupiah(allowance.amount)}</td>
+            <td>
+            <button class="btn btn-danger deleteAllowanceBtn" data-id="${allowance.id}">Delete</button>
+            </td>
+            </tr>
+            `;
+          });
+        } else {
+          tbody = `<tr><td colspan="4" class="text-center">No Allowances Found</td></tr>`;
+        }
+        $('#allowanceTable tbody').html(tbody);
+      },
+      error: function() {
+        alert('Failed to fetch allowances.');
+      }
+    });
+  }
+    // Fetch allowances and populate the table
+  function fetchAllowanceOptions() {
+    $.ajax({
+            url: base_url+'user/getAllowanceOptions', // Controller URL
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+              if (response.status === 'success' && response.data.length > 0) {
+                populateAllowanceDropdown(response.data);
+              } else {
+                alert("No allowances found.");
+              }
+            },
+            error: function() {
+              alert("Failed to fetch allowances.");
+            }
+          });
+  }
+
+  function populateAllowanceDropdown(allowances) {
+    let options = '<option value="">Select Allowance</option>';
+    $.each(allowances, function(index, allowance) {
+      options += `<option value="${allowance.id}" 
+      data-allowance="${allowance.Kode}">
+      ${allowance.Nama} - ${allowance.Status}
+      </option>`;
+    });
+    $('#allowanceSelect').html(options);
+  }
+
+  $('#saveTunjanganBtn').on('click', function() {
+    let employeeId = $('#AllowaceEmployeeId').val();
+    let allowanceId = $('#allowanceSelect').val();
+    let amount = $('#jumlahTunjangan').val();
+
+    if (employeeId === '' || allowanceId === ''|| amount === '') {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    $.ajax({
+      url: base_url+'user/addAllowance', // Controller URL to add allowance
+      type: 'POST',
+      data: {
+        employeeId: employeeId,
+        allowanceId: allowanceId,
+        amount: amount
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.status === 'success') {
+                      fetchAllowancesUser(employeeId)
+
+Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to add allowance.");
+      }
+    });
+  });
+
+function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR', 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+  $('#allowanceTable tbody').on('click', '.deleteAllowanceBtn', function() {
+        const id = $(this).data('id');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Tunjangan ini akan dihapus!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: base_url + '/user/deleteAllowanceList/' + id,
+                    success: function() {
+                      fetchAllowancesUser(id)
+                        Swal.fire('Sukses', 'Tunjangan berhasil dihapus.', 'success');
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus tunjangan.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+
+//deduction
+
+  function fetchDeductionsUser(id){
+     $('#potonganTable tbody').empty();
+    $.ajax({
+      url: base_url+`user/getEmployeeDeductions/${id}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        let tbody = '';
+        if (data.length > 0) {
+          data.forEach(function(deduction, index) {
+            tbody += `
+            <tr>
+            <td>${index + 1}</td>
+            <td>${deduction.deduction_name}</td>
+            <td>${formatRupiah(deduction.amount)}</td>
+            <td>
+            <button class="btn btn-danger deleteDeductionBtn" data-id="${deduction.id}">Delete</button>
+            </td>
+            </tr>
+            `;
+          });
+        } else {
+          tbody = `<tr><td colspan="4" class="text-center">No Deduction Found</td></tr>`;
+        }
+        $('#potonganTable tbody').html(tbody);
+      },
+      error: function() {
+        alert('Failed to fetch deduction.');
+      }
+    });
+  }
+    // Fetch allowances and populate the table
+  function fetchDeductionOptions() {
+    $.ajax({
+            url: base_url+'user/getDeductionOptions', // Controller URL
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+              if (response.status === 'success' && response.data.length > 0) {
+                populateDeductionDropdown(response.data);
+              } else {
+                alert("No allowances found.");
+              }
+            },
+            error: function() {
+              alert("Failed to fetch allowances.");
+            }
+          });
+  }
+
+  function populateDeductionDropdown(deduction) {
+    let options = '<option value="">Select Deduction</option>';
+    $.each(deduction, function(index, deduction) {
+      options += `<option value="${deduction.id}" 
+      data-deduction="${deduction.Kode}">
+      ${deduction.Nama} - ${deduction.Status}
+      </option>`;
+    });
+    $('#deductionSelect').html(options);
+  }
+
+  $('#addPotonganBtn').on('click', function() {
+    let employeeId = $('#DeductionEmployeeId').val();
+    let deductionId = $('#deductionSelect').val();
+    let amount = $('#jumlahPotongan').val();
+
+    if (employeeId === '' || deductionId === ''|| amount === '') {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    $.ajax({
+      url: base_url+'user/addDeductionList', // Controller URL to add allowance
+      type: 'POST',
+      data: {
+        employeeId: employeeId,
+        deductionId: deductionId,
+        amount: amount
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.status === 'success') {
+                      fetchDeductionsUser(employeeId)
+          
+Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        } else {
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: false,
+            timer: 2500
+          })
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to add allowance.");
+      }
+    });
+  });
+
+function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR', 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+
+  $('#potonganTable tbody').on('click', '.deleteDeductionBtn', function() {
+        const id = $(this).data('id');
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Tunjangan ini akan dihapus!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: base_url + '/user/deleteDeductionList/' + id,
+                    success: function() {
+                      fetchDeductionsUser(id)
+                        Swal.fire('Sukses', 'Tunjangan berhasil dihapus.', 'success');
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus tunjangan.', 'error');
+                    }
+                });
+            }
+        });
+    });
 
 
 
