@@ -55,7 +55,11 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Detail Master Payroll</h6>
-            <button class= "btn btn-primary create">Employee List</button>
+            <div>
+            <button id="printRekapGaji" class="btn btn-primary">Print Rekap Gaji</button>
+            
+            </div>
+            
         </div>
         <div class="table-responsive">
                    <table class="table table-bordered">

@@ -451,10 +451,7 @@ function getInOutTimes(entries) {
     return { inTime, outTime };
   }
 
-// Function to generate HTML table for attendance data
-// Function to generate HTML table for attendance data
-// Function to generate HTML table for attendance data
-  function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
+function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
     let html = `
     <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
     <table class="table table-striped table-bordered">
@@ -482,9 +479,9 @@ function getInOutTimes(entries) {
 
     // Process each date's entries
     $.each(groupedData, function (date, entries) {
-      const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
-        let inTime = new Date(originalInTime); // Create a new variable for adjustment
-        let outTime = new Date(originalOutTime); // Create a new variable for adjustment
+        const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
+        let inTime = new Date(originalInTime);
+        let outTime = new Date(originalOutTime);
         const dayOfWeek = getDayName(date);
         const workDaySetting = workDays.find(day => day.day === dayOfWeek);
 
@@ -499,11 +496,29 @@ function getInOutTimes(entries) {
             workDayCount++;
 
             // Calculate normal and overtime minutes
-            const { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
-            totalNormalWorkMinutes += normalWorkMinutes; // Add to total normal work minutes
+            let { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
+            totalNormalWorkMinutes += normalWorkMinutes;
+
+            // Set overtimeMinutes1 to 0 if it's less than 75 minutes
+            if (overtimeMinutes1 < 75) {
+                overtimeMinutes1 = 0;
+            }
             totalOvertime1Minutes += overtimeMinutes1;
-            totalOvertime2Minutes += overtimeMinutes2;
-            totalOvertime3Minutes += overtimeMinutes3;
+
+            // Bulatkan lembur level 2 dan 3 ke bawah per 15 menit
+            const roundedOvertime2 = Math.floor(overtimeMinutes2 / 15) * 15;
+            const roundedOvertime3 = Math.floor(overtimeMinutes3 / 15) * 15;
+            totalOvertime2Minutes += roundedOvertime2;
+            totalOvertime3Minutes += roundedOvertime3;
+
+            // Display original and rounded overtime for level 2 and 3
+            const overtime2Display = `${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2) % 60} menit (<span style="color: green;">Diakui: ${Math.floor(roundedOvertime2 / 60)} jam ${roundedOvertime2 % 60} menit</span>)`;
+            const overtime3Display = `${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3) % 60} menit (<span style="color: green;">Diakui: ${Math.floor(roundedOvertime3 / 60)} jam ${roundedOvertime3 % 60} menit</span>)`;
+
+            // Apply "Tidak Valid" label if overtime1 is less than 75 minutes and greater than 0
+            const overtime1Display = (overtimeMinutes1 === 0 && overtimeMinutes1 < 75)
+                ? `<span style="color: red;">(${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)})Tidak Valid</span>`
+                : `${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit`;
 
             // Apply red background if totalHours == 0
             const rowClass = totalHours <= 0 ? 'class="bg-danger"' : ''; // Assign class if totalHours is 0
@@ -515,9 +530,9 @@ function getInOutTimes(entries) {
             <td>${formattedOutTime}</td>
             <td>${totalHours} jam ${totalMinutes} menit</td>
             <td>${Math.floor(normalWorkMinutes / 60)} jam ${Math.floor(normalWorkMinutes % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2 % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3 % 60)} menit</td>
+            <td>${overtime1Display}</td>
+            <td>${overtime2Display}</td>
+            <td>${overtime3Display}</td>
             <td>
             <a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" 
             id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
@@ -525,8 +540,8 @@ function getInOutTimes(entries) {
             </a>
             </td>
             </tr>`;
-          }
-        });
+        }
+    });
 
     // Format total normal work minutes for display
     const totalNormalHours = Math.floor(totalNormalWorkMinutes / 60);
@@ -574,7 +589,7 @@ function getInOutTimes(entries) {
     </table>`;
 
     return html;
-  }
+}
 
 // Function to format time to HH:MM
   function formatTime(date) {

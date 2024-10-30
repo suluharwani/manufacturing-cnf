@@ -259,7 +259,9 @@ function groupAttendanceData(data) {
       });
   return groupedData;
 }
-  function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
+
+
+function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
     let html = `
     <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
     <table class="table table-striped table-bordered">
@@ -287,9 +289,9 @@ function groupAttendanceData(data) {
 
     // Process each date's entries
     $.each(groupedData, function (date, entries) {
-      const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
-        let inTime = new Date(originalInTime); // Create a new variable for adjustment
-        let outTime = new Date(originalOutTime); // Create a new variable for adjustment
+        const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
+        let inTime = new Date(originalInTime);
+        let outTime = new Date(originalOutTime);
         const dayOfWeek = getDayName(date);
         const workDaySetting = workDays.find(day => day.day === dayOfWeek);
 
@@ -304,11 +306,29 @@ function groupAttendanceData(data) {
             workDayCount++;
 
             // Calculate normal and overtime minutes
-            const { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
-            totalNormalWorkMinutes += normalWorkMinutes; // Add to total normal work minutes
+            let { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
+            totalNormalWorkMinutes += normalWorkMinutes;
+
+            // Set overtimeMinutes1 to 0 if it's less than 75 minutes
+            if (overtimeMinutes1 < 75) {
+                overtimeMinutes1 = 0;
+            }
             totalOvertime1Minutes += overtimeMinutes1;
-            totalOvertime2Minutes += overtimeMinutes2;
-            totalOvertime3Minutes += overtimeMinutes3;
+
+            // Bulatkan lembur level 2 dan 3 ke bawah per 15 menit
+            const roundedOvertime2 = Math.floor(overtimeMinutes2 / 15) * 15;
+            const roundedOvertime3 = Math.floor(overtimeMinutes3 / 15) * 15;
+            totalOvertime2Minutes += roundedOvertime2;
+            totalOvertime3Minutes += roundedOvertime3;
+
+            // Display original and rounded overtime for level 2 and 3
+            const overtime2Display = `${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2) % 60} menit (<span style="color: green;">Diakui: ${Math.floor(roundedOvertime2 / 60)} jam ${roundedOvertime2 % 60} menit</span>)`;
+            const overtime3Display = `${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3) % 60} menit (<span style="color: green;">Diakui: ${Math.floor(roundedOvertime3 / 60)} jam ${roundedOvertime3 % 60} menit</span>)`;
+
+            // Apply "Tidak Valid" label if overtime1 is less than 75 minutes and greater than 0
+            const overtime1Display = (overtimeMinutes1 === 0 && overtimeMinutes1 < 75)
+                ? `<span style="color: red;">(${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)})Tidak Valid</span>`
+                : `${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit`;
 
             // Apply red background if totalHours == 0
             const rowClass = totalHours <= 0 ? 'class="bg-danger"' : ''; // Assign class if totalHours is 0
@@ -320,9 +340,9 @@ function groupAttendanceData(data) {
             <td>${formattedOutTime}</td>
             <td>${totalHours} jam ${totalMinutes} menit</td>
             <td>${Math.floor(normalWorkMinutes / 60)} jam ${Math.floor(normalWorkMinutes % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes2 / 60)} jam ${Math.floor(overtimeMinutes2 % 60)} menit</td>
-            <td>${Math.floor(overtimeMinutes3 / 60)} jam ${Math.floor(overtimeMinutes3 % 60)} menit</td>
+            <td>${overtime1Display}</td>
+            <td>${overtime2Display}</td>
+            <td>${overtime3Display}</td>
             <td>
             <a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" 
             id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
@@ -330,8 +350,8 @@ function groupAttendanceData(data) {
             </a>
             </td>
             </tr>`;
-          }
-        });
+        }
+    });
 
     // Format total normal work minutes for display
     const totalNormalHours = Math.floor(totalNormalWorkMinutes / 60);
@@ -379,7 +399,9 @@ function groupAttendanceData(data) {
     </table>`;
 
     return html;
-  }
+}
+
+
 function getInOutTimes(entries) {
     let inTime = new Date(entries[0].scan_date); // original inTime
     let outTime = new Date(entries[entries.length - 1].scan_date); // original outTime
@@ -618,7 +640,7 @@ function generateSalarySlipHTML(employeeData) {
                 <tr><td>Gaji Pokok</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
                 <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
                 <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
-                <tr><td>Gaji Lembur >20.00</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
+                <tr><td>Gaji Lembur >20.30</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
                 <tr><td>Gaji Kotor</td><td>${employeeData.salary_slip_details.gross_salary}</td></tr>
                 <tr><td>Tunjangan</td><td>${employeeData.salary_slip_details.allowances}</td></tr>
                 <tr><td>Potongan</td><td>${employeeData.salary_slip_details.deductions}</td></tr>
@@ -987,6 +1009,86 @@ function formatRupiah(amount) {
             }
         });
     });
+
+$(document).on('click', '#printRekapGaji', function () {
+    // Panggil fungsi untuk mendapatkan dan mencetak data rekap gaji
+    printRekapGajiHTML(masterId);
+});
+function printRekapGajiHTML(masterId) {
+    $.ajax({
+        url: base_url + '/MasterPenggajianDetailController/dataEmployeeMaster/' + masterId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            const rekapHTML = generateRekapGajiHTML(response);
+            const newWindow = window.open();
+            newWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Rekap Gaji</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            .rekap-slip { width: 100%; margin: auto; }
+                            h1, h3 { text-align: center; }
+                            table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+                            table, th, td { border: 1px solid black; padding: 10px; text-align: left; }
+                            .page-break { page-break-before: always; }
+                        </style>
+                    </head>
+                    <body onload="window.print();window.close();">
+                        ${rekapHTML}
+                    </body>
+                </html>
+            `);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error: ' + status + ' - ' + error);
+            alert('Gagal memuat data rekap gaji.');
+        }
+    });
+}
+
+function generateRekapGajiHTML(employeeDataList) {
+    let rekapHTML = `
+        <div class="rekap-slip">
+            <h1>Rekap Gaji Karyawan</h1>
+            <p>Periode: ${formatDate(new Date())}</p>
+            <hr>`;
+
+    let totalGajiKeseluruhan = 0; // Inisialisasi total gaji keseluruhan
+
+    employeeDataList.forEach((employeeData, index) => {
+        totalGajiKeseluruhan += parseFloat(employeeData.total_salary); // Tambahkan total salary setiap karyawan ke total keseluruhan
+
+        rekapHTML += `
+            <div class="salary-slip ${index > 0 ? 'page-break' : ''}">
+                <h3>${employeeData.pegawai_nama}</h3>
+                <p><strong>ID Karyawan:</strong> ${employeeData.karyawan_id}</p>
+                <p><strong>Periode Gaji:</strong> ${formatDate(employeeData.tanggal_awal_penggajian)} - ${formatDate(employeeData.tanggal_akhir_penggajian)}</p>
+                <h4>Rincian Gaji</h4>
+                <table>
+                    <tr><td>Gaji Pokok</td><td>${formatRupiah(employeeData.total_salary)}</td></tr>
+                    <tr><td>Total Jam Kerja</td><td>${employeeData.total_work_Hours}</td></tr>
+                    <tr><td>Lembur 1</td><td>${employeeData.total_overtime1_Hours}</td></tr>
+                    <tr><td>Lembur 2</td><td>${employeeData.total_overtime2_Hours}</td></tr>
+                    <tr><td>Lembur 3</td><td>${employeeData.total_overtime3_Hours}</td></tr>
+                    <tr><td>Kerja Hari Minggu</td><td>${employeeData.sunday_work_Hours}</td></tr>
+                </table>
+                <hr>
+            </div>`;
+    });
+
+    // Tambahkan total keseluruhan gaji di akhir laporan
+    rekapHTML += `
+        <div class="total-gaji">
+            <h3>Total Keseluruhan Gaji</h3>
+            <p><strong>Total Gaji Semua Karyawan:</strong> ${formatRupiah(totalGajiKeseluruhan)}</p>
+        </div>
+    `;
+
+    rekapHTML += `</div>`;
+    return rekapHTML;
+}
 
 
 

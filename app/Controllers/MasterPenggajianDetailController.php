@@ -134,70 +134,137 @@ class MasterPenggajianDetailController extends BaseController
 
     // Fungsi untuk menghitung durasi kerja dan lembur
     private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
-    {
-        $normalWorkMinutes = 0;
-        $overtimeMinutes1 = 0;
-        $overtimeMinutes2 = 0;
-        $overtimeMinutes3 = 0;
-  
+{
+    $normalWorkMinutes = 0;
+    $overtimeMinutes1 = 0;
+    $overtimeMinutes2 = 0;
+    $overtimeMinutes3 = 0;
 
-        if ($workDaySetting) {
-            $workStart = new \DateTime("$date {$workDaySetting['work_start']}");
-            $workEnd = new \DateTime("$date {$workDaySetting['work_end']}");
-            $overtimeStart1 = new \DateTime("$date {$workDaySetting['overtime_start_1']}");
-            $overtimeEnd1 = new \DateTime("$date {$workDaySetting['overtime_end_1']}");
-            $overtimeStart2 = new \DateTime("$date {$workDaySetting['overtime_start_2']}");
-            $overtimeEnd2 = new \DateTime("$date {$workDaySetting['overtime_end_2']}");
-            $overtimeStart3 = new \DateTime("$date {$workDaySetting['overtime_start_3']}");
-            $overtimeEnd3 = new \DateTime("$date {$workDaySetting['overtime_end_3']}");
-            $workBreakStart = new \DateTime("$date {$workDaySetting['work_break']}");
-            $workBreakEnd = new \DateTime("$date {$workDaySetting['work_break_end']}");
+    if ($workDaySetting) {
+        $workStart = new \DateTime("$date {$workDaySetting['work_start']}");
+        $workEnd = new \DateTime("$date {$workDaySetting['work_end']}");
+        $overtimeStart1 = new \DateTime("$date {$workDaySetting['overtime_start_1']}");
+        $overtimeEnd1 = new \DateTime("$date {$workDaySetting['overtime_end_1']}");
+        $overtimeStart2 = new \DateTime("$date {$workDaySetting['overtime_start_2']}");
+        $overtimeEnd2 = new \DateTime("$date {$workDaySetting['overtime_end_2']}");
+        $overtimeStart3 = new \DateTime("$date {$workDaySetting['overtime_start_3']}");
+        $overtimeEnd3 = new \DateTime("$date {$workDaySetting['overtime_end_3']}");
+        $workBreakStart = new \DateTime("$date {$workDaySetting['work_break']}");
+        $workBreakEnd = new \DateTime("$date {$workDaySetting['work_break_end']}");
 
-            // Sesuaikan inTime jika diperlukan
-            if ($inTime < $workStart) {
-                $inTime = $workStart; // Atur inTime ke workStart jika lebih awal
-            }
-
-            // Hitung durasi kerja normal
-            if ($outTime > $workEnd) {
-                $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
-            } else {
-                $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
-            }
-
-            // Kurangi durasi waktu istirahat dari waktu kerja normal
-            if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
-                $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
-                $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
-                $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
-            }
-
-            // Hitung lembur level 1
-            if ($outTime > $overtimeStart1) {
-                $overtimeMinutes1 = min($overtimeEnd1->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart1->getTimestamp();
-                $overtimeMinutes1 = max($overtimeMinutes1 / 60, 0);
-            }
-
-            // Hitung lembur level 2
-            if ($outTime > $overtimeStart2) {
-                $overtimeMinutes2 = min($overtimeEnd2->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart2->getTimestamp();
-                $overtimeMinutes2 = max($overtimeMinutes2 / 60, 0);
-            }
-
-            // Hitung lembur level 3
-            if ($outTime > $overtimeStart3) {
-                $overtimeMinutes3 = min($overtimeEnd3->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart3->getTimestamp();
-                $overtimeMinutes3 = max($overtimeMinutes3 / 60, 0);
-            }
+        // Sesuaikan inTime jika diperlukan
+        if ($inTime < $workStart) {
+            $inTime = $workStart; // Atur inTime ke workStart jika lebih awal
         }
 
-        return [
-            'normalWorkMinutes' => $normalWorkMinutes,
-            'overtimeMinutes1' => $overtimeMinutes1,
-            'overtimeMinutes2' => $overtimeMinutes2,
-            'overtimeMinutes3' => $overtimeMinutes3,
-        ];
+        // Hitung durasi kerja normal
+        if ($outTime > $workEnd) {
+            $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
+        } else {
+            $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+        }
+
+        // Kurangi durasi waktu istirahat dari waktu kerja normal
+        if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
+            $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
+            $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
+            $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
+        }
+
+        // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
+        $threshold18 = new \DateTime("$date 18:00:00");
+        if ($outTime > $overtimeStart1 && $outTime > $threshold18) {
+            $overtimeMinutes1 = min($overtimeEnd1->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart1->getTimestamp();
+            $overtimeMinutes1 = max($overtimeMinutes1 / 60, 0);
+        }
+
+        // Hitung lembur level 2
+        if ($outTime > $overtimeStart2) {
+            $overtimeMinutes2 = min($overtimeEnd2->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart2->getTimestamp();
+            $overtimeMinutes2 = max($overtimeMinutes2 / 60, 0);
+        }
+
+        // Hitung lembur level 3
+        if ($outTime > $overtimeStart3) {
+            $overtimeMinutes3 = min($overtimeEnd3->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart3->getTimestamp();
+            $overtimeMinutes3 = max($overtimeMinutes3 / 60, 0);
+        }
     }
+
+    return [
+        'normalWorkMinutes' => $normalWorkMinutes,
+        'overtimeMinutes1' => $overtimeMinutes1,
+        'overtimeMinutes2' => $overtimeMinutes2,
+        'overtimeMinutes3' => $overtimeMinutes3,
+    ];
+}
+
+    // private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
+    // {
+    //     $normalWorkMinutes = 0;
+    //     $overtimeMinutes1 = 0;
+    //     $overtimeMinutes2 = 0;
+    //     $overtimeMinutes3 = 0;
+  
+
+    //     if ($workDaySetting) {
+    //         $workStart = new \DateTime("$date {$workDaySetting['work_start']}");
+    //         $workEnd = new \DateTime("$date {$workDaySetting['work_end']}");
+    //         $overtimeStart1 = new \DateTime("$date {$workDaySetting['overtime_start_1']}");
+    //         $overtimeEnd1 = new \DateTime("$date {$workDaySetting['overtime_end_1']}");
+    //         $overtimeStart2 = new \DateTime("$date {$workDaySetting['overtime_start_2']}");
+    //         $overtimeEnd2 = new \DateTime("$date {$workDaySetting['overtime_end_2']}");
+    //         $overtimeStart3 = new \DateTime("$date {$workDaySetting['overtime_start_3']}");
+    //         $overtimeEnd3 = new \DateTime("$date {$workDaySetting['overtime_end_3']}");
+    //         $workBreakStart = new \DateTime("$date {$workDaySetting['work_break']}");
+    //         $workBreakEnd = new \DateTime("$date {$workDaySetting['work_break_end']}");
+
+    //         // Sesuaikan inTime jika diperlukan
+    //         if ($inTime < $workStart) {
+    //             $inTime = $workStart; // Atur inTime ke workStart jika lebih awal
+    //         }
+
+    //         // Hitung durasi kerja normal
+    //         if ($outTime > $workEnd) {
+    //             $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
+    //         } else {
+    //             $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+    //         }
+
+    //         // Kurangi durasi waktu istirahat dari waktu kerja normal
+    //         if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
+    //             $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
+    //             $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
+    //             $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
+    //         }
+
+    //              // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
+    //     $threshold18 = new \DateTime("$date 18:00:00");
+    //     if ($outTime > $overtimeStart1 && $outTime > $threshold18) {
+    //         $overtimeMinutes1 = min($overtimeEnd1->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart1->getTimestamp();
+    //         $overtimeMinutes1 = max($overtimeMinutes1 / 60, 0);
+    //     }
+
+    //         // Hitung lembur level 2
+    //         if ($outTime > $overtimeStart2) {
+    //             $overtimeMinutes2 = min($overtimeEnd2->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart2->getTimestamp();
+    //             $overtimeMinutes2 = max($overtimeMinutes2 / 60, 0);
+    //         }
+
+    //         // Hitung lembur level 3
+    //         if ($outTime > $overtimeStart3) {
+    //             $overtimeMinutes3 = min($overtimeEnd3->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart3->getTimestamp();
+    //             $overtimeMinutes3 = max($overtimeMinutes3 / 60, 0);
+    //         }
+    //     }
+
+    //     return [
+    //         'normalWorkMinutes' => $normalWorkMinutes,
+    //         'overtimeMinutes1' => $overtimeMinutes1,
+    //         'overtimeMinutes2' => $overtimeMinutes2,
+    //         'overtimeMinutes3' => $overtimeMinutes3,
+    //     ];
+    // }
     private function getDayInIndonesian($date)
 {
     $dayOfWeek = date('N', strtotime($date)); // Menggunakan format angka untuk hari (1 = Senin, 7 = Minggu)
@@ -225,7 +292,7 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
         $date = $attendance['date'];
         $dayOfWeek = $this->getDayInIndonesian($date);
         $workDaySetting = $effectiveHoursModel->where('day', $dayOfWeek)->first();
- 
+
         if (!$workDaySetting) {
             continue; // Jika tidak ada pengaturan hari kerja, lewati iterasi ini
         }
@@ -240,7 +307,11 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
 
         // Tambahkan hasil perhitungan ke total
         $totalWorkMinutes += $workData['normalWorkMinutes'];
-        $totalOvertime1Minutes += $workData['overtimeMinutes1'];
+
+        // Set overtimeMinutes1 to 0 if it's less than 75 minutes
+        $overtimeMinutes1 = $workData['overtimeMinutes1'] >= 75 ? $workData['overtimeMinutes1'] : 0;
+        $totalOvertime1Minutes += $overtimeMinutes1;
+        
         $totalOvertime2Minutes += $workData['overtimeMinutes2'];
         $totalOvertime3Minutes += $workData['overtimeMinutes3'];
 
@@ -258,7 +329,6 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
     $sundayWorkHours = round($sundayWorkMinutes / 60, 2);
 
     return [
-        'outTime'=>$outTime,
         'totalWorkHours' => $totalWorkHours,
         'totalOvertime1Hours' => $totalOvertime1Hours,
         'totalOvertime2Hours' => $totalOvertime2Hours,
@@ -266,17 +336,18 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
         'sundayWorkHours' => $sundayWorkHours,
     ];
 }
+
 private function calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)
 {
     // Hitung gaji normal berdasarkan jam kerja
     $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
 
     // Konversi outTime menjadi timestamp untuk perbandingan waktu
-    $outTimeTimestamp = $workData['outTime']->getTimestamp();
-    $overtime1Threshold = strtotime('18:00:00');
+    // $outTimeTimestamp = $workData['outTime']->getTimestamp();
+    // $overtime1Threshold = strtotime('18:00:00');
 
     // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
-    $totalOvertime1Hours = ($outTimeTimestamp > $overtime1Threshold) ? $workData['totalOvertime1Hours'] : 0;
+    $totalOvertime1Hours =  $workData['totalOvertime1Hours'];
     $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
 
     // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
@@ -423,17 +494,15 @@ public function deleteEmployeeFromPayroll()
     // Hitung gaji normal berdasarkan jam kerja
     $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
 
-    // Konversi outTime menjadi timestamp untuk perbandingan waktu lembur level 1 (jam 18:00)
-    $outTimeTimestamp = $workData['outTime']->getTimestamp();
-    $overtime1Threshold = strtotime('18:00:00');
+
 
     // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
-    $totalOvertime1Hours = ($outTimeTimestamp > $overtime1Threshold) ? $workData['totalOvertime1Hours'] : 0;
+    $totalOvertime1Hours = $workData['totalOvertime1Hours'];
     $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
 
     // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
-    $totalOvertime2HoursRounded = floor($workData['totalOvertime2Hours'] / 0.25) * 0.25;
-    $totalOvertime3HoursRounded = floor($workData['totalOvertime3Hours'] / 0.25) * 0.25;
+    $totalOvertime2HoursRounded = ceil($workData['totalOvertime2Hours'] / 0.25) * 0.25;
+    $totalOvertime3HoursRounded = ceil($workData['totalOvertime3Hours'] / 0.25) * 0.25;
 
     // Hitung gaji lembur level 2 dan 3 dengan waktu yang sudah dibulatkan
     $totalOvertime2Salary = $totalOvertime2HoursRounded * $salaryRate['Gaji_Per_Jam'];
