@@ -144,7 +144,8 @@ $(document).ready(function () {
                             <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button>
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
                                 <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
-                                <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print</button>
+                                <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print Slip</button>
+                                <button class="btn btn-default btn-sm print-presensi"  idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Print Attendance</button>
                                 <button class="btn btn-danger btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
                         tableBody.append(row);
@@ -572,7 +573,7 @@ function formatDateIndonesian(dateString) {
     });
 
   })
-});
+}); 
     function fetchEmployeeNameByPin(pin) {
     $.ajax({
       url: base_url + 'user/getEmployeeNameByPin', 
@@ -1100,6 +1101,183 @@ function generateRekapGajiHTML(employeeDataList) {
 
     rekapHTML += `</div>`;
     return rekapHTML;
+}
+
+// Event listener untuk tombol Print Presensi
+$(document).on('click', '.print-presensi', function () {
+    const pin = $(this).attr('pinKaryawan');
+    const id = $(this).attr('idKaryawan');
+    const startDate = $(this).attr('tglAwal');
+    const endDate = $(this).attr('tglAkhir');
+
+    // Panggil fungsi untuk mendapatkan data presensi dan cetak
+    printAttendanceReport(pin, id, startDate, endDate);
+});
+
+function printAttendanceReport(pin, id, startDate, endDate) {
+    $.ajax({
+        url: base_url + 'user/getPresensi',
+        type: 'POST',
+        data: { pin: pin, id: id, startDate: startDate, endDate: endDate },
+        dataType: 'json',
+        success: function(response) {
+            const data = response.data;
+
+            if (!Array.isArray(data)) {
+                alert("Unexpected response format");
+                return;
+            }
+
+            $.ajax({
+                url: base_url + 'user/getDataWorkDay',
+                type: 'POST',
+                dataType: 'json',
+                success: function(workDays) {
+                    const groupedData = groupAttendanceData(data);
+                    const attendanceHTML = generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate);
+
+                    const newWindow = window.open();
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>Rekap Presensi</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; padding: 20px; }
+                                    .rekap-presensi { width: 100%; margin: auto; }
+                                    h1, h3 { text-align: center; }
+                                    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+                                    table, th, td { border: 1px solid black; padding: 10px; text-align: left; }
+                                </style>
+                            </head>
+                            <body onload="window.print();window.close();">
+                                ${attendanceHTML}
+                            </body>
+                        </html>
+                    `);
+                },
+                error: function() {
+                    alert("Error fetching work day settings.");
+                }
+            });
+        },
+        error: function() {
+            alert("Error fetching attendance data.");
+        }
+    });
+}
+
+// Fungsi untuk mengenerate HTML presensi untuk dicetak
+function generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate) {
+    let html = `
+    <div class="rekap-presensi">
+    <h1>Rekap Presensi Karyawan</h1>
+    <p>Periode: ${formatDateWithDayIndonesian(startDate)} - ${formatDateWithDayIndonesian(endDate)}</p>
+    <hr>
+    <table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Scan Date</th>
+            <th>Jam Masuk</th>
+            <th>Jam Keluar</th>
+            <th>Total Jam Kerja</th>
+            <th>Jam Normal</th>
+            <th>Jam Lembur 1</th>
+            <th>Jam Lembur 2</th>
+            <th>Jam Lembur 3</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+    let totalDurationMinutes = 0;
+    let totalNormalWorkMinutes = 0;
+    let totalOvertime1Minutes = 0;
+    let totalOvertime2Minutes = 0;
+    let totalOvertime3Minutes = 0;
+
+    $.each(groupedData, function (date, entries) {
+        const { inTime: originalInTime, outTime: originalOutTime } = getInOutTimes(entries);
+        let inTime = new Date(originalInTime);
+        let outTime = new Date(originalOutTime);
+        const dayOfWeek = getDayName(date);
+        const workDaySetting = workDays.find(day => day.day === dayOfWeek);
+
+        if (inTime && outTime) {
+            const duration = (outTime - inTime) / (1000 * 60); // Duration in minutes
+            totalDurationMinutes += duration;
+
+            // Format times and durations
+            const formattedInTime = formatTime(inTime);
+            const formattedOutTime = formatTime(outTime);
+            const { totalHours, totalMinutes } = formatDuration(duration);
+
+            // Calculate normal and overtime minutes
+            let { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 } = calculateWorkMinutes(inTime, outTime, workDaySetting, date);
+            totalNormalWorkMinutes += normalWorkMinutes;
+
+            // Set overtimeMinutes1 to 0 if it's less than 75 minutes
+            if (overtimeMinutes1 < 75) {
+                overtimeMinutes1 = 0;
+            }
+            totalOvertime1Minutes += overtimeMinutes1;
+
+            // Bulatkan lembur level 2 dan 3 ke bawah per 15 menit
+            const roundedOvertime2 = Math.floor(overtimeMinutes2 / 15) * 15;
+            const roundedOvertime3 = Math.floor(overtimeMinutes3 / 15) * 15;
+            totalOvertime2Minutes += roundedOvertime2;
+            totalOvertime3Minutes += roundedOvertime3;
+
+            html += `
+            <tr>
+                <td>${date} - ${dayOfWeek}</td>
+                <td>${formattedInTime}</td>
+                <td>${formattedOutTime}</td>
+                <td>${totalHours} jam ${totalMinutes} menit</td>
+                <td>${Math.floor(normalWorkMinutes / 60)} jam ${Math.floor(normalWorkMinutes % 60)} menit</td>
+                <td>${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit</td>
+                <td>${Math.floor(roundedOvertime2 / 60)} jam ${roundedOvertime2 % 60} menit</td>
+                <td>${Math.floor(roundedOvertime3 / 60)} jam ${roundedOvertime3 % 60} menit</td>
+            </tr>`;
+        }
+    });
+
+    // Format total normal work minutes for display
+    const totalNormalHours = Math.floor(totalNormalWorkMinutes / 60);
+    const totalNormalMinutes = Math.floor(totalNormalWorkMinutes % 60);
+
+    html += `</tbody></table></div>`;
+    html += `
+    <table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Keterangan</th>
+        <th>Jumlah</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Total Durasi Kerja</td>
+        <td>${Math.floor(totalDurationMinutes / 60)} jam ${Math.floor(totalDurationMinutes % 60)} menit</td>
+    </tr>
+    <tr>
+        <td>Total Kerja (Setelah Istirahat)</td>
+        <td>${totalNormalHours} jam ${totalNormalMinutes} menit</td>
+    </tr>
+    <tr>
+        <td>Total Lembur 1</td>
+        <td>${Math.floor(totalOvertime1Minutes / 60)} jam ${Math.floor(totalOvertime1Minutes % 60)} menit</td>
+    </tr>
+    <tr>
+        <td>Total Lembur 2</td>
+        <td>${Math.floor(totalOvertime2Minutes / 60)} jam ${Math.floor(totalOvertime2Minutes % 60)} menit</td>
+    </tr>
+    <tr>
+        <td>Total Lembur 3</td>
+        <td>${Math.floor(totalOvertime3Minutes / 60)} jam ${Math.floor(totalOvertime3Minutes % 60)} menit</td>
+    </tr>
+    </tbody>
+    </table>`;
+
+    return html;
 }
 
 
