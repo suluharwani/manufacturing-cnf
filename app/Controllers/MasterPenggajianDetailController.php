@@ -161,26 +161,28 @@ private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
         }
 
         // Hitung durasi kerja normal
-        if ($outTime < $workBreakStart) {
-            // Jika waktu keluar lebih awal dari waktu mulai istirahat, hitung durasi dari inTime hingga outTime
-            $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
-        } elseif ($outTime >= $workBreakStart && $outTime <= $workBreakEnd) {
-            // Jika waktu keluar berada di waktu istirahat, hitung durasi dari inTime hingga workBreakStart
-            $normalWorkMinutes = ($workBreakStart->getTimestamp() - $inTime->getTimestamp()) / 60;
-        } elseif ($outTime > $workEnd) {
-            // Jika waktu keluar lebih lambat dari waktu kerja normal, hitung hingga workEnd
-            $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
-        } else {
-            // Jika waktu keluar berada dalam waktu kerja normal sebelum istirahat
-            $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
-        }
+// Menghitung durasi kerja normal dalam menit, dengan mempertimbangkan waktu istirahat
+if ($outTime < $workBreakStart) {
+    // Jika waktu keluar lebih awal dari waktu mulai istirahat, hitung dari inTime hingga outTime
+    $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+} elseif ($outTime >= $workBreakStart && $outTime <= $workBreakEnd) {
+    // Jika waktu keluar di tengah waktu istirahat, hitung dari inTime hingga workBreakStart
+    $normalWorkMinutes = ($workBreakStart->getTimestamp() - $inTime->getTimestamp()) / 60;
+} elseif ($outTime > $workEnd) {
+    // Jika waktu keluar lebih lambat dari workEnd, hitung dari inTime hingga workEnd
+    $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
+} else {
+    // Jika waktu keluar berada dalam waktu kerja normal
+    $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+}
 
-        // Potong durasi istirahat dari durasi kerja normal jika outTime lebih lambat dari workBreakEnd
-        if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
-            $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
-            $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
-            $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
-        }
+// Mengurangi waktu istirahat jika outTime lebih lambat dari akhir waktu istirahat
+if ($inTime < $workBreakEnd && $outTime > $workBreakEnd) {
+    $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih akhir antara inTime dan workBreakStart
+    $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60; // Durasi istirahat dalam menit
+    $normalWorkMinutes -= $breakDuration; // Kurangi durasi istirahat dari total waktu kerja normal
+}
+
 
         // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
         $threshold18 = new \DateTime("$date 18:00:00");
@@ -211,72 +213,6 @@ private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
 }
 
 
-    // private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
-    // {
-    //     $normalWorkMinutes = 0;
-    //     $overtimeMinutes1 = 0;
-    //     $overtimeMinutes2 = 0;
-    //     $overtimeMinutes3 = 0;
-  
-
-    //     if ($workDaySetting) {
-    //         $workStart = new \DateTime("$date {$workDaySetting['work_start']}");
-    //         $workEnd = new \DateTime("$date {$workDaySetting['work_end']}");
-    //         $overtimeStart1 = new \DateTime("$date {$workDaySetting['overtime_start_1']}");
-    //         $overtimeEnd1 = new \DateTime("$date {$workDaySetting['overtime_end_1']}");
-    //         $overtimeStart2 = new \DateTime("$date {$workDaySetting['overtime_start_2']}");
-    //         $overtimeEnd2 = new \DateTime("$date {$workDaySetting['overtime_end_2']}");
-    //         $overtimeStart3 = new \DateTime("$date {$workDaySetting['overtime_start_3']}");
-    //         $overtimeEnd3 = new \DateTime("$date {$workDaySetting['overtime_end_3']}");
-    //         $workBreakStart = new \DateTime("$date {$workDaySetting['work_break']}");
-    //         $workBreakEnd = new \DateTime("$date {$workDaySetting['work_break_end']}");
-
-    //         // Sesuaikan inTime jika diperlukan
-    //         if ($inTime < $workStart) {
-    //             $inTime = $workStart; // Atur inTime ke workStart jika lebih awal
-    //         }
-
-    //         // Hitung durasi kerja normal
-    //         if ($outTime > $workEnd) {
-    //             $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
-    //         } else {
-    //             $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
-    //         }
-
-    //         // Kurangi durasi waktu istirahat dari waktu kerja normal
-    //         if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
-    //             $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
-    //             $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
-    //             $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
-    //         }
-
-    //              // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
-    //     $threshold18 = new \DateTime("$date 18:00:00");
-    //     if ($outTime > $overtimeStart1 && $outTime > $threshold18) {
-    //         $overtimeMinutes1 = min($overtimeEnd1->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart1->getTimestamp();
-    //         $overtimeMinutes1 = max($overtimeMinutes1 / 60, 0);
-    //     }
-
-    //         // Hitung lembur level 2
-    //         if ($outTime > $overtimeStart2) {
-    //             $overtimeMinutes2 = min($overtimeEnd2->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart2->getTimestamp();
-    //             $overtimeMinutes2 = max($overtimeMinutes2 / 60, 0);
-    //         }
-
-    //         // Hitung lembur level 3
-    //         if ($outTime > $overtimeStart3) {
-    //             $overtimeMinutes3 = min($overtimeEnd3->getTimestamp(), $outTime->getTimestamp()) - $overtimeStart3->getTimestamp();
-    //             $overtimeMinutes3 = max($overtimeMinutes3 / 60, 0);
-    //         }
-    //     }
-
-    //     return [
-    //         'normalWorkMinutes' => $normalWorkMinutes,
-    //         'overtimeMinutes1' => $overtimeMinutes1,
-    //         'overtimeMinutes2' => $overtimeMinutes2,
-    //         'overtimeMinutes3' => $overtimeMinutes3,
-    //     ];
-    // }
     private function getDayInIndonesian($date)
 {
     $dayOfWeek = date('N', strtotime($date)); // Menggunakan format angka untuk hari (1 = Senin, 7 = Minggu)
@@ -569,7 +505,7 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     $effectiveHoursModel = new MdlEffectiveHours();
     $attendanceModel = new AttendanceModel();
     $salaryCatModel = new MdlSalaryCat();
-
+    $salaryPatternModel = new \App\Models\MdlFsalaryPatternEmployee();
     // Ambil data penggajian dan karyawan
     $result = $penggajianDetailModel
         ->select('master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
@@ -590,8 +526,18 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     $totalAllowance = $this->calculateTotalAllowance($allowanceModel, $employeeId);
     $totalDeduction = $this->calculateTotalDeduction($deductionModel, $employeeId);
 
-    // Dapatkan data tarif gaji
-    $salaryRate = $salaryCatModel->where('id', 11)->first();
+    // Dapatkan data tarif gaji berdasarkan kategori atau pola gaji yang dimiliki karyawan
+        $salaryRate = $salaryPatternModel
+        ->select('employeesallarycat.Gaji_Pokok, employeesallarycat.Gaji_Per_Jam, employeesallarycat.Gaji_Per_Jam_Hari_Minggu')
+        ->join('employeesallarycat', 'employeesallarycat.id = salary_pattern_employee.id_salary_pattern')
+        ->where('salary_pattern_employee.id_employee', $employeeId)
+        ->first();
+    if (!$salaryRate) { 
+        return $this->response->setStatusCode(404)->setJSON([
+            'success' => false,
+            'message' => 'Tarif gaji tidak ditemukan untuk karyawan ini.'
+        ]);
+    }
 
     // Mendapatkan data kehadiran dan memproses in_time dan out_time
     $attendanceRecords = $attendanceModel->getAttendance($result['pegawai_pin'], $employeeId, $result['tanggal_awal_penggajian'], $result['tanggal_akhir_penggajian']);
@@ -603,11 +549,52 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     // Hitung total gaji
     $salaryDetails = $this->generateSalarySlipDetails($workData, $salaryRate, $totalAllowance, $totalDeduction);
 
-    // Gabungkan hasil dengan detail slip gaji
+    // Gabungkan hasil dengan detail slip gaji dan data kehadiran
     $result['salary_slip_details'] = $salaryDetails;
+    $result['attendance_data'] = $processedAttendance;
+    $result['salary_rate'] = $salaryRate;
 
     // Mengembalikan hasil dalam format JSON
     return $this->response->setJSON($result);
 }
+
+public function getSalaryRate($employeeId)
+{
+    // Cek apakah ID karyawan ada
+    if (!$employeeId) {
+        return $this->response->setStatusCode(400)->setJSON([
+            'success' => false,
+            'message' => 'ID karyawan tidak ditemukan.'
+        ]);
+    }
+
+    // Inisialisasi model
+    $salaryPatternModel = new \App\Models\MdlFsalaryPatternEmployee();
+    $salaryCatModel = new \App\Models\MdlSalaryCat();
+
+    // Lakukan join untuk mendapatkan rate salary berdasarkan id_employee
+    $salaryPattern = $salaryPatternModel
+        ->select('employeesallarycat.Gaji_Pokok, employeesallarycat.Gaji_Per_Jam, employeesallarycat.Gaji_Per_Jam_Hari_Minggu')
+        ->join('employeesallarycat', 'employeesallarycat.id = salary_pattern_employee.id_salary_pattern')
+        ->where('salary_pattern_employee.id_employee', $employeeId)
+        ->first();
+
+    if ($salaryPattern) {
+        return $this->response->setJSON([
+            'success' => true,
+            'salary_rate' => [
+                'Gaji_Pokok' => $salaryPattern['Gaji_Pokok'],
+                'Gaji_Per_Jam' => $salaryPattern['Gaji_Per_Jam'],
+                'Gaji_Per_Jam_Hari_Minggu' => $salaryPattern['Gaji_Per_Jam_Hari_Minggu']
+            ]
+        ]);
+    } else {
+        return $this->response->setStatusCode(404)->setJSON([
+            'success' => false,
+            'message' => 'Data salary rate tidak ditemukan untuk karyawan ini.'
+        ]);
+    }
+}
+
 
 }
