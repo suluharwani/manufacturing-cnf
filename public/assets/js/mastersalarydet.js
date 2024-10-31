@@ -433,75 +433,72 @@ function getDayName(dateString) {
       totalMinutes: Math.floor(duration % 60)
     };
   }
-  function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
+function calculateWorkMinutes(inTime, outTime, workDaySetting, date) {
     let normalWorkMinutes = 0;
     let overtimeMinutes1 = 0;
     let overtimeMinutes2 = 0;
     let overtimeMinutes3 = 0;
 
     if (workDaySetting) {
-      const workStart = new Date(`${date} ${workDaySetting.work_start}`);
-      const workEnd = new Date(`${date} ${workDaySetting.work_end}`);
-      const overtimeStart1 = new Date(`${date} ${workDaySetting.overtime_start_1}`);
-      const overtimeEnd1 = new Date(`${date} ${workDaySetting.overtime_end_1}`);
-      const overtimeStart2 = new Date(`${date} ${workDaySetting.overtime_start_2}`);
-      const overtimeEnd2 = new Date(`${date} ${workDaySetting.overtime_end_2}`);
-      const overtimeStart3 = new Date(`${date} ${workDaySetting.overtime_start_3}`);
-      const overtimeEnd3 = new Date(`${date} ${workDaySetting.overtime_end_3}`);
-      const workBreakStart = new Date(`${date} ${workDaySetting.work_break}`);
-      const workBreakEnd = new Date(`${date} ${workDaySetting.work_break_end}`);
+        const workStart = new Date(`${date} ${workDaySetting.work_start}`);
+        const workEnd = new Date(`${date} ${workDaySetting.work_end}`);
+        const overtimeStart1 = new Date(`${date} ${workDaySetting.overtime_start_1}`);
+        const overtimeEnd1 = new Date(`${date} ${workDaySetting.overtime_end_1}`);
+        const overtimeStart2 = new Date(`${date} ${workDaySetting.overtime_start_2}`);
+        const overtimeEnd2 = new Date(`${date} ${workDaySetting.overtime_end_2}`);
+        const overtimeStart3 = new Date(`${date} ${workDaySetting.overtime_start_3}`);
+        const overtimeEnd3 = new Date(`${date} ${workDaySetting.overtime_end_3}`);
+        const workBreakStart = new Date(`${date} ${workDaySetting.work_break}`);
+        const workBreakEnd = new Date(`${date} ${workDaySetting.work_break_end}`);
 
         // Adjust inTime if needed
-      if (inTime < workStart) {
+        if (inTime < workStart) {
             inTime = workStart; // Set inTime to workStart if it's earlier
-          }
-
-        // Calculate normal work minutes
-          if (outTime > workEnd) {
-            normalWorkMinutes = (workEnd - inTime) / (1000 * 60); // Calculate from inTime to workEnd
-          } else {
-            normalWorkMinutes = (outTime - inTime) / (1000 * 60); // Calculate from inTime to outTime
-          }
-
-        // Subtract break time from start of break until end of break
-        let totalWorkMinutes;
-
-if (outTime < workBreakEnd) {
-    // Jika waktu keluar lebih awal dari akhir waktu istirahat, cukup hitung durasi hingga waktu mulai istirahat
-    totalWorkMinutes = (workBreakStart - inTime) / (1000 * 60); // Konversi dari milidetik ke menit
-} else if (inTime < workBreakEnd && outTime > workBreakStart) {
-    // Hitung durasi istirahat dan kurangi dari waktu kerja normal
-    const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Gunakan waktu yang lebih lambat
-    const breakDuration = (workBreakEnd - breakStartTime) / (1000 * 60); // Durasi istirahat dalam menit
-    totalWorkMinutes = ((outTime - inTime) / (1000 * 60)) - breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja total
-} else {
-    // Jika tidak ada kondisi istirahat yang relevan, hitung total durasi kerja
-    totalWorkMinutes = (outTime - inTime) / (1000 * 60);
-}
-
-        // Calculate overtime levels
-          if (outTime > overtimeStart1) {
-            overtimeMinutes1 = (outTime < overtimeEnd1 ? outTime : overtimeEnd1) - overtimeStart1;
-            overtimeMinutes1 = overtimeMinutes1 / (1000 * 60); // Convert to minutes
-          }
-          if (outTime > overtimeStart2) {
-            overtimeMinutes2 = (outTime < overtimeEnd2 ? outTime : overtimeEnd2) - overtimeStart2;
-            overtimeMinutes2 = overtimeMinutes2 / (1000 * 60); // Convert to minutes
-          }
-          if (outTime > overtimeStart3) {
-            overtimeMinutes3 = (outTime < overtimeEnd3 ? outTime : overtimeEnd3) - overtimeStart3;
-            overtimeMinutes3 = overtimeMinutes3 / (1000 * 60); // Convert to minutes
-          }
-
-        // Prevent negative values
-          normalWorkMinutes = Math.max(normalWorkMinutes, 0);
-          overtimeMinutes1 = Math.max(overtimeMinutes1, 0);
-          overtimeMinutes2 = Math.max(overtimeMinutes2, 0);
-          overtimeMinutes3 = Math.max(overtimeMinutes3, 0);
         }
 
-        return { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 };
-      }
+        // Calculate normal work minutes without break time
+        if (outTime < workBreakStart) {
+            // Jika waktu keluar lebih awal dari waktu mulai istirahat, hitung dari inTime hingga outTime
+            normalWorkMinutes = (outTime - inTime) / (1000 * 60);
+        } else if (outTime >= workBreakStart && outTime <= workBreakEnd) {
+            // Jika waktu keluar di tengah waktu istirahat, hitung dari inTime hingga workBreakStart
+            normalWorkMinutes = (workBreakStart - inTime) / (1000 * 60);
+        } else if (outTime > workEnd) {
+            // Jika waktu keluar lebih lambat dari workEnd, hitung dari inTime hingga workEnd
+            normalWorkMinutes = (workEnd - inTime) / (1000 * 60);
+        } else {
+            // Jika waktu keluar berada dalam waktu kerja normal
+            normalWorkMinutes = (outTime - inTime) / (1000 * 60);
+        }
+
+        // Subtract break time if outTime is later than the break start
+        if (inTime < workBreakEnd && outTime > workBreakEnd) {
+            const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Use the later time
+            const breakDuration = (workBreakEnd - breakStartTime) / (1000 * 60); // Duration of break
+            normalWorkMinutes -= breakDuration; // Subtract break duration from normal work minutes
+        }
+
+        // Calculate overtime levels
+        if (outTime > overtimeStart1) {
+            overtimeMinutes1 = (Math.min(outTime, overtimeEnd1) - overtimeStart1) / (1000 * 60); // Convert to minutes
+        }
+        if (outTime > overtimeStart2) {
+            overtimeMinutes2 = (Math.min(outTime, overtimeEnd2) - overtimeStart2) / (1000 * 60); // Convert to minutes
+        }
+        if (outTime > overtimeStart3) {
+            overtimeMinutes3 = (Math.min(outTime, overtimeEnd3) - overtimeStart3) / (1000 * 60); // Convert to minutes
+        }
+
+        // Prevent negative values
+        normalWorkMinutes = Math.max(normalWorkMinutes, 0);
+        overtimeMinutes1 = Math.max(overtimeMinutes1, 0);
+        overtimeMinutes2 = Math.max(overtimeMinutes2, 0);
+        overtimeMinutes3 = Math.max(overtimeMinutes3, 0);
+    }
+
+    return { normalWorkMinutes, overtimeMinutes1, overtimeMinutes2, overtimeMinutes3 };
+}
+
 function formatDateWithDayIndonesian(dateString) {
   const dayName = getDayName(dateString);
   const formattedDate = formatDateIndonesian(dateString);

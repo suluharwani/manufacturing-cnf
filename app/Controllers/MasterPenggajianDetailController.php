@@ -136,7 +136,7 @@ class MasterPenggajianDetailController extends BaseController
     }
 
     // Fungsi untuk menghitung durasi kerja dan lembur
-    private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
+private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
 {
     $normalWorkMinutes = 0;
     $overtimeMinutes1 = 0;
@@ -161,26 +161,26 @@ class MasterPenggajianDetailController extends BaseController
         }
 
         // Hitung durasi kerja normal
-        if ($outTime > $workEnd) {
+        if ($outTime < $workBreakStart) {
+            // Jika waktu keluar lebih awal dari waktu mulai istirahat, hitung durasi dari inTime hingga outTime
+            $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+        } elseif ($outTime >= $workBreakStart && $outTime <= $workBreakEnd) {
+            // Jika waktu keluar berada di waktu istirahat, hitung durasi dari inTime hingga workBreakStart
+            $normalWorkMinutes = ($workBreakStart->getTimestamp() - $inTime->getTimestamp()) / 60;
+        } elseif ($outTime > $workEnd) {
+            // Jika waktu keluar lebih lambat dari waktu kerja normal, hitung hingga workEnd
             $normalWorkMinutes = ($workEnd->getTimestamp() - $inTime->getTimestamp()) / 60;
         } else {
+            // Jika waktu keluar berada dalam waktu kerja normal sebelum istirahat
             $normalWorkMinutes = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
         }
 
-        // Kurangi durasi waktu istirahat dari waktu kerja normal
-     if ($outTime < $workBreakEnd) {
-    // Jika waktu keluar lebih awal dari akhir waktu istirahat, cukup hitung durasi hingga waktu mulai istirahat
-    $totalWorkDuration = ($workBreakStart->getTimestamp() - $inTime->getTimestamp()) / 60;
-} elseif ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
-    // Hitung durasi istirahat dan kurangi dari waktu kerja normal
-    $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
-    $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
-    $totalWorkDuration = (($outTime->getTimestamp() - $inTime->getTimestamp()) / 60) - $breakDuration;
-} else {
-    // Jika tidak ada kondisi istirahat yang relevan, hitung total durasi kerja
-    $totalWorkDuration = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
-}
-
+        // Potong durasi istirahat dari durasi kerja normal jika outTime lebih lambat dari workBreakEnd
+        if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
+            $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
+            $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
+            $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
+        }
 
         // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
         $threshold18 = new \DateTime("$date 18:00:00");
@@ -209,6 +209,7 @@ class MasterPenggajianDetailController extends BaseController
         'overtimeMinutes3' => $overtimeMinutes3,
     ];
 }
+
 
     // private function calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date)
     // {
