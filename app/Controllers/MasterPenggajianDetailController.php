@@ -27,12 +27,13 @@ class MasterPenggajianDetailController extends BaseController
         $effectiveHoursModel = new MdlEffectiveHours();
         $attendanceModel = new AttendanceModel();
         $salaryCatModel = new MdlSalaryCat();
-
+        // $patternMdl = new MdlFsalaryPatternEmployee();
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
         $results = $penggajianDetailModel
-            ->select('master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+            ->select('salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
             ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
             ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+            ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
             ->where('master_penggajian_detail.penggajian_id', $penggajianId)
             ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
             ->get()
@@ -49,7 +50,9 @@ class MasterPenggajianDetailController extends BaseController
             $totalDeduction = $this->calculateTotalDeduction($deductionModel, $employeeId);
 
             // Dapatkan data tarif gaji
-            $salaryRate = $salaryCatModel->where('id', 11)->first();
+            $idCatSal = $result['pattern_id'];
+
+            $salaryRate = $salaryCatModel->where('id', $idCatSal)->first();
 
             // Mendapatkan data kehadiran dan memproses in_time dan out_time
             $attendanceRecords = $attendanceModel->getAttendance($pin, $employeeId, $startDate, $endDate);
