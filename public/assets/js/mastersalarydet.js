@@ -464,11 +464,20 @@ function getDayName(dateString) {
           }
 
         // Subtract break time from start of break until end of break
-          if (inTime < workBreakEnd && outTime > workBreakStart) {
-            const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Use the later time
-            const breakDuration = (workBreakEnd - breakStartTime) / (1000 * 60); // Duration of break
-            normalWorkMinutes -= breakDuration; // Subtract break duration from normal work minutes
-          }
+        let totalWorkMinutes;
+
+if (outTime < workBreakEnd) {
+    // Jika waktu keluar lebih awal dari akhir waktu istirahat, cukup hitung durasi hingga waktu mulai istirahat
+    totalWorkMinutes = (workBreakStart - inTime) / (1000 * 60); // Konversi dari milidetik ke menit
+} else if (inTime < workBreakEnd && outTime > workBreakStart) {
+    // Hitung durasi istirahat dan kurangi dari waktu kerja normal
+    const breakStartTime = inTime < workBreakStart ? workBreakStart : inTime; // Gunakan waktu yang lebih lambat
+    const breakDuration = (workBreakEnd - breakStartTime) / (1000 * 60); // Durasi istirahat dalam menit
+    totalWorkMinutes = ((outTime - inTime) / (1000 * 60)) - breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja total
+} else {
+    // Jika tidak ada kondisi istirahat yang relevan, hitung total durasi kerja
+    totalWorkMinutes = (outTime - inTime) / (1000 * 60);
+}
 
         // Calculate overtime levels
           if (outTime > overtimeStart1) {

@@ -168,11 +168,19 @@ class MasterPenggajianDetailController extends BaseController
         }
 
         // Kurangi durasi waktu istirahat dari waktu kerja normal
-        if ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
-            $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
-            $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
-            $normalWorkMinutes -= $breakDuration; // Kurangi durasi waktu istirahat dari durasi kerja normal
-        }
+     if ($outTime < $workBreakEnd) {
+    // Jika waktu keluar lebih awal dari akhir waktu istirahat, cukup hitung durasi hingga waktu mulai istirahat
+    $totalWorkDuration = ($workBreakStart->getTimestamp() - $inTime->getTimestamp()) / 60;
+} elseif ($inTime < $workBreakEnd && $outTime > $workBreakStart) {
+    // Hitung durasi istirahat dan kurangi dari waktu kerja normal
+    $breakStartTime = $inTime < $workBreakStart ? $workBreakStart : $inTime; // Gunakan waktu yang lebih lambat
+    $breakDuration = ($workBreakEnd->getTimestamp() - $breakStartTime->getTimestamp()) / 60;
+    $totalWorkDuration = (($outTime->getTimestamp() - $inTime->getTimestamp()) / 60) - $breakDuration;
+} else {
+    // Jika tidak ada kondisi istirahat yang relevan, hitung total durasi kerja
+    $totalWorkDuration = ($outTime->getTimestamp() - $inTime->getTimestamp()) / 60;
+}
+
 
         // Hitung lembur level 1, hanya jika outTime melebihi jam 18:00
         $threshold18 = new \DateTime("$date 18:00:00");
