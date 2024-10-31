@@ -62,7 +62,7 @@ class MasterPenggajianDetailController extends BaseController
             $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
 
             // Hitung total gaji
-            $result['total_salary'] = $this->calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)['totalSalary'];
+            $result['total_salary'] = $this->calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction)['totalSalary'];
             $result['total_work_Hours'] = $workData['totalWorkHours'];
             $result['total_overtime1_Hours'] = $workData['totalOvertime1Hours'];
             $result['total_overtime2_Hours'] = $workData['totalOvertime2Hours'];
@@ -340,17 +340,11 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
     ];
 }
 
-private function calculateSalary($workData, $salaryRate, $totalAllowance, $totalDeduction)
+private function calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction)
 {
-    // Hitung gaji normal berdasarkan jam kerja
-    $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
-
-    // Konversi outTime menjadi timestamp untuk perbandingan waktu
-    // $outTimeTimestamp = $workData['outTime']->getTimestamp();
-    // $overtime1Threshold = strtotime('18:00:00');
-
-    // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
-    $totalOvertime1Hours =  $workData['totalOvertime1Hours'];
+    if (isset($salaryRate) && isset($salaryRate['Gaji_Per_Jam'])) {
+        $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+          $totalOvertime1Hours =  $workData['totalOvertime1Hours'];
     $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
 
     // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
@@ -366,6 +360,27 @@ private function calculateSalary($workData, $salaryRate, $totalAllowance, $total
 
     // Hitung gaji total setelah menambahkan tunjangan dan mengurangi potongan
     $totalSalary = ($grossSalary + $totalAllowance) - $totalDeduction;
+
+} else {
+    $totalNormalSalary = 0;
+    $totalNormalSalary= 0;
+    $totalOvertime1Salary= 0;
+    $totalOvertime2Salary= 0;
+    $totalOvertime3Salary= 0;
+    $grossSalary= 0;
+    $totalAllowance= 0;
+    $totalAllowance= 0;
+    $totalDeduction= 0;
+    $totalSalary= "Belum Set Gaji";
+}
+   
+
+    // Konversi outTime menjadi timestamp untuk perbandingan waktu
+    // $outTimeTimestamp = $workData['outTime']->getTimestamp();
+    // $overtime1Threshold = strtotime('18:00:00');
+
+    // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
+  
 
     // Mengembalikan detail komponen gaji
     return [

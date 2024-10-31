@@ -161,6 +161,12 @@ $(document).ready(function () {
         // Memuat data saat halaman selesai dimuat
         loadPayrollData();
 function formatRupiah(amount) {
+    // Check if amount is already a string
+    if (typeof amount === 'string') {
+        return amount;
+    }
+
+    // Otherwise, format it as currency
     return new Intl.NumberFormat('id-ID', { 
         style: 'currency', 
         currency: 'IDR', 
