@@ -708,7 +708,7 @@ public function getSalaryRate($employeeId)
         // var_dump($dataKaryawan);
 
         foreach ($results as $data) {
-            $sheet->setCellValue('A' . $row, $data['karyawan_id']);
+            $sheet->setCellValue('A' . $row, $data['pegawai_pin']);
             $sheet->setCellValue('B' . $row, $data['pegawai_nama']);
             $sheet->setCellValue('C' . $row, $data['Gaji_Per_Jam']);
             $sheet->setCellValue('D' . $row, $data['bank_account']);
