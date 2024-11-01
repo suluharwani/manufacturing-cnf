@@ -57,7 +57,9 @@
             <h6 class="mb-0">Detail Master Payroll</h6>
             <div>
             <button id="printRekapGaji" class="btn btn-primary">Print Rekap Gaji</button>
-            
+<a id="exportExcelLink" href="#" class="btn btn-success">
+    <i class="fa fa-file-excel"></i> Unduh Rekap Gaji (Excel)
+</a>
             </div>
             
         </div>
@@ -269,3 +271,16 @@
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/mastersalarydet.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>  
+<script>
+    // Base URL tanpa ID
+    const baseUrl = "<?= base_url('MasterPenggajianDetailController/exportToExcel'); ?>";
+    
+    // Mendapatkan segmen URI dari URL saat ini
+    const currentUrl = window.location.href;
+    const urlSegments = currentUrl.split('/');
+    const id = urlSegments[4]; // Mengambil segmen ke-5 (index 4), sesuaikan sesuai struktur URL Anda
+
+    // Mengatur href tautan dengan ID dinamis
+    const exportLink = document.getElementById("exportExcelLink");
+    exportLink.href = `${baseUrl}/${id}`;
+</script>

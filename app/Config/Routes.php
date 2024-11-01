@@ -150,5 +150,5 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->post('deleteEmployeeFromPayroll','MasterPenggajianDetailController::deleteEmployeeFromPayroll');
     $routes->get('getEmployeeSalarySlip/(:num)/(:num)', 'MasterPenggajianDetailController::getEmployeeSalarySlip/$1/$2');
 $routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
-
+$routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
 });
