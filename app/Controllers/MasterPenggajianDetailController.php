@@ -680,6 +680,7 @@ public function getSalaryRate($employeeId)
             $result['OVT_salary'] =$gaji['totalOvertime1Salary']+$gaji['totalOvertime2Salary']+$gaji['totalOvertime3Salary'];
             $result['totalAllowance'] =$gaji['totalAllowance'];
             $result['totalDeduction'] =$gaji['totalDeduction'];
+            $result['grossSalary'] =$gaji['grossSalary'];
 
 
         //             'totalSalary' => $totalSalary,
@@ -719,6 +720,8 @@ public function getSalaryRate($employeeId)
         $sheet->setCellValue('O1', 'Lembur');
         $sheet->setCellValue('P1', 'Potongan');
         $sheet->setCellValue('Q1', 'Tunjangan');
+        $sheet->setCellValue('R1', 'Gaji Kotor');
+
 
         // Isi data karyawan
         $row = 2;
@@ -742,6 +745,7 @@ public function getSalaryRate($employeeId)
             $sheet->setCellValue('O' . $row, $data['OVT_salary']);
             $sheet->setCellValue('P' . $row, $data['totalDeduction']);
             $sheet->setCellValue('Q' . $row, $data['totalAllowance']);
+            $sheet->setCellValue('R' . $row, $data['grossSalary']);
             $row++;
         }
 
