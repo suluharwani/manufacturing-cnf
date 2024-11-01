@@ -32,6 +32,7 @@ class MasterPenggajianDetailController extends BaseController
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
         $results = $penggajianDetailModel
             ->select('employeesallarycat.Gaji_Per_Jam  ,informasi_pegawai.bank_account as bank_account,informasi_pegawai.pemilik_rekening as pemilik_rekening, salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+            ->distinct() 
             ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
             ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
             ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
@@ -641,6 +642,7 @@ public function getSalaryRate($employeeId)
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
          $results = $penggajianDetailModel
             ->select('employeesallarycat.Gaji_Per_Jam  ,informasi_pegawai.bank_account as bank_account,informasi_pegawai.pemilik_rekening as pemilik_rekening, salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+            ->distinct()
             ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
             ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
             ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
