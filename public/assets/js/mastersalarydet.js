@@ -654,6 +654,7 @@ function generateSalarySlipHTML(employeeData) {
                 <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
                 <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
                 <tr><td>Gaji Lembur >20.30</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
+                <tr><td>Gaji Minggu </td><td>${employeeData.salary_slip_details.sunday_salary}</td></tr>
                 <tr><td>Gaji Kotor</td><td>${employeeData.salary_slip_details.gross_salary}</td></tr>
                 <tr><td>Tunjangan</td><td>${employeeData.salary_slip_details.allowances}</td></tr>
                 <tr><td>Potongan</td><td>${employeeData.salary_slip_details.deductions}</td></tr>
