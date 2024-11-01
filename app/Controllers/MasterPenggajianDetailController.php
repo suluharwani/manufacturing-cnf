@@ -675,7 +675,21 @@ public function getSalaryRate($employeeId)
             $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
 
             // Hitung total gaji
-            $result['total_salary'] = $this->calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction)['totalSalary'];
+            $gaji =  $this->calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction);
+            $result['total_salary'] =$gaji['totalSalary'];
+            $result['OVT_salary'] =$gaji['totalOvertime1Salary']+$gaji['totalOvertime2Salary']+$gaji['totalOvertime3Salary'];
+            $result['totalAllowance'] =$gaji['totalAllowance'];
+            $result['totalDeduction'] =$gaji['totalDeduction'];
+
+
+        //             'totalSalary' => $totalSalary,
+        // 'totalNormalSalary' => $totalNormalSalary,
+        // 'totalOvertime1Salary' => $totalOvertime1Salary,
+        // 'totalOvertime2Salary' => $totalOvertime2Salary,
+        // 'totalOvertime3Salary' => $totalOvertime3Salary,
+        // 'grossSalary' => $grossSalary,
+        // 'totalAllowance' => $totalAllowance,
+        // 'totalDeduction' => $totalDeduction
             $result['total_work_Hours'] = $workData['totalWorkHours'];
             $result['total_overtime1_Hours'] = $workData['totalOvertime1Hours'];
             $result['total_overtime2_Hours'] = $workData['totalOvertime2Hours'];
@@ -702,6 +716,9 @@ public function getSalaryRate($employeeId)
         $sheet->setCellValue('L1', 'Lembur 2');
         $sheet->setCellValue('M1', 'Lembur 3');
         $sheet->setCellValue('N1', 'Jam Minggu');
+        $sheet->setCellValue('O1', 'Lembur');
+        $sheet->setCellValue('P1', 'Potongan');
+        $sheet->setCellValue('Q1', 'Tunjangan');
 
         // Isi data karyawan
         $row = 2;
@@ -722,6 +739,9 @@ public function getSalaryRate($employeeId)
             $sheet->setCellValue('L' . $row, $data['total_overtime2_Hours']);
             $sheet->setCellValue('M' . $row, $data['total_overtime3_Hours']);
             $sheet->setCellValue('N' . $row, $data['sunday_work_Hours']);
+            $sheet->setCellValue('O' . $row, $data['OVT_salary']);
+            $sheet->setCellValue('P' . $row, $data['totalDeduction']);
+            $sheet->setCellValue('Q' . $row, $data['totalAllowance']);
             $row++;
         }
 
