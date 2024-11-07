@@ -638,6 +638,17 @@ function formatDateIndonesian(dateString) {
   // Fungsi untuk mengenerate HTML slip gaji
 // Fungsi untuk mengenerate HTML slip gaji
 function generateSalarySlipHTML(employeeData) {
+    let deductionList = '' 
+    
+    $.each(employeeData.deduction, function(index, deduction) {
+      deductionList += `<tr><td>${deduction.Nama}</td><td>${numberFormat(deduction.amount)}</td></tr>`;
+    });
+
+        let allowanceList = '' 
+    
+    $.each(employeeData.allowance, function(index, allowance) {
+      allowanceList += `<tr><td>${allowance.Nama}</td><td>${numberFormat(allowance.amount)}</td></tr>`;
+    });
     const slipHTML = `
         <div class="salary-slip">
             <h1>Slip Gaji Karyawan</h1>
@@ -661,6 +672,18 @@ function generateSalarySlipHTML(employeeData) {
                 <tr><td><strong>Gaji Bersih</strong></td><td><strong>${employeeData.salary_slip_details.net_salary}</strong></td></tr>
             </table>
             <hr>
+            <h3>Rincian Tunjangan</h3>
+
+            <table>
+              ${allowanceList}
+               
+            </table>
+            <h3>Rincian Potongan</h3>
+
+            <table>
+            ${deductionList}
+            
+            </table>
             <p>Slip gaji ini dihasilkan pada ${formatDate(new Date())}</p>
         </div>
     `;
@@ -683,6 +706,22 @@ function generateSalarySlipHTML(employeeData) {
             </body>
         </html>
     `);
+}
+function numberFormat(number, decimals = 2, decPoint = ',', thousandsSep = '.') {
+    // Cek apakah input adalah angka
+    if (isNaN(number)) return '0';
+
+    // Ubah angka menjadi fixed point berdasarkan jumlah desimal
+    const fixedNumber = Number(number).toFixed(decimals);
+
+    // Pisahkan angka sebelum dan setelah desimal
+    const [integerPart, decimalPart] = fixedNumber.split('.');
+
+    // Format angka sebelum desimal dengan pemisah ribuan
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+
+    // Gabungkan kembali angka yang telah diformat
+    return formattedInteger + (decimals ? decPoint + decimalPart : '');
 }
 
 // Event listener untuk tombol Print

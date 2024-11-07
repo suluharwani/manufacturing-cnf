@@ -578,7 +578,8 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
 
     // Hitung total jam kerja dan lembur
     $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
-
+    $getDetAllowance = $this->getDetAllowance($allowanceModel, $employeeId);
+    $getDetDeduction = $this->getDetDeduction($deductionModel, $employeeId);
     // Hitung total gaji
     $salaryDetails = $this->generateSalarySlipDetails($workData, $salaryRate, $totalAllowance, $totalDeduction);
 
@@ -586,10 +587,31 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     $result['salary_slip_details'] = $salaryDetails;
     $result['attendance_data'] = $processedAttendance;
     $result['salary_rate'] = $salaryRate;
-
+    $result['allowance'] = $getDetAllowance;
+    $result['deduction'] = $getDetDeduction;
+    // var_dump($result);
+    // die();
     // Mengembalikan hasil dalam format JSON
     return $this->response->setJSON($result);
 }
+    private function getDetAllowance($allowanceModel, $employeeId)
+    {
+        return $allowanceModel
+
+           ->join('salary_allowance', 'salary_allowance.id = employee_allowance_list.allowance_id')
+            ->where('employee_id', $employeeId)
+            ->findAll();
+    }
+
+    // Fungsi untuk menghitung total deduction
+    private function getDetDeduction($deductionModel, $employeeId)
+    {
+        return $deductionModel 
+           ->join('salary_deduction', 'salary_deduction.id = employee_deduction_list.deduction_id')
+
+            ->where('employee_id', $employeeId)
+            ->findAll();
+    }
 
 public function getSalaryRate($employeeId)
 {
@@ -629,7 +651,7 @@ public function getSalaryRate($employeeId)
     }
 }
 
- public function exportToExcel($masterId)
+ public function exportToExcel($masterId = null)
     {
         // Ambil data karyawan berdasarkan masterId dari database (contoh di sini dengan array data statis)
         $penggajianDetailModel = new MasterPenggajianDetailModel();
@@ -652,6 +674,8 @@ public function getSalaryRate($employeeId)
             ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
             ->get()
             ->getResultArray();
+
+
         foreach ($results as &$result) {
             $employeeId = $result['karyawan_id'];
             $pin = $result['pegawai_pin'];
@@ -760,5 +784,148 @@ public function getSalaryRate($employeeId)
         $writer->save('php://output');
         exit();
     }
+ public function exportAllToExcel()
+    {
+        // Ambil data karyawan berdasarkan masterId dari database (contoh di sini dengan array data statis)
+        $penggajianDetailModel = new MasterPenggajianDetailModel();
+        $allowanceModel = new MdlFemployeeAllowanceList();
+        $deductionModel = new MdlFemployeeDeductionList();
+        $effectiveHoursModel = new MdlEffectiveHours();
+        $attendanceModel = new AttendanceModel();
+        $salaryCatModel = new MdlSalaryCat();
+        // $patternMdl = new MdlFsalaryPatternEmployee();
+        // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
 
+$results = $penggajianDetailModel
+    ->select('
+        employeesallarycat.Gaji_Per_Jam, 
+        informasi_pegawai.bank_account as bank_account, 
+        informasi_pegawai.pemilik_rekening as pemilik_rekening, 
+        salary_pattern_employee.id_salary_pattern as pattern_id, 
+        master_penggajian_detail.karyawan_id, 
+        pegawai.pegawai_nama, 
+        pegawai.pegawai_pin, 
+        master_penggajian.kode_penggajian, 
+        master_penggajian.tanggal_awal_penggajian, 
+        master_penggajian.tanggal_akhir_penggajian
+    ')
+    ->distinct()
+    ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'inner')
+    ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+    ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
+    ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
+    ->join('employeesallarycat', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
+    ->orderBy('master_penggajian_detail.penggajian_id', 'ASC')
+    ->get()
+    ->getResultArray();
+            // var_dump($results);
+            // die();
+        foreach ($results as &$result) {
+            $employeeId = $result['karyawan_id'];
+            $pin = $result['pegawai_pin'];
+            $startDate = $result['tanggal_awal_penggajian'];
+            $endDate = $result['tanggal_akhir_penggajian'];
+
+            // Hitung total allowance dan deduction
+            $totalAllowance = $this->calculateTotalAllowance($allowanceModel, $employeeId);
+            $totalDeduction = $this->calculateTotalDeduction($deductionModel, $employeeId);
+
+            // Dapatkan data tarif gaji
+            $idCatSal = $result['pattern_id'];
+
+            $salaryRate = $salaryCatModel->where('id', $idCatSal)->first();
+
+            // Mendapatkan data kehadiran dan memproses in_time dan out_time
+            $attendanceRecords = $attendanceModel->getAttendance($pin, $employeeId, $startDate, $endDate);
+            $processedAttendance = $this->getInOutTimes($attendanceRecords);
+
+            // Hitung total jam kerja dan lembur
+            $workData = $this->calculateWorkAndOvertime($processedAttendance, $effectiveHoursModel);
+
+            // Hitung total gaji
+            $gaji =  $this->calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction);
+            $result['total_salary'] =$gaji['totalSalary'];
+            $result['OVT_salary'] =$gaji['totalOvertime1Salary']+$gaji['totalOvertime2Salary']+$gaji['totalOvertime3Salary'];
+            $result['totalAllowance'] =$gaji['totalAllowance'];
+            $result['totalDeduction'] =$gaji['totalDeduction'];
+            $result['grossSalary'] =$gaji['grossSalary'];
+
+
+        //             'totalSalary' => $totalSalary,
+        // 'totalNormalSalary' => $totalNormalSalary,
+        // 'totalOvertime1Salary' => $totalOvertime1Salary,
+        // 'totalOvertime2Salary' => $totalOvertime2Salary,
+        // 'totalOvertime3Salary' => $totalOvertime3Salary,
+        // 'grossSalary' => $grossSalary,
+        // 'totalAllowance' => $totalAllowance,
+        // 'totalDeduction' => $totalDeduction
+            $result['total_work_Hours'] = $workData['totalWorkHours'];
+            $result['total_overtime1_Hours'] = $workData['totalOvertime1Hours'];
+            $result['total_overtime2_Hours'] = $workData['totalOvertime2Hours'];
+            $result['total_overtime3_Hours'] = $workData['totalOvertime3Hours'];
+            $result['sunday_work_Hours'] = $workData['sundayWorkHours'];
+        }
+        // Inisiasi Spreadsheet dan Sheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Rekap Gaji Karyawan');
+
+        // Header untuk kolom Excel
+        $sheet->setCellValue('A1', 'ID Karyawan');
+        $sheet->setCellValue('B1', 'Nama');
+        $sheet->setCellValue('C1', 'Gaji Per Jam');
+        $sheet->setCellValue('D1', 'No Rekening');
+        $sheet->setCellValue('E1', 'Pemilik Rekening');
+        $sheet->setCellValue('F1', 'Kode Penggajian');
+        $sheet->setCellValue('G1', 'Tanggal Awal');
+        $sheet->setCellValue('H1', 'Tanggal Akhir');
+        $sheet->setCellValue('I1', 'Total Gaji');
+        $sheet->setCellValue('J1', 'Jam Kerja Total');
+        $sheet->setCellValue('K1', 'Lembur 1');
+        $sheet->setCellValue('L1', 'Lembur 2');
+        $sheet->setCellValue('M1', 'Lembur 3');
+        $sheet->setCellValue('N1', 'Jam Minggu');
+        $sheet->setCellValue('O1', 'Lembur');
+        $sheet->setCellValue('P1', 'Potongan');
+        $sheet->setCellValue('Q1', 'Tunjangan');
+        $sheet->setCellValue('R1', 'Gaji Kotor');
+
+
+        // Isi data karyawan
+        $row = 2;
+        // var_dump($dataKaryawan);
+
+        foreach ($results as $data) {
+            $sheet->setCellValue('A' . $row, $data['pegawai_pin']);
+            $sheet->setCellValue('B' . $row, $data['pegawai_nama']);
+            $sheet->setCellValue('C' . $row, $data['Gaji_Per_Jam']);
+            $sheet->setCellValue('D' . $row, $data['bank_account']);
+            $sheet->setCellValue('E' . $row, $data['pemilik_rekening']);
+            $sheet->setCellValue('F' . $row, $data['kode_penggajian']);
+            $sheet->setCellValue('G' . $row, $data['tanggal_awal_penggajian']);
+            $sheet->setCellValue('H' . $row, $data['tanggal_akhir_penggajian']);
+            $sheet->setCellValue('I' . $row, $data['total_salary']);
+            $sheet->setCellValue('J' . $row, $data['total_work_Hours']);
+            $sheet->setCellValue('K' . $row, $data['total_overtime1_Hours']);
+            $sheet->setCellValue('L' . $row, $data['total_overtime2_Hours']);
+            $sheet->setCellValue('M' . $row, $data['total_overtime3_Hours']);
+            $sheet->setCellValue('N' . $row, $data['sunday_work_Hours']);
+            $sheet->setCellValue('O' . $row, $data['OVT_salary']);
+            $sheet->setCellValue('P' . $row, $data['totalDeduction']);
+            $sheet->setCellValue('Q' . $row, $data['totalAllowance']);
+            $sheet->setCellValue('R' . $row, $data['grossSalary']);
+            $row++;
+        }
+
+        // Menyimpan file
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Rekap_Gaji_Karyawan_.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+        exit();
+    }
 }

@@ -141,6 +141,7 @@ $routes->group('master_penggajian', function ($routes) {
     $routes->get('get/(:num)', 'MasterPenggajianController::get/$1');
     $routes->post('update', 'MasterPenggajianController::update');
     $routes->post('delete/(:num)', 'MasterPenggajianController::delete/$1'); 
+
 });
 
 
@@ -151,4 +152,5 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->get('getEmployeeSalarySlip/(:num)/(:num)', 'MasterPenggajianDetailController::getEmployeeSalarySlip/$1/$2');
 $routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
 $routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
+$routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel');
 });
