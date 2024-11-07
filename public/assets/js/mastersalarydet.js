@@ -638,13 +638,13 @@ function formatDateIndonesian(dateString) {
   // Fungsi untuk mengenerate HTML slip gaji
 // Fungsi untuk mengenerate HTML slip gaji
 function generateSalarySlipHTML(employeeData) {
-    let deductionList = '' 
+    let deductionList = '<tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>' 
     
     $.each(employeeData.deduction, function(index, deduction) {
       deductionList += `<tr><td>${deduction.Nama}</td><td>${numberFormat(deduction.amount)}</td></tr>`;
     });
 
-        let allowanceList = '' 
+        let allowanceList = '<tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>' 
     
     $.each(employeeData.allowance, function(index, allowance) {
       allowanceList += `<tr><td>${allowance.Nama}</td><td>${numberFormat(allowance.amount)}</td></tr>`;
@@ -661,6 +661,7 @@ function generateSalarySlipHTML(employeeData) {
             
             <h3>Rincian Gaji</h3>
             <table>
+                <tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>
                 <tr><td>Gaji Pokok</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
                 <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
                 <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
@@ -682,7 +683,7 @@ function generateSalarySlipHTML(employeeData) {
 
             <table>
             ${deductionList}
-            
+
             </table>
             <p>Slip gaji ini dihasilkan pada ${formatDate(new Date())}</p>
         </div>
