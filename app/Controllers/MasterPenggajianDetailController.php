@@ -538,6 +538,7 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     $effectiveHoursModel = new MdlEffectiveHours();
     $attendanceModel = new AttendanceModel();
     $salaryCatModel = new MdlSalaryCat();
+    $MdlEmployee = new MdlEmployee();
     $salaryPatternModel = new \App\Models\MdlFsalaryPatternEmployee();
     // Ambil data penggajian dan karyawan
     $result = $penggajianDetailModel
@@ -554,6 +555,8 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
             'message' => 'Data slip gaji tidak ditemukan untuk karyawan ini.'
         ]);
     }
+
+    $getDet = $MdlEmployee->getDet($employeeId);
 
     // Hitung total allowance dan deduction
     $totalAllowance = $this->calculateTotalAllowance($allowanceModel, $employeeId);
@@ -589,8 +592,8 @@ public function getEmployeeSalarySlip($employeeId, $penggajianId)
     $result['salary_rate'] = $salaryRate;
     $result['allowance'] = $getDetAllowance;
     $result['deduction'] = $getDetDeduction;
-    // var_dump($result);
-    // die();
+    $result['pegawai'] = $getDet;
+
     // Mengembalikan hasil dalam format JSON
     return $this->response->setJSON($result);
 }

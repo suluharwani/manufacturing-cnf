@@ -638,54 +638,69 @@ function formatDateIndonesian(dateString) {
   // Fungsi untuk mengenerate HTML slip gaji
 // Fungsi untuk mengenerate HTML slip gaji
 function generateSalarySlipHTML(employeeData) {
-    let deductionList = '<tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>' 
+    let pegawai = employeeData.pegawai;
+    let deductionList = '<tr><td><strong>Nama</strong></td><td><strong>Amount (Rp)</strong></td></tr>';
     
     $.each(employeeData.deduction, function(index, deduction) {
-      deductionList += `<tr><td>${deduction.Nama}</td><td>${numberFormat(deduction.amount)}</td></tr>`;
+        deductionList += `<tr><td>${deduction.Nama}</td><td>${numberFormat(deduction.amount)}</td></tr>`;
     });
 
-        let allowanceList = '<tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>' 
+    let allowanceList = '<tr><td><strong>Nama</strong></td><td><strong>Amount (Rp)</strong></td></tr>';
     
     $.each(employeeData.allowance, function(index, allowance) {
-      allowanceList += `<tr><td>${allowance.Nama}</td><td>${numberFormat(allowance.amount)}</td></tr>`;
+        allowanceList += `<tr><td>${allowance.Nama}</td><td>${numberFormat(allowance.amount)}</td></tr>`;
     });
+
     const slipHTML = `
         <div class="salary-slip">
             <h1>Slip Gaji Karyawan</h1>
-            <p>Bulan: ${formatDate(new Date())}</p>
             <hr>
             <h3>Operator</h3>
-            <p><strong>Nama Karyawan:</strong> ${employeeData.pegawai_nama}</p>
+            <p><strong>Nama Karyawan:</strong> ${pegawai.pemilik_rekening}</p>
+            <p><strong>Nama Alias:</strong> ${employeeData.pegawai_nama}</p>
             <p><strong>ID Karyawan:</strong> ${employeeData.karyawan_id}</p>
+            <p><strong>Rekening:</strong> ${pegawai.bank} - ${pegawai.bank_account}</p>
             <p><strong>Periode Gaji:</strong> ${formatDate(employeeData.tanggal_awal_penggajian)} - ${formatDate(employeeData.tanggal_akhir_penggajian)}</p>
             
             <h3>Rincian Gaji</h3>
-            <table>
-                <tr><td><strong>Nama</strong></td><td><strong>Amount(Rp)</strong></td></tr>
+            <table class="main-table">
+                <tr><td><strong>Nama</strong></td><td><strong>Amount (Rp)</strong></td></tr>
                 <tr><td>Gaji Pokok</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
                 <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
                 <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
                 <tr><td>Gaji Lembur >20.30</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
-                <tr><td>Gaji Minggu </td><td>${employeeData.salary_slip_details.sunday_salary}</td></tr>
+                <tr><td>Gaji Minggu</td><td>${employeeData.salary_slip_details.sunday_salary}</td></tr>
                 <tr><td>Gaji Kotor</td><td>${employeeData.salary_slip_details.gross_salary}</td></tr>
                 <tr><td>Tunjangan</td><td>${employeeData.salary_slip_details.allowances}</td></tr>
                 <tr><td>Potongan</td><td>${employeeData.salary_slip_details.deductions}</td></tr>
                 <tr><td><strong>Gaji Bersih</strong></td><td><strong>${employeeData.salary_slip_details.net_salary}</strong></td></tr>
             </table>
             <hr>
-            <h3>Rincian Tunjangan</h3>
-
-            <table>
-              ${allowanceList}
-               
-            </table>
-            <h3>Rincian Potongan</h3>
-
-            <table>
-            ${deductionList}
-
-            </table>
+            <div class="side-by-side">
+                <div class="table-container">
+                    <h3>Rincian Tunjangan</h3>
+                    <table>${allowanceList}</table>
+                </div>
+                <div class="table-container">
+                    <h3>Rincian Potongan</h3>
+                    <table>${deductionList}</table>
+                </div>
+            </div>
             <p>Slip gaji ini dihasilkan pada ${formatDate(new Date())}</p>
+            <hr>
+            <div style="display: flex; justify-content: space-between; margin-top: 50px;">
+                <div style="text-align: center; width: 40%;">
+                    <p>Tanggal:</p>
+                    <p>Penerima,</p>
+                    <br><br><br>
+                    <p>${pegawai.pemilik_rekening}</p>
+                </div>
+                <div style="text-align: center; width: 40%;">
+                    <p>General Manager,</p>
+                    <img src="${base_url}assets/img/ttd_cnf.png" alt="Tanda Tangan General Manager" style="width: 150px; height: auto;" />
+                    <p>ARY SETIAJI</p>
+                </div>
+            </div>
         </div>
     `;
 
@@ -695,11 +710,19 @@ function generateSalarySlipHTML(employeeData) {
             <head>
                 <title>Slip Gaji</title>
                 <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; }
-                    .salary-slip { width: 500px; margin: auto; padding: 20px; border: 1px solid #000; }
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+                    .salary-slip { width: 210mm; max-width: 210mm; margin: auto; padding: 20px; box-sizing: border-box; }
                     h1, h3 { text-align: center; }
-                    table { width: 100%; margin-top: 20px; }
-                    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 10px; text-align: left; }
+                    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+                    table, th, td { border: 1px solid black; padding: 8px; text-align: left; }
+                    p { margin: 5px 0; }
+                    .side-by-side { display: flex; justify-content: space-between; margin-top: 20px; }
+                    .table-container { width: 48%; }
+                    .main-table { font-size: 12px; width: 90%; margin: auto; }
+                    @media print {
+                        body { margin: 0; width: 210mm; height: 297mm; }
+                        .salary-slip { page-break-inside: avoid; }
+                    }
                 </style>
             </head>
             <body onload="window.print();window.close();">
@@ -708,6 +731,7 @@ function generateSalarySlipHTML(employeeData) {
         </html>
     `);
 }
+
 function numberFormat(number, decimals = 2, decPoint = ',', thousandsSep = '.') {
     // Cek apakah input adalah angka
     if (isNaN(number)) return '0';

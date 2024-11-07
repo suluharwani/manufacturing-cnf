@@ -44,4 +44,12 @@ class MdlEmployee extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    public function getDet($karyawan_id)
+    {
+        $builder = $this->db->table($this->table);
+        $builder->select('*');
+        $builder->join('informasi_pegawai', 'pegawai.pegawai_pin = informasi_pegawai.pin', 'left');
+        $builder->where('pegawai.pegawai_id', $karyawan_id);
+        return $builder->get()->getRowArray();
+    }
 }
