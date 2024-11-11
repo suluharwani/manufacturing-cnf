@@ -238,6 +238,10 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
     $totalsundayWorkMinutesOT2  =0;
     $totalsundayWorkMinutesOT3  =0;
     $sundayWorkMinutes = 0;
+    $totalsaturdayWorkMinutesOT1  =0;
+    $totalsaturdayWorkMinutesOT2  =0;
+    $totalsaturdayWorkMinutesOT3  =0;
+    $saturdayWorkMinutes = 0;
 
     foreach ($processedAttendance as $attendance) {
         $date = $attendance['date'];
@@ -257,7 +261,7 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
         $workData = $this->calculateWorkMinutes($inTime, $outTime, $workDaySetting, $date);
 
         // Tambahkan hasil perhitungan ke total
-        if ($dayOfWeek !== 'Minggu') {
+        if ($dayOfWeek !== 'Minggu' && $dayOfWeek !== 'Sabtu') {
         $totalWorkMinutes += $workData['normalWorkMinutes'];
 
         // Set overtimeMinutes1 to 0 if it's less than 75 minutes
@@ -289,9 +293,31 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
 
         $totalsundayWorkMinutesOT2 += $sundayWorkMinutesOT2;
         $totalsundayWorkMinutesOT3 += $sundayWorkMinutesOT3 = floor($workData['overtimeMinutes3'] / 15) * 15;
-;
+
 
         $sundayWorkMinutes +=$totalsundayWorkMinutesOT1+$sundayWorkMinutesOT2+$totalsundayWorkMinutesOT3;
+
+            // $sundayWorkMinutes += $duration;
+        }
+
+
+        // Jika hari adalah Minggu, tambahkan ke total jam kerja Minggu
+        if ($dayOfWeek === 'Sabtu') {
+        $saturdayWorkMinutes += $workData['normalWorkMinutes'];
+
+        // Set overtimeMinutes1 to 0 if it's less than 75 minutes
+        $saturdayWorkMinutesOT1 = $workData['overtimeMinutes1'] >= 75 ? $workData['overtimeMinutes1'] : 0;
+        $totalsaturdayWorkMinutesOT1 += $saturdayWorkMinutesOT1;
+
+        // Bulatkan lembur level 2 dan 3 ke bawah per 15 menit
+        $saturdayWorkMinutesOT2 = floor($workData['overtimeMinutes2'] / 15) * 15;
+        $saturdayWorkMinutesOT3 = floor($workData['overtimeMinutes3'] / 15) * 15;
+
+        $totalsaturdayWorkMinutesOT2 += $saturdayWorkMinutesOT2;
+        $totalsaturdayWorkMinutesOT3 += $saturdayWorkMinutesOT3 = floor($workData['overtimeMinutes3'] / 15) * 15;
+
+
+        $saturdayWorkMinutes +=$totalsaturdayWorkMinutesOT1+$saturdayWorkMinutesOT2+$totalsaturdayWorkMinutesOT3;
 
             // $sundayWorkMinutes += $duration;
         }
@@ -303,6 +329,7 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
     $totalOvertime2Hours = round($totalOvertime2Minutes / 60, 2);
     $totalOvertime3Hours = round($totalOvertime3Minutes / 60, 2);
     $sundayWorkHours = round($sundayWorkMinutes / 60, 2);
+    $saturdayWorkHours = round($saturdayWorkMinutes / 60, 2);
 
     return [
         'totalWorkHours' => $totalWorkHours,
@@ -310,6 +337,7 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
         'totalOvertime2Hours' => $totalOvertime2Hours,
         'totalOvertime3Hours' => $totalOvertime3Hours,
         'sundayWorkHours' => $sundayWorkHours,
+        'saturdayWorkHours' => $saturdayWorkHours,
     ];
 }
 
@@ -317,8 +345,35 @@ private function calculateWorkAndOvertime($processedAttendance, $effectiveHoursM
 private function calculateSalary($employeeId,$workData, $salaryRate, $totalAllowance, $totalDeduction)
 {
     if (isset($salaryRate) && isset($salaryRate['Gaji_Per_Jam'])) {
-        $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
-          $totalOvertime1Hours =  $workData['totalOvertime1Hours'];
+    //     $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+    //       $totalOvertime1Hours =  $workData['totalOvertime1Hours'];
+    // $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
+
+    // // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
+    // $totalOvertime2HoursRounded = ceil($workData['totalOvertime2Hours'] / 0.25) * 0.25;
+    // $totalOvertime3HoursRounded = ceil($workData['totalOvertime3Hours'] / 0.25) * 0.25;
+
+    // // Hitung gaji lembur level 2 dan 3 dengan waktu yang sudah dibulatkan
+    // $totalOvertime2Salary = $totalOvertime2HoursRounded * $salaryRate['Gaji_Per_Jam'];
+    // $totalOvertime3Salary = $totalOvertime3HoursRounded * $salaryRate['Gaji_Per_Jam'];
+
+    // // Hitung total gaji sebelum tunjangan dan potongan
+    // $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
+
+    // // Hitung gaji total setelah menambahkan tunjangan dan mengurangi potongan
+    // $gajiSabtu = $workData['saturdayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+    // $gajiMinggu = $workData['sundayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+    // $totalSalary = ( $gajiSabtu+ $gajiMinggu+$grossSalary + $totalAllowance) - $totalDeduction;
+
+
+//
+
+    $totalNormalSalary = $workData['totalWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+
+
+
+    // Hitung gaji lembur level 1 hanya jika outTime lebih dari 18:00
+    $totalOvertime1Hours = $workData['totalOvertime1Hours'];
     $totalOvertime1Salary = $totalOvertime1Hours * $salaryRate['Gaji_Per_Jam'];
 
     // Membulatkan lembur level 2 dan 3 ke kelipatan 15 menit (0.25 jam)
@@ -330,12 +385,16 @@ private function calculateSalary($employeeId,$workData, $salaryRate, $totalAllow
     $totalOvertime3Salary = $totalOvertime3HoursRounded * $salaryRate['Gaji_Per_Jam'];
 
     // Hitung total gaji sebelum tunjangan dan potongan
-    $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
+    $saturday = $workData['saturdayWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+    $sunday = $workData['sundayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+    $grossSalary =$saturday+ $sunday+ $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
 
-    // Hitung gaji total setelah menambahkan tunjangan dan mengurangi potongan
-    $gajiMinggu = $workData['sundayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
-    $totalSalary = ( $gajiMinggu+$grossSalary + $totalAllowance) - $totalDeduction;
+    // Hitung total gaji setelah tunjangan dan potongan
 
+    
+    $totalSalary = ($grossSalary+ $totalAllowance) - $totalDeduction;
+    
+//
 } else {
     $totalNormalSalary = 0;
     $totalNormalSalary= 0;
@@ -502,17 +561,20 @@ public function deleteEmployeeFromPayroll()
     $totalOvertime3Salary = $totalOvertime3HoursRounded * $salaryRate['Gaji_Per_Jam'];
 
     // Hitung total gaji sebelum tunjangan dan potongan
-    $grossSalary = $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
+    $saturday = $workData['saturdayWorkHours'] * $salaryRate['Gaji_Per_Jam'];
+    $sunday = $workData['sundayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
+    $grossSalary =$saturday+ $sunday+ $totalNormalSalary + $totalOvertime1Salary + $totalOvertime2Salary + $totalOvertime3Salary;
 
     // Hitung total gaji setelah tunjangan dan potongan
 
-    $sunday = $workData['sundayWorkHours'] * $salaryRate['Gaji_Per_Jam_Hari_Minggu'];
-    $netSalary = ($grossSalary +$sunday+ $totalAllowance) - $totalDeduction;
+    
+    $netSalary = ($grossSalary+ $totalAllowance) - $totalDeduction;
     
     // Struktur rincian untuk slip gaji
     return [
         'basic_salary' => number_format($totalNormalSalary, 2, ',', '.'), // Gaji Pokok
         'sunday_salary' => number_format($sunday, 2, ',', '.'), // Gaji Pokok
+        'saturday_salary' => number_format($saturday, 2, ',', '.'), // Gaji Pokok
         'overtime1_salary' => number_format($totalOvertime1Salary, 2, ',', '.'), // Gaji Lembur Level 1
         'overtime2_salary' => number_format($totalOvertime2Salary, 2, ',', '.'), // Gaji Lembur Level 2
         'overtime3_salary' => number_format($totalOvertime3Salary, 2, ',', '.'), // Gaji Lembur Level 3
@@ -867,6 +929,7 @@ $results = $penggajianDetailModel
             $result['total_overtime2_Hours'] = $workData['totalOvertime2Hours'];
             $result['total_overtime3_Hours'] = $workData['totalOvertime3Hours'];
             $result['sunday_work_Hours'] = $workData['sundayWorkHours'];
+            $result['saturday_work_Hours'] = $workData['saturdayWorkHours'];
         }
         // Inisiasi Spreadsheet dan Sheet
         $spreadsheet = new Spreadsheet();
@@ -887,11 +950,12 @@ $results = $penggajianDetailModel
         $sheet->setCellValue('K1', 'Lembur 1');
         $sheet->setCellValue('L1', 'Lembur 2');
         $sheet->setCellValue('M1', 'Lembur 3');
-        $sheet->setCellValue('N1', 'Jam Minggu');
-        $sheet->setCellValue('O1', 'Lembur');
-        $sheet->setCellValue('P1', 'Potongan');
-        $sheet->setCellValue('Q1', 'Tunjangan');
-        $sheet->setCellValue('R1', 'Gaji Kotor');
+        $sheet->setCellValue('N1', 'Jam Sabtu');
+        $sheet->setCellValue('O1', 'Jam Minggu');
+        $sheet->setCellValue('P1', 'Lembur');
+        $sheet->setCellValue('Q1', 'Potongan');
+        $sheet->setCellValue('R1', 'Tunjangan');
+        $sheet->setCellValue('S1', 'Gaji Kotor');
 
 
         // Isi data karyawan
@@ -912,11 +976,12 @@ $results = $penggajianDetailModel
             $sheet->setCellValue('K' . $row, $data['total_overtime1_Hours']);
             $sheet->setCellValue('L' . $row, $data['total_overtime2_Hours']);
             $sheet->setCellValue('M' . $row, $data['total_overtime3_Hours']);
-            $sheet->setCellValue('N' . $row, $data['sunday_work_Hours']);
-            $sheet->setCellValue('O' . $row, $data['OVT_salary']);
-            $sheet->setCellValue('P' . $row, $data['totalDeduction']);
-            $sheet->setCellValue('Q' . $row, $data['totalAllowance']);
-            $sheet->setCellValue('R' . $row, $data['grossSalary']);
+            $sheet->setCellValue('N' . $row, $data['saturday_work_Hours']);
+            $sheet->setCellValue('O' . $row, $data['sunday_work_Hours']);
+            $sheet->setCellValue('P' . $row, $data['OVT_salary']);
+            $sheet->setCellValue('Q' . $row, $data['totalDeduction']);
+            $sheet->setCellValue('R' . $row, $data['totalAllowance']);
+            $sheet->setCellValue('S' . $row, $data['grossSalary']);
             $row++;
         }
 

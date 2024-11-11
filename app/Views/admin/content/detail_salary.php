@@ -74,13 +74,7 @@
                     <th>Kode Penggajian</th>
                     <th>Tanggal Awal Penggajian</th>
                     <th>Tanggal Akhir Penggajian</th>
-                    <th>Total Gaji</th>
-                    <th>Total Jam Kerja</th>
-                    <th>Lembur 1 (Jam)</th>
-                    <th>Lembur 2 (Jam)</th>
-                    <th>Lembur 3 (Jam)</th>
-                    <th>Jam Kerja Hari Minggu</th>
-                    <th>Jam Kerja Hari Minggu</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="data-body">

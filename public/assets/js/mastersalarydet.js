@@ -135,12 +135,7 @@ $(document).ready(function () {
                             <td>${item.kode_penggajian}</td>
                             <td>${formatDate(item.tanggal_awal_penggajian)}</td>
                             <td>${formatDate(item.tanggal_akhir_penggajian)}</td>
-                            <td>${formatRupiah(item.total_salary)}</td>
-                            <td>${item.total_work_Hours}</td>
-                            <td>${item.total_overtime1_Hours}</td>
-                            <td>${item.total_overtime2_Hours}</td>
-                            <td>${item.total_overtime3_Hours}</td>
-                            <td>${item.sunday_work_Hours}</td>
+                           
                             <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button>
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
                                 <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
@@ -665,10 +660,11 @@ function generateSalarySlipHTML(employeeData) {
             <h3>Rincian Gaji</h3>
             <table class="main-table">
                 <tr><td><strong>Nama</strong></td><td><strong>Amount (Rp)</strong></td></tr>
-                <tr><td>Gaji Pokok</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
+                <tr><td>Gaji Harian Senin-Jumat</td><td>${employeeData.salary_slip_details.basic_salary}</td></tr>
                 <tr><td>Gaji Lembur 16.45-18.00</td><td>${employeeData.salary_slip_details.overtime1_salary}</td></tr>
                 <tr><td>Gaji Lembur 18.30-20.00</td><td>${employeeData.salary_slip_details.overtime2_salary}</td></tr>
                 <tr><td>Gaji Lembur >20.30</td><td>${employeeData.salary_slip_details.overtime3_salary}</td></tr>
+                <tr><td>Gaji Sabtu</td><td>${employeeData.salary_slip_details.saturday_salary}</td></tr>
                 <tr><td>Gaji Minggu</td><td>${employeeData.salary_slip_details.sunday_salary}</td></tr>
                 <tr><td>Gaji Kotor</td><td>${employeeData.salary_slip_details.gross_salary}</td></tr>
                 <tr><td>Tunjangan</td><td>${employeeData.salary_slip_details.allowances}</td></tr>
