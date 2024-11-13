@@ -20,16 +20,26 @@ class Product extends Migration
           'constraint' => 50,
           'null' => true,
         ],
+        'id_product_cat' => [
+          'type' => 'INT',
+          'constraint' => 10,
+          'null' => true,
+        ],
         'nama' => [
           'type' => 'VARCHAR',
           'constraint' => 200,
           'null' => true,
         ],  
-        'gambar' => [
+        'picture' => [
             'type' => 'VARCHAR',
             'constraint' => 2000,
             'null' => true,
           ],
+          'text' => [
+        'type' => 'VARCHAR',
+        'constraint' => 50000,
+        'null' => true,
+      ],
         'updated_at' => [
           'type' => 'datetime',
           'null' => true,

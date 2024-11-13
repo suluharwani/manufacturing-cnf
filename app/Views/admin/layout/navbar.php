@@ -18,12 +18,15 @@
                 <div class="navbar-nav w-100">
                     <a href="<?=base_url('dashboard')?>" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cube me-2"></i>Material</a>
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cube me-2"></i>Master Data</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="<?=base_url('material')?>" class="dropdown-item">All Materials</a>
-                            <a href="<?=base_url('track_material')?>" class="dropdown-item">Track Material Inventory</a>
-                            <a href="<?=base_url('product')?>" class="dropdown-item">Product</a>
-                            <a href="<?=base_url('scrap_management')?>" class="dropdown-item">Scrap Management</a>
+                            <a href="<?=base_url('material')?>" class="dropdown-item"> Materials</a>
+                            
+                            <a href="<?=base_url('product')?>" class="dropdown-item">BoM Finished goods</a>
+                            <!-- <a href="<?=base_url('track_material')?>" class="dropdown-item">Track Material Inventory</a> -->
+                            <a href="<?=base_url('warehouse')?>" class="dropdown-item">Warehouse</a>
+                            <a href="<?=base_url('productionArea')?>" class="dropdown-item">Production Area</a>
+                            <!-- <a href="<?=base_url('scrap_management')?>" class="dropdown-item">Scrap Management</a> -->
                         </div>
                     </div>
                     <div class="nav-item dropdown">
@@ -37,7 +40,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cubes me-2"></i>Warehouse</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="<?=base_url('warehouse')?>" class="dropdown-item">All Warehouse</a>
+                            
                             <a href="<?=base_url('stock')?>" class="dropdown-item">Stock</a>
                             <a href="<?=base_url('warehouse_report')?>" class="dropdown-item">Report</a>
                         </div>
@@ -45,7 +48,8 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-archive me-2"></i>Customer Order</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="<?=base_url('work_order')?>" class="dropdown-item">All Work Orders</a>
+                            <a href="<?=base_url('work_order')?>" class="dropdown-item">Proforma Invoice</a>
+                            <a href="<?=base_url('work_order')?>" class="dropdown-item">Work Orders</a>
                             <a href="<?=base_url('track_work_order')?>" class="dropdown-item">Track Work Order Status</a>
                         </div>
                     </div>

@@ -43,7 +43,7 @@ $routes->get('/warehouse_report', 'Home::warehouse_report');
 $routes->post('/material/tambah_tipe', 'MaterialController::tambah_tipe');
 $routes->post('/material/tambah_satuan', 'MaterialController::tambah_satuan');
 //product
-$routes->post('/material/listdataProdukJoin', 'MaterialController::listdataProdukJoin');
+
 
 // material
 $routes->post('/material/type_list', 'MaterialController::type_list');
@@ -153,4 +153,18 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
 $routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
 $routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
 $routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel');
+});
+
+$routes->group('product', function ($routes) {
+    // $routes->get('/', 'ProductController::index'); 
+    // $routes->post('get_list', 'ProductController::get_list'); 
+    $routes->post('addcat', 'ProductController::addcat'); 
+    // $routes->post('add', 'ProductController::add'); 
+    $routes->get('getcat/(:num)', 'ProductController::getcat/$1');
+    $routes->post('cat_list', 'ProductController::cat_list');
+    $routes->post('upload', 'ProductController::upload');
+    $routes->post('create', 'ProductController::create');
+    // $routes->post('delete/(:num)', 'ProductController::delete/$1'); 
+    $routes->post('listdataProdukJoin', 'ProductController::listdataProdukJoin');
+
 });

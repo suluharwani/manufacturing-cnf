@@ -25,6 +25,16 @@ class MaterialSatuan extends Migration
           'constraint' => 200,
           'null' => true,
         ],
+        'base_unit_id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true,
+                'null' => true,
+            ],
+            'conversion_factor' => [
+                'type' => 'FLOAT',
+                'null' => true,
+            ],
         'updated_at' => [
           'type' => 'datetime',
           'null' => true,

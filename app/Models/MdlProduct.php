@@ -12,7 +12,7 @@ class MdlProduct extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','kode','nama','gambar','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','kode','nama','id_product_cat','picture','text','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

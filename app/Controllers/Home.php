@@ -94,7 +94,7 @@ class Home extends BaseController
     public function product()
     {
         $data['group'] = 'Material';
-        $data['title'] = 'Product';
+        $data['title'] = 'Finished Goods';
         $data['content'] = view('admin/content/product');
         return view('admin/index', $data);
 

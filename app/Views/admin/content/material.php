@@ -83,9 +83,6 @@
                   <th style=" text-align: center;">Name</th>
                   <th style=" text-align: center;">Type</th>
                   <th style=" text-align: center;">Import/Export</th>
-                  <th style=" text-align: center;">Picture</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
                   <th style=" text-align: center;">Satuan</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -97,9 +94,6 @@
                   <th style=" text-align: center;">Name</th>
                   <th style=" text-align: center;">Type</th>
                   <th style=" text-align: center;">Import/Export</th>
-                  <th style=" text-align: center;">Picture</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
                   <th style=" text-align: center;">Satuan</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -117,4 +111,4 @@
             <!-- Widgets End -->
      
             <script type="text/javascript" src="<?=base_url('assets')?>/js/material.js"></script>
-            <script type="text/javascript" src="<?=base_url('assets')?>/datatables/datatables.min.js"></script>
+            <script type="text/javascript" src="<?=base_url('assets')?>/datatables/datatables.min.js"></script> 

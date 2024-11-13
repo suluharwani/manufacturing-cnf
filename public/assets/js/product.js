@@ -31,7 +31,7 @@ function tabel(){
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"material/listdataProdukJoin" , // json datasource 
+      "url" :base_url+"product/listdataProdukJoin" , // json datasource 
       "type": "post",  // method  , by default get
       "data":{},
     },
@@ -45,7 +45,10 @@ function tabel(){
         return row[2]
     }},
     {mRender: function (data, type, row) {
-     return row[1]
+     return `<img src="${base_url + 'assets/upload/thumb/' + row[4]}" alt="${row[2]}" style="height:45px; cursor: pointer;" onclick="showImageModal('${base_url + 'assets/upload/image/' + row[4]}', '${row[2]}')">`;
+    }},
+    {mRender: function (data, type, row) {
+     return row[6]
     }},
     {mRender: function (data, type, row) {
       return row[1]
@@ -74,126 +77,258 @@ function tabel(){
 });
 };
 
-$('.tambahJenisBarang').on('click',function(){
+function showImageModal(src, alt) {
+  var modal = document.getElementById("imageModal");
+  var modalImg = document.getElementById("imgDisplay");
+  var captionText = document.getElementById("caption");
+  modal.style.display = "block";
+  modalImg.src = src;
+  captionText.innerHTML = alt;
 
-    Swal.fire({
-      title: `Tambah Tipe/Jenis `,
-      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
-      html:`<form id="form_add_data">
-      <div class="form-group">
-      <label for="kode">Kode</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-      </div>
-      <div class="form-group">
-      <label for="namaBarang">Nama Jenis/Tipe</label>
-      <input type="text" class="form-control" id="namaBarang" placeholder="Nama Tipe">
-      </div>
-      </form>`,
-      confirmButtonText: 'Confirm',
-      focusConfirm: false,
-      preConfirm: () => {
-        const kode = Swal.getPopup().querySelector('#kode').value
-        const nama = Swal.getPopup().querySelector('#namaBarang').value
-        if (!kode || !nama) {
-          Swal.showValidationMessage('Silakan lengkapi data')
-        }
-        return {kode:kode, nama: nama }
-      }
-    }).then((result) => {
+  var span = document.getElementsByClassName("close")[0];
+  span.onclick = function() { 
+    modal.style.display = "none";
+  }
+}
+var span = document.getElementsByClassName("close")[0];
+span.onclick = function() { 
+  var modal = document.getElementById("imageModal");
+  modal.style.display = "none";
+}
+
+// Juga bisa menutup modal saat pengguna mengklik di luar gambar
+window.onclick = function(event) {
+  var modal = document.getElementById("imageModal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+}
+ function selectCat(id_cat=null){
       $.ajax({
         type : "POST",
-        url  : base_url+'/material/tambah_tipe',
-        async : false,
-        // dataType : "JSON",
-        data : {kode:result.value.kode,nama:result.value.nama},
+        url  : base_url+"product/cat_list",
+        async : true,
+        dataType : 'json',
         success: function(data){
-          dataTypeBarang()
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `Jenis barang berhasil ditambahkan.`,
-            showConfirmButton: false,
-            timer: 1500
-          })
-        },
-        error: function(xhr){
-          let d = JSON.parse(xhr.responseText);
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: `${d.message}`,
-            footer: '<a href="">Why do I have this issue?</a>'
-          })
-        }
-      });
-  
-    })
-  })
-  
-  $('.tambahSatuanBarang').on('click',function(){
+          let selOpts = '';
+          $.each(data, function(k, v)
+          {
+            var id = data[k].id;
+            var nama = data[k].nama;
 
-    Swal.fire({
-      title: `Tambah Satuan `,
-      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
-      html:`<form id="form_add_data">
-      <div class="form-group">
-      <label for="kode">Kode</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-      </div>
-      <div class="form-group">
-      <label for="namaSatuan">Nama Satuan</label>
-      <input type="text" class="form-control" id="namaSatuan" placeholder="Nama Satuan">
-      </div>
-      </form>`,
-      confirmButtonText: 'Confirm',
-      focusConfirm: false,
-      preConfirm: () => {
-        const kode = Swal.getPopup().querySelector('#kode').value
-        const nama = Swal.getPopup().querySelector('#namaSatuan').value
-        if (!kode || !nama) {
-          Swal.showValidationMessage('Silakan lengkapi data')
-        }
-        return {kode:kode, nama: nama }
+            selOpts += "<option value='"+id+"'>"+nama+"</option>";
+
+        });
+          $('.select_cat').html(selOpts);
+          if (id_cat!=null) {
+              $('.select_cat option[value='+id_cat+']').attr('selected','selected');
+          }
       }
+  });
+  }
+$('.addFinishedGoods').on('click',function(){
+  selectCat()
+  $('.modalTambahData').modal('show')
+})
+$('#file').change(function(){
+  $('.uploadBtn').html('Upload');
+  $('.uploadBtn').prop('disabled', false);
+  $('.uploadBtn').addClass("btn-danger");
+  $('.uploadBtn').removeClass("btn-success");
+  $('#picture').val('');
+  const file = this.files[0];
+  if (file){
+    let reader = new FileReader();
+    reader.onload = function(event){
+      $('#ajaxImgUpload').attr('src', event.target.result).width(300);
+    }
+    reader.readAsDataURL(file);
+  }
+});
+$('.reset').on('click',function(){
+  $('#form').trigger("reset");
+  $('.uploadBtn').html('Upload');
+  $('.uploadBtn').prop('disabled', false);
+  $('.uploadBtn').addClass("btn-danger");
+  $('.uploadBtn').removeClass("btn-success");
+  $('#ajaxImgUpload').attr('src', 'https://via.placeholder.com/1080');
+})
+
+
+$('.uploadBtn').on('click',function(){
+
+  upload()
+
+})
+function upload(){
+  input = $('#file').prop('files')[0];
+
+  param = ''
+  data = new FormData();
+          // data['file'] = input;
+  data.append('file', input);
+  data.append('param', param);
+  data.append('data', '');
+  $('.uploadBtn').html('Uploading ...');
+  $('.uploadBtn').attr('disabled');
+  if (!input) {
+    alert("Choose File");
+    $('.uploadBtn').html('Upload');
+    $('.uploadBtn').prop('disabled', false);
+  } else {
+    $.ajax({
+     type : "POST",
+     enctype: 'multipart/form-data',
+     url  : base_url+"product/upload",
+     async : false,
+     processData: false,
+     contentType: false,
+     data:data,
+     success: function (res) {
+      if (res.success == true) {
+        $('.uploadBtn').html('Uploaded!');
+        $('.uploadBtn').prop('disabled', true);
+        $('.uploadBtn').removeClass("btn-danger");
+        $('.uploadBtn').addClass("btn-success");
+        $('#picture').val(res.picture);
+
+                                // $('#ajaxImgUpload').attr('src', 'https://via.placeholder.com/300');
+        $('#alertMsg').addClass("text-success");
+        $('#alertMsg').html(res.msg);
+        $('#alertMessage').show();
+      } else if (res.success == false) {
+        $('#alertMsg').addClass("text-danger");
+        $('#alertMsg').html(res.msg);
+        $('#picture').val('');
+
+        $('#alertMessage').show();
+        $('.uploadBtn').html('Upload Failed!');
+        $('.uploadBtn').prop('disabled', false);
+        $('.uploadBtn').addClass("btn-danger");
+        $('.uploadBtn').removeClass("btn-success");
+
+      }
+      setTimeout(function () {
+        $('#alertMsg').html('');
+        $('#alertMessage').hide();
+      }, 4000);
+
+                            // document.getElementById("form").reset();
+    }
+  });
+  }
+}
+
+$('.save').on('click',function(){
+  if ($('#picture').val()=='') {
+    Swal.fire({
+      title: 'Gambar belum diupload!',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Upload gambar lalu simpan',
+      denyButtonText: `Tanpa Gambar`,
     }).then((result) => {
-      $.ajax({
-        type : "POST",
-        url  : base_url+'/material/tambah_satuan',
-        async : false,
-        // dataType : "JSON",
-        data : {kode:result.value.kode,nama:result.value.nama},
-        success: function(data){
-          dataSatuan()
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `Satuan ukuran barang berhasil ditambahkan.`,
-            showConfirmButton: false,
-            timer: 1500
-          })
-        },
-        error: function(xhr){
-          let d = JSON.parse(xhr.responseText);
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: `${d.message}`,
-            footer: '<a href="">Why do I have this issue?</a>'
-          })
-        }
-      });
-  
+  /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        upload()
+      } else if (result.isDenied) {
+        simpan()
+      }
     })
-  })
-  dataTypeBarang()
-  function dataTypeBarang(){
+  }else{
+    simpan()
+
+  }
+})
+
+
+function simpan(){
+  form = $('.form').serializeArray()
+  let data = {}
+  $.each(form, function(i, field){
+    data[field.name] =  field.value;
+
+  });
+  if (typeof document.getElementsByName("text")[0] !== 'undefined') {
+  data['text'] = document.getElementsByName("text")[0].value
+}
+  param=''
+  $.ajax({
+    type  : 'post',
+    url  : base_url+"product/create",
+    async : false,
+        // dataType : 'json',
+    data:{data:data, param:param},
+    success : function(res){
+          //reload table
+      
+      $('.uploadBtn').html('Upload');
+      $('.uploadBtn').prop('disabled', false);
+      $('.modalTambahData').modal('hide');  
+      $('#ajaxImgUpload').removeAttr('src');
+      $('.uploadBtn').addClass("btn-danger");
+      $('.uploadBtn').removeClass("btn-success");
+
+      $('#form').trigger("reset");
+      $('#tabelProduct').DataTable().ajax.reload();
+      Swal.fire(
+        'Berhasil!',
+        ''+data['nama']+' telah ditambahkan.',
+        'success'
+        )
+    },
+    error: function(xhr){
+      $('.uploadBtn').html('Upload');
+      $('.uploadBtn').prop('disabled', false);
+      $('.uploadBtn').addClass("btn-danger");
+      $('.uploadBtn').removeClass("btn-success");
+      let d = JSON.parse(xhr.responseText);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `${d.message}`,
+        footer: '<a href="">Why do I have this issue?</a>'
+      })
+    }
+  });
+}
+
+$('.addCat').on('click',function(){
+
+  Swal.fire({
+    title: `Tambah Kategori `,
+      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
+    html:`<form id="form_add_data">
+    <div class="form-group">
+    <label for="namaBarang">Nama Jenis/Tipe</label>
+    <input type="text" class="form-control" id="nama" placeholder="Nama Kategori">
+    </div>
+    </form>`,
+    confirmButtonText: 'Confirm',
+    focusConfirm: false,
+    preConfirm: () => {
+      const nama = Swal.getPopup().querySelector('#nama').value
+      if ( !nama) {
+        Swal.showValidationMessage('Silakan lengkapi data')
+      }
+      return {nama: nama }
+    }
+  }).then((result) => {
     $.ajax({
       type : "POST",
-      url  : base_url+"material/type_list",
+      url  : base_url+'/product/addcat',
       async : false,
+        // dataType : "JSON",
+      data : {kode:result.value.kode,nama:result.value.nama},
       success: function(data){
-       tableType(data);
-    
+        dataCat()
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: `Jenis barang berhasil ditambahkan.`,
+          showConfirmButton: false,
+          timer: 1500
+        })
       },
       error: function(xhr){
         let d = JSON.parse(xhr.responseText);
@@ -205,57 +340,42 @@ $('.tambahJenisBarang').on('click',function(){
         })
       }
     });
+
+  })
+})
+dataCat()
+function dataCat(){
+  $.ajax({
+    type : "POST",
+    url  : base_url+"product/cat_list",
+    async : false,
+    success: function(data){
+     tableCat(data);
+
+   },
+   error: function(xhr){
+    let d = JSON.parse(xhr.responseText);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: `${d.message}`,
+      footer: '<a href="">Why do I have this issue?</a>'
+    })
   }
-  function tableType(data){
-    d = JSON.parse(data);
-    console.log(d)
-    let no = 1;
-    let table = ''
-    $.each(d, function(k, v){
-            table+=     `<tr>`;
-                table+=   `<td>${no++}</td>`;
-                table+=   `<td>${d[k].kode}</td>`;
-                table+=   `<td>${d[k].nama}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editType"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteType"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
-            table+=   `</tr>`
- 
-          })
-   $('#isiType').html(table)
-  }
-  dataSatuan()
-  function dataSatuan(){
-    $.ajax({
-      type : "POST",
-      url  : base_url+"material/satuan_list",
-      async : false,
-      success: function(data){
-       tableSatuan(data);
-    
-      },
-      error: function(xhr){
-        let d = JSON.parse(xhr.responseText);
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: `${d.message}`,
-          footer: '<a href="">Why do I have this issue?</a>'
-        })
-      }
-    });
-  }
-  function tableSatuan(data){
-    d = JSON.parse(data);
-    console.log(d)
-    let no = 1;
-    let table = ''
-    $.each(d, function(k, v){
-            table+=     `<tr>`;
-                table+=   `<td>${no++}</td>`;
-                table+=   `<td>${d[k].nama}</td>`;
-                table+=   `<td>${d[k].kode}</td>`;
-                table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm editSatuan"  id="${d[k].id}" nama = "${d[k].nama}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteSatuan"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
-            table+=   `</tr>`
- 
-          })
-   $('#isiSatuan').html(table)
-  }
+});
+}
+function tableCat(data){
+  d = JSON.parse(data);
+  console.log(d)
+  let no = 1;
+  let table = ''
+  $.each(d, function(k, v){
+    table+=     `<tr>`;
+    table+=   `<td>${no++}</td>`;
+    table+=   `<td>${d[k].nama}</td>`;
+    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+    table+=   `</tr>`
+
+  })
+  $('#productCat').html(table)
+}

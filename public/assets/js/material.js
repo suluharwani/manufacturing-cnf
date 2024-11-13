@@ -52,16 +52,6 @@ $(document).ready(function() {
      {mRender: function (data, type, row) {
        return row[4]; 
      }},
-
-     {mRender: function (data, type, row) {
-       return `<a href="javascript:void(0);" class="btn btn-success btn-sm showSalesOrder" id="'+row[1]+'" >Detail</a>`; 
-     }},
-     {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersedia" id="'+row[1]+'" >Detail</a>`; 
-    }},
-    {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersediaSalesOrder" id="'+row[1]+'" >Detail</a>`; 
-    }},
     {mRender: function (data, type, row) {
       return `(${row[6]}) ${row[7]}`; 
     }},

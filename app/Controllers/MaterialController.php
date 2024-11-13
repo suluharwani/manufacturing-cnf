@@ -212,96 +212,50 @@ class MaterialController extends BaseController
         return json_encode($data);
        }
 
-       public function listdataProdukJoin()
-       {
-           $this->access('operator');
-           $serverside_model = new \App\Models\MdlDatatableJoin();
-           $request = \Config\Services::request();
-           
-           // Define the columns to select
-           $select_columns = 'product.*,';
-           
-           // Define the joins (you can add more joins as needed)
-           $joins = [
- 
-           ];
-   
-           $where = ['product.id !=' => 0, 'product.deleted_at' => NULL];
-   
-           // Column Order Must Match Header Columns in View
-           $column_order = array(
-               NULL, 
-               'product.name', 
-               'product.kode', 
-               'product.id',
-           );
-           $column_search = array(
-               'product.name', 
-               'product.kode', 
-          
-           );
-           $order = array('product.id' => 'desc');
-   
-           // Call the method to get data with dynamic joins and select fields
-           $list = $serverside_model->get_datatables('product', $select_columns, $joins, $column_order, $column_search, $order, $where);
-           
-           $data = array();
-           $no = $request->getPost("start");
-           foreach ($list as $lists) {
-               $no++;
-               $row = array();
-               $row[] = $no;
-               $row[] = $lists->id;
-               $row[] = $lists->nama;
-               $row[] = $lists->kode;
 
- // From joined suppliers table
-               $data[] = $row;
-           }
-   
-           $output = array(
-               "draw" => $request->getPost("draw"),
-               "recordsTotal" => $serverside_model->count_all('product', $where),
-               "recordsFiltered" => $serverside_model->count_filtered('product', $select_columns, $joins, $column_order, $column_search, $order, $where),
-               "data" => $data,
-           );
-          
 
-           return $this->response->setJSON($output);
-       }
+       function tambah_material() {
+    $this->access('operator');
+    $userInfo = $_SESSION['auth'];
+    $MdlMaterial = new \App\Models\MdlMaterial();
+    $MdlMaterialDet = new \App\Models\MdlMaterialDet();
 
-       function tambah_material(){
-        $this->access('operator');
-        $userInfo = $_SESSION['auth'];
-        $MdlMaterial = new \App\Models\MdlMaterial();
-        $MdlMaterialDet = new \App\Models\MdlMaterialDet();
-        $dataMaterial = [
-          "kode" =>  $_POST["kode"],
-          "name" =>  $_POST["nama"]
-          
-        ];
-
-        if ($MdlMaterial->insert($dataMaterial)) {
-          $query = $MdlMaterial->orderBy('id', 'DESC')->first();
-          $materialDet =["material_id" => $query['id'],
-                         "type_id"=>$_POST["type"],
-                         "satuan_id"=>$_POST["satuanUkuran"],
-                         "kite" =>  $_POST["kite"]
-                        ];
-          if ($MdlMaterialDet->insert($materialDet)) {
-            $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan material: ".$_POST['nama']."";
-            header('HTTP/1.1 200 OK');
-          }
-        
-        }else{
-          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan material: ".$_POST['nama'];
-          header('HTTP/1.1 500 Internal Server Error');
-          header('Content-Type: application/json; charset=UTF-8');
-          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
-        }
-        $this->changelog->riwayat($riwayat);
-      
+    // Cek jika kode sudah ada
+    $existingMaterial = $MdlMaterial->where('kode', $_POST["kode"])->first();
+    if ($existingMaterial) {
+        $riwayat = "User " . $userInfo['nama_depan'] . " gagal menambahkan material: Kode " . $_POST['kode'] . " sudah ada.";
+        header('HTTP/1.1 409 Conflict');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(array('message' => 'Kode sudah ada, gagal menambahkan data.', 'code' => 4)));
     }
+
+    $dataMaterial = [
+        "kode" => $_POST["kode"],
+        "name" => $_POST["nama"]
+    ];
+
+    if ($MdlMaterial->insert($dataMaterial)) {
+        $query = $MdlMaterial->orderBy('id', 'DESC')->first();
+        $materialDet = [
+            "material_id" => $query['id'],
+            "type_id" => $_POST["type"],
+            "satuan_id" => $_POST["satuanUkuran"],
+            "kite" => $_POST["kite"]
+        ];
+        if ($MdlMaterialDet->insert($materialDet)) {
+            $riwayat = "User " . $userInfo['nama_depan'] . " " . $userInfo['nama_belakang'] . " menambahkan material: " . $_POST['nama'] . "";
+            header('HTTP/1.1 200 OK');
+        }
+
+    } else {
+        $riwayat = "User " . $userInfo['nama_depan'] . " gagal menambahkan material: " . $_POST['nama'];
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(array('message' => 'Gagal menambahkan data.', 'code' => 3)));
+    }
+    $this->changelog->riwayat($riwayat);
+}
+
     public function get_material($id)
     {
         $model = new \App\Models\MdlMaterial();
