@@ -12,7 +12,7 @@ class MdlBuildOfMaterial extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id', 'id_product', 'id_material', 'created_at','updated_at','deleted_at'];
+    protected $allowedFields    = ['id', 'id_product', 'id_material','penggunaan','created_at','updated_at','deleted_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -168,5 +168,6 @@ $routes->group('product', function ($routes) {
     $routes->post('listdataProdukJoin', 'ProductController::listdataProdukJoin');
     $routes->get('getMaterial', 'ProductController::getMaterial');
     $routes->post('saveBom', 'ProductController::saveBom');
+    $routes->post('getBom', 'ProductController::getBom');
 
 });

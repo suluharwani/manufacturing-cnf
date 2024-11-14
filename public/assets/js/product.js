@@ -356,7 +356,6 @@ function dataCat(){
 }
 function tableCat(data){
   d = JSON.parse(data);
-  console.log(d)
   let no = 1;
   let table = ''
   $.each(d, function(k, v){
@@ -369,58 +368,182 @@ function tableCat(data){
   })
   $('#productCat').html(table)
 }
+// Event listener untuk menambah baris produk baru
 
-function getOrderMaterial(materialOptions, idProduct){
-    $.ajax({
-    type : "POST",
-    url  : base_url+"product/getBuildMaterial",
-    async : false,
-    success: function(data){
-     tableCat(data);
+// Event listener untuk menghapus baris produk
+$(document).on('click', '.remove-product', function () {
+  $(this).closest('tr').remove();
+});
+function getOrderMaterial(materialOptions, idProduct) {
+  let orderMaterialHtml = '';
 
-   },
-   error: function(xhr){
-    let d = JSON.parse(xhr.responseText);
+  $.ajax({
+    type: "POST",
+    url: base_url + "product/getBom",
+    async: false,
+    data: { idProduct: idProduct },
+    success: function(data) {
+      const parsedData = JSON.parse(data);
+      if (parsedData.length > 0) {
+
+        orderMaterialHtml += `
+          <form id="form_order_list">
+            <table class="table table-bordered" id="order_material_table">
+              <thead>
+                <tr>
+                  <th>Nama Material</th>
+                  <th>Ukuran</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        // Menampilkan data yang ada di response JSON
+        parsedData.forEach((item) => {
+          let materialOptionsHtml = materialOptions.split('</option>'); // Memecah opsi material
+          materialOptionsHtml = materialOptionsHtml.map(option => {
+            if (option.includes('value="' + item.id_material + '"')) {
+              return option.replace('<option', '<option selected="selected"');
+            }
+            return option;
+          });
+
+          orderMaterialHtml += `
+            <tr>
+              <td>
+                <select class="form-control" name="id_material[]">
+                  ${materialOptionsHtml.join('</option>')} <!-- Gabungkan kembali pilihan -->
+                </select>
+              </td>
+              <td>
+                <input type="number" class="form-control material-penggunaan" name="penggunaan[]" value="${item.penggunaan}" placeholder="Masukkan ukuran">
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        orderMaterialHtml += `
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+          </form>
+        `;
+      } else {
+        orderMaterialHtml += `
+          <form id="form_order_list">
+            <table class="table table-bordered" id="order_material_table">
+              <thead>
+                <tr>
+                  <th>Nama Material</th>
+                  <th>Ukuran</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select class="form-control" name="id_material[]">
+                      ${materialOptions}
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+          </form>
+        `;
+      }
+    },
+    error: function(xhr) {
+      let d = JSON.parse(xhr.responseText);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `${d.message}`,
+        footer: '<a href="">Why do I have this issue?</a>'
+      });
+    }
+  });
+
+  return orderMaterialHtml;
+}
+
+// Event listener untuk tombol "Tambah Material"
+$(document).on('click', '#addProduct', async function() {
+  try {
+    // Menunggu materialOptions yang diambil dari getMaterialOption
+    let materialOptions = await getMaterialOption();
+    console.log(materialOptions);
+
+    let newRow = `
+      <tr>
+        <td>
+          <select class="form-control material-select" name="id_material[]">
+            ${materialOptions}
+          </select>
+        </td>
+        <td>
+          <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+        </td>
+        <td>
+          <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+        </td>
+      </tr>
+    `;
+
+    // Menambahkan baris baru ke tabel
+    $('#order_material_table tbody').append(newRow);
+  } catch (error) {
+    // Menangani error jika ada
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: `${d.message}`,
+      text: error,
       footer: '<a href="">Why do I have this issue?</a>'
-    })
+    });
   }
 });
-    let orderMaterialHtml = `
-        <form id="form_order_list">
-          <table class="table table-bordered" id="order_material_table">
-            <thead>
-              <tr>
-                <th>Nama Material</th>
-                <th>Ukuran</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <select class="form-control material-select" name="id_material[]">
-                    ${materialOptions}
-                  </select>
-                </td>
-                <td>
-                  <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
-                </td>
-                <td>
-                  <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
-        </form>
-      `;
 
-      return orderMaterialHtml
 
+// Event listener untuk tombol "Hapus" di setiap baris
+$(document).on('click', '.remove-material', function() {
+  $(this).closest('tr').remove(); // Menghapus baris material
+});
+
+
+
+function getMaterialOption() {
+  return new Promise((resolve, reject) => {
+    let materialOptions = '';
+
+    $.ajax({
+      type: 'GET',
+      url: base_url + 'product/getMaterial', // Endpoint untuk mendapatkan produk
+      success: function (response) {
+        // Buat opsi produk dari data yang diterima
+        response.material.forEach(material => {
+          materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+        });
+
+        // Resolving the promise with the materialOptions after success
+        resolve(materialOptions);
+      },
+      error: function (xhr) {
+        // Reject the promise in case of error
+        reject('Terjadi kesalahan saat mengambil daftar produk');
+      }
+    });
+  });
 }
 
 $(document).on('click', '.createBom', function () {
@@ -513,30 +636,7 @@ function convertFormDataToObject(formData) {
   return dataObj;
 }
 
-// Event listener untuk menambah baris produk baru
-$(document).on('click', '#addProduct', function () {
-  const productRow = `
-    <tr>
-      <td>
-        <select class="form-control material-select" name="id_product[]">
-          ${$('.material-select').first().html()}
-        </select>
-      </td>
-      <td>
-        <input type="number" class="form-control product-price" name="price[]" placeholder="Masukkan harga">
-      </td>
-      <td>
-        <button type="button" class="btn btn-danger btn-sm remove-product">Hapus</button>
-      </td>
-    </tr>
-  `;
-  $('#order_material_table tbody').append(productRow);
-});
 
-// Event listener untuk menghapus baris produk
-$(document).on('click', '.remove-product', function () {
-  $(this).closest('tr').remove();
-});
 
 $(document).on('click', '.viewOrderDetail', function () {
     const orderId = $(this).data('id'); // Mengambil ID order dari tombol

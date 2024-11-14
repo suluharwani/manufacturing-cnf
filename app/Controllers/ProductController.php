@@ -279,6 +279,12 @@ public function getMaterial()
     $model = new \App\Models\MdlBuildOfMaterial();
 
     // Simpan setiap produk yang dipilih ke tabel order_list
+    if ($model->where('id_product', $idProduct)->countAllResults()>0) {
+    $model->where('id_product', $idProduct)->delete();
+        
+    }
+    // var_dump($dataPost);
+    // die();
     
     for ($i = 0; $i < count($dataPost['id_material']); $i++) {
         $data = [
@@ -291,5 +297,11 @@ public function getMaterial()
     }
 
     return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
+}
+public function getBom(){
+    $model = new \App\Models\MdlBuildOfMaterial();
+
+    $idProduct = $this->request->getPost('idProduct');
+    return json_encode($model->where('id_product', $idProduct)->findAll());
 }
 }
