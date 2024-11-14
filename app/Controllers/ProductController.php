@@ -59,9 +59,10 @@ class ProductController extends BaseController
                'product.id',
                'product.id',
                'product.id',
+               'product.id',
            );
            $column_search = array(
-               'product.name', 
+               'product.nama', 
                'product.kode', 
           
            );
@@ -260,6 +261,35 @@ class ProductController extends BaseController
           die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
      }
+public function getMaterial()
+{
+    $MdlMaterial = new \App\Models\MdlMaterial();
 
+    $material = $MdlMaterial->select('materials.*, satuan.kode as kode_satuan, satuan.nama as nama_satuan')
+                ->join('materials_detail', 'materials.id = materials_detail.material_id' )
+                ->join('satuan', 'materials_detail.satuan_id = satuan.id' )
+                ->findAll();
+
+    return $this->response->setJSON(['material' => $material]);
+}
+    public function saveBom()
+{
+    $idProduct = $this->request->getPost('idProduct');
+    $dataPost = $this->request->getPost('data');
+    $model = new \App\Models\MdlBuildOfMaterial();
+
+    // Simpan setiap produk yang dipilih ke tabel order_list
     
+    for ($i = 0; $i < count($dataPost['id_material']); $i++) {
+        $data = [
+            'id_product'   => $idProduct,
+            'id_material' => $dataPost['id_material'][$i],
+            'penggunaan'      => $dataPost['penggunaan'][$i],  // Menyimpan harga manual
+        ];
+
+        $model->insert($data);
+    }
+
+    return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
+}
 }

@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="<?=base_url('assets')?>/summernote/summernote-image-list.min.css"/>
 <link rel="stylesheet" type="text/css" href="<?=base_url('assets')?>/summernote/summernote-lite.min.css"/>
 <style type="text/css">
-.modal {
+/*.modal {
   display: none;
   position: fixed;
   z-index: 1;
@@ -37,7 +37,7 @@
   text-decoration: none;
   cursor: pointer;
 }
-
+*/
 </style>
 
 
@@ -83,7 +83,7 @@
                   <th style=" text-align: center;">Name</th>
                   <th style=" text-align: center;">Picture</th>
                   <th style=" text-align: center;">Category</th>
-                  <th style=" text-align: center;">Build of Material</th>
+                  <th style=" text-align: center;">Variable</th>
                   <th style=" text-align: center;">Track Stock</th>
                   <th style=" text-align: center;">Aktif</th>
                 </tr>
@@ -95,7 +95,7 @@
                   <th style=" text-align: center;">Name</th>
                   <th style=" text-align: center;">Picture</th>
                   <th style=" text-align: center;">Category</th>
-                  <th style=" text-align: center;">Build of Material</th>
+                  <th style=" text-align: center;">Variable</th>
                   <th style=" text-align: center;">Track Stock</th>
                   <th style=" text-align: center;">Aktif</th>
                 </tr>
@@ -169,11 +169,7 @@
 </div>
 </div>
 <!-- modal -->
-<div id="imageModal" class="modal">
-  <span class="close">&times;</span>
-  <img class="modal-content" id="imgDisplay">
-  <div id="caption"></div>
-</div>
+
 <!-- Widgets Start -->
 
 <!-- Widgets End -->

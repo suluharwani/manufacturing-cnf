@@ -45,20 +45,24 @@ function tabel(){
         return row[2]
     }},
     {mRender: function (data, type, row) {
-     return `<img src="${base_url + 'assets/upload/thumb/' + row[4]}" alt="${row[2]}" style="height:45px; cursor: pointer;" onclick="showImageModal('${base_url + 'assets/upload/image/' + row[4]}', '${row[2]}')">`;
+     return `<img src="${base_url + 'assets/upload/thumb/' + row[4]}" alt="${row[2]}" style="height:45px; cursor: pointer;" onclick="showImagePopup('${base_url + 'assets/upload/image/' + row[4]}', '${row[2]}')">`;
     }},
     {mRender: function (data, type, row) {
      return row[6]
     }},
     {mRender: function (data, type, row) {
-      return row[1]
+       return `<a href="javascript:void(0);" class="btn btn-success btn-sm createBom" id="${row[1]}" >BoM</a>
+               <a href="javascript:void(0);" class="btn btn-warning btn-sm createDesign" id="${row[1]}" >Design</a>
+               <a href="javascript:void(0);" class="btn btn-primary btn-sm createFile" id="${row[1]}" >File</a>
+                `; 
      }},
     {mRender: function (data, type, row) {
-     return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+     return `<a href="javascript:void(0);" class="btn btn-success btn-sm trackProduct" id="'+row[1]+'" >Track</a>`; 
     }},
 
     {mRender: function (data, type, row) {
-     return `<a href="javascript:void(0);" class="btn btn-success btn-sm showSalesOrder" id="'+row[1]+'" >Detail</a>`; 
+     return `<a href="javascript:void(0);" class="btn btn-warning btn-sm deleteProduct" id="'+row[1]+'" >Edit</a>
+             <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteProduct" id="'+row[1]+'" >Delete</a>`; 
     }},
    
   ],
@@ -77,31 +81,17 @@ function tabel(){
 });
 };
 
-function showImageModal(src, alt) {
-  var modal = document.getElementById("imageModal");
-  var modalImg = document.getElementById("imgDisplay");
-  var captionText = document.getElementById("caption");
-  modal.style.display = "block";
-  modalImg.src = src;
-  captionText.innerHTML = alt;
-
-  var span = document.getElementsByClassName("close")[0];
-  span.onclick = function() { 
-    modal.style.display = "none";
-  }
-}
-var span = document.getElementsByClassName("close")[0];
-span.onclick = function() { 
-  var modal = document.getElementById("imageModal");
-  modal.style.display = "none";
-}
-
-// Juga bisa menutup modal saat pengguna mengklik di luar gambar
-window.onclick = function(event) {
-  var modal = document.getElementById("imageModal");
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
+function showImagePopup(src, alt) {
+    Swal.fire({
+        title: alt,
+        imageUrl: src,
+        imageAlt: alt,
+        showCloseButton: true,
+        imageWidth: '100%', // Sesuaikan lebar gambar sesuai kebutuhan
+        imageHeight: 'auto',
+        background: '#fff', // Warna background modal
+        confirmButtonText: 'Close'
+    });
 }
  function selectCat(id_cat=null){
       $.ajax({
@@ -379,3 +369,181 @@ function tableCat(data){
   })
   $('#productCat').html(table)
 }
+
+function getOrderMaterial(materialOptions, idProduct){
+    $.ajax({
+    type : "POST",
+    url  : base_url+"product/getBuildMaterial",
+    async : false,
+    success: function(data){
+     tableCat(data);
+
+   },
+   error: function(xhr){
+    let d = JSON.parse(xhr.responseText);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: `${d.message}`,
+      footer: '<a href="">Why do I have this issue?</a>'
+    })
+  }
+});
+    let orderMaterialHtml = `
+        <form id="form_order_list">
+          <table class="table table-bordered" id="order_material_table">
+            <thead>
+              <tr>
+                <th>Nama Material</th>
+                <th>Ukuran</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <select class="form-control material-select" name="id_material[]">
+                    ${materialOptions}
+                  </select>
+                </td>
+                <td>
+                  <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+                </td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+        </form>
+      `;
+
+      return orderMaterialHtml
+
+}
+
+$(document).on('click', '.createBom', function () {
+  const idProduct = $(this).attr('id'); // Mengambil ID order dari atribut id
+
+  // Buat AJAX request untuk mengambil daftar produk
+  $.ajax({
+    type: 'GET',
+    url: base_url + 'product/getMaterial', // Endpoint untuk mendapatkan produk
+    success: function (response) {
+      let materialOptions = '';
+
+      // Buat opsi produk dari data yang diterima
+      response.material.forEach(material => {
+        materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+      });
+      orderMaterialHtml = getOrderMaterial(materialOptions,idProduct);
+    
+
+      // Tampilkan modal dengan form produk
+      Swal.fire({
+        title: 'Build of Material',
+        html: orderMaterialHtml,
+        width: '800px',
+        showCancelButton: true,
+        confirmButtonText: 'Simpan',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+          // Ambil data dari form
+          const formData = $('#form_order_list').serializeArray();
+          // Konversi form data menjadi format array of objects yang lebih mudah dibaca
+          const processedData = convertFormDataToObject(formData);
+          return processedData;
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const data = result.value;
+
+          // Kirim data produk ke server untuk disimpan
+          $.ajax({
+            type: 'POST',
+            url: base_url + 'product/saveBom', // Endpoint untuk menyimpan produk dalam order
+            data: {
+              idProduct: idProduct,
+              data: data
+            },
+            success: function (response) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Produk berhasil ditambahkan ke order',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            },
+            error: function (xhr) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Terjadi kesalahan saat menyimpan produk',
+                footer: '<a href="">Why do I have this issue?</a>'
+              });
+            }
+          });
+        }
+      });
+    },
+    error: function (xhr) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Terjadi kesalahan saat mengambil daftar produk',
+        footer: '<a href="">Why do I have this issue?</a>'
+      });
+    }
+  });
+});
+
+// Fungsi untuk konversi serializeArray menjadi format yang lebih mudah
+function convertFormDataToObject(formData) {
+  const dataObj = {};
+  
+  formData.forEach(item => {
+    const name = item.name.replace('[]', ''); // Hilangkan tanda []
+    if (!dataObj[name]) {
+      dataObj[name] = [];
+    }
+    dataObj[name].push(item.value);
+  });
+
+  return dataObj;
+}
+
+// Event listener untuk menambah baris produk baru
+$(document).on('click', '#addProduct', function () {
+  const productRow = `
+    <tr>
+      <td>
+        <select class="form-control material-select" name="id_product[]">
+          ${$('.material-select').first().html()}
+        </select>
+      </td>
+      <td>
+        <input type="number" class="form-control product-price" name="price[]" placeholder="Masukkan harga">
+      </td>
+      <td>
+        <button type="button" class="btn btn-danger btn-sm remove-product">Hapus</button>
+      </td>
+    </tr>
+  `;
+  $('#order_material_table tbody').append(productRow);
+});
+
+// Event listener untuk menghapus baris produk
+$(document).on('click', '.remove-product', function () {
+  $(this).closest('tr').remove();
+});
+
+$(document).on('click', '.viewOrderDetail', function () {
+    const orderId = $(this).data('id'); // Mengambil ID order dari tombol
+    
+    // Membuat URL tujuan
+    const url = base_url+'/admin/order/detail/' + orderId;
+    
+    // Redirect ke URL di tab baru
+    window.open(url, '_blank');
+});

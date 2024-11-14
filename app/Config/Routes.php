@@ -166,5 +166,7 @@ $routes->group('product', function ($routes) {
     $routes->post('create', 'ProductController::create');
     // $routes->post('delete/(:num)', 'ProductController::delete/$1'); 
     $routes->post('listdataProdukJoin', 'ProductController::listdataProdukJoin');
+    $routes->get('getMaterial', 'ProductController::getMaterial');
+    $routes->post('saveBom', 'ProductController::saveBom');
 
 });
