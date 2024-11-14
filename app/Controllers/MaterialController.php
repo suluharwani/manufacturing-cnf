@@ -27,10 +27,7 @@ class MaterialController extends BaseController
       //check access
      
 }
-    public function index()
-    {
-        // 
-    }
+    
     function access($page){
         $check = new \App\Controllers\CheckAccess();
         $check->access($_SESSION['auth']['id'],$page);

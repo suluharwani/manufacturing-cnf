@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MdlBuildOfMaterial extends Model
+class MdlBillOfMaterial extends Model
 {
-    protected $table            = 'buildofmaterial';
+    protected $table            = 'billofmaterial';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';

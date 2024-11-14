@@ -52,6 +52,8 @@ function tabel(){
     }},
     {mRender: function (data, type, row) {
        return `<a href="javascript:void(0);" class="btn btn-success btn-sm createBom" id="${row[1]}" >BoM</a>
+               <a href="${base_url}breakdownBoM/${row[1]}" target="_blank" class="btn btn-success btn-sm breakdownBom" id="${row[1]}" >Breakdown BoM</a>
+               <a href="javascript:void(0);" class="btn btn-success btn-sm createBom" id="${row[1]}" >Labour Cost</a>
                <a href="javascript:void(0);" class="btn btn-warning btn-sm createDesign" id="${row[1]}" >Design</a>
                <a href="javascript:void(0);" class="btn btn-primary btn-sm createFile" id="${row[1]}" >File</a>
                 `; 
@@ -565,7 +567,7 @@ $(document).on('click', '.createBom', function () {
 
       // Tampilkan modal dengan form produk
       Swal.fire({
-        title: 'Build of Material',
+        title: 'Bill of Material',
         html: orderMaterialHtml,
         width: '800px',
         showCancelButton: true,

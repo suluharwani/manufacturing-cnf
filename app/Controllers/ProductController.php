@@ -30,9 +30,14 @@ class ProductController extends BaseController
     $check = new \App\Controllers\CheckAccess();
     $check->access($_SESSION['auth']['id'],$page);
   }
-    public function index()
+    public function index($param)
     {
-        //
+         $this->access('operator');
+        $d = new WarehouseController();
+        $data['group'] = 'Admin';
+        $data['title'] = 'Breakdown BoM';
+        echo('ok');
+        return  view('admin/content/breakdownMaterial',$data);
     }
            public function listdataProdukJoin()
        {
@@ -276,7 +281,7 @@ public function getMaterial()
 {
     $idProduct = $this->request->getPost('idProduct');
     $dataPost = $this->request->getPost('data');
-    $model = new \App\Models\MdlBuildOfMaterial();
+    $model = new \App\Models\MdlBillOfMaterial();
 
     // Simpan setiap produk yang dipilih ke tabel order_list
     if ($model->where('id_product', $idProduct)->countAllResults()>0) {
@@ -299,7 +304,7 @@ public function getMaterial()
     return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
 }
 public function getBom(){
-    $model = new \App\Models\MdlBuildOfMaterial();
+    $model = new \App\Models\MdlBillOfMaterial();
 
     $idProduct = $this->request->getPost('idProduct');
     return json_encode($model->where('id_product', $idProduct)->findAll());

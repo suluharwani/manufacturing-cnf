@@ -156,7 +156,6 @@ $routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToE
 });
 
 $routes->group('product', function ($routes) {
-    // $routes->get('/', 'ProductController::index'); 
     // $routes->post('get_list', 'ProductController::get_list'); 
     $routes->post('addcat', 'ProductController::addcat'); 
     // $routes->post('add', 'ProductController::add'); 
@@ -171,3 +170,5 @@ $routes->group('product', function ($routes) {
     $routes->post('getBom', 'ProductController::getBom');
 
 });
+
+    $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1'); 

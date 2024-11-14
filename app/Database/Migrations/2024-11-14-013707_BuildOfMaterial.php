@@ -42,11 +42,11 @@ class BuildOfMaterial extends Migration
 
     ]);
     $this->forge->addPrimaryKey('id');
-    $this->forge->createTable('buildofmaterial');
+    $this->forge->createTable('billofmaterial');
   }
 
   public function down()
   {
-    $this->forge->dropTable('buildofmaterial');
+    $this->forge->dropTable('billofmaterial');
   }
 }
