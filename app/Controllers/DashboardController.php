@@ -35,7 +35,7 @@ class DashboardController extends BaseController
         //
     }
     function getCurrencyData(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\MdlCurrency();
         $data = $mdl->findAll();
         return json_encode($data);

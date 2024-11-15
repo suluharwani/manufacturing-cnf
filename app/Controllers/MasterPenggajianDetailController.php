@@ -418,6 +418,7 @@ private function calculateSalary($employeeId,$workData, $salaryRate, $totalAllow
 
     // Mengembalikan detail komponen gaji
     return [
+        'salaryRate'=> $salaryRate['Gaji_Per_Jam'],
         'totalSalary' => $totalSalary,
         'totalNormalSalary' => $totalNormalSalary,
         'totalOvertime1Salary' => $totalOvertime1Salary,
@@ -914,6 +915,7 @@ $results = $penggajianDetailModel
             $result['totalAllowance'] =$gaji['totalAllowance'];
             $result['totalDeduction'] =$gaji['totalDeduction'];
             $result['grossSalary'] =$gaji['grossSalary'];
+            $result['salaryRate'] =$gaji['salaryRate'];
 
 
         //             'totalSalary' => $totalSalary,
@@ -947,15 +949,17 @@ $results = $penggajianDetailModel
         $sheet->setCellValue('H1', 'Tanggal Akhir');
         $sheet->setCellValue('I1', 'Total Gaji');
         $sheet->setCellValue('J1', 'Jam Kerja Total');
-        $sheet->setCellValue('K1', 'Lembur 1');
-        $sheet->setCellValue('L1', 'Lembur 2');
-        $sheet->setCellValue('M1', 'Lembur 3');
+        $sheet->setCellValue('K1', 'Overtime 1');
+        $sheet->setCellValue('L1', 'Overtime 2');
+        $sheet->setCellValue('M1', 'Overtime 3');
         $sheet->setCellValue('N1', 'Jam Sabtu');
         $sheet->setCellValue('O1', 'Jam Minggu');
-        $sheet->setCellValue('P1', 'Lembur');
+        $sheet->setCellValue('P1', 'Overtime');
         $sheet->setCellValue('Q1', 'Potongan');
         $sheet->setCellValue('R1', 'Tunjangan');
         $sheet->setCellValue('S1', 'Gaji Kotor');
+        $sheet->setCellValue('T1', 'Rincian Potongan');
+        $sheet->setCellValue('U1', 'Rincian Tunjangan');
 
 
         // Isi data karyawan
@@ -982,6 +986,8 @@ $results = $penggajianDetailModel
             $sheet->setCellValue('Q' . $row, $data['totalDeduction']);
             $sheet->setCellValue('R' . $row, $data['totalAllowance']);
             $sheet->setCellValue('S' . $row, $data['grossSalary']);
+            $sheet->setCellValue('T' . $row,  json_encode($this->getDeductionDet($data['karyawan_id'])));
+            $sheet->setCellValue('U' . $row,  json_encode($this->getAllowanceDet($data['karyawan_id'])));
             $row++;
         }
 
@@ -995,5 +1001,25 @@ $results = $penggajianDetailModel
 
         $writer->save('php://output');
         exit();
+    }
+        private function getAllowanceDet($employeeId)
+    {
+        $allowanceModel = new MdlFemployeeAllowanceList();
+        return $allowanceModel
+            ->select(' salary_allowance.Nama, employee_allowance_list.amount')
+            ->join('salary_allowance','salary_allowance.id = employee_allowance_list.allowance_id ')
+            ->where('employee_id', $employeeId)
+            ->findAll();
+    }
+
+    // Fungsi untuk menghitung total deduction
+    private function getDeductionDet( $employeeId)
+    {
+        $deductionModel = new MdlFemployeeDeductionList();
+        return $deductionModel
+            ->select(' salary_deduction.Nama ,employee_deduction_list.amount')
+            ->join('salary_deduction','salary_deduction.id = employee_deduction_list.deduction_id ')
+            ->where('employee_id', $employeeId)
+            ->findAll();
     }
 }

@@ -35,7 +35,7 @@ class OrderController extends BaseController
         //
   }
   public function listdataOrder(){
-    $this->access('operator');
+    
     $serverside_model = new \App\Models\Mdl_datatables();
     $request = \Config\Services::request();
     $list_data = $serverside_model;
@@ -68,7 +68,7 @@ class OrderController extends BaseController
     return json_encode($output);
   }
   function addOrder(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $MdlMaterial = new \App\Models\MdlMaterial();
         $MdlMaterialDet = new \App\Models\MdlMaterialDet();

@@ -5,6 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+$routes->get('/forbidden', 'Home::forbidden');
 $routes->get('/', 'Homepage::index');
 $routes->get('/dashboard', 'Home::index');
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
@@ -150,9 +151,10 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->get('dataEmployeeMaster/(:any)', 'MasterPenggajianDetailController::dataEmployeeMaster/$1'); 
     $routes->post('deleteEmployeeFromPayroll','MasterPenggajianDetailController::deleteEmployeeFromPayroll');
     $routes->get('getEmployeeSalarySlip/(:num)/(:num)', 'MasterPenggajianDetailController::getEmployeeSalarySlip/$1/$2');
-$routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
-$routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
-$routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel');
+    $routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
+    $routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
+    $routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel');
+    // $routes->get('getDeductionDet', 'MasterPenggajianDetailController::getDeductionDet');
 });
 
 $routes->group('product', function ($routes) {
@@ -171,4 +173,4 @@ $routes->group('product', function ($routes) {
 
 });
 
-    $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1'); 
+    $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1');

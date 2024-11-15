@@ -26,13 +26,10 @@ class ProductController extends BaseController
       //check access
 
   }
-  function access($page){
-    $check = new \App\Controllers\CheckAccess();
-    $check->access($_SESSION['auth']['id'],$page);
-  }
+
     public function index($param)
     {
-         $this->access('operator');
+         
         $d = new WarehouseController();
         $data['group'] = 'Admin';
         $data['title'] = 'Breakdown BoM';
@@ -41,7 +38,7 @@ class ProductController extends BaseController
     }
            public function listdataProdukJoin()
        {
-           $this->access('operator');
+           
            $serverside_model = new \App\Models\MdlDatatableJoin();
            $request = \Config\Services::request();
            
@@ -198,7 +195,7 @@ class ProductController extends BaseController
     return $this->response->setJSON($response);
 }
        function addcat() {
-    $this->access('operator');
+    
     $userInfo = $_SESSION['auth'];
     $Mdl = new \App\Models\MdlProductCat();
 

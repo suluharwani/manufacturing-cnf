@@ -26,18 +26,19 @@ class Home extends BaseController
         $this->form_validation = \Config\Services::validation();
         $this->userValidation = new \App\Controllers\LoginValidation();
 
-        $check = new \App\Controllers\CheckAccess();
-        $check->logged();
 
     }
     public function index(): string
     {
-        $this->access('operator');
+        // $this->access('operator');
         $d = new WarehouseController();
         $data['group'] = 'Admin';
         $data['title'] = 'Dashboard';
         $data['content'] = view('admin/content/dashboard');
         return view('admin/index', $data);
+    }
+    function forbidden(){
+        return view('403');
     }
     function access($page)
     {

@@ -218,7 +218,7 @@ function ubah_level_user(){
 }
 //client
 public function listdata_client(){
-  $this->access('operator');
+  
   $serverside_model = new \App\Models\Mdl_datatables();
   $request = \Config\Services::request();
   $list_data = $serverside_model;
@@ -255,7 +255,7 @@ public function listdata_client(){
 }
 
 function tambah_client(){
-  $this->access('operator');
+  
   $userInfo = $_SESSION['auth'];
   $userModel = new \App\Models\MdlClient();
   $userdata = [
@@ -276,7 +276,7 @@ function tambah_client(){
 
 }
 function hapus_client(){
-  $this->access('operator');
+  
   $id = $_POST['id'];
   $nama = $_POST['nama'];
   $mdl = new \App\Models\MdlClient();
@@ -293,7 +293,7 @@ function hapus_client(){
   }
 } 
 function reset_password_client(){
-  $this->access('operator');
+  
   $db      = \Config\Database::connect();
   $builder = $db->table('client');
 
@@ -322,7 +322,7 @@ function reset_password_client(){
 
 }
 function ubah_status_client(){
-  $this->access('operator');
+  
       // code...
 
   $id = $_POST['id'];
@@ -346,7 +346,7 @@ function ubah_status_client(){
 
 function employeeData(){
 
-  $this->access('operator');
+  
   $serverside_model = new \App\Models\Mdl_datatables_2();
   $request = \Config\Services::request();
   $list_data = $serverside_model;
@@ -396,7 +396,7 @@ public function getPresensi()
   public function updateAttendance(){
 
 
-    $this->access('operator');
+    
     // $pin = $this->request->getPost('pin');
     
     $params = $this->request->getPost('params');
@@ -431,7 +431,7 @@ public function getPresensi()
     }
   }
         function addEffectiveHours(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $Mdl = new \App\Models\MdlEffectiveHours();
         $params = $this->request->getPost();

@@ -32,7 +32,7 @@ class WarehouseController extends BaseController
         //
     }
     function update(){
-      $this->access('operator');
+      
         $param = $_POST['params'];
         $id = $param['id'];
         $data['name'] = $param['name'];
@@ -57,7 +57,7 @@ class WarehouseController extends BaseController
         $check->access($_SESSION['auth']['id'],$page);
         }
     public function listdataMaterial(){
-        $this->access('operator');
+        
         $serverside_model = new \App\Models\Mdl_datatables();
         $request = \Config\Services::request();
         $list_data = $serverside_model;
@@ -90,7 +90,7 @@ class WarehouseController extends BaseController
       }
       public function listdataMaterialJoin()
       {
-          $this->access('operator');
+          
           $serverside_model = new \App\Models\MdlDatatableJoin();
           $request = \Config\Services::request();
           
@@ -151,7 +151,7 @@ class WarehouseController extends BaseController
           return $this->response->setJSON($output);
       }
       function create(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $Mdl = new \App\Models\Warehouse();
         $data = [
@@ -171,7 +171,7 @@ class WarehouseController extends BaseController
       
     }
     function delete(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
         $id = $param['id'];
         $name = $param['name'];
@@ -189,7 +189,7 @@ class WarehouseController extends BaseController
         }
        } 
        function purgeData(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
         $id = $param['id'];
         $name = $param['name'];
@@ -207,7 +207,7 @@ class WarehouseController extends BaseController
         }
        } 
        function restoreData(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
         $id = $param['id'];
         $name = $param['name'];
@@ -226,19 +226,19 @@ class WarehouseController extends BaseController
         }
        } 
        function deletedData(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\Warehouse();
         $data = $mdl->onlyDeleted()->findAll();
         return json_encode($data);
        }
        function gudang_list(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\Warehouse();
         $data = $mdl->findAll();
         return json_encode($data);
        }
        function tambah_satuan(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $MdlType = new \App\Models\MdlSatuan();
         $dataType = [
@@ -258,7 +258,7 @@ class WarehouseController extends BaseController
       
     }
        function satuan_list(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\MdlSatuan();
         $data = $mdl->get()
                 ->getResultArray();

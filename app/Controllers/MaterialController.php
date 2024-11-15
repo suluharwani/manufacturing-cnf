@@ -33,7 +33,7 @@ class MaterialController extends BaseController
         $check->access($_SESSION['auth']['id'],$page);
         }
     public function listdataMaterial(){
-        $this->access('operator');
+        
         $serverside_model = new \App\Models\Mdl_datatables();
         $request = \Config\Services::request();
         $list_data = $serverside_model;
@@ -67,7 +67,7 @@ class MaterialController extends BaseController
       }
       public function listdataMaterialJoin()
       {
-          $this->access('operator');
+          
           $serverside_model = new \App\Models\MdlDatatableJoin();
           $request = \Config\Services::request();
           
@@ -138,7 +138,7 @@ class MaterialController extends BaseController
           return json_encode($output);
       }
       function tambah_tipe(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $MdlType = new \App\Models\MdlType();
         $dataType = [
@@ -158,7 +158,7 @@ class MaterialController extends BaseController
       
     }
     function hapus_tipe(){
-        $this->access('operator');
+        
         $id = $_POST['id'];
         $nama = $_POST['nama'];
         $mdl = new \App\Models\MdlType();
@@ -175,14 +175,14 @@ class MaterialController extends BaseController
         }
        } 
        function type_list(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\MdlType();
         $data = $mdl->get()
                 ->getResultArray();
         return json_encode($data);
        }
        function tambah_satuan(){
-        $this->access('operator');
+        
         $userInfo = $_SESSION['auth'];
         $MdlType = new \App\Models\MdlSatuan();
         $dataType = [
@@ -202,7 +202,7 @@ class MaterialController extends BaseController
       
     }
        function satuan_list(){
-        $this->access('operator');
+        
         $mdl = new \App\Models\MdlSatuan();
         $data = $mdl->get()
                 ->getResultArray();
@@ -212,7 +212,7 @@ class MaterialController extends BaseController
 
 
        function tambah_material() {
-    $this->access('operator');
+    
     $userInfo = $_SESSION['auth'];
     $MdlMaterial = new \App\Models\MdlMaterial();
     $MdlMaterialDet = new \App\Models\MdlMaterialDet();
@@ -270,7 +270,7 @@ class MaterialController extends BaseController
 
     // Function to delete a material
 function delete(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
 
         $id = $param['id'];
@@ -289,7 +289,7 @@ function delete(){
         }
        } 
     function satuanDelete(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
         $id = $param['id'];
         $name = $param['name'];
@@ -307,7 +307,7 @@ function delete(){
         }
        } 
        function typeDelete(){
-        $this->access('operator');
+        
         $param = $_POST['param'];
         $id = $param['id'];
         $name = $param['name'];
@@ -325,7 +325,7 @@ function delete(){
         }
        } 
            function materialUpdate(){
-      $this->access('operator');
+      
         $param = $_POST['param'];
         $id = $param['id'];
         $data['name'] = $param['nama'];
@@ -356,7 +356,7 @@ function delete(){
         }
     }
         function satuanUpdate(){
-      $this->access('operator');
+      
         $param = $_POST['params'];
         $id = $param['id'];
         $data['nama'] = $param['name'];
@@ -377,7 +377,7 @@ function delete(){
         }
     }
         function typeUpdate(){
-      $this->access('operator');
+      
         $param = $_POST['params'];
         $id = $param['id'];
         $data['nama'] = $param['name'];
