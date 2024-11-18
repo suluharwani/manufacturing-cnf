@@ -306,4 +306,26 @@ public function getBom(){
     $idProduct = $this->request->getPost('idProduct');
     return json_encode($model->where('id_product', $idProduct)->findAll());
 }
+    public function searchMaterial()
+    {
+        // Pastikan permintaan ini adalah AJAX
+        if ($this->request->isAJAX()) {
+            $query = $this->request->getVar('query');
+
+            // Membuat instance model material
+            $materialModel =new \App\Models\MdlMaterial();
+
+            // Mencari material yang cocok dengan query
+            $results = $materialModel->like('kode', $query)
+                                     ->orLike('name', $query)
+                                     ->findAll(10); // Batasi hasil pencarian agar tidak terlalu banyak
+
+            // Mengembalikan hasil dalam format JSON
+            return $this->response->setJSON($results);
+        } else {
+            // Jika bukan AJAX request, kembalikan 404
+            return $this->response->setStatusCode(404)->setBody('Not Found');
+        }
+    }
+
 }

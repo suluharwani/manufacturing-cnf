@@ -11,7 +11,8 @@ $routes->get('/dashboard', 'Home::index');
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
 $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
 
-$routes->get('/test', 'Home::test');
+$routes->get('/test', 'Home::test');  
+$routes->get('/pembelian', 'Home::pembelian');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
 $routes->get('/employee', 'Home::employee');
@@ -168,8 +169,14 @@ $routes->group('product', function ($routes) {
     // $routes->post('delete/(:num)', 'ProductController::delete/$1'); 
     $routes->post('listdataProdukJoin', 'ProductController::listdataProdukJoin');
     $routes->get('getMaterial', 'ProductController::getMaterial');
+    $routes->get('searchMaterial', 'ProductController::searchMaterial');
     $routes->post('saveBom', 'ProductController::saveBom');
     $routes->post('getBom', 'ProductController::getBom');
+
+});
+$routes->group('stock', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
+    $routes->get('addStock/(:any)', 'Stock::addStock/(:any)'); 
 
 });
 

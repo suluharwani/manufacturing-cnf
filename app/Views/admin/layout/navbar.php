@@ -20,6 +20,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cube me-2"></i>Master Data</a>
                         <div class="dropdown-menu bg-transparent border-0">
+                            <a href="<?=base_url('supplier')?>" class="dropdown-item"> Supplier</a>
                             <a href="<?=base_url('material')?>" class="dropdown-item"> Materials</a>
                             
                             <a href="<?=base_url('product')?>" class="dropdown-item">BoM Finished goods</a>
@@ -38,10 +39,14 @@
                         </div>
                     </div>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cubes me-2"></i>Warehouse</a>
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cubes me-2"></i>Logistic</a>
                         <div class="dropdown-menu bg-transparent border-0">
                             
                             <a href="<?=base_url('stock')?>" class="dropdown-item">Stock</a>
+                            <a href="<?=base_url('pembelian')?>" class="dropdown-item">Pembelian</a>
+                            <a href="<?=base_url('pemakaianpengembalian')?>" class="dropdown-item">Pemakaian&Pengembalian</a>
+                            <a href="<?=base_url('pemusnahan')?>" class="dropdown-item">Pemusnahan</a>
+                            <a href="<?=base_url('stock')?>" class="dropdown-item">Stock Opname</a>
                             <a href="<?=base_url('warehouse_report')?>" class="dropdown-item">Report</a>
                         </div>
                     </div>

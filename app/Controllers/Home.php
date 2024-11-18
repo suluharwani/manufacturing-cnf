@@ -216,4 +216,11 @@ class Home extends BaseController
         $data['content'] = view('admin/content/detail_salary');
         return view('admin/index', $data);
     }
+        public function pembelian()
+    {
+        $data['group'] = 'Stock';
+        $data['title'] = 'Pembelian';
+        $data['content'] = view('admin/content/daftarPembelian');
+        return view('admin/index', $data);
+    }
 }
