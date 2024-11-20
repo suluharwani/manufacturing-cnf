@@ -155,7 +155,8 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->get('getSalaryRate/(:num)', 'MasterPenggajianDetailController::getSalaryRate/$1');
     $routes->get('exportToExcel/(:num)', 'MasterPenggajianDetailController::exportToExcel/$1');
     $routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel');
-    // $routes->get('getDeductionDet', 'MasterPenggajianDetailController::getDeductionDet');
+    $routes->get('getTunjanganPrint', 'MasterPenggajianDetailController::getTunjanganPrint');
+    $routes->get('getPotonganPrint', 'MasterPenggajianDetailController::getPotonganPrint');
 });
 
 $routes->group('product', function ($routes) {

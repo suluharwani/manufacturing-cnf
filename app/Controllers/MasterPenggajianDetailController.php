@@ -850,9 +850,8 @@ public function getSalaryRate($employeeId)
         $writer->save('php://output');
         exit();
     }
- public function exportAllToExcel()
-    {
-        // Ambil data karyawan berdasarkan masterId dari database (contoh di sini dengan array data statis)
+    private function getRekapGaji()
+{        // Ambil data karyawan berdasarkan masterId dari database (contoh di sini dengan array data statis)
         $penggajianDetailModel = new MasterPenggajianDetailModel();
         $allowanceModel = new MdlFemployeeAllowanceList();
         $deductionModel = new MdlFemployeeDeductionList();
@@ -862,8 +861,7 @@ public function getSalaryRate($employeeId)
         // $patternMdl = new MdlFsalaryPatternEmployee();
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
 
-$results = $penggajianDetailModel
-    ->select('
+$results = $penggajianDetailModel->select('
         employeesallarycat.Gaji_Per_Jam, 
         informasi_pegawai.bank_account as bank_account, 
         informasi_pegawai.pemilik_rekening as pemilik_rekening, 
@@ -933,75 +931,154 @@ $results = $penggajianDetailModel
             $result['sunday_work_Hours'] = $workData['sundayWorkHours'];
             $result['saturday_work_Hours'] = $workData['saturdayWorkHours'];
         }
-        // Inisiasi Spreadsheet dan Sheet
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Rekap Gaji Karyawan');
+        return $results;
+}
 
-        // Header untuk kolom Excel
-        $sheet->setCellValue('A1', 'ID Karyawan');
-        $sheet->setCellValue('B1', 'Nama');
-        $sheet->setCellValue('C1', 'Gaji Per Jam');
-        $sheet->setCellValue('D1', 'No Rekening');
-        $sheet->setCellValue('E1', 'Pemilik Rekening');
-        $sheet->setCellValue('F1', 'Kode Penggajian');
-        $sheet->setCellValue('G1', 'Tanggal Awal');
-        $sheet->setCellValue('H1', 'Tanggal Akhir');
-        $sheet->setCellValue('I1', 'Total Gaji');
-        $sheet->setCellValue('J1', 'Jam Kerja Total');
-        $sheet->setCellValue('K1', 'Overtime 1');
-        $sheet->setCellValue('L1', 'Overtime 2');
-        $sheet->setCellValue('M1', 'Overtime 3');
-        $sheet->setCellValue('N1', 'Jam Sabtu');
-        $sheet->setCellValue('O1', 'Jam Minggu');
-        $sheet->setCellValue('P1', 'Overtime');
-        $sheet->setCellValue('Q1', 'Potongan');
-        $sheet->setCellValue('R1', 'Tunjangan');
-        $sheet->setCellValue('S1', 'Gaji Kotor');
-        $sheet->setCellValue('T1', 'Rincian Potongan');
-        $sheet->setCellValue('U1', 'Rincian Tunjangan');
+private function getPotongan()
+{
+     $penggajianDetailModel = new MasterPenggajianDetailModel();
+        $allowanceModel = new MdlFemployeeAllowanceList();
+        $deductionModel = new MdlFemployeeDeductionList();
+        $data = $penggajianDetailModel->select('pegawai.pegawai_id, pegawai.pegawai_pin, pegawai.pegawai_nama,salary_deduction.Nama as potongan, employee_deduction_list.amount as potongan_amount')
+                    ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'inner')
+                    ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+                    ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
+                    ->join('employee_deduction_list', 'pegawai.pegawai_id = employee_deduction_list.employee_id', 'left')
+                    ->join('salary_deduction', 'employee_deduction_list.deduction_id = salary_deduction.id', 'left')
+                    ->orderBy('master_penggajian_detail.penggajian_id', 'ASC')
+                    ->findAll();
+        return $data;
+}
 
+private function getTunjangan()
+{
+     $penggajianDetailModel = new MasterPenggajianDetailModel();
+        $data = $penggajianDetailModel->select('pegawai.pegawai_id, pegawai.pegawai_pin, pegawai.pegawai_nama as pegawai_nama, salary_allowance.Nama as tunjangan, employee_allowance_list.amount as tunjangan_amount')
+                    ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'inner')
+                    ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+                    ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
+                    ->join('employee_allowance_list', 'pegawai.pegawai_id = employee_allowance_list.employee_id', 'left')
+                    ->join('salary_allowance', 'employee_allowance_list.allowance_id = salary_allowance.id', 'left')
+                    ->orderBy('master_penggajian_detail.penggajian_id', 'ASC')
+                    ->findAll();
+    return $data;
+}
 
-        // Isi data karyawan
-        $row = 2;
-        // var_dump($dataKaryawan);
+   public function exportAllToExcel()
+{
+    // Inisialisasi Spreadsheet
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
-        foreach ($results as $data) {
-            $sheet->setCellValue('A' . $row, $data['pegawai_pin']);
-            $sheet->setCellValue('B' . $row, $data['pegawai_nama']);
-            $sheet->setCellValue('C' . $row, $data['Gaji_Per_Jam']);
-            $sheet->setCellValue('D' . $row, $data['bank_account']);
-            $sheet->setCellValue('E' . $row, $data['pemilik_rekening']);
-            $sheet->setCellValue('F' . $row, $data['kode_penggajian']);
-            $sheet->setCellValue('G' . $row, $data['tanggal_awal_penggajian']);
-            $sheet->setCellValue('H' . $row, $data['tanggal_akhir_penggajian']);
-            $sheet->setCellValue('I' . $row, $data['total_salary']);
-            $sheet->setCellValue('J' . $row, $data['total_work_Hours']);
-            $sheet->setCellValue('K' . $row, $data['total_overtime1_Hours']);
-            $sheet->setCellValue('L' . $row, $data['total_overtime2_Hours']);
-            $sheet->setCellValue('M' . $row, $data['total_overtime3_Hours']);
-            $sheet->setCellValue('N' . $row, $data['saturday_work_Hours']);
-            $sheet->setCellValue('O' . $row, $data['sunday_work_Hours']);
-            $sheet->setCellValue('P' . $row, $data['OVT_salary']);
-            $sheet->setCellValue('Q' . $row, $data['totalDeduction']);
-            $sheet->setCellValue('R' . $row, $data['totalAllowance']);
-            $sheet->setCellValue('S' . $row, $data['grossSalary']);
-            $sheet->setCellValue('T' . $row,  json_encode($this->getDeductionDet($data['karyawan_id'])));
-            $sheet->setCellValue('U' . $row,  json_encode($this->getAllowanceDet($data['karyawan_id'])));
-            $row++;
-        }
+    // ================= Sheet 1: Rekap Gaji Karyawan =================
+    $sheet1 = $spreadsheet->getActiveSheet();
+    $sheet1->setTitle('Rekap Gaji Karyawan');
 
-        // Menyimpan file
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'Rekap_Gaji_Karyawan_.xlsx';
-        
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $fileName . '"');
-        header('Cache-Control: max-age=0');
+    // Header Sheet 1
+        $sheet1->setCellValue('A1', 'ID Karyawan');
+        $sheet1->setCellValue('B1', 'Nama');
+        $sheet1->setCellValue('C1', 'Gaji Per Jam');
+        $sheet1->setCellValue('D1', 'No Rekening');
+        $sheet1->setCellValue('E1', 'Pemilik Rekening');
+        $sheet1->setCellValue('F1', 'Kode Penggajian');
+        $sheet1->setCellValue('G1', 'Tanggal Awal');
+        $sheet1->setCellValue('H1', 'Tanggal Akhir');
+        $sheet1->setCellValue('I1', 'Total Gaji');
+        $sheet1->setCellValue('J1', 'Jam Kerja Total');
+        $sheet1->setCellValue('K1', 'Overtime 1');
+        $sheet1->setCellValue('L1', 'Overtime 2');
+        $sheet1->setCellValue('M1', 'Overtime 3');
+        $sheet1->setCellValue('N1', 'Jam Sabtu');
+        $sheet1->setCellValue('O1', 'Jam Minggu');
+        $sheet1->setCellValue('P1', 'Overtime');
+        $sheet1->setCellValue('Q1', 'Potongan');
+        $sheet1->setCellValue('R1', 'Tunjangan');
+        $sheet1->setCellValue('S1', 'Gaji Kotor');
 
-        $writer->save('php://output');
-        exit();
+    $rekapGaji = $this->getRekapGaji(); // Mengambil data rekap gaji dari database
+    $row = 2;
+    // var_dump($rekapGaji);
+    // die();
+    foreach ($rekapGaji as $data) {
+            $sheet1->setCellValue('A' . $row, $data['pegawai_pin']);
+            $sheet1->setCellValue('B' . $row, $data['pegawai_nama']);
+            $sheet1->setCellValue('C' . $row, $data['Gaji_Per_Jam']);
+            $sheet1->setCellValue('D' . $row, $data['bank_account']);
+            $sheet1->setCellValue('E' . $row, $data['pemilik_rekening']);
+            $sheet1->setCellValue('F' . $row, $data['kode_penggajian']);
+            $sheet1->setCellValue('G' . $row, $data['tanggal_awal_penggajian']);
+            $sheet1->setCellValue('H' . $row, $data['tanggal_akhir_penggajian']);
+            $sheet1->setCellValue('I' . $row, $data['total_salary']);
+            $sheet1->setCellValue('J' . $row, $data['total_work_Hours']);
+            $sheet1->setCellValue('K' . $row, $data['total_overtime1_Hours']);
+            $sheet1->setCellValue('L' . $row, $data['total_overtime2_Hours']);
+            $sheet1->setCellValue('M' . $row, $data['total_overtime3_Hours']);
+            $sheet1->setCellValue('N' . $row, $data['saturday_work_Hours']);
+            $sheet1->setCellValue('O' . $row, $data['sunday_work_Hours']);
+            $sheet1->setCellValue('P' . $row, $data['OVT_salary']);
+            $sheet1->setCellValue('Q' . $row, $data['totalDeduction']);
+            $sheet1->setCellValue('R' . $row, $data['totalAllowance']);
+            $sheet1->setCellValue('S' . $row, $data['grossSalary']);
+        $row++;
     }
+
+    // ================= Sheet 2: Potongan =================
+    $sheet2 = $spreadsheet->createSheet();
+    $sheet2->setTitle('Potongan');
+
+    // Header Sheet 2
+    $sheet2->setCellValue('A1', 'ID');
+    $sheet2->setCellValue('B1', 'PIN');
+    $sheet2->setCellValue('C1', 'Nama');
+    $sheet2->setCellValue('D1', 'Potongan');
+    $sheet2->setCellValue('E1', 'Amount');
+
+    $potongan = $this->getPotongan(); // Mengambil data potongan dari database
+    $row = 2;
+    foreach ($potongan as $data) {
+        $sheet2->setCellValue('A' . $row, $data['pegawai_id']);
+        $sheet2->setCellValue('B' . $row, $data['pegawai_pin']);
+        $sheet2->setCellValue('C' . $row, $data['pegawai_nama']);
+        $sheet2->setCellValue('D' . $row, $data['potongan']);
+        $sheet2->setCellValue('E' . $row, $data['potongan_amount']);
+        $row++;
+    }
+
+    // ================= Sheet 3: Tunjangan =================
+    $sheet3 = $spreadsheet->createSheet();
+    $sheet3->setTitle('Tunjangan');
+
+    // Header Sheet 3
+    $sheet3->setCellValue('A1', 'ID');
+    $sheet3->setCellValue('B1', 'PIN');
+    $sheet3->setCellValue('C1', 'Nama');
+    $sheet3->setCellValue('D1', 'Tunjangan');
+    $sheet3->setCellValue('E1', 'Amount');
+
+    $tunjangan = $this->getTunjangan(); // Mengambil data tunjangan dari database
+    $row = 2;
+    foreach ($tunjangan as $data) {
+        $sheet3->setCellValue('A' . $row, $data['pegawai_id']);
+        $sheet3->setCellValue('B' . $row, $data['pegawai_pin']);
+        $sheet3->setCellValue('C' . $row, $data['pegawai_nama']);
+        $sheet3->setCellValue('D' . $row, $data['tunjangan']);
+        $sheet3->setCellValue('E' . $row, $data['tunjangan_amount']);
+        $row++;
+    }
+
+    // Menyimpan file ke output
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $fileName = 'Rekap_Gaji_Potongan_Tunjangan.xlsx';
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $fileName . '"');
+    header('Cache-Control: max-age=0');
+
+    $writer->save('php://output');
+    exit();
+}
+
+
+
         private function getAllowanceDet($employeeId)
     {
         $allowanceModel = new MdlFemployeeAllowanceList();
