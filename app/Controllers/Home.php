@@ -223,4 +223,11 @@ class Home extends BaseController
         $data['content'] = view('admin/content/daftarPembelian');
         return view('admin/index', $data);
     }
+          public function supplier()
+    {
+        $data['group'] = 'Master Data';
+        $data['title'] = 'Supplier';
+        $data['content'] = view('admin/content/supplier');
+        return view('admin/index', $data);
+    }
 }

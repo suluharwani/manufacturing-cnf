@@ -11,7 +11,7 @@ $routes->get('/dashboard', 'Home::index');
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
 $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
 
-$routes->get('/test', 'Home::test');  
+$routes->get('/supplier', 'Home::supplier');  
 $routes->get('/pembelian', 'Home::pembelian');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
@@ -175,6 +175,15 @@ $routes->group('product', function ($routes) {
     $routes->post('getBom', 'ProductController::getBom');
 
 });
+$routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
+    $routes->get('list', 'SupplierController::listdataSupplierJoin'); // Route untuk menampilkan data supplier
+    $routes->post('listdataSupplierJoin', 'SupplierController::listdataSupplierJoin'); // Route untuk data server-side processing
+    $routes->post('create', 'SupplierController::create'); // Route untuk menambahkan supplier baru
+    $routes->post('update/(:num)', 'SupplierController::update/$1'); // Route untuk mengupdate data supplier
+    $routes->post('delete/(:num)', 'SupplierController::delete/$1'); // Route untuk menghapus supplier
+    $routes->get('get/(:num)', 'SupplierController::get/$1'); // Route untuk menghapus supplier
+});
+
 $routes->group('stock', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list'); 
     $routes->get('addStock/(:any)', 'Stock::addStock/(:any)'); 
