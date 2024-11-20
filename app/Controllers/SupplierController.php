@@ -95,52 +95,54 @@ class SupplierController extends BaseController
     }
 
     // Create Supplier
-    public function create()
-    {
-        $data = $this->request->getPost();
+public function create()
+{
+    $data = $this->request->getPost();
 
-        $validationRules = [
-            'supplier_name' => 'required',
-            'contact_name' => 'required',
-            'contact_email' => 'required|valid_email',
-            'contact_phone' => 'required',
-            'address' => 'required',
-            'id_currency' => 'required|numeric',
-        ];
+    $validationRules = [
+        'supplier_name' => 'required',
+        'address' => 'required',
+        'id_currency' => 'required|numeric',
+    ];
 
-        if (!$this->validate($validationRules)) {
-            return $this->response->setJSON([
-                'status' => false,
-                'message' => $this->validator->getErrors()
-            ]);
-        }
+    // Validasi data
+    if (!$this->validate($validationRules)) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => $this->validator->getErrors()
+        ]);
+    }
 
-        if ($this->request->getFile('logo')->isValid()) {
-            $data['logo_url'] = $this->uploadLogo();
-        }
+    $mdlSupplier = new MdlSupplier();
 
-        $mdlSupplier = new MdlSupplier();
-        $mdlSupplier->insert($data);
-
+    // Proses insert data
+    if ($mdlSupplier->insert($data)) {
+        // Jika berhasil
         return $this->response->setJSON([
             'status' => true,
             'message' => 'Supplier berhasil ditambahkan.'
         ]);
+    } else {
+        // Jika gagal
+        $errorMessage = $mdlSupplier->errors() ? $mdlSupplier->errors() : 'Gagal menambahkan supplier karena kesalahan internal.';
+        
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => $errorMessage
+        ]);
     }
+}
 
     // Update Supplier
     public function update($id)
     {
         $data = $this->request->getPost();
 
-        $validationRules = [
-            'supplier_name' => 'required',
-            'contact_name' => 'required',
-            'contact_email' => 'required|valid_email',
-            'contact_phone' => 'required',
-            'address' => 'required',
-            'id_currency' => 'required|numeric',
-        ];
+   $validationRules = [
+        'supplier_name' => 'required',
+        'address' => 'required',
+        'id_currency' => 'required|numeric',
+    ];
 
         if (!$this->validate($validationRules)) {
             return $this->response->setJSON([
@@ -149,9 +151,6 @@ class SupplierController extends BaseController
             ]);
         }
 
-        if ($this->request->getFile('logo')->isValid()) {
-            $data['logo_url'] = $this->uploadLogo();
-        }
 
         $mdlSupplier = new MdlSupplier();
         $mdlSupplier->update($id, $data);

@@ -64,13 +64,7 @@ class MdlSupplier extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-     protected $validationRules = [
-        'supplier_name' => 'required|max_length[255]',
-        'contact_email' => 'permit_empty|valid_email|max_length[255]',
-        'contact_phone' => 'permit_empty|max_length[20]',
-        'id_currency'   => 'permit_empty|max_length[10]',
-        'logo_url'      => 'permit_empty|valid_url|max_length[255]',
-    ];
+     protected $validationRules = [];
 
     protected $validationMessages = [
         'supplier_name' => [

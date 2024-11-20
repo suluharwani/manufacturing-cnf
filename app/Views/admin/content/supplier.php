@@ -51,7 +51,8 @@
                     <!-- Supplier Code -->
                     <div class="mb-3">
                         <label for="kode" class="form-label">Supplier Code</label>
-                        <input type="text" name="code" class="form-control" id="kode" />
+                        <input type="text" name="id" class="form-control" id="id" hidden/>
+                        <input type="text" name="code" class="form-control" id="code" />
                     </div>
                     
                     <!-- Supplier Name -->

@@ -1,7 +1,9 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/";
 
-initializeSupplierTable();
+$(document).ready(function() {
+    initializeSupplierTable();
+});
 
 function initializeSupplierTable() {
     var dataTable = $('#tabel_serverside').DataTable({
@@ -100,7 +102,7 @@ $(document).on('click', '.editSupplier', function () {
 
             // Mengisi semua data yang relevan ke dalam form
             $('#supplierForm [name="id"]').val(data.id); // Isi ID ke dalam input hidden
-            $('#supplierForm [name="kode"]').val(data.code || '');
+            $('#supplierForm [name="code"]').val(data.code || '');
             $('#supplierForm [name="supplier_name"]').val(data.supplier_name || '');
             $('#supplierForm [name="contact_name"]').val(data.contact_name || '');
             $('#supplierForm [name="contact_email"]').val(data.contact_email || '');
@@ -149,9 +151,13 @@ $('.saveSupplier').on('click', function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                Swal.fire('Berhasil!', 'Data Supplier berhasil diperbarui', 'success');
-                $('#tabel_serverside').DataTable().ajax.reload();
-                $('#supplierModal').modal('hide');
+                if (response.status) {
+                    Swal.fire('Berhasil!', 'Data Supplier berhasil diperbarui', 'success');
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    $('#supplierModal').modal('hide');
+                } else {
+                    displayErrorMessages(response.message);
+                }
             },
             error: function (xhr) {
                 let error = JSON.parse(xhr.responseText);
@@ -167,9 +173,13 @@ $('.saveSupplier').on('click', function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                Swal.fire('Berhasil!', 'Data Supplier berhasil ditambahkan', 'success');
-                $('#tabel_serverside').DataTable().ajax.reload();
-                $('#supplierModal').modal('hide');
+                if (response.status) {
+                    Swal.fire('Berhasil!', 'Data Supplier berhasil ditambahkan', 'success');
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    $('#supplierModal').modal('hide');
+                } else {
+                   displayErrorMessages(response.message);
+                }
             },
             error: function (xhr) {
                 let error = JSON.parse(xhr.responseText);
@@ -178,6 +188,20 @@ $('.saveSupplier').on('click', function () {
         });
     }
 });
+function displayErrorMessages(messages) {
+    let errorMessage = '';
+
+    // Iterasi melalui pesan error dari response.message
+    $.each(messages, function (key, value) {
+        errorMessage += `${value} <br>`;
+    });
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        html: errorMessage, // Menampilkan semua pesan error
+    });
+}
 
 // Hapus Supplier
 $(document).on('click', '.deleteSupplier', function () {
@@ -192,7 +216,7 @@ $(document).on('click', '.deleteSupplier', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                type: 'DELETE',
+                type: 'post',
                 url: base_url + "supplier/delete/" + supplierId,
                 success: function () {
                     Swal.fire('Berhasil!', 'Supplier berhasil dihapus', 'success');
