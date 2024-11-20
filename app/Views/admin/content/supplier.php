@@ -146,6 +146,37 @@
     </div>
 </div>
 
+<div class="modal fade" id="viewSupplierModal" tabindex="-1" aria-labelledby="viewSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewSupplierModalLabel">Supplier Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Supplier Name:</strong> <span id="supplier_name"></span></p>
+                        <p><strong>Contact Name:</strong> <span id="contact_name"></span></p>
+                        <p><strong>Contact Email:</strong> <span id="contact_email"></span></p>
+                        <p><strong>Contact Phone:</strong> <span id="contact_phone"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Address:</strong> <span id="address"></span></p>
+                        <p><strong>City:</strong> <span id="city"></span></p>
+                        <p><strong>State:</strong> <span id="state"></span></p>
+                        <p><strong>Postal Code:</strong> <span id="postal_code"></span></p>
+                        <p><strong>Country:</strong> <span id="country"></span></p>
+                        <p><strong>Currency:</strong> <span id="currency_name"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/supplier.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script> 

@@ -266,3 +266,33 @@ function loadCurrencies(selectedCurrencyId = null) {
         }
     });
 }
+$(document).on('click', '.viewSupplier', function () {
+    let supplierId = $(this).data('id');
+
+    $.ajax({
+        type: 'GET',
+        url: base_url + 'supplier/get/' + supplierId,
+        success: function (response) {
+            let data = response[0];
+            
+            // Mengisi data ke modal
+            $('#viewSupplierModal #supplier_name').text(data.supplier_name);
+            $('#viewSupplierModal #contact_name').text(data.contact_name);
+            $('#viewSupplierModal #contact_email').text(data.contact_email);
+            $('#viewSupplierModal #contact_phone').text(data.contact_phone);
+            $('#viewSupplierModal #address').text(data.address);
+            $('#viewSupplierModal #city').text(data.city);
+            $('#viewSupplierModal #state').text(data.state);
+            $('#viewSupplierModal #postal_code').text(data.postal_code);
+            $('#viewSupplierModal #country').text(data.country);
+            $('#viewSupplierModal #currency_name').text(data.currency_name);
+
+            // Tampilkan modal
+            $('#viewSupplierModal').modal('show');
+        },
+        error: function (xhr) {
+            let error = JSON.parse(xhr.responseText);
+            Swal.fire('Error', error.message, 'error');
+        }
+    });
+});
