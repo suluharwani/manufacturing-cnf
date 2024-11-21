@@ -230,4 +230,11 @@ class Home extends BaseController
         $data['content'] = view('admin/content/supplier');
         return view('admin/index', $data);
     }
+         public function customer()
+    {
+        $data['group'] = 'Master Data';
+        $data['title'] = 'Customer';
+        $data['content'] = view('admin/content/customer');
+        return view('admin/index', $data);
+    }
 }

@@ -40,6 +40,11 @@ class DashboardController extends BaseController
         $data = $mdl->findAll();
         return json_encode($data);
     }
+    function getCountryData(){
+        $mdl = new \App\Models\MdlCountry();
+        $data = $mdl->findAll();
+        return json_encode($data);
+    }
     function fetchAndSaveRates()
     {
         $MdlCurrency =  new \App\Models\MdlCurrency();

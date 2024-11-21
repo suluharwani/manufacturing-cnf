@@ -78,6 +78,7 @@
                         <label for="contact_phone" class="form-label">Contact Phone</label>
                         <input type="text" name="contact_phone" class="form-control" id="contact_phone" />
                     </div>
+              
                     
                     <!-- Address -->
                     <div class="mb-3">
@@ -106,7 +107,7 @@
                     <!-- Country -->
                     <div class="mb-3">
                         <label for="country" class="form-label">Country</label>
-                        <input type="text" name="country" class="form-control" id="country" />
+                        <select class="form-control country" name="id_country" aria-label="Default select example" id="country"></select>
                     </div>
                     
                     <!-- Currency -->
@@ -126,13 +127,13 @@
                         <label for="website_url" class="form-label">Website URL</label>
                         <input type="text" name="website_url" class="form-control" id="website_url" />
                     </div>
-                                        
+
                     <!-- Status -->
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-control" name="status" id="status">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
                         </select>
                     </div>
                 </form>
@@ -160,6 +161,7 @@
                         <p><strong>Contact Name:</strong> <span id="contact_name"></span></p>
                         <p><strong>Contact Email:</strong> <span id="contact_email"></span></p>
                         <p><strong>Contact Phone:</strong> <span id="contact_phone"></span></p>
+                        <p><strong>Logo:</strong> <span id="logo"></span></p>
                     </div>
                     <div class="col-md-6">
                         <p><strong>Address:</strong> <span id="address"></span></p>
@@ -178,12 +180,39 @@
     </div>
 </div>
 
+<div class="modal fade modalEditImage" id="modalEditImage" data-bs-focus="false"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <form id="form"  class="form" enctype="multipart/form-data">
+            <div class="mb-3">
+                 <img class="mb-3" id="ajaxImgUpload" alt="Preview Image" width="300px" />
+                <input type="text" name="id_sup_edit_image" id="id_sup_edit_image" hidden>
+                <input type="file" name="file" multiple="true" id="file" 
+                class="form-control form-control-lg"  accept="image/*">
+            </div>
+            <div class="d-grid">
+             <button type="button" class="btn btn-danger uploadBtn">Upload</button>
+         </div>
+     </div>
+ </form>
+
+</div>
+<div class="modal-footer">
+</div>
+</div>
+</div>
+
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/supplier.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script> 
 <script type="text/javascript" src="<?=base_url()?>/assets/summernote/summernote-lite.min.js"></script>
 <script type="text/javascript" src="<?=base_url()?>/assets/summernote/summernote-image-list.min.js"></script>
- <script type="text/javascript">
- $(document).ready(function() {
+<script type="text/javascript">
+   $(document).ready(function() {
     $('.summernote').summernote({
         callbacks: {
             onImageUpload: function(files) {
@@ -228,7 +257,7 @@
             data: out,
             success: function(img) {
                 $('.summernote').summernote('insertImage', img);
-          
+
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error(textStatus + " " + errorThrown);

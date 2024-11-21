@@ -96,3 +96,40 @@ function formatRupiah(amount) {
     // Gabungkan kembali bagian integer dan desimal
     return 'Rp ' + integerPart + ',' + decimalPart;
 }
+dataCountry()
+function dataCountry(){
+  $.ajax({
+    type : "GET",
+    url  : base_url+"dashboard/getCountryData",
+    async : false,
+    success: function(data){
+     tableCountry(data);
+
+   },
+   error: function(xhr){
+    let d = JSON.parse(xhr.responseText);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: `${d.message}`,
+      footer: '<a href="">Why do I have this issue?</a>'
+    })
+  }
+});
+}
+function tableCountry(data){
+  d = JSON.parse(data);
+  let no = 1;
+  let table = ''
+  $.each(d, function(k, v){
+    table+=     `<tr>`;
+    table+=   `<td>${no++}</td>`;
+    table+=   `<td>${d[k].country_name}</td>`;
+    table+=   `<td>${d[k].code1}</td>`;
+    table+=   `<td>${d[k].code2}</td>`;
+    table+=   `<td><img src='${base_url}assets/img-country-flag/${d[k].flag}')> </td>`;
+    table+=   `</tr>`
+
+  })
+  $('#country').html(table)
+}

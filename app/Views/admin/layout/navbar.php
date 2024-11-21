@@ -21,6 +21,7 @@
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-cube me-2"></i>Master Data</a>
                         <div class="dropdown-menu bg-transparent border-0">
                             <a href="<?=base_url('supplier')?>" class="dropdown-item"> Supplier</a>
+                            <a href="<?=base_url('customer')?>" class="dropdown-item"> Customer</a>
                             <a href="<?=base_url('material')?>" class="dropdown-item"> Materials</a>
                             
                             <a href="<?=base_url('product')?>" class="dropdown-item">BoM Finished goods</a>

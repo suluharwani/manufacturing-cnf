@@ -10,8 +10,10 @@ $routes->get('/', 'Homepage::index');
 $routes->get('/dashboard', 'Home::index');
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
 $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
+$routes->get('/dashboard/getCountryData', 'DashboardController::getCountryData');
 
 $routes->get('/supplier', 'Home::supplier');  
+$routes->get('/customer', 'Home::customer');  
 $routes->get('/pembelian', 'Home::pembelian');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
@@ -182,6 +184,16 @@ $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes
     $routes->post('update/(:num)', 'SupplierController::update/$1'); // Route untuk mengupdate data supplier
     $routes->post('delete/(:num)', 'SupplierController::delete/$1'); // Route untuk menghapus supplier
     $routes->get('get/(:num)', 'SupplierController::get/$1'); // Route untuk menghapus supplier
+    $routes->post('upload', 'SupplierController::upload'); // Route untuk menghapus supplier
+});
+$routes->group('customer', ['namespace' => 'App\Controllers'], function ($routes) {
+    $routes->get('list', 'CustomerController::listdataCustomerJoin'); // Route untuk menampilkan data supplier
+    $routes->post('listdataCustomerJoin', 'CustomerController::listdataCustomerJoin'); // Route untuk data server-side processing
+    $routes->post('create', 'CustomerController::create'); // Route untuk menambahkan supplier baru
+    $routes->post('update/(:num)', 'CustomerController::update/$1'); // Route untuk mengupdate data supplier
+    $routes->post('delete/(:num)', 'CustomerController::delete/$1'); // Route untuk menghapus supplier
+    $routes->get('get/(:num)', 'CustomerController::get/$1'); // Route untuk menghapus supplier
+    $routes->post('upload', 'CustomerController::upload'); // Route untuk menghapus supplier
 });
 
 $routes->group('stock', function ($routes) {

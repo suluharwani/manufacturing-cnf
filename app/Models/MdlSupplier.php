@@ -23,7 +23,7 @@ class MdlSupplier extends Model
         'city',
         'state',
         'postal_code',
-        'country',
+        'id_country',
         'id_currency',
         'tax_number',
         'website_url',

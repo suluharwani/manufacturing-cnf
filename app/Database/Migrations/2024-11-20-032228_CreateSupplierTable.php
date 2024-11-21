@@ -59,9 +59,9 @@ class CreateSupplierTable extends Migration
                 'constraint' => 20,
                 'null'       => true,
             ],
-            'country' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
+            'id_country' => [
+                'type'       => 'INT',
+                'constraint' => 10,
                 'null'       => true,
             ],
             'id_currency' => [
@@ -85,9 +85,9 @@ class CreateSupplierTable extends Migration
                 'null'       => true,
             ],
             'status' => [
-                'type'       => 'ENUM',
-                'constraint' => ['active', 'inactive'],
-                'default'    => 'active',
+                'type'       => 'INT',
+                'constraint' => 1,
+                'default'    => 1,
             ],
       'updated_at' => [
         'type' => 'datetime',

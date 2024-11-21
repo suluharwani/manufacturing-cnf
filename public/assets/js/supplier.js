@@ -40,7 +40,7 @@ function initializeSupplierTable() {
             { mRender: function (data, type, row) { return row[0]; } }, // No
             { mRender: function (data, type, row) { return row[3]; } }, // Code
             { mRender: function (data, type, row) { return row[4]; } }, // Nama Sup
-            { mRender: function (data, type, row) { return row[1]; } }, // 
+            { mRender: function (data, type, row) {  if(row[1]==1){status = 'active'}else{status = 'inactive'} return status } }, 
             { mRender: function (data, type, row) { return row[10]; } }, // 
 
         ],
@@ -83,12 +83,23 @@ $('.addSupplier').on('click', function () {
 
     // Mengisi opsi currency
     loadCurrencies();
-
+    loadCountry();
     // Ganti label modal menjadi "Add"
     $('#supplierModal').modal('show');
     $('.modal-title').text('Add Supplier');
 });
 
+$(document).on('click', '.logoSupplier', function (){
+
+    let supplierId = $(this).data('id');
+    let supplierName = $(this).data('name');
+    let logo_url = $(this).data('logo');
+    $("#ajaxImgUpload").attr("src",  `${base_url}assets/upload/1000/${logo_url}`);
+    $('#id_sup_edit_image').val(supplierId);
+    $('#modalEditImage').modal('show');
+
+    $('.modal-title').text(`Edit Image ${supplierName}`);
+});
 // Edit Supplier
 $(document).on('click', '.editSupplier', function () {
     let supplierId = $(this).data('id');
@@ -101,7 +112,7 @@ $(document).on('click', '.editSupplier', function () {
             let data = response[0];
 
             // Mengisi semua data yang relevan ke dalam form
-            $('#supplierForm [name="id"]').val(data.id); // Isi ID ke dalam input hidden
+            $('#supplierForm [name="id"]').val(data.sup_id); // Isi ID ke dalam input hidden
             $('#supplierForm [name="code"]').val(data.code || '');
             $('#supplierForm [name="supplier_name"]').val(data.supplier_name || '');
             $('#supplierForm [name="contact_name"]').val(data.contact_name || '');
@@ -111,14 +122,14 @@ $(document).on('click', '.editSupplier', function () {
             $('#supplierForm [name="city"]').val(data.city || '');
             $('#supplierForm [name="state"]').val(data.state || '');
             $('#supplierForm [name="postal_code"]').val(data.postal_code || '');
-            $('#supplierForm [name="country"]').val(data.country || '');
+            $('#supplierForm [name="id_country"]').val(data.id_country || '');
             $('#supplierForm [name="tax_number"]').val(data.tax_number || '');
             $('#supplierForm [name="website_url"]').val(data.website_url || '');
             $('#supplierForm [name="status"]').val(data.status || 'active');
 
             // Load currency options and set the selected one
             loadCurrencies(data.id_currency);
-
+            loadCountry(data.id_country)
             // Set image preview jika logo ada
             if (data.logo_url) {
                 $('#ajaxImgUpload').attr('src', base_url + 'uploads/supplier_logos/' + data.logo_url);
@@ -266,14 +277,50 @@ function loadCurrencies(selectedCurrencyId = null) {
         }
     });
 }
+
+function loadCountry(selectedCountryId = null) {
+    $.ajax({
+        type: "GET",
+        url: base_url + "dashboard/getCountryData",
+        async: true,
+        dataType: 'json',
+        success: function (data) {
+            let selOpts = '<option value="">-- Select Country --</option>'; // Placeholder awal
+
+            // Iterasi untuk membuat opsi dropdown dan tentukan yang terpilih
+            $.each(data, function (k, v) {
+                var id = v.id_country;
+                var nama = v.country_name;
+                var kode = v.code2;
+
+                // Menambahkan opsi ke dropdown dengan kondisi terpilih
+                if (selectedCountryId && selectedCountryId == id) {
+                    selOpts += `<option value="${id}" selected>${kode} - ${nama}</option>`;
+                } else {
+                    selOpts += `<option value="${id}">${kode} - ${nama}</option>`;
+                }
+            });
+
+            // Mengisi opsi ke dalam elemen select dengan id "Country"
+            $('#country').html(selOpts);
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to load currencies: ' + error,
+            });
+        }
+    });
+}
 $(document).on('click', '.viewSupplier', function () {
     let supplierId = $(this).data('id');
-
     $.ajax({
         type: 'GET',
         url: base_url + 'supplier/get/' + supplierId,
         success: function (response) {
             let data = response[0];
+            $('.modal-title').text(`View Data ${data.supplier_name}`);
             
             // Mengisi data ke modal
             $('#viewSupplierModal #supplier_name').text(data.supplier_name);
@@ -284,8 +331,9 @@ $(document).on('click', '.viewSupplier', function () {
             $('#viewSupplierModal #city').text(data.city);
             $('#viewSupplierModal #state').text(data.state);
             $('#viewSupplierModal #postal_code').text(data.postal_code);
-            $('#viewSupplierModal #country').text(data.country);
-            $('#viewSupplierModal #currency_name').text(data.currency_name);
+            $('#viewSupplierModal #country').text(data.country_name);
+            $('#viewSupplierModal #currency_name').text(data.kode+'-'+data.nama);
+            $('#viewSupplierModal #logo').html(`<img src=" ${base_url}assets/upload/1000/${data.logo_url} style='height: 50px;'>`);
 
             // Tampilkan modal
             $('#viewSupplierModal').modal('show');
@@ -296,3 +344,95 @@ $(document).on('click', '.viewSupplier', function () {
         }
     });
 });
+
+$('#file').change(function(){
+  $('.uploadBtn').html('Upload');
+  $('.uploadBtn').prop('disabled', false);
+  $('.uploadBtn').addClass("btn-danger");
+  $('.uploadBtn').removeClass("btn-success");
+  $('#picture').val('');
+  const file = this.files[0];
+  if (file){
+    let reader = new FileReader();
+    reader.onload = function(event){
+      $('#ajaxImgUpload').attr('src', event.target.result).width(300);
+    }
+    reader.readAsDataURL(file);
+  }
+});
+$('.reset').on('click',function(){
+  $('#form').trigger("reset");
+  $('.uploadBtn').html('Upload');
+  $('.uploadBtn').prop('disabled', false);
+  $('.uploadBtn').addClass("btn-danger");
+  $('.uploadBtn').removeClass("btn-success");
+  $('#ajaxImgUpload').attr('src', 'https://via.placeholder.com/300');
+})
+
+
+$('.uploadBtn').on('click',function(){
+  let id = $('#id_sup_edit_image').val()
+
+  upload(id)
+  $('#tabel_serverside').DataTable().ajax.reload();
+
+})
+function upload(id){
+  input = $('#file').prop('files')[0];
+
+  param = ''
+  data = new FormData();
+          // data['file'] = input;
+  data.append('id', id);
+  data.append('file', input);
+  data.append('param', param);
+  data.append('data', '');
+  $('.uploadBtn').html('Uploading ...');
+  $('.uploadBtn').attr('disabled');
+  if (!input) {
+    alert("Choose File");
+    $('.uploadBtn').html('Upload');
+    $('.uploadBtn').prop('disabled', false);
+  } else {
+    $.ajax({
+     type : "POST",
+     enctype: 'multipart/form-data',
+     url  : base_url+"supplier/upload",
+     async : false,
+     processData: false,
+     contentType: false,
+     data:data,
+     success: function (res) {
+      if (res.success == true) {
+        $('.uploadBtn').html('Uploaded!');
+        $('.uploadBtn').prop('disabled', true);
+        $('.uploadBtn').removeClass("btn-danger");
+        $('.uploadBtn').addClass("btn-success");
+        $('#picture').val(res.picture);
+
+                                // $('#ajaxImgUpload').attr('src', 'https://via.placeholder.com/300');
+        $('#alertMsg').addClass("text-success");
+        $('#alertMsg').html(res.msg);
+        $('#alertMessage').show();
+      } else if (res.success == false) {
+        $('#alertMsg').addClass("text-danger");
+        $('#alertMsg').html(res.msg);
+        $('#picture').val('');
+
+        $('#alertMessage').show();
+        $('.uploadBtn').html('Upload Failed!');
+        $('.uploadBtn').prop('disabled', false);
+        $('.uploadBtn').addClass("btn-danger");
+        $('.uploadBtn').removeClass("btn-success");
+
+      }
+      setTimeout(function () {
+        $('#alertMsg').html('');
+        $('#alertMessage').hide();
+      }, 4000);
+
+                            // document.getElementById("form").reset();
+    }
+  });
+  }
+}
