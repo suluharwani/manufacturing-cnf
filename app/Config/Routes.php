@@ -19,8 +19,11 @@ $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
 $routes->get('/employee', 'Home::employee');
 $routes->get('/salary', 'Home::salarySetting');
+$routes->get('/proformainvoice', 'Home::proformainvoice');
+$routes->get('/finishing', 'Home::finishing');
 $routes->post('/employeeData', 'User::employeeData');
 $routes->get('/employeeData', 'User::employeeData');
+
 
 $routes->get('/login', 'Login');
 $routes->get('/signup', 'Login');
@@ -203,3 +206,15 @@ $routes->group('stock', function ($routes) {
 });
 
     $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1');
+$routes->group('finishing', ['namespace' => 'App\Controllers'], function ($routes) {
+    $routes->get('/', 'FinishingController::index'); // Halaman utama finishing
+    $routes->post('getAll', 'FinishingController::getAll'); // Mendapatkan semua data finishing
+    $routes->post('create', 'FinishingController::create'); // Menambahkan data finishing baru
+    $routes->post('update/(:num)', 'FinishingController::update/$1'); // Memperbarui data finishing berdasarkan ID
+    $routes->delete('delete/(:num)', 'FinishingController::delete/$1'); // Menghapus data finishing berdasarkan ID
+    $routes->post('get', 'FinishingController::get'); // Menghapus data finishing berdasarkan ID
+    $routes->post('updatePicture', 'FinishingController::updatePicture'); // Menghapus data finishing berdasarkan ID
+    $routes->post('updateData', 'FinishingController::updateData'); // Menghapus data finishing berdasarkan ID
+    
+    
+});

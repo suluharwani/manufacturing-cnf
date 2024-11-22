@@ -237,4 +237,17 @@ class Home extends BaseController
         $data['content'] = view('admin/content/customer');
         return view('admin/index', $data);
     }
+         public function proformainvoice()
+    {
+        $data['group'] = 'Customer Order';
+        $data['title'] = 'Proforma Invoice';
+        $data['content'] = view('admin/content/proformaInvoice');
+        return view('admin/index', $data);
+    }
+    public function finishing(){
+        $data['group'] = 'Master Data';
+        $data['title'] = 'Finishing Product';
+        $data['content'] = view('admin/content/finishing');
+        return view('admin/index', $data);
+    } 
 }

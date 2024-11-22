@@ -23,6 +23,7 @@
                             <a href="<?=base_url('supplier')?>" class="dropdown-item"> Supplier</a>
                             <a href="<?=base_url('customer')?>" class="dropdown-item"> Customer</a>
                             <a href="<?=base_url('material')?>" class="dropdown-item"> Materials</a>
+                            <a href="<?=base_url('finishing')?>" class="dropdown-item"> Finishing</a>
                             
                             <a href="<?=base_url('product')?>" class="dropdown-item">BoM Finished goods</a>
                             <!-- <a href="<?=base_url('track_material')?>" class="dropdown-item">Track Material Inventory</a> -->
@@ -54,7 +55,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-archive me-2"></i>Customer Order</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="<?=base_url('work_order')?>" class="dropdown-item">Proforma Invoice</a>
+                            <a href="<?=base_url('proformainvoice')?>" class="dropdown-item">Proforma Invoice</a>
                             <a href="<?=base_url('work_order')?>" class="dropdown-item">Work Orders</a>
                             <a href="<?=base_url('track_work_order')?>" class="dropdown-item">Track Work Order Status</a>
                         </div>
