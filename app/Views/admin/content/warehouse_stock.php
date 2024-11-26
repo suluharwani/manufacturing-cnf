@@ -30,28 +30,27 @@
                   <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
+                  <th style=" text-align: center;">Stock Awal</th>
+                  <th style=" text-align: center;">Pembelian</th>
+                  <th style=" text-align: center;">Pengeluaran</th>
+                  <th style=" text-align: center;">Stock</th>
+                  <th style=" text-align: center;">Harga</th>
+                  <th style=" text-align: center;">Harga Rupiah</th>
                   <th style=" text-align: center;">Aktif</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr class="text-center">
-                <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
+                  <th style=" text-align: center;">Stock Awal</th>
+                  <th style=" text-align: center;">Pembelian</th>
+                  <th style=" text-align: center;">Pengeluaran</th>
+                  <th style=" text-align: center;">Stock</th>
+                  <th style=" text-align: center;">Harga</th>
+                  <th style=" text-align: center;">Harga Rupiah</th>
                   <th style=" text-align: center;">Aktif</th>
-                </tr>
               </tr>
             </tfoot>
           </table>
@@ -65,5 +64,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/stock.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

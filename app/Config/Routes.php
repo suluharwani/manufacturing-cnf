@@ -202,6 +202,7 @@ $routes->group('customer', ['namespace' => 'App\Controllers'], function ($routes
 $routes->group('stock', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list'); 
     $routes->get('addStock/(:any)', 'Stock::addStock/(:any)'); 
+    $routes->post('stockdata', 'Stock::stockdata'); 
 
 });
 

@@ -47,35 +47,39 @@ function currencyData(){
   }
 });
 }
-function tableCurrency(data){
+function tableCurrency(data) {
   d = JSON.parse(data);
-  console.log(d)
+  console.log(d);
   let no = 1;
-  let table = ''
-  let arrow = ''
+  let table = '';
+  let arrow = '';
 
-  $.each(d, function(k, v){
-  if (d[k].oldrate - d[k].rate < 0) { //naik
-  	arrow = '<i class="fa fa-arrow-up">';
-  }else if(d[k].oldrate - d[k].rate > 0){//turun
-  	arrow = '<i class="fa fa-arrow-down">';
-  }else{ //equal
-	arrow = '<i class="fa fa-arrows-alt-h">';
-  }
-    table+=     `<tr>`;
-    table+=   `<td>${no++}</td>`;
-    table+=   `<td>${d[k].kode}</td>`;
-    table+=   `<td>${d[k].nama}</td>`;
-    table+=   `<td>${d[k].olddate}</td>`;
-    table+=   `<td>${d[k].oldrate} </br> ${formatRupiah(1/d[k].oldrate)}/${d[k].kode}</td>`;
-    table+=   `<td>${d[k].update}</td>`;
-    table+=   `<td>${d[k].rate}</br> ${formatRupiah(1/d[k].rate)}/${d[k].kode}</td>`;
-    table+=   `<td>${arrow}<td>`;
-    table+=   `</tr>`
+  $.each(d, function(k, v) {
+    let changePercentage = ((d[k].rate - d[k].oldrate) / d[k].oldrate) * 100;
 
-  })
-  $('#tableCurrency').html(table)
+    if (d[k].oldrate - d[k].rate < 0) { // naik
+      arrow = `<i class="fa fa-arrow-up" style="color:green;"></i> <span style="color:green;">${changePercentage.toFixed(2)}%</span>`;
+    } else if (d[k].oldrate - d[k].rate > 0) { // turun
+      arrow = `<i class="fa fa-arrow-down" style="color:red;"></i> <span style="color:red;">-${Math.abs(changePercentage).toFixed(2)}%</span>`;
+    } else { // equal
+      arrow = `<i class="fa fa-arrows-alt-h" style="color:blue;"></i> <span style="color:blue;">0.00%</span>`;
+    }
+
+    table += `<tr>`;
+    table += `<td>${no++}</td>`;
+    table += `<td>${d[k].kode}</td>`;
+    table += `<td>${d[k].nama}</td>`;
+    table += `<td>${d[k].olddate}</td>`;
+    table += `<td>${d[k].oldrate} </br> ${formatRupiah(1 / d[k].oldrate)}/${d[k].kode}</td>`;
+    table += `<td>${d[k].update}</td>`;
+    table += `<td>${d[k].rate}</br> ${formatRupiah(1 / d[k].rate)}/${d[k].kode}</td>`;
+    table += `<td>${arrow}</td>`;
+    table += `</tr>`;
+  });
+
+  $('#tableCurrency').html(table);
 }
+
 function formatRupiah(amount) {
     // Pastikan bahwa jumlah adalah angka atau dapat dikonversi menjadi angka
     if (isNaN(amount)) {
