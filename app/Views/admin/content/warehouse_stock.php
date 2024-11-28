@@ -21,7 +21,14 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Persediaan Material</h6>
-                        <button class= "btn btn-primary">Tambah</button>
+                        <div>
+                            
+                            <button class= "btn btn-primary">Stock Opname</button>
+                        <button class= "btn btn-primary">Pemakaian</button>
+                        <button class= "btn btn-primary">Pemusnahan</button>
+                        <button class= "btn btn-primary">Saldo Awal</button>
+                        </div>
+                        
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">

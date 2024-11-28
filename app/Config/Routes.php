@@ -219,3 +219,15 @@ $routes->group('finishing', ['namespace' => 'App\Controllers'], function ($route
     
     
 });
+$routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($routes) {
+    $routes->post('listdataPembelian', 'ControllerPembelian::listdataPembelian'); // Halaman utama finishing
+    // $routes->post('getAll', 'FinishingController::getAll'); // Mendapatkan semua data finishing
+    // $routes->post('create', 'FinishingController::create'); // Menambahkan data finishing baru
+    // $routes->post('update/(:num)', 'FinishingController::update/$1'); // Memperbarui data finishing berdasarkan ID
+    // $routes->delete('delete/(:num)', 'FinishingController::delete/$1'); // Menghapus data finishing berdasarkan ID
+    // $routes->post('get', 'FinishingController::get'); // Menghapus data finishing berdasarkan ID
+    // $routes->post('updatePicture', 'FinishingController::updatePicture'); // Menghapus data finishing berdasarkan ID
+    // $routes->post('updateData', 'FinishingController::updateData'); // Menghapus data finishing berdasarkan ID
+    
+    
+});

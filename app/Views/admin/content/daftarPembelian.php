@@ -21,36 +21,28 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Persediaan Material</h6>
-                        <button class= "btn btn-primary">Tambah</button>
+                        <button class= "btn btn-primary addPembelian">Tambah</button>
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Tanggal</th>
                   <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Supplier</th>
+                  <th style=" text-align: center;">Nilai</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
-                <tr class="text-center">
-                <th style=" text-align: center;">#</th>
+                <tr  class="text-center">
+                  <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Tanggal</th>
                   <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Supplier</th>
+                  <th style=" text-align: center;">Nilai</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </tr>
             </tfoot>
@@ -65,5 +57,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/pembelian.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
