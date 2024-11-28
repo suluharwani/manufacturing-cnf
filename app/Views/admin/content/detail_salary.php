@@ -1,4 +1,6 @@
 <link rel="stylesheet" type="text/css" href="<?= base_url('assets') ?>/datatables/datatables.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
     /* Tambahan minimal CSS untuk fixed header */
     thead th {
