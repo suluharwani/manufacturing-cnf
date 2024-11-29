@@ -14,7 +14,6 @@ $routes->get('/dashboard/getCountryData', 'DashboardController::getCountryData')
 
 $routes->get('/supplier', 'Home::supplier');  
 $routes->get('/customer', 'Home::customer');  
-$routes->get('/pembelian', 'Home::pembelian');
 $routes->get('/material', 'Home::material');
 $routes->get('/warehouse', 'Home::warehouse');
 $routes->get('/employee', 'Home::employee');
@@ -220,14 +219,17 @@ $routes->group('finishing', ['namespace' => 'App\Controllers'], function ($route
     
 });
 $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($routes) {
-    $routes->post('listdataPembelian', 'ControllerPembelian::listdataPembelian'); // Halaman utama finishing
-    // $routes->post('getAll', 'FinishingController::getAll'); // Mendapatkan semua data finishing
-    // $routes->post('create', 'FinishingController::create'); // Menambahkan data finishing baru
-    // $routes->post('update/(:num)', 'FinishingController::update/$1'); // Memperbarui data finishing berdasarkan ID
-    // $routes->delete('delete/(:num)', 'FinishingController::delete/$1'); // Menghapus data finishing berdasarkan ID
-    // $routes->post('get', 'FinishingController::get'); // Menghapus data finishing berdasarkan ID
-    // $routes->post('updatePicture', 'FinishingController::updatePicture'); // Menghapus data finishing berdasarkan ID
-    // $routes->post('updateData', 'FinishingController::updateData'); // Menghapus data finishing berdasarkan ID
+    $routes->get('', 'Home::pembelian');
+    $routes->post('listdataPembelian', 'ControllerPembelian::listdataPembelian'); 
+    $routes->get('form/(:any)', 'ControllerPembelian::pembelianForm/$1');
+    $routes->post('listdataPembelianDetail/(:any)', 'ControllerPembelian::listdataPembelianDetail/$1');
+    $routes->get('getSupplierData/(:num)', 'ControllerPembelian::getSupplierData/$1'); // Route untuk mengambil data supplier berdasarkan ID
+    $routes->get('getSupplierList', 'ControllerPembelian::getSupplierList'); 
+    $routes->post('updateSupplier/(:any)', 'ControllerPembelian::updateSupplier/$1'); 
+
+    $routes->get('getCountryData', 'ControllerPembelian::getCountryData'); // Route untuk mengambil data negara
+    $routes->get('getCurrencyData', 'ControllerPembelian::getCurrencyData'); // Route untuk mengambil data mata uang  
+    $routes->get('getSupplierDataByPurchase/(:num)', 'ControllerPembelian::getSupplierDataByPurchase/$1'); // Route untuk mengambil data mata uang  
     
     
 });

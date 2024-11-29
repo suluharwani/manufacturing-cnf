@@ -15,9 +15,14 @@ class Pembelian extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
+            'id_po' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'null' => false,
+            ],
             'id_supplier' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
+                'type' => 'INT',
+                'constraint' => 11,
                 'null' => false,
             ],
             'invoice' => [
@@ -37,6 +42,11 @@ class Pembelian extends Migration
                 'type' => 'INT',
                 'null' => true,
             ],
+            'pajak' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
             'created_at datetime default current_timestamp',
             'updated_at' => [
                 'type' => 'DATETIME',

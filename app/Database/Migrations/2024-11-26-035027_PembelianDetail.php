@@ -25,12 +25,42 @@ class PembelianDetail extends Migration
                 'constraint' => 11,
                 'null' => false,
             ],
+            'id_currency' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'null' => false,
+            ],
             'jumlah' => [
               'type' => 'FLOAT',
                 'constraint' => 10.2,
                 'null' => true,
                     ],
             'harga' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
+              'diskon1' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
+              'diskon2' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
+              'diskon3' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
+              'pajak' => [
+               'type' => 'FLOAT',
+                'constraint' => 10.2,
+                'null' => true,
+              ],
+              'potongan' => [
                'type' => 'FLOAT',
                 'constraint' => 10.2,
                 'null' => true,

@@ -52,7 +52,7 @@ $(document).ready(function() {
         return formatNumber(row[8])
     }},
     {mRender: function (data, type, row) {
-     return `<a href="javascript:void(0);" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+     return `<a href="${base_url}pembelian/form/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder">Edit</a>`; 
     }}
   ],
   "columnDefs": [{
