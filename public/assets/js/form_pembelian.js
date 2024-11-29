@@ -417,21 +417,21 @@ function loadSupplierList() {
     });
   });
 
-    $('.saveSupplier').submit(function(event) {
+    $('.saveSupplier').click(function(event) {
     event.preventDefault();
 
     // Ambil data dari form
     var supplier = $('#supplier').val();
     var pajak = $('#pajak').val();
-   
+    var pajak = $('#invoice').val();
 
-    // Kirim data melalui AJAX ke server
     $.ajax({
       type: "POST",
       url: base_url + "pembelian/updateSupplier/"+getLastSegment(), // URL untuk menambahkan material (ganti dengan URL yang sesuai)
       data: {
         supplier: supplier,
         pajak: pajak,
+        invoice: invoice
 
       },
       success: function(response) {
@@ -439,7 +439,7 @@ function loadSupplierList() {
         if(response.status === 'success') {
           alert('Material added successfully!');
           $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-          location.reload(); // Reload halaman untuk memperbarui tabel
+          // location.reload(); // Reload halaman untuk memperbarui tabel
         } else {
           alert('Error adding material');
         }

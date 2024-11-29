@@ -244,6 +244,45 @@ return view('admin/index', $data);
         return $this->response->setJSON($supplier);
     }
     public function updateSupplier($id){
+    $invoice = $_POST['invoice'];
+    $id_supplier = $_POST['supplier'];
+    $pajak = $_POST['pajak'];
+
+    $data = array('id_supplier' =>$id_supplier ,
+                  'invoice' =>$invoice ,
+                  'pajak' =>$pajak 
+
+     );
+    $MdlPembelian = new MdlPembelian();
+    $MdlPembelianDetail = new MdlPembelianDetail();
+    $MdlPembelian->set($data)->where('id',$id)->update();
+
+    if ($MdlPembelian->affectedRows()!== 0) {
+        $pembelian = $MdlPembelian->find($id_pembelian);
+
+        if ($pembelian) {
+            $id_supplier = $pembelian['id_supplier'];
+
+            $supplierModel = new MdlSupplier();
+
+            $supplier = $supplierModel
+                        ->select('currency.id as currency_id')
+                        ->join('currency','currency.id = supplier.id_currency ')
+                        ->where('supplier.id', $id_supplier)
+                        ->get()->getResultArray();
+                       
+       
+
+            
+            $MdlPembelianDetail->set(array('id_currency'=>$supplier[0]['currency_id'], 'pajak'=>$pajak))->where('id_pembelian',$id)->update();
+
+        }
+        return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'successfully',
+    ]);
+    }
+
 
     }
 }

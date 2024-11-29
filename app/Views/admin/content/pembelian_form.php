@@ -33,6 +33,12 @@
         <input type="text" class="form-control" value="<?=$pembelian[0]['invoice']?>" id="invoice" placeholder="Invoice">
       </div>
     </div>
+    <div class="row mb-3">
+      <label for="invoice" class="col-md-3 col-form-label">PO</label>
+      <div class="col-md-9">
+        <input type="text" class="form-control" value="" id="invoice" placeholder="Invoice" disabled>
+      </div>
+    </div>
         <div class="row mb-3">
       <label for="email" class="col-md-3 col-form-label">Supplier</label>
       <div class="col-md-9">
@@ -62,7 +68,7 @@
     </div>
 
     <!-- Tombol Kirim -->
-    <button type="submit" class="btn btn-primary saveSupplier">Save</button>
+    <button type="button" class="btn btn-primary saveSupplier">Save</button>
   </form>
 </div>
                     </div>
