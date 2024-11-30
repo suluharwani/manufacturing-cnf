@@ -335,5 +335,32 @@ return view('admin/index', $data);
     }
     public function addMaterial(){
         $mdl = new MdlPembelianDetail();
+        $data['id_material'] = $_POST['materialCode'];
+        $data['jumlah'] = $_POST['materialQty'];
+        $data['harga'] = $_POST['harga'];
+        $data['id_currency'] = $_POST['id_currency'];
+        $data['diskon1'] = $_POST['disc1'];
+        $data['diskon2'] = $_POST['disc2'];
+        $data['diskon3'] = $_POST['disc3'];
+        $data['potongan'] = $_POST['potongan'];
+        $data['pajak'] = $_POST['pajak'];
+        $data['id_pembelian'] = $_POST['id_pembelian'];
+        var_dump($data);
+        die();
+           if ($mdl->insert($data)) {
+        // Jika berhasil
+                    return $this->response->setJSON([
+                        'status' => 'success',
+                        'message' => 'Invoice Berhasil Ditambahkan'
+                    ]);
+                } else {
+        // Jika gagal
+                    $errorMessage = $mdlCustomer->errors() ? $mdlCustomer->errors() : 'Gagal menambahkan Invoice karena kesalahan internal.';
+
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => $errorMessage
+                    ]);
+                }
     }
 }

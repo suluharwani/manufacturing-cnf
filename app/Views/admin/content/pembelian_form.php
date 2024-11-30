@@ -17,7 +17,6 @@
 
 
 
-<?=print_r($pembelian[0])?>
 
 
 <!-- Recent Sales Start -->
@@ -177,8 +176,8 @@
             <input type="number" class="form-control" id="potongan">
           </div>
           <div class="mb-3">
-            <label for="pajak" class="form-label">Pajak</label>
-            <input type="number" class="form-control" id="pajak">
+            <label for="pajak_barang" class="form-label">Pajak</label>
+            <input type="number" class="form-control" id="pajak_barang" >
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>

@@ -48,44 +48,6 @@ $(document).ready(function() {
   });
 
   // Menangani form submit di modal
-  $('#addMaterialForm').submit(function(event) {
-    event.preventDefault();
-
-    // Ambil data dari form
-    var materialCode = $('#materialCode').val();
-    var materialName = $('#materialName').val();
-    var materialQty = $('#materialQty').val();
-    var materialPrice = $('#materialPrice').val();
-    var materialDiscount = $('#materialDiscount').val();
-    var materialTax = $('#materialTax').val();
-
-    // Kirim data melalui AJAX ke server
-    $.ajax({
-      type: "POST",
-      url: base_url + "pembelian/addMaterial", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
-      data: {
-        materialCode: materialCode,
-        materialName: materialName,
-        materialQty: materialQty,
-        materialPrice: materialPrice,
-        materialDiscount: materialDiscount,
-        materialTax: materialTax
-      },
-      success: function(response) {
-        // Tampilkan pesan sukses jika berhasil menambahkan material
-        if(response.status === 'success') {
-          alert('Material added successfully!');
-          $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-          location.reload(); // Reload halaman untuk memperbarui tabel
-        } else {
-          alert('Error adding material');
-        }
-      },
-      error: function() {
-        alert('Error connecting to server');
-      }
-    });
-  });
 
     loadSupplierList(); // Memanggil fungsi untuk mengisi list supplier ketika halaman dimuat
  var id_pembelian = getLastSegment();
@@ -344,10 +306,6 @@ function loadSupplierList() {
         }
     });
 }
-  $('.addMaterial').click(function() {
-    // Reset form di modal
-    $('#addMaterialForm')[0].reset();
-  });
 
   // Menangani form submit di modal
   $('#addMaterialForm').submit(function(event) {
@@ -362,7 +320,8 @@ function loadSupplierList() {
     var disc2 = $('#disc2').val();
     var disc3 = $('#disc3').val();
     var potongan = $('#potongan').val();
-    var pajak = $('#pajak').val();
+    var pajak = $('#pajak_barang').val();
+    id_pembelian = getLastSegment()
 
     // Kirim data melalui AJAX ke server
     $.ajax({
@@ -377,14 +336,14 @@ function loadSupplierList() {
         disc2: disc2,
         disc3: disc3,
         potongan: potongan,
-        pajak: pajak
+        pajak: pajak,
+        id_pembelian : id_pembelian
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material
         if(response.status === 'success') {
           alert('Material added successfully!');
           $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-          location.reload(); // Reload halaman untuk memperbarui tabel
         } else {
           alert('Error adding material');
         }
