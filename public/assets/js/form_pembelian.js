@@ -170,35 +170,7 @@ $(document).ready(function() {
       "dataType": 'json',
       "data":{},
     },
-            //     $row[] = $no; //0
-            // $row[] = $lists->id_pembelian_detail; //1
-            // $row[] = $lists->material_kode; //2
-            // $row[] = $lists->material_name;//3
-            // $row[] = $lists->harga;//4
-            // $row[] = $lists->kode_currency;//5
-            // $row[] = $lists->nama_currency;//6
-            // $row[] = $lists->rate;//7
-            // $row[] = $lists->id_material;//8
-            // $row[] = $lists->jumlah;//9
-            // $row[] = $lists->diskon1;//10
-            // $row[] = $lists->diskon2;//11
-            // $row[] = $lists->diskon3;//12
-            // $row[] = $lists->pajak;//13
-            // $row[] = $lists->potongan;//14
 
-
-                  // <th style=" text-align: center;">#</th>
-                  // <th style=" text-align: center;">Kode</th>
-                  // <th style=" text-align: center;">Nama</th>
-                  // <th style=" text-align: center;">Harga Dasar</th>
-                  // <th style=" text-align: center;">Disc 1</th>
-                  // <th style=" text-align: center;">Disc 2</th>
-                  // <th style=" text-align: center;">Disc 3</th>
-                  // <th style=" text-align: center;">Potongan</th>
-                  // <th style=" text-align: center;">Pajak</th>
-                  // <th style=" text-align: center;">Harga Akhir</th>
-                  // <th style=" text-align: center;">Kurs Rupiah</th>
-                  // <th style=" text-align: center;">Action</th>
     columns: [
     {},
     {mRender: function (data, type, row) {
@@ -383,11 +355,14 @@ function loadSupplierList() {
 
     // Ambil data dari form
     var materialCode = $('#materialCode').val();
-    var materialName = $('#materialName').val();
     var materialQty = $('#materialQty').val();
-    var materialPrice = $('#materialPrice').val();
-    var materialDiscount = $('#materialDiscount').val();
-    var materialTax = $('#materialTax').val();
+    var harga = $('#harga').val();
+    var id_currency = $('#id_currency').val();
+    var disc1 = $('#disc1').val();
+    var disc2 = $('#disc2').val();
+    var disc3 = $('#disc3').val();
+    var potongan = $('#potongan').val();
+    var pajak = $('#pajak').val();
 
     // Kirim data melalui AJAX ke server
     $.ajax({
@@ -395,11 +370,14 @@ function loadSupplierList() {
       url: base_url + "pembelian/addMaterial", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
       data: {
         materialCode: materialCode,
-        materialName: materialName,
         materialQty: materialQty,
-        materialPrice: materialPrice,
-        materialDiscount: materialDiscount,
-        materialTax: materialTax
+        harga: harga,
+        id_currency: id_currency,
+        disc1: disc1,
+        disc2: disc2,
+        disc3: disc3,
+        potongan: potongan,
+        pajak: pajak
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material
@@ -417,35 +395,33 @@ function loadSupplierList() {
     });
   });
 
-    $('.saveSupplier').click(function(event) {
-    event.preventDefault();
+$('.saveSupplier').click(function() {
 
-    // Ambil data dari form
-    var supplier = $('#supplier').val();
-    var pajak = $('#pajak').val();
-    var pajak = $('#invoice').val();
+  // Ambil data dari form
+  var supplier = $('#supplier').val();
+  var pajak = $('#pajak').val();
+  var invoice = $('#invoice').val();  // Perbaikan: mengganti variabel pajak kedua dengan invoice
 
-    $.ajax({
-      type: "POST",
-      url: base_url + "pembelian/updateSupplier/"+getLastSegment(), // URL untuk menambahkan material (ganti dengan URL yang sesuai)
-      data: {
-        supplier: supplier,
-        pajak: pajak,
-        invoice: invoice
-
-      },
-      success: function(response) {
-        // Tampilkan pesan sukses jika berhasil menambahkan material
-        if(response.status === 'success') {
-          alert('Material added successfully!');
-          $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-          // location.reload(); // Reload halaman untuk memperbarui tabel
-        } else {
-          alert('Error adding material');
-        }
-      },
-      error: function() {
-        alert('Error connecting to server');
+  $.ajax({
+    type: "POST",
+    url: base_url + "pembelian/updateSupplier/" + getLastSegment(), // URL untuk menambahkan material (ganti dengan URL yang sesuai)
+    data: {
+      supplier: supplier,
+      pajak: pajak,
+      invoice: invoice
+    },
+    success: function(response) {
+      // Tampilkan pesan sukses jika berhasil menambahkan material
+      if(response.status === 'success') {
+        alert('Material added successfully!');
+        $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
+        // location.reload(); // Reload halaman untuk memperbarui tabel
+      } else {
+        alert('Error adding material');
       }
-    });
+    },
+    error: function() {
+      alert('Error connecting to server');
+    }
   });
+});

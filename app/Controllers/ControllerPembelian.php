@@ -21,12 +21,11 @@ class ControllerPembelian extends BaseController
         $request = \Config\Services::request();
 
         // Columns to select
-        $select_columns = 'pembelian.*, supplier.supplier_name, sum(pembelian_detail.jumlah * pembelian_detail.harga) as total_harga';
+        $select_columns = 'pembelian.*, supplier.supplier_name';
 
         // Define joins
         $joins = [
             ['supplier', 'supplier.id = pembelian.id_supplier', 'left'],
-            ['pembelian_detail', 'pembelian_detail.id_pembelian = pembelian.id', 'left']
         ];
 
         $where = ['pembelian.id !=' => 0, 'pembelian.deleted_at' => NULL];
@@ -62,7 +61,7 @@ class ControllerPembelian extends BaseController
             $row[] = $lists->tanggal_jatuh_tempo;//5
             $row[] = $lists->status_pembayaran;//6
             $row[] = $lists->supplier_name;//7
-            $row[] = $lists->total_harga;//8
+            $row[] = $lists->posting;//8
 
         $data[] = $row;
 
@@ -80,7 +79,11 @@ class ControllerPembelian extends BaseController
 function pembelianForm($idPembelian){
     $MdlPembelian = new MdlPembelian();
     $MdlPembelianDetail = new MdlPembelianDetail();
-$dataPembelian = $MdlPembelian->where('id', $idPembelian)->get()->getResultArray();
+$dataPembelian = $MdlPembelian
+                ->select('pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
+                ->join('supplier', 'supplier.id = pembelian.id_supplier')   
+                ->join('currency', 'currency.id = supplier.id_currency')    
+                ->where('pembelian.id', $idPembelian)->get()->getResultArray();
 // $dataPembelianDetail = $MdlPembelianDetail
 //                     ->select('materials.*')
 //                     ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian")
@@ -258,7 +261,7 @@ return view('admin/index', $data);
     $MdlPembelian->set($data)->where('id',$id)->update();
 
     if ($MdlPembelian->affectedRows()!== 0) {
-        $pembelian = $MdlPembelian->find($id_pembelian);
+        $pembelian = $MdlPembelian->find($id);
 
         if ($pembelian) {
             $id_supplier = $pembelian['id_supplier'];
@@ -284,5 +287,53 @@ return view('admin/index', $data);
     }
 
 
+    }
+
+    public function addInvoice(){
+    $data['id_supplier'] = $_POST['supplier'];
+    $data['invoice'] = $_POST['invoice'];
+    $data['tanggal_nota'] = $_POST['tanggal_nota'];
+    $data['pajak'] = $_POST['pajak'];
+    $data['status_pembayaran'] = 0;
+    $data['posting'] = 0;
+    $mdl = new MdlPembelian();
+       if ($mdl->insert($data)) {
+        // Jika berhasil
+                    return $this->response->setJSON([
+                        'status' => 'success',
+                        'message' => 'Invoice Berhasil Ditambahkan'
+                    ]);
+                } else {
+        // Jika gagal
+                    $errorMessage = $mdlCustomer->errors() ? $mdlCustomer->errors() : 'Gagal menambahkan Invoice karena kesalahan internal.';
+
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => $errorMessage
+                    ]);
+                }
+    }
+    public function deleteinvoice(){
+        $id = $_POST['id'];
+        $mdl = new MdlPembelian();
+
+        $mdl->where(array('id' =>$id , 'posting'=>0));
+        $mdl->delete();
+
+        // Cek apakah data benar-benar dihapus
+        if ($mdl->affectedRows() > 0) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Data berhasil dihapus.'
+            ]);
+        } else {
+            return $this->response->setStatusCode(404)->setJSON([
+                'success' => false,
+                'message' => 'Tidak dapat dihapus, status terposting'
+            ]);
+        }
+    }
+    public function addMaterial(){
+        $mdl = new MdlPembelianDetail();
     }
 }

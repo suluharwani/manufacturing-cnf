@@ -230,6 +230,8 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->get('getCountryData', 'ControllerPembelian::getCountryData'); // Route untuk mengambil data negara
     $routes->get('getCurrencyData', 'ControllerPembelian::getCurrencyData'); // Route untuk mengambil data mata uang  
     $routes->get('getSupplierDataByPurchase/(:num)', 'ControllerPembelian::getSupplierDataByPurchase/$1'); // Route untuk mengambil data mata uang  
+    $routes->post('addInvoice', 'ControllerPembelian::addInvoice'); // Route untuk mengambil data mata uang  
+    $routes->post('deleteinvoice', 'ControllerPembelian::deleteinvoice'); // Route untuk mengambil data mata uang  
     
     
 });

@@ -17,7 +17,7 @@
 
 
 
-
+<?=print_r($pembelian[0])?>
 
 
 <!-- Recent Sales Start -->
@@ -63,7 +63,7 @@
     <div class="row mb-3">
       <label for="pajak" class="col-md-3 col-form-label">Pajak</label>
       <div class="col-md-9">
-        <input type="tel" class="form-control" id="pajak" placeholder="...%"> 
+        <input type="tel" class="form-control" value="<?=$pembelian[0]['pajak']?>" id="pajak" placeholder="...%"> 
       </div>
     </div>
 
@@ -132,7 +132,6 @@
 
 <!-- Widgets End -->
 <!-- Button to trigger modal -->
-<button class="btn btn-primary" id="openAddMaterialModal">Add</button>
 
 <!-- Modal -->
 <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
@@ -156,16 +155,30 @@
             <input type="number" class="form-control" id="materialQty" required>
           </div>
           <div class="mb-3">
-            <label for="materialPrice" class="form-label">Price</label>
-            <input type="number" class="form-control" id="materialPrice" required>
+            <label for="harga" class="form-label">Harga</label>
+            <input type="number" class="form-control" id="harga" required> <span> Cuurency: <?=$pembelian[0]['curr_code'].'-'.$pembelian[0]['curr_name']?></span>
+            <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']?>" hidden>
+            
           </div>
           <div class="mb-3">
-            <label for="materialDiscount" class="form-label">Discount</label>
-            <input type="number" class="form-control" id="materialDiscount">
+            <label for="disc1" class="form-label">Discount 1</label>
+            <input type="number" class="form-control" id="disc1">
           </div>
           <div class="mb-3">
-            <label for="materialTax" class="form-label">Tax</label>
-            <input type="number" class="form-control" id="materialTax">
+            <label for="disc2" class="form-label">Discount 2</label>
+            <input type="number" class="form-control" id="disc2">
+          </div>
+          <div class="mb-3">
+            <label for="disc3" class="form-label">Discount 3</label>
+            <input type="number" class="form-control" id="disc3">
+          </div>
+           <div class="mb-3">
+            <label for="potongan" class="form-label">potongan</label>
+            <input type="number" class="form-control" id="potongan">
+          </div>
+          <div class="mb-3">
+            <label for="pajak" class="form-label">Pajak</label>
+            <input type="number" class="form-control" id="pajak">
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>
