@@ -10,13 +10,6 @@
     }
 </style>
 
-<!-- Tambahkan di dalam <head> -->
-
-<!-- Tambahkan sebelum tag penutupan </body> -->
-
-
-
-
 
 
 <!-- Recent Sales Start -->
@@ -67,7 +60,17 @@
     </div>
 
     <!-- Tombol Kirim -->
-    <button type="button" class="btn btn-primary saveSupplier">Save</button>
+    <button type="button" class="btn btn-primary saveSupplier">Update Supplier</button>
+    <button type="button" class="btn btn-warning saveSupplier">Import PO</button>
+    <?php
+    if ($pembelian[0]['posting'] == 0||$pembelian[0]['posting'] == "0") {?>
+    <button type="button" class="btn btn-success postingPembelian">Posting Pembelian</button>
+    <?php
+    }else{?>
+    <button type="button" class="btn btn-danger batalPostingPembelian">Batal Posting Pembelian</button>
+    <?php
+    }
+    ?>
   </form>
 </div>
                     </div>
@@ -176,8 +179,8 @@
             <input type="number" class="form-control" id="potongan">
           </div>
           <div class="mb-3">
-            <label for="pajak_barang" class="form-label">Pajak</label>
-            <input type="number" class="form-control" id="pajak_barang" >
+            <label for="pajak_barang" class="form-label">Pajak (%)</label>
+            <input type="number" class="form-control" value="<?=$pembelian[0]['pajak']?>" id="pajak_barang" >
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>

@@ -223,6 +223,7 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('listdataPembelian', 'ControllerPembelian::listdataPembelian'); 
     $routes->get('form/(:any)', 'ControllerPembelian::pembelianForm/$1');
     $routes->post('listdataPembelianDetail/(:any)', 'ControllerPembelian::listdataPembelianDetail/$1');
+    $routes->get('listdataPembelianDetail/(:any)', 'ControllerPembelian::listdataPembelianDetail/$1');
     $routes->get('getSupplierData/(:num)', 'ControllerPembelian::getSupplierData/$1'); // Route untuk mengambil data supplier berdasarkan ID
     $routes->get('getSupplierList', 'ControllerPembelian::getSupplierList'); 
     $routes->post('updateSupplier/(:any)', 'ControllerPembelian::updateSupplier/$1'); 
@@ -233,6 +234,9 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('addInvoice', 'ControllerPembelian::addInvoice'); // Route untuk mengambil data mata uang  
     $routes->post('deleteinvoice', 'ControllerPembelian::deleteinvoice'); // Route untuk mengambil data mata uang  
     $routes->post('addMaterial', 'ControllerPembelian::addMaterial'); // Route untuk mengambil data mata uang  
-    
-    
+    $routes->post('update/(:segment)','ControllerPembelian::update/$1');  // Mengupdate data material
+    $routes->post('delete/(:segment)', 'ControllerPembelian::delete/$1');  // Menghapus material
+    $routes->get('get/(:segment)', 'ControllerPembelian::get/$1');  // Menghapus material
+    $routes->post('posting', 'ControllerPembelian::posting');  
+    $routes->post('unposting', 'ControllerPembelian::unposting'); 
 });

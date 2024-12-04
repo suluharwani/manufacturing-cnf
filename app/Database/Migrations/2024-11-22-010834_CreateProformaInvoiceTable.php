@@ -22,16 +22,22 @@ class CreateProformaInvoiceTable extends Migration
             'invoice_date' => [
                 'type' => 'DATE',
             ],
-            'customer_name' => [
-                'type'       => 'VARCHAR',
-                'constraint' => '255',
+            'customer_id' => [
+                'type'       => 'INT',
+                'constraint' => '10',
             ],
             'customer_address' => [
                 'type' => 'TEXT',
             ],
-            'currency' => [
-                'type'       => 'VARCHAR',
+            'id_currency' => [
+                'type'       => 'INT',
                 'constraint' => '10',
+            ],
+            'etd' => [
+                'type' => 'DATE',
+            ],
+            'eta' => [
+                'type' => 'DATE',
             ],
             'payment_terms' => [
                 'type'       => 'VARCHAR',

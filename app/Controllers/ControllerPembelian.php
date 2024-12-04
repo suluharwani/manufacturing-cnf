@@ -10,8 +10,22 @@ use App\Models\MdlPembelianDetail;
 use App\Models\MdlCountry;
 use App\Models\MdlSupplier;
 use App\Models\MdlCurrency;
+use App\Models\MdlStock;
 class ControllerPembelian extends BaseController
 {
+    protected $changelog;
+        public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+        $this->session = session();
+        helper(['form', 'url']);
+        $this->form_validation = \Config\Services::validation();
+        $this->changelog = new \App\Controllers\Changelog();
+
+        // Check if session is active
+        $check = new \App\Controllers\CheckAccess();
+        $check->logged();
+    }
     public function index()
     {
         //
@@ -119,7 +133,8 @@ return view('admin/index', $data);
                             materials.name as material_name,
                             currency.kode as kode_currency,
                             currency.nama as nama_currency,
-                            currency.rate';
+                            currency.rate,
+                            pembelian.posting';
 
         // Define joins
         $joins = [
@@ -167,6 +182,7 @@ return view('admin/index', $data);
             $row[] = $lists->diskon3;//12
             $row[] = $lists->pajak;//13
             $row[] = $lists->potongan;//14
+            $row[] = $lists->posting;//15
 
         $data[] = $row;
 
@@ -345,9 +361,9 @@ return view('admin/index', $data);
         $data['potongan'] = $_POST['potongan'];
         $data['pajak'] = $_POST['pajak'];
         $data['id_pembelian'] = $_POST['id_pembelian'];
-        var_dump($data);
-        die();
-           if ($mdl->insert($data)) {
+
+        $mdl->insert($data);
+           if ($mdl->affectedRows()!=0) {
         // Jika berhasil
                     return $this->response->setJSON([
                         'status' => 'success',
@@ -362,5 +378,200 @@ return view('admin/index', $data);
                         'message' => $errorMessage
                     ]);
                 }
+    }
+ public function updateMaterial($id)
+    {
+        $MdlPembelianDetail = new MdlPembelianDetail();
+
+        $input = $this->request->getPost();
+
+        if (!$this->validate([
+            'materialCode' => 'required',
+            'materialQty' => 'required|numeric',
+            'harga' => 'required|numeric',
+            'id_currency' => 'required|numeric',
+        ])) {
+            return $this->failValidationErrors($this->validator->getErrors());
+        }
+
+        $data = [
+            'material_code' => $input['materialCode'],
+            'material_qty' => $input['materialQty'],
+            'harga' => $input['harga'],
+            'id_currency' => $input['id_currency'],
+            'disc1' => $input['disc1'],
+            'disc2' => $input['disc2'],
+            'disc3' => $input['disc3'],
+            'potongan' => $input['potongan'],
+            'pajak' => $input['pajak'],
+        ];
+
+        $updated = $MdlPembelianDetail->update($id, $data);
+
+        if ($updated) {
+            return $this->respond([
+                'status' => 'success',
+                'message' => 'Material updated successfully!'
+            ]);
+        } else {
+            return $this->fail('Failed to update material.');
+        }
+    }
+    // Fungsi untuk menghapus material
+    public function delete($id)
+    {
+        $MdlPembelianDetail = new MdlPembelianDetail();
+        // if (!$MdlPembelianDetail->find($id)) {
+        //      return $this->response->setJSON([
+        //         'status' => false,
+        //         'message' => 'Material not deleted!'
+        //     ]);
+        // }
+
+        if ($MdlPembelianDetail->delete($id)) {
+            return  $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Material deleted successfully!'
+            ]);
+        } else {
+             return  $this->response->setJSON([
+                'status' => false,
+                'message' => 'Delete failed!'
+            ]);
+        }
+    }
+    function get($id){
+        $MdlPembelianDetail = new MdlPembelianDetail();
+        return $MdlPembelianDetail->select('pembelian_detail.id as id_pembelian_detail,
+                            pembelian_detail.id_material,
+                            pembelian_detail.id_currency,
+                            pembelian_detail.jumlah,
+                            pembelian_detail.harga,
+                            pembelian_detail.id_currency,
+                            pembelian_detail.diskon1,
+                            pembelian_detail.diskon2,
+                            pembelian_detail.diskon3,
+                            pembelian_detail.pajak,
+                            pembelian_detail.potongan,
+                            materials.kode as material_kode,
+                            materials.name as material_name,
+                            currency.kode as kode_currency,
+                            currency.nama as nama_currency,
+                            currency.rate')
+        ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian", 'left')
+        ->join('supplier', 'supplier.id = pembelian.id_supplier', 'left')
+        ->join("materials","materials.id = pembelian_detail.id_material", 'left')
+        ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
+        ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left')
+        ->where("pembelian_detail.id ", $id)->findAll();
+    }
+public function unposting()
+{
+    $id = $_POST['id'];
+    $MdlPembelianDetail = new MdlPembelianDetail();
+    $MdlPembelian = new MdlPembelian();
+    $MdlStock = new MdlStock();
+
+    // Ambil data pembelian detail berdasarkan id_pembelian
+    $data = $MdlPembelianDetail
+                ->where('id_pembelian', $id)
+                ->findAll();
+
+    // Perulangan untuk setiap detail pembelian
+    foreach ($data as $detail) {
+        // Mengurangi stok yang telah ditambahkan saat posting
+        $existingStock = $MdlStock->where('id_material', $detail['id_material'])->first();
+
+        if ($existingStock) {
+            // Kurangi stok masuk sesuai jumlah yang dibeli
+            $existingStock['stock_masuk'] -= $detail['jumlah'];
+
+            // Update record stock setelah dikurangi
+            $MdlStock->update($existingStock['id'], $existingStock);
+        }
+
+        // Tambahkan logika lain jika perlu untuk mengurangi data terkait lainnya
+    }
+
+    // Setelah selesai, update status pembelian menjadi 0 (unposted)
+    $MdlPembelian->update($id, ['posting' => 0]);
+    
+    if ($MdlPembelian->affectedRows() !== 0) {
+        $riwayat = "Membatalkan Pembelian id: {$id}";
+        $this->changelog->riwayat($riwayat);
+        header('HTTP/1.1 200 OK');
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+    }
+}
+    public function posting(){
+        $id = $_POST['id'];
+        $MdlPembelianDetail = new MdlPembelianDetail();
+        $MdlPembelian = new MdlPembelian();
+        $MdlStock = new MdlStock();
+
+        // Ambil data pembelian detail berdasarkan id_pembelian
+    $data = $MdlPembelianDetail
+                ->where('id_pembelian', $id)
+                ->findAll();
+
+    // Perulangan untuk setiap detail pembelian
+    foreach ($data as $detail) {
+              $hargaDasar = $detail['harga'];
+      $diskon1 = $detail['diskon1'] || 0;  // Jika diskon1 kosong, anggap 0
+      $diskon2 = $detail['diskon2'] || 0;  // Jika diskon2 kosong, anggap 0
+      $diskon3 = $detail['diskon3'] || 0;  // Jika diskon3 kosong, anggap 0
+      $potongan = $detail['potongan'] || 0;  // Jika potongan kosong, anggap 0
+      $pajak = $detail['pajak'] || 0;     // Jika pajak kosong, anggap 0
+
+      // Menghitung harga setelah diskon bertingkat
+      $hargaSetelahDiskon = $hargaDasar - ($hargaDasar * ($diskon1 / 100)) - ($hargaDasar * ($diskon2 / 100)) - ($hargaDasar * ($diskon3 / 100)) - $potongan;
+
+      // Menghitung pajak dari harga setelah diskon
+      $hargaDenganPajak = $hargaSetelahDiskon + ($hargaSetelahDiskon * ($pajak / 100));
+
+        // Cek apakah data material sudah ada di tabel stock
+        $existingStock = $MdlStock->where('id_material', $detail['id_material'])->first();
+
+        if ($existingStock) {
+
+            $existingStock['stock_masuk'] += $detail['jumlah'];
+            $existingStock['price'] = $hargaDenganPajak;
+            $existingStock['id_currency'] = $detail['id_currency'];
+
+            // Update record stock
+            $MdlStock->update($existingStock['id'], $existingStock);
+        } else {
+            // Jika tidak ada, insert data stock baru
+            $stockData = [
+                'id_material' => $detail['id_material'],
+                // 'stock_awal' => $detail['stock_awal'],
+                'stock_masuk' => $detail['harga'],   
+                // 'stock_keluar' => $detail['stock_keluar'],
+                'price' => $hargaDenganPajak,
+                'id_currency' => $detail['id_currency'],
+
+            ];
+
+            // Insert data stock
+            $MdlStock->insert($stockData);
+        }
+    }
+
+    // Setelah selesai, update status pembelian menjadi 1
+    $MdlPembelian->update($id, ['posting' => 1]);
+    if ($MdlPembelian->affectedRows()!==0) {
+                $riwayat = "Menambah Pembelian id: {$id}";
+                $this->changelog->riwayat($riwayat);
+                header('HTTP/1.1 200 OK');
+
+        } else {
+             header('HTTP/1.1 500 Internal Server Error');
+              header('Content-Type: application/json; charset=UTF-8');
+              die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+        }
+
     }
 }

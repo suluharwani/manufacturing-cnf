@@ -239,8 +239,13 @@ $(document).ready(function() {
       return formatRupiah((hargaDenganPajak*row[9])/row[7]);
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}pembelian/form/${row[1]}" target="_blank" class="btn btn-warning btn-sm showPurchaseOrder">Edit</a>
-             <a href="${base_url}pembelian/form/${row[1]}" target="_blank" class="btn btn-danger btn-sm showPurchaseOrder">Delete</a>`; 
+      if (row[15]==0) {
+        return `<a href="javascript:void(0);" class="btn btn-warning btn-sm editMaterial" data-id = "${row[1]}">Edit</a>
+             <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteMaterial" data-id = "${row[1]}">Delete</a>`; 
+      }else{
+        return `Data sudah diposting`
+      }
+     
     }}
   ],
   "columnDefs": [{
@@ -257,8 +262,21 @@ $(document).ready(function() {
 
 });
 })
-function formatNumber(number) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+function formatNumber(number, decimals = 2, decimalSeparator = ".", thousandSeparator = ",") {
+    // Memastikan angka dalam format yang benar
+    const num = parseFloat(number);
+    
+    // Menghasilkan string dengan angka yang diformat
+    let formattedNumber = num.toFixed(decimals);
+    
+    // Memisahkan angka menjadi bagian integer dan desimal
+    let [integer, decimal] = formattedNumber.split(decimalSeparator);
+
+    // Menambahkan pemisah ribuan pada bagian integer
+    integer = integer.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+
+    // Menggabungkan bagian integer dan desimal kembali
+    return decimal ? integer + decimalSeparator + decimal : integer;
 }
 function formatDateTime(datetime) {
   const date = new Date(datetime); // Mengubah datetime menjadi objek Date
@@ -342,7 +360,12 @@ function loadSupplierList() {
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material
         if(response.status === 'success') {
-          alert('Material added successfully!');
+          Swal.fire({
+  title: "Good job!",
+  text: "Material added successfully!",
+  icon: "success"
+});
+          $('#tabel_serverside').DataTable().ajax.reload();
           $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
         } else {
           alert('Error adding material');
@@ -353,7 +376,99 @@ function loadSupplierList() {
       }
     });
   });
+$('.postingPembelian').click(function() {
+  let id = getLastSegment();
 
+  // Memeriksa apakah ID valid
+  if (!id) {
+    Swal.fire({
+      title: 'ID tidak ditemukan!',
+      text: 'Tidak ada ID yang dapat diproses.',
+      icon: 'error',
+      confirmButtonColor: '#3085d6',
+      confirmButtonText: 'Tutup'
+    });
+    return; // Hentikan eksekusi jika ID tidak valid
+  }
+
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: "Pembelian akan diposting",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Posting pembelian!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: 'post',
+        url: base_url + '/pembelian/posting',
+        async: false,
+        data: { id: id },
+        success: function(data) {
+          //reload table
+          location.reload(true);
+          Swal.fire(
+            'Diposting!',
+            'Pembelian telah diposting',
+            'success'
+          );
+        },
+        error: function(xhr) {
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          });
+        }
+      });
+    }
+  });
+});
+
+$('.batalPostingPembelian').click(function() {
+  id = getLastSegment()
+  Swal.fire({
+    title: 'Apakah anda yakin?',
+    text: "Pembelian akan diposting",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya, Posting pembelian!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type  : 'post',
+        url   : base_url+'/pembelian/unposting',
+        async : false,
+        // dataType : 'json',
+        data:{id:id},
+        success : function(data){
+          //reload table
+          location.reload(true);
+          Swal.fire(
+            'Diposting!',
+            'Pembelian telah diposting',
+            'success'
+            )
+        },
+        error: function(xhr){
+          let d = JSON.parse(xhr.responseText);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+          })
+        }
+      });
+    }
+  })
+});
 $('.saveSupplier').click(function() {
 
   // Ambil data dari form
@@ -372,9 +487,13 @@ $('.saveSupplier').click(function() {
     success: function(response) {
       // Tampilkan pesan sukses jika berhasil menambahkan material
       if(response.status === 'success') {
-        alert('Material added successfully!');
+        Swal.fire({
+        title: "Good job!",
+        text: "Updated!",
+        icon: "success"
+      });
         $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-        // location.reload(); // Reload halaman untuk memperbarui tabel
+         $('#tabel_serverside').DataTable().ajax.reload(); // Reload halaman untuk memperbarui tabel
       } else {
         alert('Error adding material');
       }
@@ -384,3 +503,180 @@ $('.saveSupplier').click(function() {
     }
   });
 });
+$(document).on('click', '.deleteMaterial', function(e) {
+  e.preventDefault();
+  var materialId = $(this).data('id'); // Mendapatkan ID material dari data attribute
+
+  // Menampilkan konfirmasi dengan SweetAlert
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Jika konfirmasi diterima, lakukan penghapusan
+      $.ajax({
+        type: "POST",
+        url: base_url + "pembelian/delete/" + materialId, // Endpoint untuk menghapus material
+        data: {},
+        success: function(response) {
+          if (response.status === 'success') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'Material has been deleted.',
+            });
+             $('#tabel_serverside').DataTable().ajax.reload(); // Reload halaman untuk memperbarui data
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error deleting material!',
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error connecting to the server!',
+          });
+        }
+      });
+    }
+  });
+});
+$(document).on('click', '.editMaterial', function(e) {
+        e.preventDefault();
+
+        // Ambil ID material dari atribut data-id
+        var materialId = $(this).data('id');
+        
+        // Menggunakan AJAX untuk mendapatkan data material
+        $.ajax({
+            url: base_url+'pembelian/get/' + materialId,  // Endpoint untuk mengambil data material
+            type: 'GET',
+            success: function(response) {
+                if (response.status === 'success') {
+                    var material = response.data;
+                    
+                    // Tampilkan SweetAlert dengan form edit
+                    Swal.fire({
+                        title: 'Edit Material',
+                        html: `
+                            <input type="hidden" id="materialId" value="${material.id}" />
+                            <div>
+                                <label for="materialCode">Material Code</label>
+                                <input type="text" id="materialCode" class="swal2-input" value="${material.material_code}" required />
+                            </div>
+                            <div>
+                                <label for="materialQty">Quantity</label>
+                                <input type="number" id="materialQty" class="swal2-input" value="${material.material_qty}" required />
+                            </div>
+                            <div>
+                                <label for="harga">Harga</label>
+                                <input type="number" id="harga" class="swal2-input" value="${material.harga}" required />
+                            </div>
+                            <div>
+                                <label for="id_currency">Currency</label>
+                                <input type="number" id="id_currency" class="swal2-input" value="${material.id_currency}" required />
+                            </div>
+                            <div>
+                                <label for="disc1">Discount 1</label>
+                                <input type="number" id="disc1" class="swal2-input" value="${material.disc1}" />
+                            </div>
+                            <div>
+                                <label for="disc2">Discount 2</label>
+                                <input type="number" id="disc2" class="swal2-input" value="${material.disc2}" />
+                            </div>
+                            <div>
+                                <label for="disc3">Discount 3</label>
+                                <input type="number" id="disc3" class="swal2-input" value="${material.disc3}" />
+                            </div>
+                            <div>
+                                <label for="potongan">Potongan</label>
+                                <input type="number" id="potongan" class="swal2-input" value="${material.potongan}" />
+                            </div>
+                            <div>
+                                <label for="pajak">Tax</label>
+                                <input type="number" id="pajak" class="swal2-input" value="${material.pajak}" />
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Update',
+                        cancelButtonText: 'Cancel',
+                        preConfirm: function() {
+                            // Ambil nilai input dari form SweetAlert
+                            var updatedData = {
+                                materialCode: $('#materialCode').val(),
+                                materialQty: $('#materialQty').val(),
+                                harga: $('#harga').val(),
+                                id_currency: $('#id_currency').val(),
+                                disc1: $('#disc1').val(),
+                                disc2: $('#disc2').val(),
+                                disc3: $('#disc3').val(),
+                                potongan: $('#potongan').val(),
+                                pajak: $('#pajak').val()
+                            };
+                            return updatedData;
+                        }
+                    }).then((result) => {
+                        // Jika tombol Update diklik
+                        if (result.isConfirmed) {
+                            // Kirim data yang diupdate ke server menggunakan AJAX
+                            var materialId = $('#materialId').val();
+                            var updatedData = result.value;
+                            
+                            $.ajax({
+                                url: 'material/update/' + materialId,  // Endpoint untuk update material
+                                type: 'POST',
+                                data: updatedData,
+                                success: function(response) {
+                                    if (response.status === 'success') {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Material Updated!',
+                                            text: response.message
+                                        }).then(() => {
+                                            location.reload();  // Reload halaman untuk melihat perubahan
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: response.message
+                                        });
+                                    }
+                                },
+                                error: function() {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to update material.'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Material not found.'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to fetch material data.'
+                });
+            }
+        });
+    });
+

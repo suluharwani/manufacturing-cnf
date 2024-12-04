@@ -128,7 +128,7 @@ $('.create').on('click', function () {
         if (result.isConfirmed) {
             $.post(base_url + 'master_penggajian/add', result.value, function () {
                 Swal.fire('Success', 'Payroll added', 'success');
-                dataTable.ajax.reload();
+                $('#tabel_serverside').DataTable().ajax.reload();
             });
         }
     });
@@ -195,7 +195,7 @@ $(document).on('click', '.edit', function () {
             if (result.isConfirmed) {
                 $.post(base_url + 'master_penggajian/update', result.value, function () {
                     Swal.fire('Success', 'Payroll updated', 'success');
-                    dataTable.ajax.reload();
+                    $('#tabel_serverside').DataTable().ajax.reload();
                 });
             }
         });
@@ -218,7 +218,7 @@ $(document).on('click', '.delete', function () {
         if (result.isConfirmed) {
             $.post(base_url + 'master_penggajian/delete/' + id, function () {
                 Swal.fire('Deleted!', 'Your record has been deleted.', 'success');
-                dataTable.ajax.reload();
+                $('#tabel_serverside').DataTable().ajax.reload();
             });
         }
     });

@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ProformaInvoice extends Model
+class MdlStock extends Model
 {
-    protected $table            = 'proforma_invoice';
+    protected $table            = 'stock';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','invoice_number','invoice_date','customer_id','customer_address','id_currency','etd','eta','payment_terms','remarks','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','id_material','stock_awal','stock_masuk','stock_keluar','price','id_currency','created_at','updated_at','deleted_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
