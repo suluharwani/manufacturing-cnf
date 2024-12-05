@@ -250,4 +250,10 @@ class Home extends BaseController
         $data['content'] = view('admin/content/finishing');
         return view('admin/index', $data);
     } 
+    public function productionArea(){
+        $data['group'] = 'Production Area';
+        $data['title'] = 'Production Area';
+        $data['content'] = view('admin/content/productionArea');
+        return view('admin/index', $data);
+    }
 }

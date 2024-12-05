@@ -11,6 +11,8 @@ $routes->get('/dashboard', 'Home::index');
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates');
 $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
 $routes->get('/dashboard/getCountryData', 'DashboardController::getCountryData');
+$routes->get('productionArea', 'Home::productionArea');
+
 
 $routes->get('/supplier', 'Home::supplier');  
 $routes->get('/customer', 'Home::customer');  
@@ -73,6 +75,13 @@ $routes->post('/material/typeUpdate', 'MaterialController::typeUpdate');
 
 
 
+$routes->post('ProductionController/gudang_list', 'ProductionController::gudang_list');
+$routes->post('ProductionController/delete', 'ProductionController::delete');
+$routes->post('ProductionController/deletedData', 'ProductionController::deletedData');
+$routes->post('ProductionController/restoreData', 'ProductionController::restoreData');
+$routes->post('ProductionController/purgeData', 'ProductionController::purgeData');
+$routes->post('ProductionController/update', 'ProductionController::update');
+$routes->post('ProductionController/create', 'ProductionController::create');
 
 
 
@@ -239,4 +248,15 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->get('get/(:segment)', 'ControllerPembelian::get/$1');  // Menghapus material
     $routes->post('posting', 'ControllerPembelian::posting');  
     $routes->post('unposting', 'ControllerPembelian::unposting'); 
+
+
+    
+});
+
+$routes->group('proformainvoice', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
+    $routes->post('getCustomerList', 'ProformaInvoiceController::getCustomerList'); 
+    $routes->post('add', 'ProformaInvoiceController::add'); 
+    $routes->post('listdata', 'ProformaInvoiceController::listdata'); 
+
 });

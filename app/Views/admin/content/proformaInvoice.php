@@ -28,21 +28,19 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Invoice</th>
                   <th style=" text-align: center;">Date</th>
-                  <th style=" text-align: center;">Code</th>
                   <th style=" text-align: center;">Customer</th>
-                  <th style=" text-align: center;">Due</th>
-                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr class="text-center">
-                <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Invoice</th>
                   <th style=" text-align: center;">Date</th>
-                  <th style=" text-align: center;">Code</th>
                   <th style=" text-align: center;">Customer</th>
-                  <th style=" text-align: center;">Due</th>
-                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </tr>
             </tfoot>
