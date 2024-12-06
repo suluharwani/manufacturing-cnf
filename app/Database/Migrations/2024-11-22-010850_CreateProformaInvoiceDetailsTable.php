@@ -20,6 +20,11 @@ class CreateProformaInvoiceDetailsTable extends Migration
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
+              'id_currency' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
             'item_description' => [
                 'type'       => 'VARCHAR',
                 'constraint' => '255',

@@ -186,7 +186,7 @@ $routes->group('product', function ($routes) {
     $routes->get('searchMaterial', 'ProductController::searchMaterial');
     $routes->post('saveBom', 'ProductController::saveBom');
     $routes->post('getBom', 'ProductController::getBom');
-
+    $routes->get('getProduct', 'ProductController::getProduct');
 });
 $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('list', 'SupplierController::listdataSupplierJoin'); // Route untuk menampilkan data supplier
@@ -258,5 +258,8 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->post('getCustomerList', 'ProformaInvoiceController::getCustomerList'); 
     $routes->post('add', 'ProformaInvoiceController::add'); 
     $routes->post('listdata', 'ProformaInvoiceController::listdata'); 
+    $routes->get('pi/(:any)', 'ProformaInvoiceController::pi/$1'); 
+    $routes->post('listdataPi/(:any)', 'ProformaInvoiceController::listdataPi/$1'); 
+    $routes->post('addProduct', 'ProformaInvoiceController::addProduct'); 
 
 });

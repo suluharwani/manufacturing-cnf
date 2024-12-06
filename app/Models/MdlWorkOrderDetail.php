@@ -4,27 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ProformaInvoiceDetail extends Model
+class MdlWorkOrderDetail extends Model
 {
-    protected $table            = 'proforma_invoice_details';
+    protected $table            = 'mdlworkorderdetails';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [ 'id',
-                                    'invoice_id',
-                                    'id_product',
-                                    'id_currency',
-                                    'item_description',
-                                    'hs_code',
-                                    'quantity',
-                                    'unit',
-                                    'unit_price',
-                                    'total_price' ,
-                                    'remarks',
-                                    'updated_at',
-                                    'deleted_at' ];
+    protected $allowedFields    = [];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -33,7 +21,7 @@ class ProformaInvoiceDetail extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = true;
+    protected $useTimestamps = false;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';

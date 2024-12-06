@@ -327,5 +327,12 @@ public function getBom(){
             return $this->response->setStatusCode(404)->setBody('Not Found');
         }
     }
+    public function getProduct()
+    {
+           $MdlProduct = new \App\Models\MdlProduct();
 
+    $product = $MdlProduct->findAll();
+
+    return $this->response->setJSON(['product' => $product]);
+    }
 }
