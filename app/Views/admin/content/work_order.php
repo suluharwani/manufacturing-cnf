@@ -28,23 +28,22 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Date</th>
-                  <th style=" text-align: center;">Code</th>
-                  <th style=" text-align: center;">Customer</th>
-                  <th style=" text-align: center;">Due</th>
-                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">Proforma Invoice</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">Start</th>
+                  <th style=" text-align: center;">End</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
-                <tr class="text-center">
-                <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Date</th>
-                  <th style=" text-align: center;">Code</th>
-                  <th style=" text-align: center;">Customer</th>
-                  <th style=" text-align: center;">Due</th>
-                  <th style=" text-align: center;">Status</th>
+               <tr  class="text-center">
+                  <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Proforma Invoice</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">Start</th>
+                  <th style=" text-align: center;">End</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
-              </tr>
             </tfoot>
           </table>
                     </div>
@@ -57,5 +56,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/order.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/workorder.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

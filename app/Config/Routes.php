@@ -258,8 +258,22 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->post('getCustomerList', 'ProformaInvoiceController::getCustomerList'); 
     $routes->post('add', 'ProformaInvoiceController::add'); 
     $routes->post('listdata', 'ProformaInvoiceController::listdata'); 
+    $routes->post('get_list', 'ProformaInvoiceController::get_list'); 
     $routes->get('pi/(:any)', 'ProformaInvoiceController::pi/$1'); 
     $routes->post('listdataPi/(:any)', 'ProformaInvoiceController::listdataPi/$1'); 
     $routes->post('addProduct', 'ProformaInvoiceController::addProduct'); 
 
 });
+$routes->group('wo', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
+
+    $routes->post('listdata', 'WorkOrderController::listdataWorkOrder'); 
+    $routes->post('add', 'WorkOrderController::add'); 
+    $routes->get('(:any)', 'WorkOrderController::wo/$1'); 
+
+});
+    $routes->get('WogetPi/(:any)', 'WorkOrderController::getPi/$1'); 
+    $routes->post('workOrder/addDetail', 'WorkOrderController::addDetail'); 
+    $routes->get('getWo/(:any)', 'WorkOrderController::getWo/$1'); 
+    $routes->post('workOrder/delete/(:any)', 'WorkOrderController::delete/$1'); 
+

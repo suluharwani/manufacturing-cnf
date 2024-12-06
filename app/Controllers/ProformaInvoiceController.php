@@ -206,5 +206,10 @@ public function addProduct(){
         die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
     }
 }
+public function get_list(){
+         $mdl = new ProformaInvoice();
+         $data =  $mdl->orderBy('id','desc')->get()->getResultArray();
+        return json_encode($data);
+}
 
 }

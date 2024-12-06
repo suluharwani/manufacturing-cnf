@@ -34,38 +34,67 @@ class WorkOrderController extends BaseController
   {
         //
   }
-  public function listdataOrder(){
+  public function listdataWorkOrder(){
     
-    $serverside_model = new \App\Models\Mdl_datatables();
-    $request = \Config\Services::request();
-    $list_data = $serverside_model;
-    $where = ['id !=' => 0, 'deleted_at'=>NULL];
-                //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
-                //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
-    $column_order = array(NULL,'orders.order_number','orders.customer_name','order.due','orders.status','orders.due_date','orders.delivery_date');
-    $column_search = array('orders.order_number','orders.customer_name','order.due','orders.status','orders.due_date','orders.delivery_date');
-    $order = array('orders.id' => 'desc');
-    $list = $list_data->get_datatables('orders', $column_order, $column_search, $order, $where);
-    $data = array();
-    $no = $request->getPost("start");
-    foreach ($list as $lists) {
-      $no++;
-      $row    = array();
-      $row[] = $no;
-      $row[] = $lists->id;
-      $row[] = $lists->order_name;
-      $row[] = $lists->status;
+           $serverside_model = new \App\Models\MdlDatatableJoin();
+           $request = \Config\Services::request();
+           
+           // Define the columns to select
+           $select_columns = 'work_order.*, proforma_invoice.invoice_number';
+           
+           // Define the joins (you can add more joins as needed)
+           $joins = [
+                 ['proforma_invoice', 'proforma_invoice.id = work_order.invoice_id', 'left'],
+           ];
+   
+           $where = ['work_order.id !=' => 0, 'work_order.deleted_at' => NULL];
+   
+           // Column Order Must Match Header Columns in View
+           $column_order = array(
+               NULL, 
+               'proforma_invoice.invoice_number', 
+               'work_order.kode', 
+               'work_order.id',
+               'work_order.start',
+               'work_order.end',
+               'work_order.id',
+           );
+           $column_search = array(
+               'work_order.nama', 
+               'work_order.kode', 
+          
+           );
+           $order = array('work_order.id' => 'desc');
+   
+           // Call the method to get data with dynamic joins and select fields
+           $list = $serverside_model->get_datatables('work_order', $select_columns, $joins, $column_order, $column_search, $order, $where);
+           
+           $data = array();
+           $no = $request->getPost("start");
+           foreach ($list as $lists) {
+               $no++;
+               $row = array();
+               $row[] = $no;
+               $row[] = $lists->id;
+               $row[] = $lists->invoice_id;
+               $row[] = $lists->invoice_number;
+               $row[] = $lists->kode;
+               $row[] = $lists->start;
+               $row[] = $lists->end;
 
-      $data[] = $row;
-    }
-    $output = array(
-      "draw" => $request->getPost("draw"),
-      "recordsTotal" => $list_data->count_all('orders', $where),
-      "recordsFiltered" => $list_data->count_filtered('orders', $column_order, $column_search, $order, $where),
-      "data" => $data,
-    );
+ // From joined suppliers table
+               $data[] = $row;
+           }
+   
+           $output = array(
+               "draw" => $request->getPost("draw"),
+               "recordsTotal" => $serverside_model->count_all('work_order', $where),
+               "recordsFiltered" => $serverside_model->count_filtered('work_order', $select_columns, $joins, $column_order, $column_search, $order, $where),
+               "data" => $data,
+           );
+          
 
-    return json_encode($output);
+           return $this->response->setJSON($output);
   }
   function addOrder(){
         
@@ -97,5 +126,187 @@ class WorkOrderController extends BaseController
         }
         $this->changelog->riwayat($riwayat);
       
+    }
+    public function add(){
+        $userInfo = $_SESSION['auth'];
+
+        $Mdl = new \App\Models\MdlWorkOrder();
+
+              if ($Mdl->insert($_POST)) {
+        $riwayat = "User ".$userInfo['nama_depan']." menambahkan wo: ".$_POST['kode'];
+        $this->changelog->riwayat($riwayat);  
+            header('HTTP/1.1 200 OK');
+        
+        }else{
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan wo: ".$_POST['kode'];
+          $this->changelog->riwayat($riwayat);
+
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
+        }
+    }
+
+
+        public function wo($id)
+    {
+         $Mdl = new \App\Models\MdlWorkOrder();
+         $MdlDetail = new \App\Models\MdlWorkOrderDetail();
+$dataPembelian = $Mdl
+                ->select('proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name, work_order.kode, work_order.start, work_order.end')
+                ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id','left')    
+                ->join('customer', 'customer.id = proforma_invoice.customer_id','left')    
+                ->join('currency', 'currency.id = customer.id_currency','left')    
+                ->where('work_order.id', $id)->get()->getResultArray();
+// $dataPembelianDetail = $MdlPembelianDetail
+//                     ->select('materials.*')
+//                     ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian")
+//                     ->join("materials","materials.id = pembelian_detail.id_material")
+//                     ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material")
+//                     ->where('pembelian.id', $idPembelian)->find();
+// var_dump($dataPembelianDetail);
+// die();
+        $data['wo'] = $dataPembelian;
+
+        // var_dump($data['pi']);
+        // die();
+        $data['content'] = view('admin/content/form_wo',$data);
+        return view('admin/index', $data);
+    }
+    public function listdataWo($id){
+         $serverside_model = new \App\Models\MdlDatatableJoin();
+           $request = \Config\Services::request();
+           
+           // Define the columns to select
+           $select_columns = 'work_order_details.*,product.nama as nama, product.kode as kode,product.id as id_product';
+           
+           // Define the joins (you can add more joins as needed)
+           $joins = [
+                 ['product', 'product.id = work_order_details.id_product', 'left'],
+           ];
+   
+           $where = ['work_order_details.invoice_id ' => $id, 'work_order_details.deleted_at' => NULL];
+   
+           // Column Order Must Match Header Columns in View
+           $column_order = array(
+               NULL, 
+               'product.nama', 
+               'product.kode', 
+               'id_product',
+               'id_product',
+               'id_product',
+               'id_product',
+               'id_product',
+           );
+           $column_search = array(
+               'product.nama', 
+               'product.kode', 
+          
+           );
+           $order = array('work_order_details.id' => 'desc');
+   
+           // Call the method to get data with dynamic joins and select fields
+           $list = $serverside_model->get_datatables('work_order_details', $select_columns, $joins, $column_order, $column_search, $order, $where);
+
+           $data = array();
+           $no = $request->getPost("start");
+           foreach ($list as $lists) {
+               $no++;
+               $row = array();
+               $row[] = $no;
+               $row[] = $lists->id_product;
+               $row[] = $lists->nama;
+               $row[] = $lists->kode;
+               $row[] = $lists->quantity;
+
+ // From joined suppliers table
+               $data[] = $row;
+           }
+   
+           $output = array(
+               "draw" => $request->getPost("draw"),
+               "recordsTotal" => $serverside_model->count_all('work_order_details', $where),
+               "recordsFiltered" => $serverside_model->count_filtered('work_order_details', $select_columns, $joins, $column_order, $column_search, $order, $where),
+               "data" => $data,
+           );
+          
+
+           return $this->response->setJSON($output);
+    }
+function getPi($id_wo)
+{
+    // Load models
+    $MdlWo = new \App\Models\MdlWorkOrder();
+    $MdlWoDetail = new \App\Models\MdlWorkOrderDetail();
+    $MdlPiDetail = new \App\Models\ProformaInvoiceDetail();
+
+    // Get invoice_id based on work order id
+    $id_pi = $MdlWo->where('id', $id_wo)->get()->getResultArray()[0]['invoice_id'];
+
+    // Query to get the proforma invoice details and calculate total quantity in work_order_detail
+    $data = $MdlPiDetail->select('proforma_invoice_details.*, 
+                                   COALESCE(SUM(work_order_detail.quantity), 0) as qty_wo, 
+                                   (proforma_invoice_details.quantity - COALESCE(SUM(work_order_detail.quantity), 0)) as qty_tersedia, 
+                                   product.*, product.id as id_product')
+                        ->join('work_order_detail', 'work_order_detail.product_id = proforma_invoice_details.id_product', 'left')
+                        ->join('product', 'product.id = proforma_invoice_details.id_product', 'left')
+                        ->where('proforma_invoice_details.invoice_id', $id_pi) // Filter by invoice_id from proforma_invoice_details
+                        ->groupBy('proforma_invoice_details.id_product') // Group by product_id from proforma_invoice_details
+                        ->get()
+                        ->getResultArray();
+
+    return json_encode($data);
+}
+
+public function addDetail()
+{
+    // Ambil data dari POST request
+    $data = $this->request->getPost();
+
+    // Model untuk work order detail
+    $MdlWoDetail = new \App\Models\MdlWorkOrderDetail();
+
+    // Cek apakah sudah ada data dengan id_wo dan id_product yang sama
+    $existingData = $MdlWoDetail->where('wo_id', $data['wo_id'])
+                                ->where('product_id', $data['product_id'])
+                                ->first();
+
+    if ($existingData) {
+        // Jika data sudah ada, lakukan update quantity
+        $newQuantity = $existingData['quantity'] + $data['quantity'];  // Tambah quantity yang baru
+        $MdlWoDetail->update($existingData['id'], ['quantity' => $newQuantity]);
+        
+        // Mengirimkan response sukses
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Quantity updated successfully.']);
+    } else {
+        // Jika data belum ada, lakukan insert
+        if ($MdlWoDetail->insert($data)) {
+            // Mengirimkan response sukses setelah insert
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Product added successfully.']);
+        } else {
+            // Mengirimkan response error jika insert gagal
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to add product.']);
+        }
+    }
+}
+function getWo($id_wo){
+           $MdlWo = new \App\Models\MdlWorkOrder();
+
+         $MdlWoDetail = new \App\Models\MdlWorkOrderDetail();
+         $MdlPiDetail = new \App\Models\ProformaInvoiceDetail();
+
+    $data = $MdlWoDetail->select('* ,work_order_detail.id as id_det')
+                        ->join('product', 'product.id = work_order_detail.product_id', 'left')
+                        ->where('work_order_detail.wo_id', $id_wo)
+                        ->get()
+                        ->getResultArray();
+         return json_encode($data);
+}
+
+    public function delete($id)
+    {
+        $model = new \App\Models\MdlWorkOrderDetail();
+        $model->delete($id);
+        return $this->response->setJSON(['status' => 'success']);
     }
 }
