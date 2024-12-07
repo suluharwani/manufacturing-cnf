@@ -83,6 +83,16 @@ $routes->post('ProductionController/purgeData', 'ProductionController::purgeData
 $routes->post('ProductionController/update', 'ProductionController::update');
 $routes->post('ProductionController/create', 'ProductionController::create');
 
+$routes->post('production/warehouseList', 'ProductionController::warehouseList');
+$routes->post('production/productionList', 'ProductionController::productionList');
+$routes->post('production/getWOList', 'ProductionController::getWOList');
+$routes->post('production/addWo', 'ProductionController::addWo');
+$routes->post('production/addWo', 'ProductionController::addWo');
+$routes->get('production/getWOProduction/(:any)', 'ProductionController::getWOProduction/$1');
+$routes->get('production/getProductByWO/(:any)', 'ProductionController::getProductByWO/$1');
+$routes->post('production/addProgress', 'ProductionController::addProgress');
+$routes->get('production/getProductionProduct/(:any)', 'ProductionController::getProductionProduct/$1');
+
 
 
 $routes->post('/warehouseController/gudang_list', 'WarehouseController::gudang_list');

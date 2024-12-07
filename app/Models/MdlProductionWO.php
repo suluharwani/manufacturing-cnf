@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MdlWorkOrder extends Model
+class MdlProductionWO extends Model
 {
-    protected $table            = 'work_order';
+    protected $table            = 'production_wo';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','invoice_id','kode','target_date','start','end','updated_at','deleted_at','created_at','status'];
+    protected $allowedFields    = ['id','warehouse_id','production_id','wo_id','updated_at','created_at','updated_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

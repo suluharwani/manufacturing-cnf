@@ -4,9 +4,9 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class WorkOrder extends Migration
+class ProductionWO extends Migration
 {
-     public function up()
+   public function up()
     {
         $this->forge->addField([
             'id' => [
@@ -15,19 +15,20 @@ class WorkOrder extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            'invoice_id' => [
+            'warehouse_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
                 'unsigned'   => true,
             ],
-            'status' => [
+            'production_id' => [
                 'type'       => 'INT',
                 'constraint' => 11,
-                'default'=>1,
+                'unsigned'   => true,
             ],
-            'target_date' => [
-                'type' => 'datetime',
-                'null' => true,
+            'wo_id' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
             ],
             'updated_at' => [
                 'type' => 'datetime',
@@ -40,11 +41,11 @@ class WorkOrder extends Migration
             'created_at datetime default current_timestamp',
         ]);
         $this->forge->addPrimaryKey('id');
-        $this->forge->createTable('work_order');
+        $this->forge->createTable('production_wo');
     }
 
     public function down()
     {
-        $this->forge->dropTable('work_order');
+        $this->forge->dropTable('production_wo');
     }
 }

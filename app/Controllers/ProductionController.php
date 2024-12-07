@@ -140,5 +140,88 @@ class ProductionController extends BaseController
         $data = $mdl->findAll();
         return json_encode($data);
        }
-}
+
+       function warehouseList(){
+        
+        $mdl = new \App\Models\Warehouse();
+        $data = $mdl->findAll();
+        return json_encode($data);
+       }
+       function productionList(){
+        
+        $mdl = new \App\Models\MdlProductionArea();
+        $data = $mdl->findAll();
+        return json_encode($data);
+       }
+        function getWOList(){
+        
+        $mdl = new \App\Models\MdlWorkOrder();
+        $data = $mdl->get()->getResultArray();
+        return json_encode($data);
+       }
+
+       function addWo(){
+        $userInfo = $_SESSION['auth'];
+
+        $Mdl = new \App\Models\MdlProductionWO();
+
+              if ($Mdl->insert($_POST)) {
+        $riwayat = "User ".$userInfo['nama_depan']." menambahkan wo: ke produksi ".$_POST['wo_id']."ke ".$_POST['nama'];
+        $this->changelog->riwayat($riwayat);  
+            header('HTTP/1.1 200 OK');
+        
+        }else{
+          $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan wo: ".$_POST['kode'];
+          $this->changelog->riwayat($riwayat);
+
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
+        }
+       }
+function getWOProduction($id){
+        
+        $mdl = new \App\Models\MdlProductionWO();
+        $data = $mdl->select('proforma_invoice.invoice_number as pi, production_wo.id as id, work_order.kode as kode')
+        ->join('work_order', 'work_order.id = production_wo.wo_id ')
+        ->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id ')
+        ->where('production_wo.production_id',$id)->get()->getResultArray();
+        return json_encode($data);
+       }
+  function getProductByWO($id_production){
+  $mdl = new \App\Models\MdlProductionWO();
+        $data = $mdl->select('work_order.kode as wo,proforma_invoice.invoice_number, product.kode, product.nama, work_order_detail.quantity, product.id as id_product, production_wo.production_id as production_id, production_wo.wo_id as wo_id, proforma_invoice.id as pi_id')
+        ->join('work_order', 'work_order.id = production_wo.wo_id ')
+        ->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id ')
+        ->join('work_order_detail', 'work_order_detail.wo_id = work_order.id ')
+        ->join('product', 'work_order_detail.product_id = product.id ')
+        ->where('production_wo.production_id',$id_production)->get()->getResultArray();
+        return json_encode($data);
+       }
+  function addProgress(){
+        $userInfo = $_SESSION['auth'];
+
+     $mdl = new \App\Models\MdlProductionProgress();
+    if ($mdl->insert($_POST)) {
+        $riwayat = "User ".$userInfo['nama_depan']." menambahkan  produksi ke produksi ".$_POST['production_id']."dari WO ".$_POST['wo_id']." produk ".$_POST['product_id'];
+        $this->changelog->riwayat($riwayat);  
+            header('HTTP/1.1 200 OK');
+        
+        }else{
+          // $riwayat = "User ".$userInfo['nama_depan']." gagal menambahkan wo: ".$_POST['kode'];
+          // $this->changelog->riwayat($riwayat);
+
+          header('HTTP/1.1 500 Internal Server Error');
+          header('Content-Type: application/json; charset=UTF-8');
+          die(json_encode(array('message' => 'User exist, gagal menambahkan data.', 'code' => 3)));
+        }
+
+      }
+      function getProductionProduct($id){
+        $mdl = new \App\Models\MdlProductionProgress();
+        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->join('product', 'product.id = production_progress.product_id')->where('production_id',$id)->get()->getResultArray();
+        return json_encode($data);
+      }
+  }
+
  
