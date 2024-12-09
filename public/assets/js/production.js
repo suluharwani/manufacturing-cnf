@@ -269,6 +269,8 @@ function fetchDataProd(id) {
                             <td>${item.invoice_number}</td>
                             <td>${item.wo}</td>
                             <td>${item.nama}</td>
+                            <td>${item.qty_wo}</td>
+                            <td>${item.qty_prod}</td>
                             <td>${item.quantity}</td>
                             <td>
                                 <button class="btn btn-secondary btn-sm produksiStock" wo = "${item.wo}" invoice_number = "${item.invoice_number}" nama = "${item.nama}" quantity = "${item.quantity}" production_id ="${item.production_id}" pi_id ="${item.pi_id}"  wo_id ="${item.wo_id}" id_product="${item.id_product}">Produksi</button>
@@ -300,7 +302,7 @@ $('#tableProd').on('click', '.produksiStock', function () {
    wo =  $(this).attr('wo') 
    invoice_number =  $(this).attr('invoice_number') 
    nama =  $(this).attr('nama')
-   quantity = $(this).attr('quantity') 
+   quantity_max = $(this).attr('quantity') 
    production_id =$(this).attr('production_id')
    pi_id =$(this).attr('pi_id')  
    wo_id =$(this).attr('wo_id') 
@@ -324,15 +326,17 @@ $('#tableProd').on('click', '.produksiStock', function () {
             <div class="form-group">
                 <label for="customer">Quantity</label>
                 <input type="text" id="quantity" class="form-control" aria-describedby="kodeHelp">
-                <div> max : ${quantity}</div>
+                <div> max : ${quantity_max}</div>
             </div>
         </form>`,
         confirmButtonText: 'Confirm',
         focusConfirm: false,
         preConfirm: () => {
-            const quantity = Swal.getPopup().querySelector('#quantity').value;
+            const quantity_input = Swal.getPopup().querySelector('#quantity').value;
             if (!quantity) {
                 Swal.showValidationMessage('Silakan lengkapi data');
+            }else if(quantity>quantity_max){
+              Swal.showValidationMessage('Melebihi WO');
             }
             return { quantity: quantity};
         }

@@ -150,7 +150,9 @@
               <th scope="col">PROFORMA INVOICE</th>
               <th scope="col">WORK ORDER</th>
               <th scope="col">PRODUCT</th>
-              <th scope="col">QUANTITY</th>
+              <th scope="col">QUANTITY WO</th>
+              <th scope="col">QUANTITY PRODUKSI</th>
+              <th scope="col">QUANTITY UNPROGRESS</th>
               <th scope="col">ACTION</th>
             </tr>
           </thead>
@@ -182,7 +184,7 @@
               <th scope="col">PROFORMA INVOICE</th>
               <th scope="col">WORK ORDER</th>
               <th scope="col">PRODUCT</th>
-              <th scope="col">QUANTITY</th>
+              
               <th scope="col">ACTION</th>
             </tr>
           </thead>
