@@ -224,9 +224,9 @@ $('#isiProduction').on('click', '.add', function () {
             });
         } else {
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Data tidak dalam format yang diharapkan.',
+                icon: 'info',
+                title: 'Informasi',
+                text: 'Tidak ada data WO.',
                 footer: '<a href="">Why do I have this issue?</a>'
             });
         }
@@ -280,7 +280,7 @@ function fetchDataProd(id) {
                 }
             }  else {
                 // If no data is found, display a 'no data' message
-                tableRowsProd = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
+                tableRowsProd = '<tr><td colspan="8" class="text-center">No data available</td></tr>';
             }
             console.log(tableRowsProd)
             // Populate the table body with the generated rows
@@ -333,12 +333,14 @@ $('#tableProd').on('click', '.produksiStock', function () {
         focusConfirm: false,
         preConfirm: () => {
             const quantity_input = Swal.getPopup().querySelector('#quantity').value;
-            if (!quantity) {
+            if (!quantity_input) {
                 Swal.showValidationMessage('Silakan lengkapi data');
-            }else if(quantity>quantity_max){
+            }else if(quantity_input>quantity_max){
+                console.log(quantity_input)
+                console.log(quantity_max)
               Swal.showValidationMessage('Melebihi WO');
             }
-            return { quantity: quantity};
+            return { quantity: quantity_input};
         }
     }).then((result) => {
         $.ajax({
@@ -461,7 +463,7 @@ function fetchDataProdArea(id) {
                 }
             }  else {
                 // If no data is found, display a 'no data' message
-                tableRows = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
+                tableRows = '<tr><td colspan="5" class="text-center">No data available</td></tr>';
             }
             console.log(tableRows)
             // Populate the table body with the generated rows

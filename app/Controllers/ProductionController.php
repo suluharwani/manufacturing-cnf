@@ -199,8 +199,8 @@ function getProductByWO($id_production)
                             product.kode,
                             product.nama,
                             work_order_detail.quantity as qty_wo,
-                            sum(production_progress.quantity) as qty_prod,
-                            work_order_detail.quantity - COALESCE(SUM(production_progress.quantity), 0) as quantity, 
+                            SUM(DISTINCT production_progress.quantity) as qty_prod,
+                            work_order_detail.quantity - COALESCE(SUM(DISTINCT production_progress.quantity), 0) as quantity, 
                             product.id as id_product,
                             production_wo.production_id as production_id,
                             production_wo.wo_id as wo_id,
@@ -227,6 +227,7 @@ function getProductByWO($id_production)
 
     return json_encode($data);
 }
+
 
 
   function addProgress(){
