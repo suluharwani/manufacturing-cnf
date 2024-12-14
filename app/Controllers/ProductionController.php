@@ -251,9 +251,98 @@ function getProductByWO($id_production)
       }
       function getProductionProduct($id){
         $mdl = new \App\Models\MdlProductionProgress();
-        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->join('product', 'product.id = production_progress.product_id')->where('production_id',$id)->get()->getResultArray();
+        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->
+                      join('product', 'product.id = production_progress.product_id')->
+                      where('production_id',$id)->get()->getResultArray();
         return json_encode($data);
       }
+            function getWarehouseProduct($id){
+        $mdl = new \App\Models\MdlProductionProgress();
+        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->
+                      join('product', 'product.id = production_progress.product_id')->
+                      where('warehouse_id',$id)->get()->getResultArray();
+        return json_encode($data);
+      }
+       public function moveProduction()
+    {
+        $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal
+        $prodIdTujuan = $this->request->getPost('prod_id');      // ID produksi tujuan
+        $quantity = $this->request->getPost('quantity');         // Quantity yang dipindahkan
+
+        // Validasi input
+        if (empty($prodIdAwal) || empty($prodIdTujuan) || empty($quantity)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua kolom harus diisi.'
+            ]);
+        }
+
+        // Cek apakah quantity adalah angka positif
+        if (!is_numeric($quantity) || $quantity <= 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Quantity harus berupa angka positif.'
+            ]);
+        }
+
+        // Load model
+        $model =  new \App\Models\MdlProductionProgress();
+
+        // Pindahkan quantity
+        $result = $model->transferQuantity($prodIdAwal, $prodIdTujuan, $quantity);
+
+        if ($result === true) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Produk berhasil dipindahkan.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memindahkan produk.'
+            ]);
+        }
+    }
+           public function moveWarehouse()
+    {
+        $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal
+        $prodIdTujuan = $this->request->getPost('prod_id');      // ID produksi tujuan
+        $quantity = $this->request->getPost('quantity');         // Quantity yang dipindahkan
+
+        // Validasi input
+        if (empty($prodIdAwal) || empty($prodIdTujuan) || empty($quantity)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua kolom harus diisi.'
+            ]);
+        }
+
+        // Cek apakah quantity adalah angka positif
+        if (!is_numeric($quantity) || $quantity <= 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Quantity harus berupa angka positif.'
+            ]);
+        }
+
+        // Load model
+        $model =  new \App\Models\MdlProductionProgress();
+
+        // Pindahkan quantity
+        $result = $model->transferFinish($prodIdAwal, $prodIdTujuan, $quantity);
+
+        if ($result === true) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Produk berhasil dipindahkan.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memindahkan produk.'
+            ]);
+        }
+    }
   }
 
  

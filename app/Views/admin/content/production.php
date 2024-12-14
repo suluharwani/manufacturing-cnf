@@ -212,6 +212,8 @@
           <thead>
             <tr>
               <th scope="col">NO</th>
+              <th scope="col">LOKASI PRODUKSI</th>
+              <th scope="col">WO</th>
               <th scope="col">KODE</th>
               <th scope="col">NAMA</th>
               <th scope="col">QUANTITY</th>

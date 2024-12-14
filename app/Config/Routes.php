@@ -92,8 +92,11 @@ $routes->get('production/getWOProduction/(:any)', 'ProductionController::getWOPr
 $routes->get('production/getProductByWO/(:any)', 'ProductionController::getProductByWO/$1');
 $routes->post('production/addProgress', 'ProductionController::addProgress');
 $routes->get('production/getProductionProduct/(:any)', 'ProductionController::getProductionProduct/$1');
+$routes->get('production/getWarehouseProduct/(:any)', 'ProductionController::getWarehouseProduct/$1');
+$routes->post('production/moveProduction', 'ProductionController::moveProduction');
+$routes->post('production/moveWarehouse', 'ProductionController::moveWarehouse');
 
-
+ 
 
 $routes->post('/warehouseController/gudang_list', 'WarehouseController::gudang_list');
 $routes->post('/warehouseController/delete', 'WarehouseController::delete');
