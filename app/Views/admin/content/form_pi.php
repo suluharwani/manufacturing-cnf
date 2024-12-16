@@ -39,15 +39,33 @@
       </div>
     </div>
     <div class="row mb-3">
-      <label for="lastName" class="col-md-3 col-form-label">Country</label>
+      <label for="country_name" class="col-md-3 col-form-label">Country</label>
       <div class="col-md-9">
-       <input type="text" class="form-control" id="country" disabled>
+       <input type="text" class="form-control" id="country_name" value="<?=$pi[0]['country_name']?>" disabled>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="lastName" class="col-md-3 col-form-label">Currency</label>
+      <label for="customer_address" class="col-md-3 col-form-label">Address</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" id="currency" disabled>
+       <textarea class="form-control"  rows="4" id="customer_address" ><?=$pi[0]['customer_address']?></textarea>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">Currency</label>
+      <div class="col-md-9">
+        <input type="text" class="form-control"  value="<?=$pi[0]['curr_name']?>" disabled>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">ETD</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control"  value="<?=$pi[0]['etd']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">ETA</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control"  value="<?=$pi[0]['eta']?>" >
       </div>
     </div>
 <!--  -->
@@ -57,6 +75,12 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
   </form>
+                        <button class= "btn btn-secondary updatePI">Update</button>
+                        <button class= "btn btn-primary statusPI">Status</button>
+                        <button class= "btn btn-secondary alokasiPI">Alokasi Material</button>
+                        <button class= "btn btn-warning purchaseRequestPI">Purchase Request</button>
+                        <button class= "btn btn-success postingPI">Posting</button>
+
 </div>
                     </div>
                            </div>
@@ -76,6 +100,7 @@
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Qty</th>
+                  <th style=" text-align: center;">Price</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
@@ -85,6 +110,7 @@
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Qty</th>
+                  <th style=" text-align: center;">Price</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
             </tfoot>

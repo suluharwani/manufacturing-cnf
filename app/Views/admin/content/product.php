@@ -86,6 +86,10 @@
                 <input type="text" name="kode" class="form-control" id="kode" >
             </div>
             <div class="mb-3">
+                <label for="kode" class="form-label">HS Code(Harmonized Commodity Description and Coding System)</label>
+                <input type="text" name="hs_code" class="form-control" id="hs_code" >
+            </div>
+            <div class="mb-3">
                 <label for="nama" class="form-label">Nama Produk</label>
                 <input type="text" name="nama" class="form-control" id="nama" >
             </div>

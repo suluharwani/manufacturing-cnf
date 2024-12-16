@@ -55,4 +55,53 @@ class ProformaInvoiceDetail extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+ public function getProductById($id)
+    {
+        $builder = $this->db->table($this->table);
+
+        // Define the joins
+        $builder->select('proforma_invoice_details.*, 
+                          product.hs_code as hs_code, 
+                          product.kode as product_code, 
+                          product.nama as product_name, 
+                          product.id_product_cat as product_category_id, 
+                          product.picture as product_picture, 
+                          product.text as product_text,
+                          currency.kode as currency_code, 
+                          currency.nama as currency_name,
+                          currency.rate as currency_rate');
+        
+        $builder->join('product', 'product.id = proforma_invoice_details.id_product', 'left');
+        $builder->join('currency', 'currency.id = proforma_invoice_details.id_currency', 'left');
+
+        // Apply the where condition
+        $builder->where('proforma_invoice_details.id', $id);
+  
+        // Execute the query and return the result
+        return $builder->get()->getRowArray();
+    }
+
+    public function updateProduct($id, $data)
+    {
+        $builder = $this->db->table($this->table);
+
+        // Apply the where condition
+        $builder->where('id', $id);
+
+        // Update the record with new data
+        return $builder->update($data);
+    }
+
+    public function deleteProduct($id)
+    {
+        $builder = $this->db->table($this->table);
+
+        // Apply the where condition
+        $builder->where('id', $id);
+
+        // Delete the record
+        return $builder->delete();
+    }
 }

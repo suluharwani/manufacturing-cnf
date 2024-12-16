@@ -145,7 +145,13 @@ $(document).ready(function() {
         return row[4]
     }},
     {mRender: function (data, type, row) {
-        return row[1]
+        return row[5]
+    }},
+    {mRender: function (data, type, row) {
+        return`
+         <button class="btn btn-warning btn-sm editBtn" id = "${row[7]}">Edit</button>
+         <button class="btn btn-danger btn-sm deleteBtn" id = "${row[7]}">Delete</button>
+        `
     }},
   ],
   "columnDefs": [{
@@ -249,7 +255,6 @@ function loadSupplierList() {
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material
-        if(response.status === 'success') {
           Swal.fire({
   title: "Good job!",
   text: "Material added successfully!",
@@ -257,9 +262,7 @@ function loadSupplierList() {
 });
           $('#tabel_serverside').DataTable().ajax.reload();
           $('#addMaterialModal').modal('hide'); // Tutup modal setelah berhasil
-        } else {
-          alert('Error adding material');
-        }
+       
       },
       error: function() {
         alert('Error connecting to server');
@@ -570,3 +573,115 @@ $(document).on('click', '.editMaterial', function(e) {
         });
     });
 
+$(document).on('click', '.editBtn', function(e) {
+    e.preventDefault();
+    
+    var productId = $(this).attr('id');
+    
+    $.ajax({
+        url: base_url + 'proformainvoice/getProduct/' + productId,
+        type: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                var product = response.data;
+                
+                Swal.fire({
+                    title: 'Edit Product',
+                    html: `
+        <form id="form_edit_product">
+            
+            <div class="form-group">
+                <label for="hs_code">HS Code</label>
+                <input type="text" class="form-control" value="${product.hs_code}" disabled />
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" class="form-control" id="quantity" value="${product.quantity}" placeholder="Quantity" />
+            </div>
+            <div class="form-group">
+                <label for="unit_price">Unit Price</label>
+                <input type="number" class="form-control" id="unit_price" value="${product.unit_price}" placeholder="Unit Price" />
+            </div>
+              <div class="form-group">
+                <label for="remarks">Remark</label>
+                <input type="text" class="form-control" id="remarks" value="${product.remarks}" placeholder="Item Description" />
+            </div>
+        </form>
+    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Update',
+                    cancelButtonText: 'Cancel',
+                    preConfirm: function() {
+                        return {
+                            id_product: $('#id_product').val(),
+                            remarks: $('#remarks').val(),
+                            hs_code: $('#hs_code').val(),
+                            quantity: $('#quantity').val(),
+                            unit_price: $('#unit_price').val(),
+                            total_price: $('#total_price').val()
+                        };
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var updatedData = result.value;
+                        
+                        $.ajax({
+                            url: base_url + 'proformainvoice/updateProduct/' + product.id,
+                            type: 'POST',
+                            data: updatedData,
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    Swal.fire('Updated!', 'Product details have been updated.', 'success');
+                                    // Reload your table or update UI here
+                                } else {
+                                    Swal.fire('Error', 'Failed to update product.', 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error', 'Failed to update product.', 'error');
+                            }
+                        });
+                    }
+                });
+            } else {
+                Swal.fire('Error', 'Product not found.', 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', 'Failed to fetch product data.', 'error');
+        }
+    });
+});
+$(document).on('click', '.deleteBtn', function(e) {
+    e.preventDefault();
+    
+    var productId = $(this).attr('id');
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This will permanently delete the product.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: base_url + 'proformainvoice/deleteProduct/' + productId,
+                type: 'POST',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+                        // Reload your table or update UI here
+                    } else {
+                        Swal.fire('Error', 'Failed to delete product.', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to delete product.', 'error');
+                }
+            });
+        }
+    });
+});

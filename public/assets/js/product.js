@@ -118,7 +118,7 @@ function showImagePopup(src, alt) {
       }
   });
   }
-$('.addFinishedGoods').on('click',function(){
+$('.addFinishedGoods').on('click',function(){ 
   selectCat()
   $('.modalTambahData').modal('show')
 })

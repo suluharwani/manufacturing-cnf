@@ -30,6 +30,11 @@ class Product extends Migration
           'constraint' => 200,
           'null' => true,
         ],  
+         'hs_code' => [
+          'type' => 'VARCHAR',
+          'constraint' => 200,
+          'null' => true,
+        ],  
         'picture' => [
             'type' => 'VARCHAR',
             'constraint' => 2000,

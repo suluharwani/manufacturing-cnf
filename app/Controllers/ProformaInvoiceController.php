@@ -27,6 +27,7 @@ class ProformaInvoiceController extends BaseController
     $check = new \App\Controllers\CheckAccess();
     $check->logged();
       //check access
+    $this->proformaInvoiceDetailModel = new ProformaInvoiceDetail();
 
   }
     public function pi($id)
@@ -34,14 +35,15 @@ class ProformaInvoiceController extends BaseController
          $Mdl = new ProformaInvoice();
     $MdlDetail = new ProformaInvoiceDetail();
 $dataPembelian = $Mdl
-                ->select('proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
+                ->select('country_data.*, proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
                 ->join('customer', 'customer.id = proforma_invoice.customer_id','left')    
                 ->join('currency', 'currency.id = customer.id_currency','left')    
+                ->join('country_data', 'country_data.id_country = customer.id_country','left')    
                 ->where('proforma_invoice.id', $id)->get()->getResultArray();
 // $dataPembelianDetail = $MdlPembelianDetail
 //                     ->select('materials.*')
 //                     ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian")
-//                     ->join("materials","materials.id = pembelian_detail.id_material")
+//                     ->join("materialscountry_datamaterials.id = pembelian_detail.id_material")
 //                     ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material")
 //                     ->where('pembelian.id', $idPembelian)->find();
 // var_dump($dataPembelianDetail);
@@ -58,7 +60,7 @@ $dataPembelian = $Mdl
            $request = \Config\Services::request();
            
            // Define the columns to select
-           $select_columns = 'proforma_invoice_details.*,product.nama as nama, product.kode as kode,product.id as id_product';
+           $select_columns = 'proforma_invoice_details.*, proforma_invoice_details.id as det_id,product.nama as nama, product.kode as kode,product.id as id_product';
            
            // Define the joins (you can add more joins as needed)
            $joins = [
@@ -98,6 +100,10 @@ $dataPembelian = $Mdl
                $row[] = $lists->nama;
                $row[] = $lists->kode;
                $row[] = $lists->quantity;
+               $row[] = $lists->unit_price;
+               $row[] = $lists->total_price;
+               $row[] = $lists->det_id;
+
 
  // From joined suppliers table
                $data[] = $row;
@@ -211,5 +217,78 @@ public function get_list(){
          $data =  $mdl->orderBy('id','desc')->get()->getResultArray();
         return json_encode($data);
 }
+ public function getProduct($id)
+    {
+        // Fetch product data from the model
+        $product = $this->proformaInvoiceDetailModel->getProductById($id);
+
+        if ($product) {
+            // Return success response with product data
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => $product
+            ]);
+        } else {
+            // Return error if product not found
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Product not found'
+            ]);
+        }
+    }
+
+    // Update product details
+    public function updateProduct($id)
+    {
+        $data = [
+            'invoice_id' => $this->request->getPost('invoice_id'),
+            'id_product' => $this->request->getPost('id_product'),
+            'id_currency' => $this->request->getPost('id_currency'),
+            'item_description' => $this->request->getPost('item_description'),
+            'hs_code' => $this->request->getPost('hs_code'),
+            'quantity' => $this->request->getPost('quantity'),
+            'unit' => $this->request->getPost('unit'),
+            'unit_price' => $this->request->getPost('unit_price'),
+            'total_price' => $this->request->getPost('total_price'),
+            'remarks' => $this->request->getPost('remarks'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $updateResult = $this->proformaInvoiceDetailModel->updateProduct($id, $data);
+
+        if ($updateResult) {
+            // Return success response
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Product updated successfully'
+            ]);
+        } else {
+            // Return error response
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to update product'
+            ]);
+        }
+    }
+
+    // Delete product
+    public function deleteProduct($id)
+    {
+        $deleteResult = $this->proformaInvoiceDetailModel->deleteProduct($id);
+
+        if ($deleteResult) {
+            // Return success response
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Product deleted successfully'
+            ]);
+        } else {
+            // Return error response
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to delete product'
+            ]);
+        }
+    }
 
 }

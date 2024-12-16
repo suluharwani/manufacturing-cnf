@@ -275,6 +275,10 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->get('pi/(:any)', 'ProformaInvoiceController::pi/$1'); 
     $routes->post('listdataPi/(:any)', 'ProformaInvoiceController::listdataPi/$1'); 
     $routes->post('addProduct', 'ProformaInvoiceController::addProduct'); 
+    $routes->get('getProduct/(:num)', 'ProformaInvoiceController::getProduct/$1');
+    $routes->post('updateProduct/(:num)', 'ProformaInvoiceController::updateProduct/$1');
+    $routes->post('deleteProduct/(:num)', 'ProformaInvoiceController::deleteProduct/$1');
+
 
 });
 $routes->group('wo', function ($routes) {
