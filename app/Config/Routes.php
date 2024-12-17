@@ -294,3 +294,11 @@ $routes->group('wo', function ($routes) {
     $routes->get('getWo/(:any)', 'WorkOrderController::getWo/$1'); 
     $routes->post('workOrder/delete/(:any)', 'WorkOrderController::delete/$1'); 
 
+
+$routes->group('purchase', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
+
+    $routes->post('purchaseorderlist', 'PurchaseController::listdataPurchaseOrder'); 
+    $routes->post('add_po', 'PurchaseController::add_po'); 
+
+});

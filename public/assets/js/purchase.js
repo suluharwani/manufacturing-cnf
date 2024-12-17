@@ -1,6 +1,7 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
 
+
 $(document).ready(function() {
   var dataTable = $('#tabel_serverside').DataTable( {
     "processing" : true,
@@ -20,8 +21,8 @@ $(document).ready(function() {
     },
     "dom": 'Bfrtip',
     "buttons": [
-      'csv'
-      ],
+    'csv'
+    ],
     "order": [],
     "ordering": true,
     "info": true,
@@ -29,7 +30,7 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"purchase/purchaselist" , // json datasource 
+      "url" :base_url+"purchase/purchaseorderlist" , // json datasource 
       "type": "post",  // method  , by default get
       // "async": false,
       "dataType": 'json',
@@ -37,43 +38,24 @@ $(document).ready(function() {
     },
     
     columns: [
-      {},
-      {mRender: function (data, type, row) {
-    //   return  row[1]+" "+row[2]+"</br>"+"<a href=mailto:"+row[3]+">"+row[3]+"</a>";
-        return row[3]
-      }},
-      {mRender: function (data, type, row) {
+    {},
+    {mRender: function (data, type, row) {
+        return row[1]
+    }},
+    {mRender: function (data, type, row) {
         return row[2]
-      }},
-      {mRender: function (data, type, row) {
-       return row[5]
-     }},
-     {mRender: function (data, type, row) {
-       return row[4]; 
-     }},
-
-     {mRender: function (data, type, row) {
-       return `<a href="javascript:void(0);" class="btn btn-success btn-sm showSalesOrder" id="'+row[1]+'" >Detail</a>`; 
-     }},
-     {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersedia" id="'+row[1]+'" >Detail</a>`; 
     }},
     {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm showTersediaSalesOrder" id="'+row[1]+'" >Detail</a>`; 
+        return row[3]
     }},
     {mRender: function (data, type, row) {
-      return `(${row[6]}) ${row[7]}`; 
-    }},
-
-    {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" nama="${row[2]}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" nama="${row[2]}" >Delete</a>`; 
-    }
-  }
+     return `<a href="${base_url}PurchaseController/po/${row[14]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[4]}" >Detail</a>`; 
+    }}
   ],
-    "columnDefs": [{
-      "targets": [0],
-      "orderable": false
-    }],
+  "columnDefs": [{
+    "targets": [0],
+    "orderable": false
+  }],
 
   error: function(){  // error handling
     $(".tabel_serverside-error").html("");
@@ -84,59 +66,118 @@ $(document).ready(function() {
 
 });
 })
-
-$('.addPurchaseOrder').on('click',function(){
-
+$('.addPurchaseOrder').on('click', function () {
+    // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
     Swal.fire({
-      title: `Tambah Invoice Masuk `,
-      // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
-      html:`<form id="form_add_data">
-      <div class="form-group">
-      <label for="kode">Nomor Invoice</label>
-      <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-      </div>
-      <div class="form-group">
-      <label for="namaBarang">Mata uang</label>
-      <input type="text" class="form-control" id="namaBarang" placeholder="Nama Tipe">
-      </div>
-      </form>`,
-      confirmButtonText: 'Confirm',
-      focusConfirm: false,
-      preConfirm: () => {
-        const kode = Swal.getPopup().querySelector('#kode').value
-        const nama = Swal.getPopup().querySelector('#namaBarang').value
-        if (!kode || !nama) {
-          Swal.showValidationMessage('Silakan lengkapi data')
+        title: `Tambah Purchase Order`,
+        html: `
+        <form id="form_add_data">
+            <div class="form-group">
+                <label for="kode">Kode</label>
+                <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+                <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
+            </div>
+            <div class="form-group">
+                <label for="supplier">Supplier</label>
+                <select id="supplier" class="form-control">
+                    <option value="">Pilih supplier</option>
+                </select>
+            </div>
+        </form>`,
+        confirmButtonText: 'Confirm',
+        focusConfirm: false,
+        preConfirm: () => {
+            const kode = Swal.getPopup().querySelector('#kode').value;
+            const supplier = Swal.getPopup().querySelector('#supplier').value;
+            if (!kode || !supplier) {
+                Swal.showValidationMessage('Silakan lengkapi data');
+            }
+            return { kode: kode, supplier: supplier };
         }
-        return {kode:kode, nama: nama }
-      }
     }).then((result) => {
-      $.ajax({
-        type : "POST",
-        url  : base_url+'/material/tambah_tipe',
-        async : false,
-        // dataType : "JSON",
-        data : {kode:result.value.kode,nama:result.value.nama},
-        success: function(data){
-          dataTypeBarang()
-          Swal.fire({
-            position: 'center',
-            icon: 'success',
-            title: `Jenis barang berhasil ditambahkan.`,
-            showConfirmButton: false,
-            timer: 1500
-          })
-        },
-        error: function(xhr){
-          let d = JSON.parse(xhr.responseText);
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: `${d.message}`,
-            footer: '<a href="">Why do I have this issue?</a>'
-          })
-        }
-      });
-  
-    })
-  })
+        $.ajax({
+            type: "POST",
+            url: base_url + '/purchase/add_po',
+            async: false,
+            data: { code: result.value.kode, supplier_id: result.value.supplier },
+            success: function (data) {
+                 $('#tabel_serverside').DataTable().ajax.reload();
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: `Jenis barang berhasil ditambahkan.`,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            },
+            error: function (xhr) {
+                let d = JSON.parse(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `${d.message}`,
+                    footer: '<a href="">Why do I have this issue?</a>'
+                });
+            }
+        });
+    });
+
+    // Menambahkan event listener pada tombol generate kode
+    $('#generateCode').on('click', function () {
+        const generatedCode = generateCode();
+        $('#kode').val(generatedCode);  // Set value ke input kode
+    });
+
+    // Menambahkan opsi customer ke select dropdown
+    // getCustomerOption().then(options => {
+    //     $('#customer').html(options); // Isi select dengan opsi customer
+    // }).catch(error => {
+    //     Swal.fire('Error', error, 'error');
+    // });
+        getSupplierOption().then(options => {
+        $('#supplier').html(options); // Isi select dengan opsi customer
+    }).catch(error => {
+        Swal.fire('Error', error, 'error');
+    });
+});
+
+function generateCode() {
+    // Mendapatkan tanggal saat ini
+    const today = new Date();
+    
+    // Format tanggal: yymmdd
+    const year = today.getFullYear().toString().slice(-2); // Ambil 2 digit terakhir dari tahun
+    const month = ('0' + (today.getMonth() + 1)).slice(-2); // Bulan dalam format 2 digit
+    const day = ('0' + today.getDate()).slice(-2); // Hari dalam format 2 digit
+    
+    // Menghasilkan dua angka acak
+    const randomNum = Math.floor(Math.random() * 100); // Angka acak antara 0 dan 99
+    const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
+    
+    // Gabungkan semuanya menjadi format PIXXXXXXXX
+    const code = `PO${year}${month}${day}${randomNumStr}`;
+    
+    return code;
+}
+
+function getSupplierOption() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'get',
+            url: base_url + 'pembelian/getSupplierList', // Endpoint untuk mendapatkan produk
+            success: function (response) {
+                // Buat opsi produk dari data yang diterima
+                var options = '<option value="">Pilih Supplier</option>';
+                response.forEach(function (supplier) {
+                    options += `<option value="${supplier.id}">${supplier.supplier_name}</option>`;
+                });
+                // Resolving the promise dengan materialOptions setelah sukses
+                resolve(options);
+            },
+            error: function (xhr) {
+                // Menolak promise jika terjadi kesalahan
+                reject('Terjadi kesalahan saat mengambil daftar');
+            }
+        });
+    });
+}

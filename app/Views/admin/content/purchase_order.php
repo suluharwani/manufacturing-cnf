@@ -29,28 +29,18 @@
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Tanggal</th>
+                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr class="text-center">
                 <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Tanggal</th>
+                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </tr>
             </tfoot>
