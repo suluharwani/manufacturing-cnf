@@ -30,6 +30,7 @@
                   <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Tanggal</th>
+                  <th style=" text-align: center;">Supplier</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -39,6 +40,7 @@
                 <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Kode</th>
                   <th style=" text-align: center;">Tanggal</th>
+                  <th style=" text-align: center;">Supplier</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>

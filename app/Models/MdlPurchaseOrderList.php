@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class MdlPurchaseOrderList extends Model
 {
-    protected $table            = 'mdlpurchaseorderlists';
+    protected $table            = 'purchase_order_list';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_material','quantity','price','remarks','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','id_po','id_material','quantity','price','remarks','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

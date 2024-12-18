@@ -267,9 +267,12 @@ public function getMaterial()
 {
     $MdlMaterial = new \App\Models\MdlMaterial();
 
-    $material = $MdlMaterial->select('materials.*, satuan.kode as kode_satuan, satuan.nama as nama_satuan')
+    $material = $MdlMaterial->select('materials.*, satuan.kode as kode_satuan, satuan.nama as nama_satuan, stock.price as price, stock.id_currency as id_currency, currency.kode as curr_code, currency.nama as curr_name' )
                 ->join('materials_detail', 'materials.id = materials_detail.material_id' )
                 ->join('satuan', 'materials_detail.satuan_id = satuan.id' )
+                ->join('stock', 'stock.id_material = materials.id' ,'left')
+                ->join('currency', 'currency.id = stock.id_currency','left')    
+
                 ->findAll();
 
     return $this->response->setJSON(['material' => $material]);

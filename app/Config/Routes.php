@@ -298,7 +298,23 @@ $routes->group('wo', function ($routes) {
 $routes->group('purchase', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list'); 
 
-    $routes->post('purchaseorderlist', 'PurchaseController::listdataPurchaseOrder'); 
+    $routes->post('listdataPurchaseOrder', 'PurchaseController::listdataPurchaseOrder'); 
+    $routes->post('listdataPo/(:any)', 'PurchaseController::listdataPo/$1'); 
     $routes->post('add_po', 'PurchaseController::add_po'); 
+    $routes->get('po/(:any)', 'PurchaseController::po/$1'); 
+    $routes->post('addPOList', 'PurchaseController::addPOList'); 
 
 });
+
+$routes->group('report', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
+
+    $routes->get('activity', 'ReportController::activity'); 
+    $routes->get('customer_order', 'ReportController::customer_order'); 
+    $routes->get('finished_good', 'ReportController::finished_good'); 
+    $routes->get('material', 'ReportController::material'); 
+    $routes->get('purchase', 'ReportController::purchase'); 
+
+
+});
+

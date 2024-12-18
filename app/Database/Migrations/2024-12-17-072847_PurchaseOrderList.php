@@ -15,6 +15,10 @@ class PurchaseOrderList extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
+            'id_po' => [
+                'type'       => 'INT',
+                'constraint' => '10',
+            ],
             'id_material' => [
                 'type'       => 'INT',
                 'constraint' => '10',

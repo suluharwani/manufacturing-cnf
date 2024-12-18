@@ -88,12 +88,13 @@
                     </div>
 
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
+                        <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Report</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="signin.html" class="dropdown-item">System Settings</a>
-                            <a href="signup.html" class="dropdown-item">Backup&Restore</a>
-                            <a href="404.html" class="dropdown-item">Documentation</a>
-                            <a href="blank.html" class="dropdown-item active">Support</a>
+                            <a href="<?=base_url('report/material')?>" class="dropdown-item">Material</a>
+                            <a href="<?=base_url('report/finished_good')?>" class="dropdown-item">Finished Good</a>
+                            <a href="<?=base_url('report/purchase')?>" class="dropdown-item">Purchase</a>
+                            <a href="<?=base_url('report/customer_order')?>" class="dropdown-item ">Customer Order</a>
+                            <a href="<?=base_url('report/activity')?>" class="dropdown-item ">Activity</a>
                         </div>
                     </div>
                 </div>

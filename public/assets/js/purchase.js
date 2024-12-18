@@ -30,7 +30,7 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"purchase/purchaseorderlist" , // json datasource 
+      "url" :base_url+"purchase/listdataPurchaseOrder" , // json datasource 
       "type": "post",  // method  , by default get
       // "async": false,
       "dataType": 'json',
@@ -46,10 +46,20 @@ $(document).ready(function() {
         return row[2]
     }},
     {mRender: function (data, type, row) {
-        return row[3]
+        return row[5]
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}PurchaseController/po/${row[14]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[4]}" >Detail</a>`; 
+      if (row[3] == 0) {
+        status = `<span class="badge bg-secondary">Draft</span>`
+      }else if (row[3]==1) {
+        status = `<span class="badge bg-primary">Diposting</span>`
+      }else{
+        status =  `<span class="badge bg-danger">Tidak ada</span>`
+      }
+      return status
+    }},
+    {mRender: function (data, type, row) {
+     return `<a href="${base_url}purchase/po/${row[4]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[4]}" >Detail</a>`; 
     }}
   ],
   "columnDefs": [{
@@ -68,6 +78,8 @@ $(document).ready(function() {
 })
 $('.addPurchaseOrder').on('click', function () {
     // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
+  const currentDate = new Date();
+const formattedDate = currentDate.toISOString().split('T')[0];
     Swal.fire({
         title: `Tambah Purchase Order`,
         html: `
@@ -92,14 +104,14 @@ $('.addPurchaseOrder').on('click', function () {
             if (!kode || !supplier) {
                 Swal.showValidationMessage('Silakan lengkapi data');
             }
-            return { kode: kode, supplier: supplier };
+            return { kode: kode, supplier: supplier};
         }
     }).then((result) => {
         $.ajax({
             type: "POST",
             url: base_url + '/purchase/add_po',
             async: false,
-            data: { code: result.value.kode, supplier_id: result.value.supplier },
+            data: { code: result.value.kode, supplier_id: result.value.supplier, date:formattedDate, status :0  },
             success: function (data) {
                  $('#tabel_serverside').DataTable().ajax.reload();
                 Swal.fire({
