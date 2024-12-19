@@ -287,6 +287,87 @@ function loadSupplierList() {
       }
     });
   });
+  $('.updatePO').click(function() {
+    let id = getLastSegment();
+    let date = $('#po_date').val();
+    let arrival_target = $('#po_arrival_target').val();
+    // Memeriksa apakah ID valid
+    if (!id) {
+      Swal.fire({
+        title: 'ID tidak ditemukan!',
+        text: 'Tidak ada ID yang dapat diproses.',
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Tutup'
+      });
+      return; // Hentikan eksekusi jika ID tidak valid
+    }
+  
+    Swal.fire({
+      title: 'Apakah anda yakin?',
+      text: "Data akan diupdate",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: 'post',
+          url: base_url + '/purchase/update/' + id,
+          async: false,
+          data: {date : date , arrival_target : arrival_target},
+          success: function(data) {
+            //reload table
+            location.reload(true);
+            Swal.fire(
+              'Diupdate!',
+              'Data telah diupdate',
+              'success'
+            );
+          },
+          error: function(xhr) {
+            let d = JSON.parse(xhr.responseText);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: `${d.message}`,
+              footer: '<a href="">Why do I have this issue?</a>'
+            });
+          }
+        });
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $('.postingPembelian').click(function() {
   let id = getLastSegment();
 

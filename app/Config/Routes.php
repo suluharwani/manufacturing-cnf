@@ -302,6 +302,7 @@ $routes->group('purchase', function ($routes) {
     $routes->post('listdataPo/(:any)', 'PurchaseController::listdataPo/$1'); 
     $routes->post('add_po', 'PurchaseController::add_po'); 
     $routes->get('po/(:any)', 'PurchaseController::po/$1'); 
+    $routes->post('update/(:any)', 'PurchaseController::update/$1'); 
     $routes->post('addPOList', 'PurchaseController::addPOList'); 
 
 });

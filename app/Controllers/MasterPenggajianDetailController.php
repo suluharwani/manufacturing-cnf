@@ -879,6 +879,7 @@ $results = $penggajianDetailModel->select('
     ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
     ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
     ->join('employeesallarycat', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
+    ->orderBy('master_penggajian.id', 'ASC')
     ->orderBy('pegawai.pegawai_id', 'ASC')
     ->get()
     ->getResultArray();

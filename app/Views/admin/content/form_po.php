@@ -60,13 +60,13 @@
     <div class="row mb-3">
       <label  class="col-md-3 col-form-label">Date</label>
       <div class="col-md-9">
-        <input type="date" class="form-control"  value="<?=$po[0]['date']?>" >
+        <input type="date" class="form-control" id="po_date"  value="<?=$po[0]['date']?>" >
       </div>
     </div>
     <div class="row mb-3">
       <label  class="col-md-3 col-form-label">Arrival Target</label>
       <div class="col-md-9">
-        <input type="date" class="form-control"  value="<?=$po[0]['arrival_target']?>" >
+        <input type="date" class="form-control" id="po_arrival_target"  value="<?=$po[0]['arrival_target']?>" >
       </div>
     </div>
 <!--  -->
@@ -76,8 +76,7 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
   </form>
-                        <button class= "btn btn-secondary updatePI">Update</button>
-                        <button class= "btn btn-primary statusPI">Status</button>
+                        <button class= "btn btn-secondary updatePO">Update</button>
                         <button class= "btn btn-secondary alokasiPI">Alokasi Material</button>
                         <button class= "btn btn-warning purchaseRequestPI">Purchase Request</button>
                         <button class= "btn btn-success postingPI">Posting</button>

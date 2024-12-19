@@ -322,6 +322,7 @@ $('.postingPembelian').click(function() {
   });
 });
 
+
 $('.batalPostingPembelian').click(function() {
   id = getLastSegment()
   Swal.fire({

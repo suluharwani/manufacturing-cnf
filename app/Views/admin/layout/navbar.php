@@ -45,11 +45,10 @@
                         <div class="dropdown-menu bg-transparent border-0">
                             
                             <a href="<?=base_url('stock')?>" class="dropdown-item">Stock</a>
-                            <a href="<?=base_url('pembelian')?>" class="dropdown-item">Pembelian</a>
-                            <a href="<?=base_url('pemakaianpengembalian')?>" class="dropdown-item">Pemakaian&Pengembalian</a>
-                            <a href="<?=base_url('pemusnahan')?>" class="dropdown-item">Pemusnahan</a>
+                            <a href="<?=base_url('pembelian')?>" class="dropdown-item">Incoming Stock</a>
+                            <a href="<?=base_url('pemakaianpengembalian')?>" class="dropdown-item">use and return</a>
+                            <a href="<?=base_url('pemusnahan')?>" class="dropdown-item"> Inventory reduction</a>
                             <a href="<?=base_url('stock')?>" class="dropdown-item">Stock Opname</a>
-                            <a href="<?=base_url('warehouse_report')?>" class="dropdown-item">Report</a>
                         </div>
                     </div>
                     <div class="nav-item dropdown">
