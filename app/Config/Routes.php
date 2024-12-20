@@ -12,6 +12,7 @@ $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveR
 $routes->get('/dashboard/getCurrencyData', 'DashboardController::getCurrencyData');
 $routes->get('/dashboard/getCountryData', 'DashboardController::getCountryData');
 $routes->get('productionArea', 'Home::productionArea');
+$routes->get('material_request', 'Home::materialRequest');
 
 
 $routes->get('/supplier', 'Home::supplier');  
@@ -318,4 +319,11 @@ $routes->group('report', function ($routes) {
 
 
 });
+$routes->group('materialrequest', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list'); 
 
+    $routes->post('materialRequestList', 'MaterialRequestController::materialRequestList'); 
+    $routes->get('material_request', 'ReportController::index'); 
+
+
+});

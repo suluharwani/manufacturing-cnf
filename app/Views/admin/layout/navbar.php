@@ -62,7 +62,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-file me-2"></i>Purchase</a>
                         <div class="dropdown-menu bg-transparent border-0">
-                            <a href="<?=base_url('purchase_order')?>" class="dropdown-item">All Material Request</a>
+                            <a href="<?=base_url('material_request')?>" class="dropdown-item">All Material Request</a>
                             <a href="<?=base_url('purchase_order')?>" class="dropdown-item">All Purchase Orders</a>
                             <a href="<?=base_url('track_purchase_delivery')?>" class="dropdown-item">Track Purchase Delivery</a>
                         </div>
