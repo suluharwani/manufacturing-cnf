@@ -37,7 +37,7 @@ $(document).ready(function () {
     stateSave: true,
     scrollX: true,
     ajax: {
-      url: base_url + "materialrequest/materialRequestList",
+      url: base_url + "materialrequest/materialRequest",
       type: "post",
       dataType: "json",
       data: {},
@@ -85,7 +85,7 @@ $(document).ready(function () {
       {
         mRender: function (data, type, row) {
           return `
-          <td><button class="btn btn-success btn-sm materialRequestList" data-id="${row[1]}" >Detail</button></td>
+          <td><button class="btn btn-success btn-sm" onclick="window.open('/mr/${row[1]}', '_blank')" >Detail</button></td>
           `;
         },
       },

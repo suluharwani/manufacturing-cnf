@@ -319,9 +319,11 @@ $routes->group('report', function ($routes) {
 
 
 });
+$routes->get('mr/(:any)', 'MaterialRequestController::mr/$1'); 
 $routes->group('materialrequest', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list'); 
 
+    $routes->post('materialRequest', 'MaterialRequestController::materialRequest'); 
     $routes->post('materialRequestList', 'MaterialRequestController::materialRequestList'); 
     $routes->get('material_request', 'ReportController::index'); 
 

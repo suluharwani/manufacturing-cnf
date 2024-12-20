@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class MaterialRequestController extends BaseController
 {
   
-    public function materialRequestList()
+    public function materialRequest()
     {
         $serverside_model = new \App\Models\MdlDatatableJoin();
         $request = \Config\Services::request();
@@ -71,5 +71,14 @@ class MaterialRequestController extends BaseController
       //   return $this->response->setJSON($output);
       
         return json_encode($output);
+    }
+    public function mr($id){
+        $mdl = new \App\Models\MdlMaterialRequest();
+        
+        $data['mr'] = $mdl->select('material_request.*,proforma_invoice.invoice_number as pi')
+                    ->join('proforma_invoice', 'proforma_invoice.id = material_request.id_pi', 'left')
+                        ->where('material_request.id', $id)->first(); 
+        $data['content'] = view('admin/content/form_mr', $data);
+        return view('admin/index', data: $data);
     }
 }
