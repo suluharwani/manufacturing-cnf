@@ -32,6 +32,7 @@
                         <th style=" text-align: center;">Code</th>
                         <th style=" text-align: center;">PI</th>
                         <th style=" text-align: center;">Remark</th>
+                        <th style=" text-align: center;">Status</th>
                         <th style=" text-align: center;">Action</th>
                     </tr>
                 </thead>
@@ -42,6 +43,7 @@
                         <th style=" text-align: center;">Code</th>
                         <th style=" text-align: center;">PI</th>
                         <th style=" text-align: center;">Remark</th>
+                        <th style=" text-align: center;">Status</th>
                         <th style=" text-align: center;">Action</th>
                     </tr>
                     </tr>

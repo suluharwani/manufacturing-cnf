@@ -14,7 +14,7 @@ class MaterialRequestController extends BaseController
         $request = \Config\Services::request();
         
         // Define the columns to select
-        $select_columns = 'material_request.id, material_request.kode,material_request.created_at, material_request.remarks, material_request.created_at, proforma_invoice.invoice_number as pi';
+        $select_columns = 'material_request.id,material_request.status, material_request.kode,material_request.created_at, material_request.remarks, material_request.created_at, proforma_invoice.invoice_number as pi';
         
         // Define the joins (you can add more joins as needed)
         $joins = [
@@ -28,7 +28,12 @@ class MaterialRequestController extends BaseController
         // Column Order Must Match Header Columns in View
         $column_order = array(
             NULL, 
-
+            'material_request.created_at',
+            'material_request.kode',
+            'proforma_invoice.invoice_number',
+            'material_request.remarks',
+            'material_request.status',
+            'material_request.id',
 
         );
         $column_search = array(
