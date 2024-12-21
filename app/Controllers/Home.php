@@ -262,4 +262,10 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material_request');
         return view('admin/index', $data);
     }
+    public function department(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/department');
+        return view('admin/index', $data);
+    }
 }

@@ -22,19 +22,25 @@ class AccessControl implements FilterInterface
         
         // Memeriksa apakah session 'auth' ada
         if (is_null($auth) || !isset($auth['level'])) {
-            return redirect()->to(base_url('/login')); // Redirect ke halaman login jika belum login
+            // Redirect ke halaman login jika session tidak ditemukan atau level tidak ada
+            return redirect()->to(base_url('/forbidden'));
         }
 
         // Mendapatkan level akses pengguna
-        $userLevel = $auth['level'];
+        $userLevel = (int)$auth['level'];
         
-        // Mengambil level yang dibutuhkan dari argumen
-        $requiredLevel = isset($arguments[0]) ? (int)$arguments[0] : 1; // Default ke level 1 jika tidak ada
+        // Mengambil level yang dibutuhkan dari argumen filter
+        // Jika tidak ada argumen, default ke level 1 (Super Admin)
+        $requiredLevel = isset($arguments[0]) ? (int)$arguments[0] : 1;
 
         // Memeriksa apakah level akses pengguna cukup untuk mengakses halaman ini
-        if ($userLevel < $requiredLevel) {
-            return redirect()->to(base_url('/forbidden')); // Redirect jika akses ditolak
+        if ($userLevel > $requiredLevel) {
+            // Jika level pengguna lebih tinggi dari level yang dibutuhkan, akses ditolak
+            return redirect()->to(base_url('/forbidden'));
         }
+
+        // Jika level pengguna mencukupi atau lebih tinggi dari yang dibutuhkan, lanjutkan request
+        return null;
     }
 
     /**
@@ -47,6 +53,6 @@ class AccessControl implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Tidak ada proses setelah request
+        // Tidak ada proses setelah request (kosong jika tidak ada aksi yang diperlukan)
     }
 }

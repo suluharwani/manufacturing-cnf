@@ -7,6 +7,19 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class MaterialRequestController extends BaseController
 {
+    protected $changelog;
+        public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+        $this->session = session();
+        helper(['form', 'url']);
+        $this->form_validation = \Config\Services::validation();
+        $this->changelog = new \App\Controllers\Changelog();
+
+        // Check if session is active
+        $check = new \App\Controllers\CheckAccess();
+        $check->logged();
+    }
   
     public function materialRequest()
     {
@@ -80,5 +93,18 @@ class MaterialRequestController extends BaseController
                         ->where('material_request.id', $id)->first(); 
         $data['content'] = view('admin/content/form_mr', $data);
         return view('admin/index', data: $data);
+    }
+    public function add(){
+        $mdl = new \App\Models\MdlMaterialRequest();
+        $mdl->insert($_POST);
+        if ($mdl->affectedRows() !== 0) {
+     $riwayat = "Menambahkan Material Request ";
+     $this->changelog->riwayat($riwayat);
+     header('HTTP/1.1 200 OK');
+ } else {
+     header('HTTP/1.1 500 Internal Server Error');
+     header('Content-Type: application/json; charset=UTF-8');
+     die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+ }
     }
 }

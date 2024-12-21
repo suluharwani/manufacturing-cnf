@@ -39,5 +39,6 @@
     <h1>403</h1>
     <p>Forbidden: You do not have permission to access this page.</p>
     <a href="/" class="button">Go Back to Home</a>
+    <a href="/login" class="button">Login</a>
 </body>
 </html>

@@ -230,4 +230,10 @@ class PurchaseController extends BaseController
                 Tidak ada perubahan pada data', 'code'=>1]));
         }
     }
+public function mr(){
+    $data['group'] = 'Material Request';
+    $data['title'] = 'Material Request';
+    $data['content'] = view('admin/content/material_request');
+    return view('admin/index', $data);
+}    
 }

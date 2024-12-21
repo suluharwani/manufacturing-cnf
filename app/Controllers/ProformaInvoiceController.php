@@ -217,6 +217,14 @@ public function get_list(){
          $data =  $mdl->orderBy('id','desc')->get()->getResultArray();
         return json_encode($data);
 }
+
+public function get_list_json(){
+    $mdl = new ProformaInvoice();
+    $pi = $mdl->orderBy('id', 'DESC')->findAll();
+
+    return $this->response->setJSON($pi);
+}
+
  public function getProduct($id)
     {
         // Fetch product data from the model

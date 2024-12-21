@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MdlMaterialRequest extends Model
+class MdlDepartment extends Model
 {
-    protected $table            = 'material_request';
+    protected $table            = 'department';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['kode','dept_id', 'id_pi', 'status', 'remarks', 'created_at', 'updated_at', 'deleted_at'];
+    protected $allowedFields    = ['id', 'name', 'description', 'created_at', 'updated_at', 'deleted_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
