@@ -112,11 +112,11 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Detail Master Payroll</h6>
+            <h6 class="mb-0">Material Request List</h6>
             <div>
-            <button id="printRekapGaji" class="btn btn-primary">Print Rekap Gaji</button>
+            <button id="printRekapGaji" class="btn btn-primary">Posting</button>
 <a id="exportExcelLink" href="#" class="btn btn-success">
-    <i class="fa fa-file-excel"></i> Unduh Rekap Gaji (Excel)
+    <i class="fa fa-file-excel"></i> Print
 </a>
             </div>
             
@@ -126,12 +126,13 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>ID</th>
-                    <th>Nama Pegawai</th>
-                    <th>PIN Pegawai</th>
-                    <th>Kode Penggajian</th>
-                    <th>Tanggal Awal Penggajian</th>
-                    <th>Tanggal Akhir Penggajian</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>PI</th>
+                    <th>Department</th>
+                    <th>Quantity</th>
+                    <th>Price/Unit</th>
+                    <th>Total</th>
                     <th>Action</th>
                 </tr>
             </thead>

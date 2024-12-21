@@ -330,6 +330,7 @@ $routes->group('materialrequest', function ($routes) {
     $routes->post('materialRequestList', 'MaterialRequestController::materialRequestList',['filter' => 'accessControl:2']); 
     $routes->get('material_request', 'MaterialRequestController::index',['filter' => 'accessControl:2']); 
     $routes->post('add', 'MaterialRequestController::add',['filter' => 'accessControl:2']); 
+    $routes->post('datamr/(:any)', 'MaterialRequestController::datamr/$1',['filter' => 'accessControl:2']); 
 });
 
 $routes->post('department/department_list', 'departmentController::department_list',['filter' => 'accessControl:1']); 

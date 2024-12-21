@@ -107,4 +107,14 @@ class MaterialRequestController extends BaseController
      die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
  }
     }
+    function datamr($id_mr){
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        $data = $mdl->select('material_request_list.*, materials.name as material, proforma_invoice.invoice_number as pi, department.name as dep')
+                    ->join('materials', 'materials.id = material_request_list.id_material', 'left')
+                    ->join('proforma_invoice', 'proforma_invoice.id = material_request_list.id_pi', 'left')
+                    ->join('department', 'department.id = material_request_list.id_dept', 'left')
+                    ->where('id_mr', $id_mr)->findAll();
+        return json_encode($data);
+
+    }
 }

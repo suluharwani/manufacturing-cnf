@@ -88,16 +88,16 @@ $(document).ready(function () {
 });
 
     // Menambahkan pegawai ke payroll
-    $(document).on('click', '.add-to-payroll', function () {
-        let employeeId = $(this).data('id');
+    $(document).on('click', '.addMR', function () {
+        let id = $(this).data('id');
         $.ajax({
         type : "POST",
-        url  : base_url+'/MasterPenggajianDetailController/addEmployeeToPayroll',
+        url  : base_url+'/materialrequest/addMR',
         async : false,
         // dataType : "JSON",
-        data : {employeeId:employeeId,masterId:masterId},
+        data : {id:id,masterId:masterId},
         success: function(data){
-           loadPayrollData()
+           loadData()
           Swal.fire({
             position: 'center',
             icon: 'success',
@@ -118,11 +118,11 @@ $(document).ready(function () {
       });
 
     });
-
-     function loadPayrollData() {
+    loadData()
+     function loadData() {
             $.ajax({
-                url: base_url+'/MasterPenggajianDetailController/dataEmployeeMaster/'+masterId,
-                type: 'GET',
+                url: base_url+'/materialrequest/datamr/'+masterId,
+                type: 'post',
                 dataType: 'json',
                 success: function(response) {
                     // Mengosongkan tabel sebelum memuat data baru
@@ -133,19 +133,19 @@ $(document).ready(function () {
                     response.forEach(function(item) {
                         var row = `<tr>
                             <td>${no++}</td>
-                            <td>${item.karyawan_id}</td>
-                            <td>${item.pegawai_nama}</td>
-                            <td>${item.pegawai_pin}</td>
-                            <td>${item.kode_penggajian}</td>
-                            <td>${formatDate(item.tanggal_awal_penggajian)}</td>
-                            <td>${formatDate(item.tanggal_akhir_penggajian)}</td>
+                            <td>${item.code}</td>
+                            <td>${item.material}</td>
+                            <td>${item.pi}</td>
+                            <td>${item.dep}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.price}</td>
+                            <td>${parseFloat(item.price*item.quantity)}</td>
                            
-                            <td><button class="btn btn-success btn-sm showPresensi" idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Attendance</button>
-                                <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
-                                <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
-                                <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print Slip</button>
-                                <button class="btn btn-default btn-sm print-presensi"   idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Print Attendance</button>
-                                <button class="btn btn-danger btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
+                            <td>
+                            <button class="btn btn-success btn-sm updateList"  data-id="${item.id}">Edit</button>
+                            <button class="btn btn-success btn-sm deleteList"  data-id="${item.id}">Delete</button>
+                             
+                            </td>   
                         </tr>`;
                         tableBody.append(row);
                     });
