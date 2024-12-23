@@ -12,7 +12,15 @@ class MdlMaterialRequestList extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_mr', 'id_pi', 'id_material', 'quantity', 'price', 'remarks', 'created_at', 'updated_at', 'deleted_at'];
+    protected $allowedFields    = ['id','id_mr',
+    'id_mr',
+    'id_material',
+    'id_dept',
+    'id_sup',
+    'id_pi',
+    'quantity',
+    'price',
+    'remarks','created_at', 'updated_at', 'deleted_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

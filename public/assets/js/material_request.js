@@ -132,12 +132,7 @@ function dateFormater(date) {
                     <option value="">Proforma Invoice</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="department">Department</label>
-                <select id="department" class="form-control">
-                    <option value="">Department</option>
-                </select>
-            </div>
+           
             <div class="form-group">
                 <label for="supplier">supplier</label>
                 <select id="supplier" class="form-control">

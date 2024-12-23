@@ -109,12 +109,59 @@ class MaterialRequestController extends BaseController
     }
     function datamr($id_mr){
         $mdl = new \App\Models\MdlMaterialRequestList();
-        $data = $mdl->select('material_request_list.*, materials.name as material, proforma_invoice.invoice_number as pi, department.name as dep')
+        $data = $mdl->select('material_request_list.*,supplier.supplier_name as supplier, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep')
                     ->join('materials', 'materials.id = material_request_list.id_material', 'left')
                     ->join('proforma_invoice', 'proforma_invoice.id = material_request_list.id_pi', 'left')
                     ->join('department', 'department.id = material_request_list.id_dept', 'left')
+                    ->join('supplier', 'supplier.id = material_request_list.id_sup', 'left')
                     ->where('id_mr', $id_mr)->findAll();
         return json_encode($data);
 
+    }
+    public function addMR(){
+            $mdl = new \App\Models\MdlMaterialRequestList();
+            $mdl->insert($_POST);
+            if ($mdl->affectedRows() !== 0) {
+         $riwayat = "Menambahkan Material Request list";
+         $this->changelog->riwayat($riwayat);
+         header('HTTP/1.1 200 OK');
+     } else {
+         header('HTTP/1.1 500 Internal Server Error');
+         header('Content-Type: application/json; charset=UTF-8');
+         die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+     }
+
+    }
+    public function deleteList($id){
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        $mdl->delete($id);
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = 'Menghapus Material Request List';
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+            }
+    }
+    public function getMR($id) {
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        
+        // Fetch the material request data along with the proforma invoice
+        $data = $mdl->select('material_request_list.*,supplier.supplier_name as supplier, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep')
+        ->join('materials', 'materials.id = material_request_list.id_material', 'left')
+        ->join('proforma_invoice', 'proforma_invoice.id = material_request_list.id_pi', 'left')
+        ->join('department', 'department.id = material_request_list.id_dept', 'left')
+        ->join('supplier', 'supplier.id = material_request_list.id_sup', 'left')
+        ->where('material_request_list.id', $id)->first();
+        
+        // Check if data is found
+        if ($data) {
+            return json_encode($data);
+        } else {
+            // Return an error message if no data found
+            return json_encode(['message' => 'Material Request not found', 'code' => 404]);
+        }
     }
 }
