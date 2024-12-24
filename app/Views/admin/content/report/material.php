@@ -1,72 +1,84 @@
+<!-- Button Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <!-- Add this button for List Laporan -->
+                <button class="btn btn-primary" id="listLaporanBtnKS">Kartu Stock</button>
+                <button class="btn btn-primary" id="listLaporanBtnPB">Pembelian</button>
+                <button class="btn btn-primary" id="listLaporanBtnPM">Pemakaian</button>
+                <button class="btn btn-primary" id="listLaporanBtnRS">Rusak/Scrap</button>
+
+      
 
 
+                <div class="modal fade" id="laporanModal" tabindex="-1" aria-labelledby="laporanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="laporanModalLabel">Filter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <form id="laporanMaterialForm">
+                                    <div class="form-group">
+                                        <label for="startDate">Tanggal Mulai</label>
+                                        <input type="date" class="form-control" id="startDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="endDate">Tanggal Akhir</label>
+                                        <input type="date" class="form-control" id="endDate" required>
+                                    </div>
+                                    <label for="materialSelect">Pilih Material</label>
+                                    <input type="text" class="form-control" id="materialSelect" hidden>
 
-            <!-- Button Start -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="row g-4">
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-light rounded h-100 p-4">
-                            <h6 class="mb-4">Basic Buttons</h6>
-                            <div class="m-n2">
-                                <button type="button" class="btn btn-primary m-2">Primary</button>
-                                <button type="button" class="btn btn-secondary m-2">Secondary</button>
-                                <button type="button" class="btn btn-success m-2">Success</button>
-                                <button type="button" class="btn btn-danger m-2">Danger</button>
-                                <button type="button" class="btn btn-warning m-2">Warning</button>
-                                <button type="button" class="btn btn-info m-2">Info</button>
-                                <button type="button" class="btn btn-light m-2">Light</button>
-                                <button type="button" class="btn btn-dark m-2">Dark</button>
-                                <button type="button" class="btn btn-link m-2">Link</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-light rounded h-100 p-4">
-                            <h6 class="mb-4">Outline Buttons</h6>
-                            <div class="m-n2">
-                                <button type="button" class="btn btn-outline-primary m-2">Primary</button>
-                                <button type="button" class="btn btn-outline-secondary m-2">Secondary</button>
-                                <button type="button" class="btn btn-outline-success m-2">Success</button>
-                                <button type="button" class="btn btn-outline-danger m-2">Danger</button>
-                                <button type="button" class="btn btn-outline-warning m-2">Warning</button>
-                                <button type="button" class="btn btn-outline-info m-2">Info</button>
-                                <button type="button" class="btn btn-outline-light m-2">Light</button>
-                                <button type="button" class="btn btn-outline-dark m-2">Dark</button>
-                                <button type="button" class="btn btn-outline-link m-2">Link</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-light rounded h-100 p-4">
-                            <h6 class="mb-4">Rounded Buttons</h6>
-                            <div class="m-n2">
-                                <button type="button" class="btn btn-primary rounded-pill m-2">Primary</button>
-                                <button type="button" class="btn btn-secondary rounded-pill m-2">Secondary</button>
-                                <button type="button" class="btn btn-success rounded-pill m-2">Success</button>
-                                <button type="button" class="btn btn-danger rounded-pill m-2">Danger</button>
-                                <button type="button" class="btn btn-warning rounded-pill m-2">Warning</button>
-                                <button type="button" class="btn btn-info rounded-pill m-2">Info</button>
-                                <button type="button" class="btn btn-light rounded-pill m-2">Light</button>
-                                <button type="button" class="btn btn-dark rounded-pill m-2">Dark</button>
-                                <button type="button" class="btn btn-link rounded-pill m-2">Link</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-xl-6">
-                        <div class="bg-light rounded h-100 p-4">
-                            <h6 class="mb-4">Buttons Size</h6>
-                            <div class="m-n2">
-                                <button type="button" class="btn btn-lg btn-primary m-2">Large Button (btn-lg)</button>
-                                <button type="button" class="btn btn-lg btn-secondary m-2">Large Button (btn-lg)</button>
-                                <button type="button" class="btn btn-sm btn-primary m-2">Small Button (btn-sm)</button>
-                                <button type="button" class="btn btn-sm btn-secondary m-2">Small Button (btn-sm)</button>
-                            </div>
-                        </div>
-                    </div>
+    <div class="dropdown">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search Material" aria-label="Search Material">
+        <div class="dropdown-menu" id="dropdownMenu" aria-labelledby="searchInput">
+            <div id="materialOptions">
+                <!-- Options will be populated here -->
+            </div>
+        </div>
+    </div>
+                                </form>
 
+                <hr>
+
+                <!-- Table to display and manage potongan -->
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="generateReportBtnMaterial" data-bs-dismiss="modal">View</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+        <div class="col-sm-12 col-xl-12">
+            <div class="bg-light rounded h-100 p-4">
+                <!-- Section to display results -->
+                <div id="resultSection" class="mt-4">
+                    <h6>Hasil Laporan</h6>
+                    <div id="resultTableContainer">
+                        <!-- Results will be displayed here -->
+                    </div>
+                    <button class="btn btn-success" id="printExcelBtn">Print to Excel</button>
                 </div>
             </div>
-            <!-- Button End -->
+        </div>
 
 
-   
+
+    </div>
+</div>
+<!-- Button End -->
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/report_material.js"></script>
+
+
+
+
+

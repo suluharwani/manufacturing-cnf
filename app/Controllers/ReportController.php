@@ -51,4 +51,14 @@ class ReportController extends BaseController
       return view('admin/index', $data);
 
   }
+  public function materialStockCard(){
+  
+    $mdlPembelian = new \App\Models\MdlPembelianDetail();
+    $data['pembelian'] = $mdlPembelian
+        ->where('id_material', $_POST['material_id'])
+        ->where('created_at >=', $_POST['start_date'])
+        ->where('created_at <=', $_POST['end_date'])
+        ->findAll();
+    return json_encode($data);
+  }
 }
