@@ -1,4 +1,6 @@
-<!-- Button Start -->
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
         <div class="col-sm-12 col-xl-12">
@@ -66,7 +68,7 @@
                     <div id="resultTableContainer">
                         <!-- Results will be displayed here -->
                     </div>
-                    <button class="btn btn-success" id="printExcelBtn">Print to Excel</button>
+                    <button class="btn btn-success" id="printBtn">Print</button>
                 </div>
             </div>
         </div>

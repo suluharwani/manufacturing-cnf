@@ -338,5 +338,23 @@ $routes->group('materialrequest', function ($routes) {
 
 });
 
-$routes->post('department/department_list', 'departmentController::department_list',['filter' => 'accessControl:1']); 
+$routes->post('department/department_list', 'DepartmentController::department_list',['filter' => 'accessControl:1']); 
 
+$routes->group('materialrequisition', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
+
+    $routes->get('', 'Home::material_requisition',['filter' => 'accessControl:2']); 
+    $routes->get('list', 'Home::material_requisition_list',['filter' => 'accessControl:2']); 
+    $routes->get('process', 'Home::material_requisition_process',['filter' => 'accessControl:2']); 
+    $routes->post('listData', `MaterialRequisitionController::material_requisition`,['filter' => 'accessControl:2']); 
+    
+
+});
+$routes->group('materialreturn', function ($routes) {
+    $routes->get('', 'Home::material_return',['filter' => 'accessControl:2']); 
+
+});
+$routes->group('pemusnahan', function ($routes) {
+    $routes->get('', 'Home::inventory_reduction',['filter' => 'accessControl:2']); 
+
+});

@@ -1,6 +1,6 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
-
+window.jsPDF = window.jspdf.jsPDF
     $(document).ready(function () {
         // Show the modal when the button is clicked
         $('#listLaporanBtnKS').on('click', function () {
@@ -78,46 +78,38 @@ var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : ""
                     material_id: materialId
                 },
                 success: function (result) {
+                    let no = 1;
                     var data = JSON.parse(result);
                     var tableBody = $('#resultTableBody');
                     tableBody.empty(); // Clear existing rows
                     let row = `<thead>
             <tr>
-                <th>ID</th>
-                <th>ID Pembelian</th>
-                <th>ID Material</th>
-                <th>ID Currency</th>
-                <th>Jumlah</th>
-                <th>Harga</th>
-                <th>Status Pembayaran</th>
-                <th>Diskon 1</th>
-                <th>Diskon 2</th>
-                <th>Diskon 3</th>
-                <th>Pajak</th>
-                <th>Potongan</th>
-                <th>Created At</th>
-                <th>Updated At</th>
+                <th>No</th>
+                <th>DATE</th>
+                <th>CODE</th>
+                <th>NAME</th>
+                <th>QUANTITY</th>
+                <th>PRICE</th>
+                <th>CURRENCY</th>
+                <th>IDR PRICE/ITEM</th>
+                <th>BALANCE</th>
             </tr>
         </thead>`; // Initialize the row variable
                     // Loop through the pembelian array and create table rows
+
                     data.pembelian.forEach(function (item) {
 
                         row += `
                             <tr>
-                                <td>${item.id}</td>
-                                <td>${item.id_pembelian}</td>
-                                <td>${item.id_material}</td>
-                                <td>${item.id_currency}</td>
-                                <td>${item.jumlah !== null ? item.jumlah : 'N/A'}</td>
-                                <td>${item.harga !== null ? item.harga : 'N/A'}</td>
-                                <td>${item.status_pembayaran !== null ? item.status_pembayaran : 'N/A'}</td>
-                                <td>${item.diskon1}</td>
-                                <td>${item.diskon2}</td>
-                                <td>${item.diskon3}</td>
-                                <td>${item.pajak}</td>
-                                <td>${item.potongan}</td>
-                                <td>${item.created_at}</td>
-                                <td>${item.updated_at}</td>
+                                <td>${no++}</td>
+                                <td>${formatDateIndo(item.created_at)}</td>
+                                <td>${item.materials_code}</td>
+                                <td>${item.materials_name}</td>
+                                <td>${item.jumlah ? formatAngka(item.jumlah) : 'N/A'}</td>
+                                <td>${item.harga ? formatAngka(item.harga) : 'N/A'}</td>
+                                <td>(${item.curr_code}) - ${item.curr_name}</td>
+                                <td>${item.harga !== null ? formatAngka(item.harga/item.curr_rate) : 'N/A'}</td>
+                                <td>${'N/A'}</td>
                             </tr>
                         `;
 
@@ -183,10 +175,99 @@ var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : ""
             });
         });
 
-        // Print to Excel functionality
-        $('#printExcelBtn').on('click', function () {
-            const table = document.getElementById('resultTableContainer');
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-            XLSX.writeFile(wb, 'Laporan_Material.xlsx');
+        $('#printBtn').on('click', function () {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation, mm units, A4 size
+        
+            // Add title
+            pdf.setFontSize(18);
+            pdf.text('Laporan Material', 10, 10);
+            
+            // Define columns and data
+            const columns = [
+                { header: 'NO', dataKey: 'no' },
+                { header: 'DATE', dataKey: 'date' },
+                { header: 'CODE', dataKey: 'code' },
+                { header: 'NAME', dataKey: 'name' },
+                { header: 'QUANTITY', dataKey: 'quantity' },
+                { header: 'PRICE', dataKey: 'price' },
+                { header: 'CURRENCY', dataKey: 'currency' },
+                { header: 'IDR PRICE/ITEM', dataKey: 'idrPrice' },
+                { header: 'BALANCE', dataKey: 'balance' }
+            ];
+        
+            // Prepare data for the table
+            const data = [];
+            $('#resultTableContainer tr').each(function() {
+                const row = $(this).find('td');
+                const rowData = {
+                    no: row.eq(0).text() || 'N/A',
+                    date: row.eq(1).text() || 'N/A',
+                    code: row.eq(2).text() || 'N/A',
+                    name: row.eq(3).text() || 'N/A',
+                    quantity: row.eq(4).text() || 'N/A',
+                    price: row.eq(5).text() || 'N/A',
+                    currency: row.eq(6).text() || 'N/A',
+                    idrPrice: row.eq(7).text() || 'N/A',
+                    balance: row.eq(8).text() || 'N/A'
+                };
+                data.push(rowData);
+            });
+        
+            // Use autoTable to create the table
+            pdf.autoTable({
+                head: [columns.map(col => col.header)],
+                body: data.map(item => columns.map(col => item[col.dataKey])),
+                startY: 20, // Start Y position for the table
+                theme: 'grid', // Optional: choose a theme
+                margin: { horizontal: 10 }, // Margin from the edges
+                styles: {
+                    overflow: 'linebreak', // Allow line breaks
+                    cellWidth: 'auto', // Auto width for cells
+                    fontSize: 10 // Font size
+                },
+                columnStyles: {
+                    // Optional: set specific styles for columns
+                    0: { cellWidth: 10 }, // Example: set width for the first column
+                    1: { cellWidth: 30 }, // Example: set width for the second column
+                    // Add more styles as needed
+                }
+            });
+        
+            // Save the PDF
+            pdf.save('Laporan_Material.pdf');
         });
+ 
+
+
+
     });
+
+    function formatDateIndo(dateString) {
+        // Create a new Date object from the input date string
+        const date = new Date(dateString);
+    
+        // Get the day, month, and year
+        const day = String(date.getDate()).padStart(2, '0'); // Pad with leading zero if needed
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+    
+        // Return the formatted date in DD/MM/YYYY
+        return `${day}/${month}/${year}`;
+    }
+    function formatAngka(angka) {
+        // Memisahkan bagian desimal dan ribuan
+        let [bagianRibuan, bagianDesimal] = angka.toString().split(".");
+        
+        // Menambahkan titik sebagai pemisah ribuan
+        bagianRibuan = bagianRibuan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        
+        // Mengatur bagian desimal, maksimal 2 angka
+        if (bagianDesimal) {
+            bagianDesimal = bagianDesimal.substring(0, 2);
+        } else {
+            bagianDesimal = "00"; // Jika tidak ada bagian desimal
+        }
+        
+        return `${bagianRibuan},${bagianDesimal}`;
+    }

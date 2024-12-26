@@ -268,4 +268,35 @@ class Home extends BaseController
         $data['content'] = view('admin/content/department');
         return view('admin/index', $data);
     }
+    public function material_requisition(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/material_requisition');
+        return view('admin/index', $data);
+    }
+    public function material_requisition_list(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/material_requisition_list');
+        return view('admin/index', $data);
+    }
+    public function material_requisition_process(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/material_requisition_process');
+        return view('admin/index', $data);
+    }
+    public function material_return(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/material_return');
+        return view('admin/index', $data);
+    }
+    public function inventory_reduction(){
+        $data['group'] = 'Department';
+        $data['title'] = 'Department';
+        $data['content'] = view('admin/content/material_reduction');
+        return view('admin/index', $data);
+    }
+
 }
