@@ -1,6 +1,24 @@
 <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<style>/* Menambahkan border pada seluruh tabel */
+table {
+    border-collapse: collapse; /* Untuk menggabungkan border agar lebih rapi */
+    width: 100%;
+}
+
+/* Menambahkan border pada header tabel */
+th, td {
+    border: 1px solid #000; /* Border hitam dengan ketebalan 1px */
+    padding: 8px; /* Memberikan jarak di dalam cell */
+    text-align: center; /* Menyelaraskan teks ke tengah */
+}
+
+/* Menambahkan border di antara setiap baris */
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Memberikan warna latar belakang yang lebih terang pada baris genap */
+}
+</style>
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
         <div class="col-sm-12 col-xl-12">

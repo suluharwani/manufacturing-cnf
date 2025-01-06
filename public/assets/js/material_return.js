@@ -30,24 +30,34 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"/pembelian/listdataPembelian" , // json datasource 
+      "url" :base_url+"/materialreturn/listdataMaterialReturn" , // json datasource 
       "type": "post",  // method  , by default get
       // "async": false,
       "dataType": 'json',
       "data":{},
     },
-    
+    // $row[] = $no;
+    // $row[] = $lists->id;
+    // $row[] = $lists->created_at;
+    // $row[] = $lists->code;
+    // $row[] = $lists->wo;
+    // $row[] = $lists->nama_depan.' '.$lists->nama_belakang;
+    // $row[] = $lists->remarks;
+    // $row[] = $lists->status;
     columns: [
     {},
     {mRender: function (data, type, row) {
-        return formatDateTime(row[4])
+        return formatDateTime(row[2])
     }},
+    {mRender: function (data, type, row) {
+      return row[3]
+  }},
    
     {mRender: function (data, type, row) {
-        return row[7]
+        return row[4]
     }},
     {mRender: function (data, type, row) {
-        return row[3]
+        return row[5]
     }},
     {mRender: function (data, type, row) {
       if (row[8] == 0) {
@@ -58,7 +68,7 @@ $(document).ready(function() {
         return status
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}pembelian/form/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder">Edit</a>
+     return `<a href="${base_url}materialreturn/form/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder">Edit</a>
              <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteInvoice" invoice = "${row[3]}" id="${row[1]}" >Delete</a>
              `; 
     }}

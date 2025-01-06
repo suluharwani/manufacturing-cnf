@@ -35,7 +35,15 @@ class Home extends BaseController
         $data['group'] = 'Admin';
         $data['title'] = 'Dashboard';
         $data['content'] = view('admin/content/dashboard');
-        return view('admin/index', $data);
+        return view( 'admin/index', $data);
+    }
+    function col($table)
+    {
+        $query = $this->db->query("SELECT * FROM $table");
+
+    foreach ($query->getFieldNames() as $field) {
+      echo '"'.$field.'",';
+    }
     }
     function forbidden(){
         return view('403');
@@ -269,32 +277,32 @@ class Home extends BaseController
         return view('admin/index', $data);
     }
     public function material_requisition(){
-        $data['group'] = 'Department';
-        $data['title'] = 'Department';
+        $data['group'] = 'Material Requisition';
+        $data['title'] = 'Material Requisition';
         $data['content'] = view('admin/content/material_requisition');
         return view('admin/index', $data);
     }
     public function material_requisition_list(){
-        $data['group'] = 'Department';
-        $data['title'] = 'Department';
+        $data['group'] = 'Material Requisition';
+        $data['title'] = 'Material Requisition List';
         $data['content'] = view('admin/content/material_requisition_list');
         return view('admin/index', $data);
     }
     public function material_requisition_process(){
-        $data['group'] = 'Department';
-        $data['title'] = 'Department';
+        $data['group'] = 'Material Requisition';
+        $data['title'] = 'Material Requisition Process';
         $data['content'] = view('admin/content/material_requisition_process');
         return view('admin/index', $data);
     }
     public function material_return(){
-        $data['group'] = 'Department';
-        $data['title'] = 'Department';
+        $data['group'] = 'Material Return';
+        $data['title'] = 'Material Return';
         $data['content'] = view('admin/content/material_return');
         return view('admin/index', $data);
     }
     public function inventory_reduction(){
-        $data['group'] = 'Department';
-        $data['title'] = 'Department';
+        $data['group'] = 'Inventory Reduction';
+        $data['title'] = 'Inventory Reduction';
         $data['content'] = view('admin/content/material_reduction');
         return view('admin/index', $data);
     }

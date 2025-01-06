@@ -20,7 +20,7 @@
 <div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Persediaan Material</h6>
+                        <h6 class="mb-0">Material Return</h6>
                         <button class= "btn btn-primary tambahPembelian">Tambah</button>
                     </div>
                     <div class="table-responsive">
@@ -28,19 +28,20 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Tanggal</th>
-                  <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
+                  <th style=" text-align: center;">Date</th>
+                  <th style=" text-align: center;">Code</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">Admin</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr  class="text-center">
-                  <th style=" text-align: center;">#</th>
+                <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Tanggal</th>
-                  <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">ADMIN</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>

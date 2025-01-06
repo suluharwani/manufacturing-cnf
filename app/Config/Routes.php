@@ -5,7 +5,9 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
 $routes->get('/forbidden', 'Home::forbidden');
+$routes->get('/col/(:any)', 'Home::col/$1');
 $routes->get('/', 'Homepage::index');
 
 $routes->get('/dashboard', 'Home::index',['filter' => 'accessControl:2']);
@@ -352,9 +354,13 @@ $routes->group('materialrequisition', function ($routes) {
 });
 $routes->group('materialreturn', function ($routes) {
     $routes->get('', 'Home::material_return',['filter' => 'accessControl:2']); 
-
+    $routes->get('form/(:any)', 'MaterialReturnController::material_return_form/$1',['filter' => 'accessControl:2']); 
+    $routes->post('listdataMaterialReturn', 'MaterialReturnController::listdataMaterialReturn',['filter' => 'accessControl:2']); 
+    $routes->post('listdataMaterialReturnList/(:any)', 'MaterialReturnController::listdataMaterialReturnList/$1',['filter' => 'accessControl:2']); 
+    
 });
 $routes->group('pemusnahan', function ($routes) {
     $routes->get('', 'Home::inventory_reduction',['filter' => 'accessControl:2']); 
 
 });
+

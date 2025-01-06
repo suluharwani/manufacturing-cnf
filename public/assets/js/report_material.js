@@ -78,6 +78,8 @@ window.jsPDF = window.jspdf.jsPDF
                     material_id: materialId
                 },
                 success: function (result) {
+                    data = JSON.parse(result);
+                    let balanceBefore = data.balance_before
                     let no = 1;
                     var data = JSON.parse(result);
                     var tableBody = $('#resultTableBody');
@@ -89,32 +91,39 @@ window.jsPDF = window.jspdf.jsPDF
                 <th>CODE</th>
                 <th>NAME</th>
                 <th>QUANTITY</th>
-                <th>PRICE</th>
-                <th>CURRENCY</th>
-                <th>IDR PRICE/ITEM</th>
                 <th>BALANCE</th>
             </tr>
         </thead>`; // Initialize the row variable
                     // Loop through the pembelian array and create table rows
+           
 
-                    data.pembelian.forEach(function (item) {
+                    // data.pembelian.forEach(function (item) {
 
+                        row += `
+                            <tr>
+                                <td colspan="4">Balance Before</td>
+            
+                                <td>${balanceBefore}</td>
+                                <td>${balanceBefore}</td>
+                            </tr>
+                        `;
+                    // console.log(result);
+                    // });
+                    let total = parseInt(balanceBefore);
+                           data.pembelian.forEach(function (item) {
+                            total+=parseInt(item.jumlah ? item.jumlah : 0);
                         row += `
                             <tr>
                                 <td>${no++}</td>
                                 <td>${formatDateIndo(item.created_at)}</td>
                                 <td>${item.materials_code}</td>
                                 <td>${item.materials_name}</td>
-                                <td>${item.jumlah ? formatAngka(item.jumlah) : 'N/A'}</td>
-                                <td>${item.harga ? formatAngka(item.harga) : 'N/A'}</td>
-                                <td>(${item.curr_code}) - ${item.curr_name}</td>
-                                <td>${item.harga !== null ? formatAngka(item.harga/item.curr_rate) : 'N/A'}</td>
-                                <td>${'N/A'}</td>
+                                <td>${item.jumlah }</td>
+                                <td>${total}</td>
                             </tr>
                         `;
 
                     });
-                    console.log(row);
 
                     tableBody = row; // Append the row to the table body
                 

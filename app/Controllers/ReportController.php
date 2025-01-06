@@ -58,7 +58,7 @@ class ReportController extends BaseController
     }
     public function materialStockCard()
     {
-        $data['balance_before'] =  
+        $data['balance_before'] =  $this->balanceBefore($_POST);
 
         $data['pembelian'] = $this->materialPurchase($_POST);
 
@@ -92,5 +92,37 @@ class ReportController extends BaseController
         // Return the data as JSON or load a view as needed
         return $data;
     }
+    public function balanceBefore($params)
+    {
+        $mdlPembelian = new \App\Models\MdlPembelianDetail();
+        $mdlStock = new \App\Models\MdlStock(); // Model untuk tabel stock
+    
+        // Get the material ID and date range from the POST request
+        $materialId = $params['material_id'];
+        $startDate = $params['start_date'];
+    
+        // Query to get the opening stock from the stock table
+        $openingStockQuery = $mdlStock->select('stock_awal')
+            ->where('id_material', $materialId)
+            ->first();
+        
+        $openingStock = $openingStockQuery ? $openingStockQuery['stock_awal'] : 0;
+    
+        // Query to sum pembelian_detail.jumlah up to the start date
+        $purchasesQuery = $mdlPembelian->select('SUM(jumlah) as total_purchases')
+            ->where('id_material', $materialId)
+            ->where('created_at <', $startDate)
+            ->first();
+        
+        $totalPurchases = $purchasesQuery ? $purchasesQuery['total_purchases'] : 0;
+    
+        // Calculate total balance
+        $totalBalance = $totalPurchases + $openingStock;
+    
+        // Return the total balance as a response
+        return $totalBalance;
+    }
+    
+
 
 }
