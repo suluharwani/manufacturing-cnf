@@ -54,10 +54,11 @@ function initializeSupplierTable() {
             { mRender: function (data, type, row) { return row[0]; } }, // No
             { mRender: function (data, type, row) { return row[3]; } }, // Code
             { mRender: function (data, type, row) { return row[2]; } }, // Nama Sup
-            { mRender: function (data, type, row) { return `${row[4]} ${row[8]}` ; } }, 
-            { mRender: function (data, type, row) { return `${row[5]} ${row[8]}`; } }, // 
-            { mRender: function (data, type, row) { return `${row[6]} ${row[8]}`; } }, // 
-            { mRender: function (data, type, row) { return `${parseFloat(row[4])+parseFloat(row[5])-parseFloat(row[6])} ${row[8]}` ; } }, // 
+            { mRender: function (data, type, row) { return `${Math.abs(row[4])} ${row[8]}` ; } }, 
+            { mRender: function (data, type, row) { return `${Math.abs(row[5])} ${row[8]}`; } }, // 
+            { mRender: function (data, type, row) { return `${Math.abs(row[6])} ${row[8]}`; } }, // 
+            { mRender: function (data, type, row) { return `${row[13] === null ? 0 : row[13] } ${row[8]}`; } }, // 
+            { mRender: function (data, type, row) { return `${parseFloat(Math.abs(row[14]))} ${row[8]}` ; } }, // 
             { mRender: function (data, type, row) { return `${row[12]} ${formatNumber(row[10],0)}`; }}, // 
             { mRender: function (data, type, row) { return `Rp. ${formatNumber(parseFloat(row[10])/parseFloat(row[11]),2)}`; }}, // 
             { mRender: function (data, type, row) { return `<a href="javascript:void(0);" class="btn btn-warning btn-sm view" id="${row[1]}" ">View</a>

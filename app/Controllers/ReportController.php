@@ -59,15 +59,22 @@ class ReportController extends BaseController
     public function materialStockCard()
     {
         $data['balance_before'] =  $this->balanceBefore($_POST);
-
+        $data['destruction'] = $this->materialDestruction($_POST);
         $data['pembelian'] = $this->materialPurchase($_POST);
-
+        $data['return'] = $this->materialReturn($_POST);
+        $data['stock_opname'] = $this->materialStockOpname($_POST);
+        $data['material_requisition'] = $this->materialRequisition($_POST);
+        $data['merge'] = $this->sortByDate(array_merge($data['pembelian'], $data['material_requisition'], $data['return'],$data['destruction'],$data['stock_opname']));
         return json_encode($data);
     }
-
-    public function materialPurchase($params)
-    {
-        $mdlPembelian = new \App\Models\MdlPembelianDetail();
+    function sortByDate($data) {
+        usort($data, function($a, $b) {
+            return strtotime($a['created_at']) - strtotime($b['created_at']);
+        });
+        return $data;
+    }
+    public function materialReturn($params){
+        $mdl = new \App\Models\MdlMaterialReturnList();
     
         // Get the material ID and date range from the POST request
         $materialId =$params['material_id'];
@@ -75,9 +82,79 @@ class ReportController extends BaseController
         $endDate = $params['end_date']; // Assuming the date is sent as 'end_date'
     
         // Initialize the query
-        $query = $mdlPembelian->select('pembelian_detail.*, materials.name as materials_name, ,materials.kode as materials_code, currency.kode as curr_code, currency.nama as curr_name, currency.rate as curr_rate') // Select fields from both tables
+        $query = $mdl->select(' 
+        "Material Return" as source,
+        "IN" as desc, 
+        material_return_list.jumlah as jumlah, 
+        material_return_list.created_at as created_at, 
+        materials.name as materials_name, 
+        materials.kode as materials_code, ') // Select fields from both tables
+            ->join('materials', 'materials.id = material_return_list.id_material') // Join with materials table
+            ->where('material_return_list.id_material', $materialId);
+    
+        // Add date range conditions if provided
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('material_return_list.created_at >=', value: $startDate)
+                  ->where('material_return_list.created_at <=', $endDate);
+        }
+    
+        // Fetch the purchase details
+        $data = $query->findAll();
+
+    
+        // Return the data as JSON or load a view as needed
+        return $data;
+    }
+    public function materialRequisition($params){
+        $mdl = new \App\Models\MdlMaterialRequisitionProgress();
+    
+        // Get the material ID and date range from the POST request
+        $materialId =$params['material_id'];
+        $startDate = $params['start_date']; // Assuming the date is sent as 'start_date'
+        $endDate = $params['end_date']; // Assuming the date is sent as 'end_date'
+    
+        // Initialize the query
+        $query = $mdl->select(' 
+        "Material Requisition" as source,
+        "OUT" as desc, 
+        -(material_requisition_progress.jumlah) as jumlah, 
+        material_requisition_progress.created_at as created_at, 
+        materials.name as materials_name, 
+        materials.kode as materials_code, ') // Select fields from both tables
+            ->join('materials', 'materials.id = material_requisition_progress.id_material') // Join with materials table
+            ->where('material_requisition_progress.id_material', $materialId);
+    
+        // Add date range conditions if provided
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('material_requisition_progress.created_at >=', value: $startDate)
+                  ->where('material_requisition_progress.created_at <=', $endDate);
+        }
+    
+        // Fetch the purchase details
+        $data = $query->findAll();
+
+    
+        // Return the data as JSON or load a view as needed
+        return $data;
+    }
+    public function materialPurchase($params)
+    {
+        $mdl = new \App\Models\MdlPembelianDetail();
+    
+        // Get the material ID and date range from the POST request
+        $materialId =$params['material_id'];
+        $startDate = $params['start_date']; // Assuming the date is sent as 'start_date'
+        $endDate = $params['end_date']; // Assuming the date is sent as 'end_date'
+    
+        // Initialize the query
+        $query = $mdl->select(' 
+        "Purchasing" as source,
+        "IN" as desc, 
+        pembelian_detail.jumlah as jumlah, 
+        pembelian_detail.created_at as created_at, 
+        materials.name as materials_name, 
+        materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = pembelian_detail.id_material') // Join with materials table
-            ->join('currency', 'currency.id = pembelian_detail.id_currency') // Join with materials table
             ->where('pembelian_detail.id_material', $materialId);
     
         // Add date range conditions if provided
@@ -88,6 +165,73 @@ class ReportController extends BaseController
     
         // Fetch the purchase details
         $data = $query->findAll();
+
+    
+        // Return the data as JSON or load a view as needed
+        return $data;
+    }
+    public function materialDestruction($params)
+    {
+        $mdl = new \App\Models\MdlMaterialDestructionList();
+    
+        // Get the material ID and date range from the POST request
+        $materialId =$params['material_id'];
+        $startDate = $params['start_date']; // Assuming the date is sent as 'start_date'
+        $endDate = $params['end_date']; // Assuming the date is sent as 'end_date'
+    
+        // Initialize the query
+        $query = $mdl->select(' 
+        "Material Destruction" as source,
+        "OUT" as desc, 
+        -(material_destruction_list.jumlah) as jumlah, 
+        material_destruction_list.created_at as created_at, 
+        materials.name as materials_name, 
+        materials.kode as materials_code, ') // Select fields from both tables
+            ->join('materials', 'materials.id = material_destruction_list.id_material') // Join with materials table
+            ->where('material_destruction_list.id_material', $materialId);
+    
+        // Add date range conditions if provided
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('material_destruction_list.created_at >=', $startDate)
+                  ->where('material_destruction_list.created_at <=', $endDate);
+        }
+    
+        // Fetch the purchase details
+        $data = $query->findAll();
+
+    
+        // Return the data as JSON or load a view as needed
+        return $data;
+    }
+    public function materialStockOpname($params)
+    {
+        $mdl = new \App\Models\MdlStockOpnameList();
+    
+        // Get the material ID and date range from the POST request
+        $materialId =$params['material_id'];
+        $startDate = $params['start_date']; // Assuming the date is sent as 'start_date'
+        $endDate = $params['end_date']; // Assuming the date is sent as 'end_date'
+    
+        // Initialize the query
+        $query = $mdl->select(' 
+        "Material Stock Opname" as source,
+        "SO" as desc, 
+        (stock_opname_list.jumlah_akhir - stock_opname_list.jumlah_awal) as jumlah, 
+        stock_opname_list.created_at as created_at, 
+        materials.name as materials_name, 
+        materials.kode as materials_code, ') // Select fields from both tables
+            ->join('materials', 'materials.id = stock_opname_list.id_material') // Join with materials table
+            ->where('stock_opname_list.id_material', $materialId);
+    
+        // Add date range conditions if provided
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('stock_opname_list.created_at >=', $startDate)
+                  ->where('stock_opname_list.created_at <=', $endDate);
+        }
+    
+        // Fetch the purchase details
+        $data = $query->findAll();
+
     
         // Return the data as JSON or load a view as needed
         return $data;

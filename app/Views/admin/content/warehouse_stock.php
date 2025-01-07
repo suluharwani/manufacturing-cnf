@@ -35,29 +35,31 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Stock Awal</th>
-                  <th style=" text-align: center;">Pembelian</th>
-                  <th style=" text-align: center;">Pengeluaran</th>
-                  <th style=" text-align: center;">Stock</th>
-                  <th style=" text-align: center;">Harga</th>
-                  <th style=" text-align: center;">Harga Rupiah</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">Code</th>
+                  <th style=" text-align: center;">Name</th>
+                  <th style=" text-align: center;">Opening Balance</th>
+                  <th style=" text-align: center;">Total Incoming</th>
+                  <th style=" text-align: center;">Total Outgoing</th>
+                  <th style=" text-align: center;">Stock Opname</th>
+                  <th style=" text-align: center;">Balance</th>
+                  <th style=" text-align: center;">Price</th>
+                  <th style=" text-align: center;">Price (Rupiah)</th>
+                  <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr class="text-center">
-                  <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Stock Awal</th>
-                  <th style=" text-align: center;">Pembelian</th>
-                  <th style=" text-align: center;">Pengeluaran</th>
-                  <th style=" text-align: center;">Stock</th>
-                  <th style=" text-align: center;">Harga</th>
-                  <th style=" text-align: center;">Harga Rupiah</th>
-                  <th style=" text-align: center;">Aktif</th>
+                <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Code</th>
+                  <th style=" text-align: center;">Name</th>
+                  <th style=" text-align: center;">Opening Balance</th>
+                  <th style=" text-align: center;">Total Incoming</th>
+                  <th style=" text-align: center;">Total Outgoing</th>
+                  <th style=" text-align: center;">Stock Opname</th>
+                  <th style=" text-align: center;">Balance</th>
+                  <th style=" text-align: center;">Price</th>
+                  <th style=" text-align: center;">Price (Rupiah)</th>
+                  <th style=" text-align: center;">Action</th>
               </tr>
             </tfoot>
           </table>

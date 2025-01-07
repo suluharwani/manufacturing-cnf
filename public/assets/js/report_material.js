@@ -90,6 +90,8 @@ window.jsPDF = window.jspdf.jsPDF
                 <th>DATE</th>
                 <th>CODE</th>
                 <th>NAME</th>
+                <th>DESC</th>
+                <th>SOURCE</th>
                 <th>QUANTITY</th>
                 <th>BALANCE</th>
             </tr>
@@ -102,6 +104,8 @@ window.jsPDF = window.jspdf.jsPDF
                         row += `
                             <tr>
                                 <td colspan="4">Balance Before</td>
+                                <td>Default</td>
+                                <td>STOCK</td>
             
                                 <td>${balanceBefore}</td>
                                 <td>${balanceBefore}</td>
@@ -109,15 +113,17 @@ window.jsPDF = window.jspdf.jsPDF
                         `;
                     // console.log(result);
                     // });
-                    let total = parseInt(balanceBefore);
-                           data.pembelian.forEach(function (item) {
-                            total+=parseInt(item.jumlah ? item.jumlah : 0);
+                    let total = parseFloat(balanceBefore);
+                           data.merge.forEach(function (item) {
+                            total+=parseFloat(item.jumlah ? item.jumlah : 0);
                         row += `
                             <tr>
                                 <td>${no++}</td>
                                 <td>${formatDateIndo(item.created_at)}</td>
                                 <td>${item.materials_code}</td>
                                 <td>${item.materials_name}</td>
+                                <td>${item.desc }</td>
+                                <td>${item.source }</td>
                                 <td>${item.jumlah }</td>
                                 <td>${total}</td>
                             </tr>
@@ -198,10 +204,9 @@ window.jsPDF = window.jspdf.jsPDF
                 { header: 'DATE', dataKey: 'date' },
                 { header: 'CODE', dataKey: 'code' },
                 { header: 'NAME', dataKey: 'name' },
+                { header: 'DESC', dataKey: 'desc' },
+                { header: 'SOURCE', dataKey: 'source' },
                 { header: 'QUANTITY', dataKey: 'quantity' },
-                { header: 'PRICE', dataKey: 'price' },
-                { header: 'CURRENCY', dataKey: 'currency' },
-                { header: 'IDR PRICE/ITEM', dataKey: 'idrPrice' },
                 { header: 'BALANCE', dataKey: 'balance' }
             ];
         
@@ -214,11 +219,10 @@ window.jsPDF = window.jspdf.jsPDF
                     date: row.eq(1).text() || 'N/A',
                     code: row.eq(2).text() || 'N/A',
                     name: row.eq(3).text() || 'N/A',
-                    quantity: row.eq(4).text() || 'N/A',
-                    price: row.eq(5).text() || 'N/A',
-                    currency: row.eq(6).text() || 'N/A',
-                    idrPrice: row.eq(7).text() || 'N/A',
-                    balance: row.eq(8).text() || 'N/A'
+                    desc: row.eq(4).text() || 'N/A',
+                    source: row.eq(5).text() || 'N/A',
+                    quantity: row.eq(6).text() || 'N/A',
+                    balance: row.eq(7).text() || 'N/A'
                 };
                 data.push(rowData);
             });

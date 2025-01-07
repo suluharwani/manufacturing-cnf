@@ -39,9 +39,10 @@
               <tfoot>
                 <tr  class="text-center">
                 <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Tanggal</th>
+                  <th style=" text-align: center;">Date</th>
+                  <th style=" text-align: center;">Code</th>
                   <th style=" text-align: center;">WO</th>
-                  <th style=" text-align: center;">ADMIN</th>
+                  <th style=" text-align: center;">Admin</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
