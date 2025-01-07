@@ -111,7 +111,7 @@ class Stock extends BaseController
       $row[] = $lists->satuan;
       $row[] = $lists->kode_satuan;
       $row[] = $lists->id_material;
-      $row[] = $lists->price; 
+      $row[] = $lists->price;
       $row[] = $lists->rate;
       $row[] = $lists->kode_currency;
       $row[] = $this->get_stock_in_out($lists->id_material)['so']; //stock opname
@@ -133,11 +133,11 @@ class Stock extends BaseController
 
   function get_stock_in_out($id)
   {
-    $data['total_in'] = 
-            $this->materialPurchase($id)+$this->materialReturn($id);
-    $data['total_out'] = $this->materialDestruction($id)+$this->materialRequisition($id)+
+    $data['total_in'] = $this->materialPurchase($id) + $this->materialReturn($id);
+    $data['total_out'] = $this->materialDestruction($id) + $this->materialRequisition($id);
     $data['so'] = $this->materialStockOpname($id);
-    $data['total'] = $data['total_in']+$data['total_out']+$data['so'];
+    $data['total'] = $data['total_in'] + $data['total_out'] + $data['so'];
+    // var_dump($data);
     return $data;
 
   }
@@ -151,6 +151,8 @@ class Stock extends BaseController
         sum(material_return_list.jumlah) as jumlah, 
  ') // Select fields from both tables
       ->join('materials', 'materials.id = material_return_list.id_material') // Join with materials table
+      ->join('material_return', 'material_return.id = material_return_list.id_material_return')
+      ->where('material_return.status', 1)
       ->where('material_return_list.id_material', $id);
 
 
@@ -159,12 +161,12 @@ class Stock extends BaseController
 
 
     // Return the data as JSON or load a view as needed
-   if (empty($data)) {
-        return 0;
+    if (empty($data)) {
+      return 0;
     }
 
     // Return the 'jumlah' value
-    return $data[0]['jumlah']; 
+    return $data[0]['jumlah'];
   }
   public function materialRequisition($id)
   {
@@ -174,17 +176,21 @@ class Stock extends BaseController
     $query = $mdl->select(' 
         sum(-(material_requisition_progress.jumlah)) as jumlah, 
        ')
+      ->join('material_requisition_list', 'material_requisition_list.id = material_requisition_progress.id_material_requisition_list') // Join with materials table
+
+      ->join('material_requisition', 'material_requisition.id = material_requisition_list.id_material_requisition') // Join with materials table
+      ->where('material_requisition.status', 1)
       ->where('material_requisition_progress.id_material', $id);
     $data = $query->findAll();
 
 
     // Return the data as JSON or load a view as needed
-   if (empty($data)) {
-        return 0;
+    if (empty($data)) {
+      return 0;
     }
 
     // Return the 'jumlah' value
-    return $data[0]['jumlah']; 
+    return $data[0]['jumlah'];
   }
   public function materialPurchase($id)
   {
@@ -195,7 +201,8 @@ class Stock extends BaseController
     $query = $mdl->select(' 
         sum(pembelian_detail.jumlah) as jumlah, 
 ') // Select fields from both tables
-
+      ->join('pembelian', 'pembelian.id = pembelian_detail.id_pembelian') // Join with materials table
+      ->where('pembelian.posting', 1)
       ->where('pembelian_detail.id_material', $id);
 
     // Add date range conditions if provided
@@ -206,12 +213,12 @@ class Stock extends BaseController
 
     // Return the data as JSON or load a view as needed
 
-   if (empty($data)) {
-        return 0;
+    if (empty($data)) {
+      return 0;
     }
 
     // Return the 'jumlah' value
-    return $data[0]['jumlah']; 
+    return $data[0]['jumlah'];
   }
   public function materialDestruction($id)
   {
@@ -223,6 +230,8 @@ class Stock extends BaseController
        
         sum(-(material_destruction_list.jumlah)) as jumlah, 
          ') // Select fields from both tables
+      ->join('material_destruction', 'material_destruction.id = material_destruction_list.id_material_destruction') // Join with materials table
+      ->where('material_destruction.status', 1)
       ->where('material_destruction_list.id_material', $id);
 
     // Add date range conditions if provided
@@ -233,12 +242,12 @@ class Stock extends BaseController
 
 
     // Return the data as JSON or load a view as needed
-   if (empty($data)) {
-        return 0;
+    if (empty($data)) {
+      return 0;
     }
 
     // Return the 'jumlah' value
-    return $data[0]['jumlah']; 
+    return $data[0]['jumlah'];
   }
   public function materialStockOpname($id)
   {
@@ -252,6 +261,8 @@ class Stock extends BaseController
        
         sum((stock_opname_list.jumlah_akhir - stock_opname_list.jumlah_awal)) as jumlah, 
          ') // Select fields from both tables
+         ->join('stock_opname', 'stock_opname.id = stock_opname_list.id_stock_opname')
+            ->where('stock_opname.status', 1)
       ->where('stock_opname_list.id_material', $id);
 
     // Add date range conditions if provided
@@ -261,12 +272,12 @@ class Stock extends BaseController
 
 
     // Return the data as JSON or load a view as needed
-   if (empty($data)) {
-        return 0;
+    if (empty($data)) {
+      return 0;
     }
 
     // Return the 'jumlah' value
-    return $data[0]['jumlah']; 
+    return $data[0]['jumlah'];
   }
 
 }

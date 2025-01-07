@@ -1,6 +1,7 @@
 <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+
 <style>/* Menambahkan border pada seluruh tabel */
 table {
     border-collapse: collapse; /* Untuk menggabungkan border agar lebih rapi */
@@ -28,7 +29,7 @@ tr:nth-child(even) {
                 <button class="btn btn-primary" id="listLaporanBtnPB">Pembelian</button>
                 <button class="btn btn-primary" id="listLaporanBtnPM">Pemakaian</button>
                 <button class="btn btn-primary" id="listLaporanBtnRS">Rusak/Scrap</button>
-
+                <button class="btn btn-success" id="printBtn">Print</button>
       
 
 
@@ -86,7 +87,7 @@ tr:nth-child(even) {
                     <div id="resultTableContainer">
                         <!-- Results will be displayed here -->
                     </div>
-                    <button class="btn btn-success" id="printBtn">Print</button>
+                    
                 </div>
             </div>
         </div>

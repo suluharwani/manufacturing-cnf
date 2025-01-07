@@ -322,6 +322,7 @@ $routes->group('report', function ($routes) {
     $routes->get('material', 'ReportController::material',['filter' => 'accessControl:2']); 
     $routes->get('purchase', 'ReportController::purchase',['filter' => 'accessControl:2']); 
     $routes->post('materialStockCard', 'ReportController::materialStockCard',['filter' => 'accessControl:2']); 
+    $routes->get('getHeader', 'ReportController::getHeader',['filter' => 'accessControl:2']); 
 
 
 });

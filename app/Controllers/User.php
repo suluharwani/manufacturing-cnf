@@ -115,7 +115,7 @@ function tambah_admin(){
     "status" => 1
   ];
   if ($userModel->createNewUser($userdata)) {
-    $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_depan']." menambahkan user: ".$_POST['email']."sebagai Admin";
+    $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan user: ".$_POST['email']."sebagai Admin";
     header('HTTP/1.1 200 OK');
   }else{
     $riwayat = "User ".$userInfo['name']." gagal menambahkan user: ".$_POST['email'];

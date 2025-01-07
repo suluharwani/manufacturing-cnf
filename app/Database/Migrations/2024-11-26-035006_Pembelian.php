@@ -47,6 +47,11 @@ class Pembelian extends Migration
                 'constraint' => 10.2,
                 'null' => true,
               ],
+              'remarks' => [
+            'type' => 'VARCHAR',
+            'constraint' => '255',
+            'null' => true,
+        ],
             'created_at datetime default current_timestamp',
             'updated_at' => [
                 'type' => 'DATETIME',

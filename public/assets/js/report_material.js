@@ -68,13 +68,19 @@ window.jsPDF = window.jspdf.jsPDF
         $('#generateReportBtnMaterial').on('click', function () {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
+                // Tambahkan waktu ke endDate
+    let startDateTime = startDate + ' 00:00:00';
+    let endDateTime = endDate + ' 23:59:59';
+
+    // Jika startDate adalah datetime-local, maka format juga
+
             const materialId = $('#materialSelect').val();
             $.ajax({
                 url: base_url+'report/materialStockCard', 
                 method: 'POST',
                 data: {
-                    start_date: startDate,
-                    end_date: endDate,
+                    start_date: startDateTime,
+                    end_date: endDateTime,
                     material_id: materialId
                 },
                 success: function (result) {
@@ -92,6 +98,7 @@ window.jsPDF = window.jspdf.jsPDF
                 <th>NAME</th>
                 <th>DESC</th>
                 <th>SOURCE</th>
+                <th>ACTIVITY</th>
                 <th>QUANTITY</th>
                 <th>BALANCE</th>
             </tr>
@@ -103,9 +110,13 @@ window.jsPDF = window.jspdf.jsPDF
 
                         row += `
                             <tr>
-                                <td colspan="4">Balance Before</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td>Default</td>
                                 <td>STOCK</td>
+                                <td>From stock before ${startDate}</td>
             
                                 <td>${balanceBefore}</td>
                                 <td>${balanceBefore}</td>
@@ -124,6 +135,7 @@ window.jsPDF = window.jspdf.jsPDF
                                 <td>${item.materials_name}</td>
                                 <td>${item.desc }</td>
                                 <td>${item.source }</td>
+                                <td>${item.activity }</td>
                                 <td>${item.jumlah }</td>
                                 <td>${total}</td>
                             </tr>
@@ -141,11 +153,11 @@ window.jsPDF = window.jspdf.jsPDF
         });
 
         // Print to Excel functionality
-        $('#printExcelBtn').on('click', function () {
-            const table = document.getElementById('resultTableContainer');
-            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-            XLSX.writeFile(wb, 'Laporan_Material.xlsx');
-        });
+        // $('#printExcelBtn').on('click', function () {
+        //     const table = document.getElementById('resultTableContainer');
+        //     const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+        //     XLSX.writeFile(wb, 'Laporan_Material.xlsx');
+        // });
     });
 
     $(document).ready(function () {
@@ -189,67 +201,120 @@ window.jsPDF = window.jspdf.jsPDF
                 }
             });
         });
-
         $('#printBtn').on('click', function () {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation, mm units, A4 size
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            const id = $('#materialSelect').val(); // Get the selected material ID
         
-            // Add title
-            pdf.setFontSize(18);
-            pdf.text('Laporan Material', 10, 10);
-            
-            // Define columns and data
-            const columns = [
-                { header: 'NO', dataKey: 'no' },
-                { header: 'DATE', dataKey: 'date' },
-                { header: 'CODE', dataKey: 'code' },
-                { header: 'NAME', dataKey: 'name' },
-                { header: 'DESC', dataKey: 'desc' },
-                { header: 'SOURCE', dataKey: 'source' },
-                { header: 'QUANTITY', dataKey: 'quantity' },
-                { header: 'BALANCE', dataKey: 'balance' }
-            ];
+            // Make an AJAX request to fetch the header data
+            $.ajax({
+                url: base_url+'report/getHeader',  // Your API endpoint for fetching the material header
+                type: 'GET',
+                data: { id: id }, // Send the selected ID to the server
+                success: function(response) {
+                    // Assuming the server responds with an object like { code, name, admin }
+                    const dataHeader = response.data;
         
-            // Prepare data for the table
-            const data = [];
-            $('#resultTableContainer tr').each(function() {
-                const row = $(this).find('td');
-                const rowData = {
-                    no: row.eq(0).text() || 'N/A',
-                    date: row.eq(1).text() || 'N/A',
-                    code: row.eq(2).text() || 'N/A',
-                    name: row.eq(3).text() || 'N/A',
-                    desc: row.eq(4).text() || 'N/A',
-                    source: row.eq(5).text() || 'N/A',
-                    quantity: row.eq(6).text() || 'N/A',
-                    balance: row.eq(7).text() || 'N/A'
-                };
-                data.push(rowData);
-            });
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation, mm units, A4 size
         
-            // Use autoTable to create the table
-            pdf.autoTable({
-                head: [columns.map(col => col.header)],
-                body: data.map(item => columns.map(col => item[col.dataKey])),
-                startY: 20, // Start Y position for the table
-                theme: 'grid', // Optional: choose a theme
-                margin: { horizontal: 10 }, // Margin from the edges
-                styles: {
-                    overflow: 'linebreak', // Allow line breaks
-                    cellWidth: 'auto', // Auto width for cells
-                    fontSize: 10 // Font size
+                    // Add title
+                    pdf.setFontSize(18);
+                    pdf.text('MATERIAL ACTIVITY REPORT', 10, 10);
+        
+                    // Add a table for Item Codes with specific values
+                    pdf.setFontSize(12);
+                    const itemCodeData = [
+                        ['Item Code', `${dataHeader.code}`], // First row of item codes
+                        ['Name', `${dataHeader.name}`], // Second row of item codes
+                        ['Periode', `${startDate} - ${endDate}`], // Period for the report
+                        ['Admin', `${dataHeader.admin}`]  // Admin responsible for the material
+                    ];
+        
+                    // Add header for Item Codes without borders
+                    pdf.autoTable({
+                        body: itemCodeData, // Body rows with item code values
+                        startY: 20, // Start Y position for the table
+                        theme: 'grid', // Use grid theme
+                        margin: { horizontal: 10 }, // Margin from the edges
+                        styles: {
+                            overflow: 'linebreak', // Allow line breaks
+                            cellWidth: 'auto', // Auto width for cells
+                            fontSize: 10, // Font size for the item codes
+                            lineWidth: 0, // Disable borders
+                            fillColor: null // Disable fill color
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 80 }, // Set width for each column
+                            1: { cellWidth: 80 },
+                        }
+                    });
+        
+                    // Define columns and data for material activity
+                    const columns = [
+                        { header: 'NO', dataKey: 'no' },
+                        { header: 'DATE', dataKey: 'date' },
+                        { header: 'CODE', dataKey: 'code' },
+                        { header: 'NAME', dataKey: 'name' },
+                        { header: 'DESC', dataKey: 'desc' },
+                        { header: 'SOURCE', dataKey: 'source' },
+                        { header: 'ACTIVITY', dataKey: 'activity' },
+                        { header: 'QUANTITY', dataKey: 'quantity' },
+                        { header: 'BALANCE', dataKey: 'balance' }
+                    ];
+        
+                    // Prepare data for the material activity table
+                    const data = [];
+                    $('#resultTableContainer tr').each(function(index) {
+                        // Skip the first row (header)
+                        if (index === 0) return;
+        
+                        const row = $(this).find('td');
+                        const rowData = {
+                            no: row.eq(0).text() || 'N/A',
+                            date: row.eq(1).text() || 'N/A',
+                            code: row.eq(2).text() || 'N/A',
+                            name: row.eq(3).text() || 'N/A',
+                            desc: row.eq(4).text() || 'N/A',
+                            source: row.eq(5).text() || 'N/A',
+                            activity: row.eq(6).text() || 'N/A',
+                            quantity: row.eq(7).text() || 'N/A',
+                            balance: row.eq(8).text() || 'N/A'
+                        };
+                        data.push(rowData);
+                    });
+        
+                    // Create material activity table
+                    pdf.autoTable({
+                        head: [columns.map(col => col.header)], // Use headers for the first row
+                        body: data.map(item => columns.map(col => item[col.dataKey])), // Use data for the table body
+                        startY: 60, // Start Y position for the material activity table (below the Item Code table)
+                        theme: 'grid', // Optional: choose a theme
+                        margin: { horizontal: 10 }, // Margin from the edges
+                        styles: {
+                            overflow: 'linebreak', // Allow line breaks
+                            cellWidth: 'auto', // Auto width for cells
+                            fontSize: 10 // Font size for the material activity table
+                        },
+                        columnStyles: {
+                            // Optional: set specific styles for columns
+                            0: { cellWidth: 10 }, // Example: set width for the first column
+                            1: { cellWidth: 30 }, // Example: set width for the second column
+                            // Add more styles as needed
+                        }
+                    });
+        
+                    // Save the PDF
+                    pdf.save('Laporan_Material.pdf');
                 },
-                columnStyles: {
-                    // Optional: set specific styles for columns
-                    0: { cellWidth: 10 }, // Example: set width for the first column
-                    1: { cellWidth: 30 }, // Example: set width for the second column
-                    // Add more styles as needed
+                error: function(error) {
+                    console.error('Error fetching header data:', error);
                 }
             });
-        
-            // Save the PDF
-            pdf.save('Laporan_Material.pdf');
         });
+        
+        
+        
  
 
 
