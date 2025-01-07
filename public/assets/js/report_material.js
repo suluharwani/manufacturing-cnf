@@ -228,7 +228,8 @@ window.jsPDF = window.jspdf.jsPDF
                         ['Item Code', `${dataHeader.code}`], // First row of item codes
                         ['Name', `${dataHeader.name}`], // Second row of item codes
                         ['Periode', `${startDate} - ${endDate}`], // Period for the report
-                        ['Admin', `${dataHeader.admin}`]  // Admin responsible for the material
+                        ['Admin', `${dataHeader.admin}`],  // Admin responsible for the material
+                        ['Satuan', `${dataHeader.satuan}`]  // Admin responsible for the material
                     ];
         
                     // Add header for Item Codes without borders
@@ -247,6 +248,7 @@ window.jsPDF = window.jspdf.jsPDF
                         columnStyles: {
                             0: { cellWidth: 80 }, // Set width for each column
                             1: { cellWidth: 80 },
+                  
                         }
                     });
         

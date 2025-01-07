@@ -355,16 +355,23 @@ class ReportController extends BaseController
         $materialModel = new \App\Models\MdlMaterial();
 
         // Fetch material data based on the ID
-        $materialData = $materialModel->find($id);
+
+        $materialData = $materialModel->select('materials.kode as kode, materials.name as name,satuan.kode as satuan_kode, satuan.nama as satuan_nama ')
+        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')             
+        ->where('materials.id',$id)->find();
+
 
         // If material data exists, return it as JSON
-        if ($materialData) {
+        $data = $materialData[0];
+        if ($data) {
             return $this->response->setJSON([
                 'status' => 'success',
                 'data' => [
-                    'code' => $materialData['kode'],
-                    'name' => $materialData['name'],
-                    'admin'=> $userInfo['nama_depan']." ".$userInfo['nama_belakang']
+                    'code' => $data['kode'],
+                    'name' => $data['name'],
+                    'admin'=> $userInfo['nama_depan']." ".$userInfo['nama_belakang'],
+                    'satuan'=> $data['satuan_nama']." (".$data['satuan_kode'].")"
                 ]
             ]);
         } else {
