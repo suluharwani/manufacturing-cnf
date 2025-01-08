@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use AllowDynamicProperties;
 class MaterialRequestController extends BaseController
 {
     protected $changelog;
@@ -164,4 +164,5 @@ class MaterialRequestController extends BaseController
             return json_encode(['message' => 'Material Request not found', 'code' => 404]);
         }
     }
+
 }

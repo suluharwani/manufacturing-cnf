@@ -300,10 +300,10 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material_return');
         return view('admin/index', $data);
     }
-    public function inventory_reduction(){
-        $data['group'] = 'Inventory Reduction';
-        $data['title'] = 'Inventory Reduction';
-        $data['content'] = view('admin/content/material_reduction');
+    public function inventory_destruction(){
+        $data['group'] = 'Inventory Destruction';
+        $data['title'] = 'Inventory Destruction';
+        $data['content'] = view('admin/content/material_destruction');
         return view('admin/index', $data);
     }
 

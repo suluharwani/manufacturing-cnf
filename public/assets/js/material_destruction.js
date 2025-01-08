@@ -30,44 +30,41 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"/requisition/listdata" , // json datasource 
+      "url" :base_url+"/pemusnahan/listdataPemusnahan" , // json datasource 
       "type": "post",  // method  , by default get
       // "async": false,
       "dataType": 'json',
       "data":{},
     },
-
+    // $row[] = $no;
+    // $row[] = $lists->code;
+    // $row[] = $lists->created_at;
+    // $row[] = $lists->status;
+    // $row[] = $lists->id;
+    // $row[] = $lists->department_name;
     columns: [
     {},
     {mRender: function (data, type, row) {
-        return formatDateTime(row[1])
+        return formatDateTime(row[2])
     }},
    
     {mRender: function (data, type, row) {
-        return row[2]
+        return row[5]
     }},
     {mRender: function (data, type, row) {
-        return row[3]
+        return row[1]
     }},
     {mRender: function (data, type, row) {
-      return row[4]
-
-    }},
-    {mRender: function (data, type, row) {
-      return row[5]
-
-    }},
-    {mRender: function (data, type, row) {
-      if (row[6] == 0) {
-        stat = `<span class="badge bg-warning text-dark">Draft</span>`
+      if (row[3] == 0) {
+        status = `<span class="badge bg-warning text-dark">Draft</span>`
       }else{
-        stat = `<span class="badge bg-success text-dark">Posted</span>`
+        status = `<span class="badge bg-success text-dark">Posted</span>`
       }
-        return stat
+        return status
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}pemusnahan/form/${row[7]}" target="_blank" class="btn btn-success btn-sm ">Edit</a>
-             <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" code = "${row[1]}" id="${row[7]}" >Delete</a>
+     return `<a href="${base_url}pemusnahan/form/${row[4]}" target="_blank" class="btn btn-success btn-sm ">Edit</a>
+             <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" code = "${row[1]}" id="${row[4]}" >Delete</a>
              `; 
     }}
   ],
@@ -139,7 +136,7 @@ $('.tambah').click(function() {
           $('#tambah').modal('hide'); 
           $('#tabel_serverside').DataTable().ajax.reload();
 
-      }, 
+      },
       error: function() {
         alert('Error connecting to server');
       }

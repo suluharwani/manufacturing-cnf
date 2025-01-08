@@ -14,34 +14,38 @@
 
 
 
-
+ 
 
 <!-- Recent Sales Start -->
 <div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Persediaan Material</h6>
-                        <button class= "btn btn-primary tambahPembelian">Tambah</button>
+                        <h6 class="mb-0">Data</h6>
+                        <button class= "btn btn-primary tambah">Tambah</button>
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Tanggal</th>
-                  <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
-                  <th style=" text-align: center;">Status</th>
+                  <th style=" text-align: center;">DATE</th>
+                  <th style=" text-align: center;">CODE</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">DEPARTMENT</th>
+                  <th style=" text-align: center;">ADMIN/REQUESTOR</th>
+                  <th style=" text-align: center;">STATUS</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr  class="text-center">
-                  <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Tanggal</th>
-                  <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
-                  <th style=" text-align: center;">Status</th>
+                <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">DATE</th>
+                  <th style=" text-align: center;">CODE</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">DEPARTMENT</th>
+                  <th style=" text-align: center;">ADMIN/REQUESTOR</th>
+                  <th style=" text-align: center;">STATUS</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
               </tr>
@@ -52,11 +56,11 @@
             </div>
 <!-- Recent Sales End -->
 
-<div class="modal fade" id="tambahPembelianModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
+<div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tambahPembelianModalLabel">Pembelian</h5>
+        <h5 class="modal-title" id="tambahLabel">Pembelian</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

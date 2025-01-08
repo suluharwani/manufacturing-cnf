@@ -361,7 +361,26 @@ $routes->group('materialreturn', function ($routes) {
     
 });
 $routes->group('pemusnahan', function ($routes) {
-    $routes->get('', 'Home::inventory_reduction',['filter' => 'accessControl:2']); 
-
+    $routes->get('', 'Home::inventory_destruction',['filter' => 'accessControl:2']); 
+    $routes->get('form/(:any)', 'MaterialDestructionController::destruction_form/$1',['filter' => 'accessControl:2']); 
+    $routes->post('addDocument', 'MaterialDestructionController::addDocument',['filter' => 'accessControl:2']); 
+    $routes->post('addMD', 'MaterialDestructionController::addMD',['filter' => 'accessControl:2']); 
+    $routes->post('listdataPemusnahan', 'MaterialDestructionController::listdataPemusnahan',['filter' => 'accessControl:2']); 
+    $routes->post('delete', 'MaterialDestructionController::delete',['filter' => 'accessControl:2']); 
+    $routes->post('deleteList/(:any)', 'MaterialDestructionController::deleteList/$1',['filter' => 'accessControl:2']); 
+    $routes->post('datamd/(:any)', 'MaterialDestructionController::datamd/$1',['filter' => 'accessControl:2']); 
+    $routes->post('posting/(:any)', 'MaterialDestructionController::posting/$1',['filter' => 'accessControl:2']); 
+    
 });
 
+$routes->group('requisition', function ($routes) {
+    $routes->get('form/(:any)', 'MaterialRequisition::destruction_form/$1',['filter' => 'accessControl:2']); 
+    $routes->post('addDocument', 'MaterialRequisition::addDocument',['filter' => 'accessControl:2']); 
+    $routes->post('addMD', 'MaterialRequisition::addMD',['filter' => 'accessControl:2']); 
+    $routes->post('listdata', 'MaterialRequisition::listdata',['filter' => 'accessControl:2']); 
+    $routes->post('delete', 'MaterialRequisition::delete',['filter' => 'accessControl:2']); 
+    $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 
+    $routes->post('datamd/(:any)', 'MaterialRequisition::datamd/$1',['filter' => 'accessControl:2']); 
+    $routes->post('posting/(:any)', 'MaterialRequisition::posting/$1',['filter' => 'accessControl:2']); 
+    
+});

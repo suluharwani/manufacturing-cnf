@@ -297,9 +297,9 @@ class ReportController extends BaseController
 
         // Convert endDate to DateTime object, subtract one day, and keep the time
         $endDateObj = new \DateTime($endDate);
-        $endDateObj->modify('-1 day');
+        $endDateObj->modify('-1 second');
         $endDate = $endDateObj->format('Y-m-d H:i:s');
-
+        // var_dump($endDate);
         // Prepare data for passing to other methods
         $data['material_id'] = $materialId;
         $data['start_date'] = $startDate;
@@ -312,7 +312,7 @@ class ReportController extends BaseController
         $return = $this->materialReturn($data);
         $stock_opname = $this->materialStockOpname($data);
         $material_requisition = $this->materialRequisition($data);
-
+        // var_dump($material_requisition);
         // Calculate the total balance by summing 'jumlah' from each result
         $totalBalance = 0;
 

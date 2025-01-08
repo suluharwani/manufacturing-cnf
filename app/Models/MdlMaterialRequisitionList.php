@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 
 class MdlMaterialRequisitionList extends Model
 {
-    protected $table            = 'mdlmaterialrequisitionlists';
+    protected $table            = 'material_requisition_list';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ["id","id_material_requisition","id_material","id_currency","jumlah","harga","created_at","updated_at","deleted_at"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -21,7 +21,7 @@ class MdlMaterialRequisitionList extends Model
     protected array $castHandlers = [];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
