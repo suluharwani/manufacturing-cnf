@@ -12,7 +12,7 @@ class MdlMaterialRequisition extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ["id","code","id_wo","id_dept","id_user","remarks","created_at","updated_at","deleted_at","status","requestor","server"];
+    protected $allowedFields    = ["id","code","id_wo","id_dept","id_user","remarks","created_at","updated_at","deleted_at","status","requestor","server","completion"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

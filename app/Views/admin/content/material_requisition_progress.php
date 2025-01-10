@@ -21,7 +21,6 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Data</h6>
-                        <button class= "btn btn-primary tambah">Tambah</button>
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
@@ -96,5 +95,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/material_requisition.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/material_requisition_progress.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

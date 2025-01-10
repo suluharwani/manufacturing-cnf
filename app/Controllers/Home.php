@@ -306,5 +306,11 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material_destruction');
         return view('admin/index', $data);
     }
+    public function material_requisition_progress(){
+        $data['group'] = 'Material Requisition Progress';
+        $data['title'] = 'Material Requisition Progress';
+        $data['content'] = view('admin/content/material_requisition_progress');
+        return view('admin/index', $data);
+    }
 
 }

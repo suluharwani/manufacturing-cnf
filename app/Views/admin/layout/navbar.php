@@ -63,19 +63,19 @@
 
                     <a href="<?= base_url('stock') ?>" class="dropdown-item">Stock</a>
                     <a href="<?= base_url('pembelian') ?>" class="dropdown-item">Incoming Stock</a>
-                    <a href="<?= base_url('pemusnahan') ?>" class="dropdown-item"> Inventory reduction</a>
-                    <a href="<?= base_url('materialrequisition') ?>" class="dropdown-item">Material Requisition</a>
                     <a href="<?= base_url('material_requisition_progress') ?>" class="dropdown-item">Progress Material Requisition</a>
+                    <a href="<?= base_url('pemusnahan') ?>" class="dropdown-item"> Inventory reduction</a>
                     <a href="<?= base_url('materialreturn') ?>" class="dropdown-item">Material Return</a>
                     <a href="<?= base_url('stock') ?>" class="dropdown-item">Stock Opname</a>
                 </div>
             </div>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
-                        class="fa fa-archive me-2"></i>Customer Order</a>
+                        class="fa fa-archive me-2"></i>Pre-production</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('proformainvoice') ?>" class="dropdown-item">Proforma Invoice</a>
                     <a href="<?= base_url('work_order') ?>" class="dropdown-item">Work Orders</a>
+                    <a href="<?= base_url('materialrequisition') ?>" class="dropdown-item">Material Requisition</a>
                     <a href="<?= base_url('track_work_order') ?>" class="dropdown-item">Track Work Order Status</a>
                 </div>
             </div>

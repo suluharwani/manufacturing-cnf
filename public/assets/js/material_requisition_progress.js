@@ -30,7 +30,7 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-      "url" :base_url+"/requisition/listdata" , // json datasource 
+      "url" :base_url+"/requisitionprogress/listdata" , // json datasource 
       "type": "post",  // method  , by default get
       // "async": false,
       "dataType": 'json',
@@ -69,11 +69,10 @@ $(document).ready(function() {
         return stat
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}requisition/form/${row[7]}" target="_blank" class="btn btn-success btn-sm ">Edit</a>
-             <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" code = "${row[1]}" id="${row[7]}" >Delete</a>
+     return `<a href="${base_url}requisitionprogress/form/${row[7]}" target="_blank" class="btn btn-success btn-sm ">Progress</a>
              `; 
     }}
-  ],
+  ], 
   "columnDefs": [{
     "targets": [0],
     "orderable": false

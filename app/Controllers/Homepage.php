@@ -9,10 +9,7 @@ class Homepage extends BaseController
 {
     public function index()
     {
-        // $data['title'] = $_ENV['perusahaan']; ;
-        echo('<img src= "'.base_url('assets/images.png').'" width="600px">  ');
+        return view('homepage');
 
-        // $data['content'] = view('admin/content/material');
-        // return view('admin/index', $data);
     }
 }

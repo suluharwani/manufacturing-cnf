@@ -141,6 +141,39 @@ class Stock extends BaseController
     return $data;
 
   }
+  function get_stock($id)
+  {
+    $data['stock_awal'] = $this->getStockAwal($id);
+    $data['total_in'] = $this->materialPurchase($id) + $this->materialReturn($id);
+    $data['total_out'] = $this->materialDestruction($id) + $this->materialRequisition($id);
+    $data['so'] = $this->materialStockOpname($id);
+    $data['total'] = $data['total_in'] + $data['total_out'] + $data['so'] + $data['stock_awal'];
+    // var_dump($data);
+    return json_encode($data);
+
+  }
+  public function getStockAwal($id)
+  {
+    $mdl = new \App\Models\MdlStock();
+
+    // Initialize the query
+    $query = $mdl->select('stock_awal as jumlah')
+      ->where('stock.id_material', $id);
+
+
+    // Fetch the purchase details
+    $data = $query->findAll();
+
+
+    // Return the data as JSON or load a view as needed
+    if (empty($data)) {
+      return 0;
+    }
+
+    // Return the 'jumlah' value
+    return $data[0]['jumlah'];
+  }
+
   public function materialReturn($id)
   {
     $mdl = new \App\Models\MdlMaterialReturnList();
@@ -261,8 +294,8 @@ class Stock extends BaseController
        
         sum((stock_opname_list.jumlah_akhir - stock_opname_list.jumlah_awal)) as jumlah, 
          ') // Select fields from both tables
-         ->join('stock_opname', 'stock_opname.id = stock_opname_list.id_stock_opname')
-            ->where('stock_opname.status', 1)
+      ->join('stock_opname', 'stock_opname.id = stock_opname_list.id_stock_opname')
+      ->where('stock_opname.status', 1)
       ->where('stock_opname_list.id_material', $id);
 
     // Add date range conditions if provided

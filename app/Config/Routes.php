@@ -55,6 +55,8 @@ $routes->get('/scrap_management', 'Home::scrap_management',['filter' => 'accessC
 $routes->get('/warehouse_report', 'Home::warehouse_report',['filter' => 'accessControl:2']);
 $routes->post('/material/tambah_tipe', 'MaterialController::tambah_tipe',['filter' => 'accessControl:2']);
 $routes->post('/material/tambah_satuan', 'MaterialController::tambah_satuan',['filter' => 'accessControl:2']);
+$routes->get('/material_requisition_progress',  'Home::material_requisition_progress',['filter' => 'accessControl:2']);
+
 //product
 
 
@@ -229,7 +231,8 @@ $routes->group('stock', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
     $routes->get('addStock/(:any)', 'Stock::addStock/(:any)',['filter' => 'accessControl:2']); 
     $routes->post('stockdata', 'Stock::stockdata',['filter' => 'accessControl:2']); 
-
+    $routes->get('get_stock_in_out/(:any)', 'Stock::get_stock/$1',['filter' => 'accessControl:2']); 
+    
 });
 
     $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1',['filter' => 'accessControl:2']);
@@ -374,7 +377,7 @@ $routes->group('pemusnahan', function ($routes) {
 });
 
 $routes->group('requisition', function ($routes) {
-    $routes->get('form/(:any)', 'MaterialRequisition::destruction_form/$1',['filter' => 'accessControl:2']); 
+    $routes->get('form/(:any)', 'MaterialRequisition::mr/$1',['filter' => 'accessControl:2']); 
     $routes->post('addDocument', 'MaterialRequisition::addDocument',['filter' => 'accessControl:2']); 
     $routes->post('addMD', 'MaterialRequisition::addMD',['filter' => 'accessControl:2']); 
     $routes->post('listdata', 'MaterialRequisition::listdata',['filter' => 'accessControl:2']); 
@@ -382,5 +385,18 @@ $routes->group('requisition', function ($routes) {
     $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 
     $routes->post('datamd/(:any)', 'MaterialRequisition::datamd/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'MaterialRequisition::posting/$1',['filter' => 'accessControl:2']); 
+    $routes->get('WoAvailablelistdata/(:any)', 'MaterialRequisition::WoAvailablelistdata/$1',['filter' => 'accessControl:2']); 
+    $routes->get('dataRequestList/(:any)', 'MaterialRequisition::dataRequestList/$1',['filter' => 'accessControl:2']); 
+    $routes->post('submitRequest', 'MaterialRequisition::submitRequest',['filter' => 'accessControl:2']); 
+    $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 
+    
+});
+
+$routes->group('requisitionprogress', function ($routes) {
+  
+    $routes->post('listdata', 'MaterialRequisitionProgress::listdata',['filter' => 'accessControl:2']); 
+    $routes->get('form/(:any)', 'MaterialRequisitionProgress::mr/$1',['filter' => 'accessControl:2']); 
+    $routes->post('posting/(:any)', 'MaterialRequisitionProgress::posting/$1',['filter' => 'accessControl:2']); 
+    
     
 });
