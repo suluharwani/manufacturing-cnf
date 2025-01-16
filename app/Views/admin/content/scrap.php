@@ -28,29 +28,21 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                  <th style=" text-align: center;">PI</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">DEPARTMENT</th>
+                  <th style=" text-align: center;">SCRAP</th>
+                  <th style=" text-align: center;">ACTION</th>
                 </tr>
               </thead>
               <tfoot>
-                <tr class="text-center">
-                <th style=" text-align: center;">#</th>
-                  <th style=" text-align: center;">Kode</th>
-                  <th style=" text-align: center;">Nama</th>
-                  <th style=" text-align: center;">Kelompok</th>
-                  <th style=" text-align: center;">Purchase Order</th>
-                  <th style=" text-align: center;">Sales Order</th>
-                  <th style=" text-align: center;">Tersedia</th>
-                  <th style=" text-align: center;">Tersedia Sales Order</th>
-                  <th style=" text-align: center;">Satuan</th>
-                  <th style=" text-align: center;">Aktif</th>
+                <tr  class="text-center">
+                  <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">PI</th>
+                  <th style=" text-align: center;">WO</th>
+                  <th style=" text-align: center;">DEPARTMENT</th>
+                  <th style=" text-align: center;">SCRAP</th>
+                  <th style=" text-align: center;">ACTION</th>
                 </tr>
               </tr>
             </tfoot>
@@ -65,5 +57,5 @@
 
 <!-- Widgets End -->
 
-<script type="text/javascript" src="<?= base_url('assets') ?>/js/warehouse.js"></script>
+<script type="text/javascript" src="<?= base_url('assets') ?>/js/scrap.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

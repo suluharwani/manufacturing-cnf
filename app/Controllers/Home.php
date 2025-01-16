@@ -226,8 +226,8 @@ class Home extends BaseController
     }
         public function pembelian()
     {
-        $data['group'] = 'Stock';
-        $data['title'] = 'Pembelian';
+        $data['group'] = 'Goods Received Note';
+        $data['title'] = 'Goods Received Note';
         $data['content'] = view('admin/content/daftarPembelian');
         return view('admin/index', $data);
     }

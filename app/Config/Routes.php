@@ -400,3 +400,15 @@ $routes->group('requisitionprogress', function ($routes) {
     
     
 });
+
+$routes->group('scrap', function ($routes) {
+  
+    $routes->post('listdataScrap', 'ScrapController::listdataScrap',['filter' => 'accessControl:2']); 
+    $routes->post('addScrap', 'ScrapController::addScrap',['filter' => 'accessControl:2']); 
+    $routes->get('form/(:any)', 'ScrapController::scrap_form/$1',['filter' => 'accessControl:2']); 
+    $routes->post('listdataWO/(:any)', 'ScrapController::listdataWO/$1',['filter' => 'accessControl:2']); 
+    $routes->get('WoAvailablelistdata/(:any)', 'ScrapController::WoAvailablelistdata/$1',['filter' => 'accessControl:2']); 
+    $routes->get('materialScrapList/(:any)', 'ScrapController::materialScrapList/$1',['filter' => 'accessControl:2']); 
+    
+    
+});

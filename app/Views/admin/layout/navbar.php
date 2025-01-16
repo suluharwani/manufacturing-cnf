@@ -62,7 +62,7 @@
                 <div class="dropdown-menu bg-transparent border-0">
 
                     <a href="<?= base_url('stock') ?>" class="dropdown-item">Stock</a>
-                    <a href="<?= base_url('pembelian') ?>" class="dropdown-item">Incoming Stock</a>
+                    <a href="<?= base_url('pembelian') ?>" class="dropdown-item">Goods Received Note</a>
                     <a href="<?= base_url('material_requisition_progress') ?>" class="dropdown-item">Progress Material Requisition</a>
                     <a href="<?= base_url('pemusnahan') ?>" class="dropdown-item"> Inventory reduction</a>
                     <a href="<?= base_url('materialreturn') ?>" class="dropdown-item">Material Return</a>
