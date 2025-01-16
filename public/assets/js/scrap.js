@@ -64,9 +64,24 @@ $(document).ready(function () {
       },
       {
         mRender: function (data, type, row) {
-          return `<a href="${base_url}scrap/form/${row[1]}" target="_blank" class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>
+          if(row[6] == 0){
+            return `Unposted`;
+
+          }else{
+            return `Posted`
+          }
+      },
+      },
+      {
+        mRender: function (data, type, row) {
+          if(row[6] == 0){
+            return `<a href="${base_url}scrap/form/${row[1]}" target="_blank" class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>
                   <a href="javascript:void(0);" target="_blank" class="btn btn-danger btn-sm delete" id="'+row[1]+'" >Delete</a>`;
-        },
+
+          }else{
+            return `<a href="${base_url}scrap/form/${row[1]}" target="_blank" class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>`
+          }
+      },
       },
     ],
     columnDefs: [
@@ -86,3 +101,125 @@ $(document).ready(function () {
     },
   });
 });
+
+$('.add').on('click', function () {
+  // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
+  Swal.fire({
+      title: `Add Scrap Document`,
+      html: `
+      <form id="form_add_data">
+          <div class="form-group">
+              <label for="kode">Kode</label>
+              <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+              <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
+          </div>
+         
+          <div class="form-group">
+              <label for="work_order">work_order</label>
+              <select id="work_order" class="form-control">
+                  <option value="">Work Order</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="kode">Remarks</label>
+              <input type="text" class="form-control" id="remarks" aria-describedby="remarksHelp" placeholder="remarks">
+          </div>
+      </form>`,
+      confirmButtonText: 'Confirm',
+      focusConfirm: false,
+      preConfirm: () => {
+          const kode = Swal.getPopup().querySelector('#kode').value;
+          const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
+          const work_order = Swal.getPopup().querySelector('#work_order').value;
+          const department = Swal.getPopup().querySelector('#department').value;
+          const remarks = Swal.getPopup().querySelector('#remarks').value;
+          if (!kode || !proforma_invoice || !work_order || !department || !remarks) {
+              Swal.showValidationMessage('Silakan lengkapi data');
+          }
+          return {department:department, kode: kode, proforma_invoice: proforma_invoice, work_order:work_order , remarks:remarks };
+      }
+  }).then((result) => {
+      $.ajax({
+          type: "POST",
+          url: base_url + '/materialrequest/add',
+          async: false,
+          // 'kode','dept_id', 'id_pi', 'status', 'remarks',
+          data: { kode: result.value.kode, dept_id: result.value.department,id_pi:result.value.proforma_invoice, work_order:result.value.work_order, status:0, remarks:result.value.remarks },
+          success: function (data) {
+               $('#tabel_serverside').DataTable().ajax.reload();
+              Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: `Material request successfully added.`,
+                  showConfirmButton: false,
+                  timer: 1500
+              });
+          },
+          error: function (xhr) {
+              let d = JSON.parse(xhr.responseText);
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: `${d.message}`,
+                  footer: '<a href="">Why do I have this issue?</a>'
+              });
+          }
+      });
+  });
+
+  // Menambahkan event listener pada tombol generate kode
+  $('#generateCode').on('click', function () {
+      const generatedCode = generateCode();
+      $('#kode').val(generatedCode);  // Set value ke input kode
+  });
+
+  // Menambahkan opsi customer ke select dropdown
+  getWOOption().then(options => {
+      $('#work_order').html(options); // Isi select dengan opsi customer
+  }).catch(error => {
+      Swal.fire('Error', error, 'error');
+  });
+
+});
+
+function generateCode() {
+  // Mendapatkan tanggal saat ini
+  const today = new Date();
+  
+  // Format tanggal: yymmdd
+  const year = today.getFullYear().toString().slice(-2); // Ambil 2 digit terakhir dari tahun
+  const month = ('0' + (today.getMonth() + 1)).slice(-2); // Bulan dalam format 2 digit
+  const day = ('0' + today.getDate()).slice(-2); // Hari dalam format 2 digit
+  
+  // Menghasilkan dua angka acak
+  const randomNum = Math.floor(Math.random() * 100); // Angka acak antara 0 dan 99
+  const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
+  
+  // Gabungkan semuanya menjadi format PIXXXXXXXX
+  const code = `SC${year}${month}${day}${randomNumStr}`;
+  
+  return code;
+}
+function getWOOption() {
+  return new Promise((resolve, reject) => {
+
+    $.ajax({
+      type: 'POST',
+      url: base_url + '/wo/woList', // Endpoint untuk mendapatkan PI
+      success: function(response) {
+        // Buat opsi produk dari data yang diterima
+        var WOoptions = '<option value="">Work Order</option>';
+              response.forEach(function(wo) {
+                  WOoptions += `<option value="${wo.id}">${wo.kode}</option>`;
+              });
+
+        // Resolving the promise dengan materialWOOptions setelah sukses
+        resolve(WOoptions);
+      },
+      error: function(xhr) {
+        // Menolak promise jika terjadi kesalahan
+        reject('Terjadi kesalahan saat mengambil daftar produk');
+      }
+    });
+  });
+}

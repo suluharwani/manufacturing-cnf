@@ -7,6 +7,25 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class ScrapController extends BaseController
 {
+    protected $changelog;
+    public function __construct()
+    {
+        //   parent::__construct();
+        $this->db = \Config\Database::connect();
+        $this->session = session();
+        $this->uri = service('uri');
+        helper('form');
+        $this->form_validation = \Config\Services::validation();
+        $this->userValidation = new \App\Controllers\LoginValidation();
+        $this->changelog = new \App\Controllers\Changelog();
+
+        //if sesion habis
+        //check access
+        $check = new \App\Controllers\CheckAccess();
+        $check->logged();
+        //check access
+
+    }
     public function scrap_form($id)
     {
          $Mdl = new \App\Models\MdlScrapDoc();
@@ -72,6 +91,7 @@ $dataScrapDoc = $Mdl
             $row[] = $lists->wo_code;
             $row[] = $lists->code;
             $row[] = $lists->dept_name;
+            $row[] = $lists->status;
 
 // From joined suppliers table
             $data[] = $row;
@@ -187,5 +207,47 @@ public function materialScrapList($idScrap){
     ->join('satuan', 'satuan.id = materials_detail.satuan_id')
     ->where('scrap_doc_id', $idScrap)->get()->getResultArray();
     return json_encode( $data );
+}
+public function deleteList($id){
+    $userInfo = $_SESSION['auth'];
+
+    $mdl = new \App\Models\MdlScrap();
+    // $id = $this->request->getPost('id');
+
+    // Ambil data sebelum dihapus untuk riwayat
+    $dataBeforeDelete = $mdl->where( 'id', $id)->first();
+
+    if ($dataBeforeDelete) {
+        $mdl->where( 'id', $id)->delete();
+
+        if ($mdl->affectedRows() != 0) {
+            $riwayat = "{$userInfo['nama_depan']} {$userInfo['nama_belakang']} menghapus scrap id: {$id} dengan data: " . json_encode($dataBeforeDelete);
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 500)));
+        }
+    } else {
+        header('HTTP/1.1 404 Not Found');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(array('message' => 'Data tidak ditemukan', 'code' => 404)));
+    }
+
+}
+    
+function posting($id) {
+    $mdl = new \App\Models\MdlScrapDoc();
+    $mdl->set('status', $_POST['status'])->where('id',$id)->update();
+    if ($mdl->affectedRows() !== 0) {
+        $riwayat = 'Berhasil ubah status ke '.$_POST['status'].' scrap id: ' . $id.'';
+        $this->changelog->riwayat($riwayat);
+        header('HTTP/1.1 200 OK');
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+    }
 }
 }

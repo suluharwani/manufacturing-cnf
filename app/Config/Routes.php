@@ -293,6 +293,7 @@ $routes->group('proformainvoice', function ($routes) {
 $routes->group('wo', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
 
+    $routes->post('woList', 'WorkOrderController::woList',['filter' => 'accessControl:2']); 
     $routes->post('listdata', 'WorkOrderController::listdataWorkOrder',['filter' => 'accessControl:2']); 
     $routes->post('add', 'WorkOrderController::add',['filter' => 'accessControl:2']); 
     $routes->get('(:any)', 'WorkOrderController::wo/$1',['filter' => 'accessControl:2']); 
@@ -409,6 +410,8 @@ $routes->group('scrap', function ($routes) {
     $routes->post('listdataWO/(:any)', 'ScrapController::listdataWO/$1',['filter' => 'accessControl:2']); 
     $routes->get('WoAvailablelistdata/(:any)', 'ScrapController::WoAvailablelistdata/$1',['filter' => 'accessControl:2']); 
     $routes->get('materialScrapList/(:any)', 'ScrapController::materialScrapList/$1',['filter' => 'accessControl:2']); 
+    $routes->post('deleteList/(:any)', 'ScrapController::deleteList/$1',['filter' => 'accessControl:2']); 
+    $routes->post('posting/(:any)', 'ScrapController::posting/$1',['filter' => 'accessControl:2']); 
     
     
 });

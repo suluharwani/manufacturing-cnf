@@ -12,7 +12,7 @@ class MdlScrap extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ["id","material_id","quantity","reason","created_at","updated_at","deleted_at","scrap_doc_id",];
+    protected $allowedFields    = ["id","material_id","quantity","reason","created_at","updated_at","deleted_at","scrap_doc_id"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

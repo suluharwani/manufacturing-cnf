@@ -88,7 +88,15 @@
   <div class="bg-light text-center rounded p-4">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h6 class="mb-0">Material Scrap</h6>
-      <button class="btn btn-primary posting">Posting</button>
+      <?php
+    if ($scrap_doc[0]['status'] == 0||$scrap_doc[0]['status'] == "0") {?>
+    <button type="button" class="btn btn-success posting">Posting</button>
+    <?php
+    }else{?>
+    <button type="button" class="btn btn-danger batalPosting">Batal Posting</button>
+    <?php
+    }
+    ?>
     </div>
     <div class="table-responsive">
 

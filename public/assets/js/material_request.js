@@ -280,11 +280,7 @@ function getPIOption() {
   });
 }
 
-$.ajax({
-  url: base_url + '/proformainvoice/get_list',
-  method: 'POST',
-  dataType: 'json' // Expecting JSON response
-})
+
 
 function getDepartOption() {
   return new Promise((resolve, reject) => {
@@ -310,8 +306,26 @@ function getDepartOption() {
   });
 }
 
-$.ajax({
-  url: base_url + '/proformainvoice/get_list',
-  method: 'POST',
-  dataType: 'json' // Expecting JSON response
-})
+function getWOOption() {
+  return new Promise((resolve, reject) => {
+
+    $.ajax({
+      type: 'POST',
+      url: base_url + '/department/department_list', // Endpoint untuk mendapatkan PI
+      success: function(response) {
+        // Buat opsi produk dari data yang diterima
+        var PIoptions = '<option value="">Work Order</option>';
+              response.forEach(function(pi) {
+                  PIoptions += `<option value="${pi.id}">${pi.name}</option>`;
+              });
+
+        // Resolving the promise dengan materialPIOptions setelah sukses
+        resolve(PIoptions);
+      },
+      error: function(xhr) {
+        // Menolak promise jika terjadi kesalahan
+        reject('Terjadi kesalahan saat mengambil daftar produk');
+      }
+    });
+  });
+}

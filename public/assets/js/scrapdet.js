@@ -31,7 +31,7 @@ $(document).ready(function () {
       for (const item of data) {
       max_request = item.total_usage
 
-        if(statusDoc == 'Posted'){
+        if(statusDoc == 1){
           button = `Document Posted`
         }else{
            button = (max_request <= 0) 
@@ -84,7 +84,7 @@ $('#materialTable tbody').on('click', '.add', function () {
               </div>
               <div class="form-group">
                   <label for="quantity">Quantity</label>
-                  <input type="text" class="form-control" id="quantity" aria-describedby="quantityHelp" placeholder="quantity">
+                  <input type="number" class="form-control" id="quantity" aria-describedby="quantityHelp" placeholder="quantity">
               </div>
               <div class="form-group">
                   <label for="remarks">Remark</label>
@@ -170,8 +170,15 @@ $('#materialTable tbody').on('click', '.add', function () {
                     var tableBody = $('#data-body');
                     tableBody.empty();
                     no = 1
+                    
+                     
                     // Menampilkan data ke dalam tabel
                     response.forEach(function(item) {
+                      if(statusDoc == 1){
+                        button = `Document Posted`
+                      }else{
+                        button = `<button class="btn btn-danger btn-sm deleteList"  data-id="${item.id}">Delete</button>`
+                      }
                         var row = `<tr>
                             <td>${no++}</td>
                             <td>${item.kode}</td>
@@ -179,8 +186,7 @@ $('#materialTable tbody').on('click', '.add', function () {
                             <td>${item.satuan}</td>
                             <td>${item.quantity}</td>
                             <td>
-                            <button class="btn btn-danger btn-sm deleteList"  data-id="${item.id}">Delete</button>
-                             
+                            ${button}
                             </td>   
                         </tr>`;
                         tableBody.append(row);
@@ -207,13 +213,13 @@ $('#materialTable tbody').on('click', '.add', function () {
               if (result.isConfirmed) {
                   $.ajax({
                       type: "POST",
-                      url: base_url + '/materialrequest/deleteList/' + id,
+                      url: base_url + '/scrap/deleteList/' + id,
                       success: function() {
                           loadData();
-                          Swal.fire('Sukses', 'Tunjangan berhasil dihapus.', 'success');
+                          Swal.fire('Sukses', 'Scrap berhasil dihapus.', 'success');
                       },
                       error: function() {
-                          Swal.fire('Error', 'Gagal menghapus tunjangan.', 'error');
+                          Swal.fire('Error', 'Gagal menghapus scrap.', 'error');
                       }
                   });
               }
@@ -317,3 +323,59 @@ function formatDate(datetime) {
       });
     });
   }
+  $('.posting').on('click',function(){
+    const id = masterId;
+    const status = 1;
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: `Data akan diposting!`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Posting!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/scrap/posting/' + id,
+                data: {status:status},
+                success: function() {
+                  window.location.reload();
+                    Swal.fire('Sukses', 'Dokumen berhasil diposting.', 'success');
+                },
+                error: function() {
+                    Swal.fire('Error', 'Gagal.', 'error');
+                }
+            });
+        }
+    });
+  })
+  $('.batalPosting').on('click',function(){
+    const id = masterId;
+    const status = 0;
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: `Posting akan dibatalkan!`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Posting!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/scrap/posting/' + id,
+                data: {status:status},
+                success: function() {
+                  window.location.reload();
+                    Swal.fire('Sukses', 'Dokumen berhasil diposting.', 'success');
+                },
+                error: function() {
+                    Swal.fire('Error', 'Gagal.', 'error');
+                }
+            });
+        }
+    });
+  })

@@ -309,4 +309,11 @@ function getWo($id_wo){
         $model->delete($id);
         return $this->response->setJSON(['status' => 'success']);
     }
+    function woList(){
+        $mdl = new \App\Models\MdlWorkOrder();
+         $data =  $mdl->orderBy('id','desc')->get()->getResultArray();
+         return $this->response->setJSON($data);
+
+    }
+   
 }
