@@ -68,15 +68,16 @@ window.jsPDF = window.jspdf.jsPDF
         $('#generateReportBtnMaterial').on('click', function () {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
+            const selectlist = $('#selectlist').val();
                 // Tambahkan waktu ke endDate
     let startDateTime = startDate + ' 00:00:00';
     let endDateTime = endDate + ' 23:59:59';
 
     // Jika startDate adalah datetime-local, maka format juga
 
-            const materialId = $('#materialSelect').val();
+            const materialId = $('#selectlist').val();
             $.ajax({
-                url: base_url+'report/materialStockCard', 
+                url: base_url+'report/materialStockCard',  
                 method: 'POST',
                 data: {
                     start_date: startDateTime,
@@ -125,7 +126,33 @@ window.jsPDF = window.jspdf.jsPDF
                     // console.log(result);
                     // });
                     let total = parseFloat(balanceBefore);
-                           data.merge.forEach(function (item) {
+                                        // <option value="all">Semua Material</option>
+                                        // <option value="materialDestruction">Material Destruction</option>
+                                        // <option value="materialRequisition">Material Requisition</option>
+                                        // <option value="materialReceiptNote">Material Receipt Note</option>
+                                        // <option value="materialReturn">Material Return</option>
+                                        // <option value="opname">Stock Opname</option>
+                                let dataview = ''
+                                console.log(selectlist)
+                            if (selectlist === 'all' || selectlist === '') {
+                                dataview = data.merge
+                            } else if(selectlist == 'materialDestruction' ) {
+                                dataview = data.destruction
+                            }else if(selectlist == 'materialRequisition'){
+                                dataview = data.material_requisition
+                            }else if (selectlist == 'materialReceiptNote'){
+                                dataview = data.pembelian
+                            }
+                            else if(selectlist == 'materialReturn'){
+                                dataview = data.return
+                            }
+                            else if(selectlist == 'opname'){
+                                dataview = data.stock_opname
+                            }
+
+                            console.log(dataview)
+                            
+                            dataview.forEach(function (item) {
                             total+=parseFloat(item.jumlah ? item.jumlah : 0);
                         row += `
                             <tr>

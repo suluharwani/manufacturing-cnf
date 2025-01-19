@@ -25,10 +25,7 @@ tr:nth-child(even) {
         <div class="col-sm-12 col-xl-12">
             <div class="bg-light rounded h-100 p-4">
                 <!-- Add this button for List Laporan -->
-                <button class="btn btn-primary" id="listLaporanBtnKS">Kartu Stock</button>
-                <button class="btn btn-primary" id="listLaporanBtnPB">Pembelian</button>
-                <button class="btn btn-primary" id="listLaporanBtnPM">Pemakaian</button>
-                <button class="btn btn-primary" id="listLaporanBtnRS">Rusak/Scrap</button>
+                <button class="btn btn-primary" id="listLaporanBtnKS">Stock Material</button>
                 <button class="btn btn-success" id="printBtn">Print</button>
       
 
@@ -50,8 +47,26 @@ tr:nth-child(even) {
                                         <label for="endDate">Tanggal Akhir</label>
                                         <input type="date" class="form-control" id="endDate" required>
                                     </div>
+                                    <div class="form-group">
+                                    <label for="materialSelect">Select Filter</label>
+
+                                    <select class="form-select" id="selectlist" >
+                                        <option value="all">Semua Material</option>
+                                        <option value="materialDestruction">Material Destruction</option>
+                                        <option value="materialRequisition">Material Requisition</option>
+                                        <option value="materialReceiptNote">Material Receipt Note</option>
+                                        <option value="materialReturn">Material Return</option>
+                                        <option value="opname">Stock Opname</option>
+                                   
+                                   
+
+                                    </select>
+                                    </div>
+                                    <div class="form-group">
                                     <label for="materialSelect">Pilih Material</label>
                                     <input type="text" class="form-control" id="materialSelect" hidden>
+                                    </div>
+                                    
 
     <div class="dropdown">
         <input type="text" class="form-control" id="searchInput" placeholder="Search Material" aria-label="Search Material">
