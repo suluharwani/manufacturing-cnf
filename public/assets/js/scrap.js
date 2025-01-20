@@ -113,7 +113,12 @@ $('.add').on('click', function () {
               <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
               <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
           </div>
-         
+         <div class="form-group">
+              <label for="department">department</label>
+              <select id="department" class="form-control">
+                  <option value="">Department</option>
+              </select>
+          </div>
           <div class="form-group">
               <label for="work_order">work_order</label>
               <select id="work_order" class="form-control">
@@ -129,28 +134,27 @@ $('.add').on('click', function () {
       focusConfirm: false,
       preConfirm: () => {
           const kode = Swal.getPopup().querySelector('#kode').value;
-          const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
           const work_order = Swal.getPopup().querySelector('#work_order').value;
           const department = Swal.getPopup().querySelector('#department').value;
           const remarks = Swal.getPopup().querySelector('#remarks').value;
-          if (!kode || !proforma_invoice || !work_order || !department || !remarks) {
+          if (!kode || !work_order || !department || !remarks) {
               Swal.showValidationMessage('Silakan lengkapi data');
           }
-          return {department:department, kode: kode, proforma_invoice: proforma_invoice, work_order:work_order , remarks:remarks };
+          return {department:department, kode: kode,  work_order:work_order , remarks:remarks };
       }
   }).then((result) => {
       $.ajax({
           type: "POST",
-          url: base_url + '/materialrequest/add',
+          url: base_url + '/scrap/add',
           async: false,
           // 'kode','dept_id', 'id_pi', 'status', 'remarks',
-          data: { kode: result.value.kode, dept_id: result.value.department,id_pi:result.value.proforma_invoice, work_order:result.value.work_order, status:0, remarks:result.value.remarks },
+          data: { code: result.value.kode, id_dept: result.value.department, id_wo:result.value.work_order, status:0, remarks:result.value.remarks },
           success: function (data) {
                $('#tabel_serverside').DataTable().ajax.reload();
               Swal.fire({
                   position: 'center',
                   icon: 'success',
-                  title: `Material request successfully added.`,
+                  title: `Scrap successfully added.`,
                   showConfirmButton: false,
                   timer: 1500
               });
@@ -179,9 +183,38 @@ $('.add').on('click', function () {
   }).catch(error => {
       Swal.fire('Error', error, 'error');
   });
+  getDepartOption().then(Departoptions => {
+    console.log(Departoptions);
+    $('#department').html(Departoptions); // Isi select dengan opsi customer
+}).catch(error => {
+    Swal.fire('Error', error, 'error');
+});
 
 });
 
+function getDepartOption() {
+  return new Promise((resolve, reject) => {
+
+    $.ajax({
+      type: 'POST',
+      url: base_url + '/department/department_list', // Endpoint untuk mendapatkan PI
+      success: function(response) {
+        // Buat opsi produk dari data yang diterima
+        var PIoptions = '<option value="">Department</option>';
+              response.forEach(function(pi) {
+                  PIoptions += `<option value="${pi.id}">${pi.name}</option>`;
+              });
+
+        // Resolving the promise dengan materialPIOptions setelah sukses
+        resolve(PIoptions);
+      },
+      error: function(xhr) {
+        // Menolak promise jika terjadi kesalahan
+        reject('Terjadi kesalahan saat mengambil daftar produk');
+      }
+    });
+  });
+}
 function generateCode() {
   // Mendapatkan tanggal saat ini
   const today = new Date();

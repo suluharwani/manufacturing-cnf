@@ -327,6 +327,8 @@ $routes->group('report', function ($routes) {
     $routes->get('purchase', 'ReportController::purchase',['filter' => 'accessControl:2']); 
     $routes->post('materialStockCard', 'ReportController::materialStockCard',['filter' => 'accessControl:2']); 
     $routes->get('getHeader', 'ReportController::getHeader',['filter' => 'accessControl:2']); 
+    $routes->get('getHeaderScrap', 'ReportController::getHeaderScrap',['filter' => 'accessControl:2']); 
+    $routes->post('materialScrap', 'ReportController::materialScrap',['filter' => 'accessControl:2']); 
 
 
 });
@@ -404,6 +406,7 @@ $routes->group('requisitionprogress', function ($routes) {
 
 $routes->group('scrap', function ($routes) {
   
+    $routes->post('add', 'ScrapController::add',['filter' => 'accessControl:2']); 
     $routes->post('listdataScrap', 'ScrapController::listdataScrap',['filter' => 'accessControl:2']); 
     $routes->post('addScrap', 'ScrapController::addScrap',['filter' => 'accessControl:2']); 
     $routes->get('form/(:any)', 'ScrapController::scrap_form/$1',['filter' => 'accessControl:2']); 

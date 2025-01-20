@@ -199,6 +199,20 @@ public function addScrap(){
             'message' => 'Hanya dapat diakses melalui AJAX.'
         ], ResponseInterface::HTTP_METHOD_NOT_ALLOWED);
 }
+public function add(){
+
+    $mdl = new \App\Models\MdlScrapDoc();
+    $mdl->insert($_POST);
+    if ($mdl->affectedRows() !== 0) {
+        $riwayat = 'Berhasil menambahkan scrap doc '.$_POST['code'].' ';
+        $this->changelog->riwayat($riwayat);
+        header('HTTP/1.1 200 OK');
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+    }
+}
 public function materialScrapList($idScrap){
     $model = new \App\Models\MdlScrap();
     $data = $model->select('scrap.*, materials.kode, materials.name, scrap.quantity as quantity, satuan.kode as satuan')

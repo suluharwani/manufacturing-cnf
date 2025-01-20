@@ -382,7 +382,68 @@ class ReportController extends BaseController
             ]);
         }
     }
+    function getHeaderScrap()
+    {
+        $userInfo = $_SESSION['auth'];
+        // Get the ID from the AJAX request
+        $id = $this->request->getGet('id');
 
+        // Load the model to fetch material data
+        $Model = new \App\Models\MdlScrapDoc();
+
+        // Fetch material data based on the ID
+
+        $materialData = $Model->select('* ')       
+        ->where('scrap_doc.id_wo',$id)->find();
+
+
+        // If material data exists, return it as JSON
+        $data = $materialData[0];
+        if ($data) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => [
+                    'code' => $data['code'],
+                ]
+            ]);
+        } else {
+            // Return an error if the material data is not found
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => ' not found'
+            ]);
+        }
+    }
+public function materialScrap(){
+
+    $idWO = $_POST['woId'];
+    $endDate = $_POST['end_date'];
+    $startDate = $_POST['start_date'];
+
+    // $MdlDoc = new \App\Models\MdlScrapDoc();
+    $mdl = new \App\Models\MdlScrap();
+    $query = $mdl->select('scrap.*, scrap_doc.code sc, work_order.kode as wo, proforma_invoice.invoice_number as pi, materials.kode as material_code, materials.name as material_name, satuan.kode as satuan_kode, satuan.nama as satuan_nama') // Select fields from both tables
+        ->join('scrap_doc', 'scrap_doc.id = scrap.scrap_doc_id')
+        ->join('work_order', 'work_order.id = scrap_doc.id_wo')
+        ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+        ->join('materials', 'materials.id = scrap.material_id')
+        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+        ->where('scrap_doc.status', 1)
+        ->where('scrap_doc.id_wo', $idWO);
+
+    // Add date range conditions if provided
+    if (!empty($startDate) && !empty($endDate)) {
+        $query->where('scrap_doc.created_at >=', $startDate)
+            ->where('scrap_doc.created_at <=', $endDate);
+    }
+
+    // Fetch the purchase details
+    $data = $query->findAll();
+
+    // Return the data as JSON or load a view as needed
+    return json_encode($data);
+}
 
 
 }
