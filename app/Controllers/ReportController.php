@@ -90,8 +90,11 @@ class ReportController extends BaseController
         stock.created_at as created_at, 
         materials.name as materials_name, 
         materials.kode as materials_code,
+        satuan.kode as satuan
         ')
             ->join('materials', 'materials.id = stock.id_material')
+        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->where('id_material', $materialId);
 
         if (!empty($startDate) && !empty($endDate)) {
@@ -122,8 +125,11 @@ class ReportController extends BaseController
         material_return_list.jumlah as jumlah, 
         material_return_list.created_at as created_at, 
         materials.name as materials_name, 
+        satuan.kode as satuan,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_return_list.id_material') // Join with materials table
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->join('material_return', 'material_return.id = material_return_list.id_material_return') // Join with materials table
             ->where('material_return_list.id_material', $materialId)
             ->where('material_return.status', 1);
@@ -158,8 +164,11 @@ class ReportController extends BaseController
         -(material_requisition_progress.jumlah) as jumlah, 
         material_requisition_progress.created_at as created_at, 
         materials.name as materials_name, 
+        satuan.kode as satuan,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_requisition_progress.id_material') // Join with materials table
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->join('material_requisition_list', 'material_requisition_list.id = material_requisition_progress.id_material_requisition_list') // Join with materials table
             ->join('material_requisition', 'material_requisition.id = material_requisition_list.id_material_requisition') // Join with materials table
             ->where('material_requisition.status', 1)
@@ -195,8 +204,11 @@ class ReportController extends BaseController
         pembelian_detail.jumlah as jumlah, 
         pembelian_detail.created_at as created_at, 
         materials.name as materials_name, 
+         satuan.kode as satuan,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = pembelian_detail.id_material') // Join with materials table
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->join('pembelian', 'pembelian.id = pembelian_detail.id_pembelian') // Join with materials table
             ->where('pembelian.posting', 1)
             ->where('pembelian_detail.id_material', $materialId);
@@ -231,9 +243,12 @@ class ReportController extends BaseController
         -(material_destruction_list.jumlah) as jumlah, 
         material_destruction_list.created_at as created_at, 
         materials.name as materials_name, 
+         satuan.kode as satuan,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_destruction_list.id_material') // Join with materials table
             ->join('material_destruction', 'material_destruction.id = material_destruction_list.id_material_destruction') // Join with materials table
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->where('material_destruction.status', 1)
             ->where('material_destruction_list.id_material', $materialId);
 
@@ -267,8 +282,11 @@ class ReportController extends BaseController
         (stock_opname_list.jumlah_akhir - stock_opname_list.jumlah_awal) as jumlah, 
         stock_opname_list.created_at as created_at, 
         materials.name as materials_name, 
+         satuan.kode as satuan,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = stock_opname_list.id_material')
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
             ->join('stock_opname', 'stock_opname.id = stock_opname_list.id_stock_opname')
             ->where('stock_opname.status', 1)
             ->where('stock_opname_list.id_material', value: $materialId);
@@ -358,7 +376,7 @@ class ReportController extends BaseController
 
         $materialData = $materialModel->select('materials.kode as kode, materials.name as name,satuan.kode as satuan_kode, satuan.nama as satuan_nama ')
         ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')             
+        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')        
         ->where('materials.id',$id)->find();
 
 

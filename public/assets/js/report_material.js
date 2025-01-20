@@ -213,8 +213,8 @@ window.jsPDF = window.jspdf.jsPDF
                                 <td>${item.desc }</td>
                                 <td>${item.source }</td>
                                 <td>${item.activity }</td>
-                                <td>${item.jumlah }</td>
-                                <td>${total}</td>
+                                <td>${item.jumlah} (${item.satuan})</td>
+                                <td>${total} (${item.satuan})</td>
                             </tr>
                         `;
 
