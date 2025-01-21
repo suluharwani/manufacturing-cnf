@@ -232,9 +232,16 @@ function getProductByWO($id_production)
 
   function addProgress(){
         $userInfo = $_SESSION['auth'];
-
+        // wo_id:wo_id, production_id:production_id,product_id:id_product, quantity: result.value.quantity
      $mdl = new \App\Models\MdlProductionProgress();
     if ($mdl->insert($_POST)) {
+      $mdlStockMove = new \App\Models\MdlStockMove();
+      $data['wo_id'] = $_POST['wo_id'];
+      $data['product_id'] = $_POST['product_id'];
+      $data['prod_id_tujuan'] = $_POST['production_id'];
+      $data['stock_change'] = $_POST['quantity'];
+      $mdlStockMove->insert($data);
+
         $riwayat = "User ".$userInfo['nama_depan']." menambahkan  produksi ke produksi ".$_POST['production_id']."dari WO ".$_POST['wo_id']." produk ".$_POST['product_id'];
         $this->changelog->riwayat($riwayat);  
             header('HTTP/1.1 200 OK');
@@ -251,15 +258,17 @@ function getProductByWO($id_production)
       }
       function getProductionProduct($id){
         $mdl = new \App\Models\MdlProductionProgress();
-        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->
+        $data = $mdl->select('product.id as product_id, product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity, production_progress.wo_id as wo_id, work_order.kode as wo_code')->
                       join('product', 'product.id = production_progress.product_id')->
+                      join('work_order', 'work_order.id = production_progress.wo_id')->
                       where('production_id',$id)->get()->getResultArray();
         return json_encode($data);
       }
             function getWarehouseProduct($id){
         $mdl = new \App\Models\MdlProductionProgress();
-        $data = $mdl->select('product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity')->
+        $data = $mdl->select('product.id as product_id, product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity, production_progress.wo_id as wo_id, work_order.kode as wo_code')->
                       join('product', 'product.id = production_progress.product_id')->
+                      join('work_order', 'work_order.id = production_progress.wo_id')->
                       where('warehouse_id',$id)->get()->getResultArray();
         return json_encode($data);
       }
@@ -268,6 +277,8 @@ function getProductByWO($id_production)
         $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal
         $prodIdTujuan = $this->request->getPost('prod_id');      // ID produksi tujuan
         $quantity = $this->request->getPost('quantity');         // Quantity yang dipindahkan
+        $wo_id = $this->request->getPost('wo_id');         // Quantity yang dipindahkan
+        $product_id = $this->request->getPost('product_id');         // Quantity yang dipindahkan
 
         // Validasi input
         if (empty($prodIdAwal) || empty($prodIdTujuan) || empty($quantity)) {
@@ -292,6 +303,13 @@ function getProductByWO($id_production)
         $result = $model->transferQuantity($prodIdAwal, $prodIdTujuan, $quantity);
 
         if ($result === true) {
+          $mdlStockMove = new \App\Models\MdlStockMove();
+      $dataMovement['wo_id'] = $wo_id;
+      $dataMovement['product_id'] = $product_id;
+      $dataMovement['prod_id_asal'] = $prodIdAwal;
+      $dataMovement['prod_id_tujuan'] = $prodIdTujuan;
+      $dataMovement['stock_change'] = $quantity;
+      $mdlStockMove->insert($dataMovement);
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Produk berhasil dipindahkan.'
@@ -308,7 +326,10 @@ function getProductByWO($id_production)
         $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal
         $prodIdTujuan = $this->request->getPost('prod_id');      // ID produksi tujuan
         $quantity = $this->request->getPost('quantity');         // Quantity yang dipindahkan
-
+        $wo_id = $this->request->getPost('wo_id');         // Quantity yang dipindahkan
+        $wh_id = $this->request->getPost('wh_id');         // Quantity yang dipindahkan
+        $product_id = $this->request->getPost('product_id');         // Quantity yang dipindahkan
+        
         // Validasi input
         if (empty($prodIdAwal) || empty($prodIdTujuan) || empty($quantity)) {
             return $this->response->setJSON([
@@ -332,6 +353,62 @@ function getProductByWO($id_production)
         $result = $model->transferFinish($prodIdAwal, $prodIdTujuan, $quantity);
 
         if ($result === true) {
+          $mdlStockMove = new \App\Models\MdlStockMove();
+      $dataMovement['wo_id'] = $wo_id;
+      $dataMovement['product_id'] = $product_id;
+      $dataMovement['wh_id_asal'] = $wh_id;
+      $dataMovement['wh_id_tujuan'] = $prodIdTujuan;
+      $dataMovement['stock_change'] = $quantity;
+      $mdlStockMove->insert($dataMovement);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Produk berhasil dipindahkan.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memindahkan produk.'
+            ]);
+        }
+    }
+    public function moveWarehouseFromProd()
+    {
+        $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal
+        $prodIdTujuan = $this->request->getPost('prod_id');      // ID produksi tujuan
+        $quantity = $this->request->getPost('quantity');         // Quantity yang dipindahkan
+        $wo_id = $this->request->getPost('wo_id');         // Quantity yang dipindahkan
+        $prod_awal = $this->request->getPost('prod_awal');         // Quantity yang dipindahkan
+        $product_id = $this->request->getPost('product_id'); 
+        // Validasi input
+        if (empty($prodIdAwal) || empty($prodIdTujuan) || empty($quantity)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua kolom harus diisi.'
+            ]);
+        }
+
+        // Cek apakah quantity adalah angka positif
+        if (!is_numeric($quantity) || $quantity <= 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Quantity harus berupa angka positif.'
+            ]);
+        }
+
+        // Load model
+        $model =  new \App\Models\MdlProductionProgress();
+
+        // Pindahkan quantity
+        $result = $model->transferFinish($prodIdAwal, $prodIdTujuan, $quantity);
+
+        if ($result === true) {
+          $mdlStockMove = new \App\Models\MdlStockMove();
+      $dataMovement['wo_id'] = $wo_id;
+      $dataMovement['product_id'] = $product_id;
+      $dataMovement['prod_id_asal'] = $prod_awal;
+      $dataMovement['wh_id_tujuan'] = $prodIdTujuan;
+      $dataMovement['stock_change'] = $quantity;
+      $mdlStockMove->insert($dataMovement);
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Produk berhasil dipindahkan.'

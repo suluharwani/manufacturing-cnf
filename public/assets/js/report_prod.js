@@ -3,31 +3,11 @@ var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : ""
 window.jsPDF = window.jspdf.jsPDF
     $(document).ready(function () {
         // Show the modal when the button is clicked
-        $('#listLaporanBtnKS').on('click', function () {
-            $('#laporanModal').modal('show');
+        $('#listLaporanBtnPd').on('click', function () {
+            $('#laporanModal').modal('show'); 
         });
 
-        // Populate material select options (you can fetch this from your server)
-        function loadMaterials() {
-            $.ajax({
-                url: base_url + 'product/getMaterial', // Update with your API endpoint
-                method: 'GET',
-                success: function (data) {
-                    // Clear existing options
-                    $('#materialOptions').empty();
-    
-                    // Populate the dropdown with new options
-                    data.material.forEach(function (material) {
-                        $('#materialOptions').append(`
-                            <a class="dropdown-item" href="#" data-id="${material.id}">${material.name}</a>
-                        `);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error loading materials: ", error);
-                }
-            });
-        }
+
         function loadMwo() {
             $.ajax({
                 url: base_url + 'production/getWOList', // Update with your API endpoint
@@ -42,6 +22,13 @@ window.jsPDF = window.jspdf.jsPDF
                             <a class="dropdown-item" href="#" data-id="${Wo.id}">${Wo.kode}</a>
                         `);
                     });
+                    $('#WoOptionsMV').empty();
+                    // Populate the dropdown with new options
+                    res.forEach(function (Wo) {
+                        $('#WoOptionsMV').append(`
+                            <a class="dropdown-item" href="#" data-id="${Wo.id}">${Wo.kode}</a>
+                        `);
+                    });
                     
                 },
                 error: function (xhr, status, error) {
@@ -52,7 +39,7 @@ window.jsPDF = window.jspdf.jsPDF
     
         // Call the function to load materials
         loadMwo();
-        loadMaterials();
+   
     
         // Search functionality
         $('#searchInput').on('input', function() {
@@ -82,7 +69,33 @@ window.jsPDF = window.jspdf.jsPDF
 
         // Call the function to load materials
 
+        $('#searchWoInputMV').on('input', function() {  
+            var searchValue = $(this).val().toLowerCase();  
+            $('#WoOptionsMV .dropdown-item').filter(function() {  
+                $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);  
+            });  
+        });  
+        // Handle selection
+        $(document).on('click', '#WoOptionsMV .dropdown-item', function() {  
+            var selectedWo = $(this).text();  
+            var selectedId = $(this).data('id');  
+            $('#searchWoInputMV').val(selectedWo); // Set the input value  
+            $('#woDropdownMenuMV').removeClass('show'); // Hide the dropdown  
+            $('#woSelectMV').val(selectedId); // Set the selected work order ID  
+        });  
+          
     
+        // Show dropdown on focus
+        $('#searchInput').on('focus', function() {  
+            $('#materialDropdownMenu').addClass('show');  
+        });  
+          
+        // Show dropdown on focus for work orders  
+        $('#searchWoInput').on('focus', function() {  
+            $('#woDropdownMenuMV').addClass('show');  
+        });  
+
+        ////////////////////////////////
         // Search functionality
         $('#searchWoInput').on('input', function() {  
             var searchValue = $(this).val().toLowerCase();  
@@ -111,115 +124,81 @@ window.jsPDF = window.jspdf.jsPDF
         });  
 
         // Generate report on button click
-        $('#generateReportBtnMaterial').on('click', function () {
-            btnReportMt.style.display = 'block'; // Tampilkan konten Production  
-            btnReportSc.style.display = 'none'; // Sembunyikan konten Movement  
+        $('#generateReportBtnProd').on('click', function () {
 
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
-            const selectlist = $('#selectlist').val();
+            const woId = $('#woSelectMV').val();
                 // Tambahkan waktu ke endDate
     let startDateTime = startDate + ' 00:00:00';
     let endDateTime = endDate + ' 23:59:59';
 
     // Jika startDate adalah datetime-local, maka format juga
 
-            const materialId = $('#materialSelect').val(); 
             $.ajax({
-                url: base_url+'report/materialStockCard',  
+                url: base_url+'report/productionMoveReport',  
                 method: 'POST',
                 data: {
                     start_date: startDateTime,
                     end_date: endDateTime,
-                    material_id: materialId
+                    woId: woId
                 },
                 success: function (result) {
                     data = JSON.parse(result);
-                    let balanceBefore = data.balance_before
+                    
                     let no = 1;
                     var data = JSON.parse(result);
                     var tableBody = $('#resultTableBody');
                     tableBody.empty(); // Clear existing rows
                     let row = `<thead>
+                    
             <tr>
                 <th>No</th>
                 <th>DATE</th>
+                <th>WORK ORDER</th>
+                <th>PRODUCTION AREA</th>
                 <th>CODE</th>
                 <th>HSCODE</th>
                 <th>NAME</th>
-                <th>DESC</th>
-                <th>SOURCE</th>
-                <th>ACTIVITY</th>
                 <th>QUANTITY</th>
-                <th>BALANCE</th>
             </tr>
         </thead>`; // Initialize the row variable
                     // Loop through the pembelian array and create table rows
-           
-
-                    // data.pembelian.forEach(function (item) {
-
-                        
-                    // console.log(result);
-                    // });
-                    let total = parseFloat(balanceBefore);
-                                        // <option value="all">Semua Material</option>
-                                        // <option value="materialDestruction">Material Destruction</option>
-                                        // <option value="materialRequisition">Material Requisition</option>
-                                        // <option value="materialReceiptNote">Material Receipt Note</option>
-                                        // <option value="materialReturn">Material Return</option>
-                                        // <option value="opname">Stock Opname</option>
-                                let dataview = [];
-                                console.log(selectlist)
-                            if (selectlist === 'all' || selectlist === '') {
-                                row += `
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Default</td>
-                                            <td>STOCK</td>
-                                            <td>From stock before ${startDate}</td>
-                        
-                                            <td>${balanceBefore}</td>
-                                            <td>${balanceBefore}</td>
-                                        </tr>
-                                    `;
-
-                                
-                                    dataview = data.merge
-                                } else if(selectlist == 'materialDestruction' ) {
-                                    dataview = data.destruction
-                                }else if(selectlist == 'materialRequisition'){
-                                    dataview = data.material_requisition
-                                }else if (selectlist == 'materialReceiptNote'){
-                                    dataview = data.pembelian
-                                }
-                                else if(selectlist == 'materialReturn'){
-                                    dataview = data.return
-                                }
-                                else if(selectlist == 'opname'){
-                                    dataview = data.stock_opname
-                                }
-
-                            console.log(dataview)
-                            
-                            dataview.forEach(function (item) {
-                            total+=parseFloat(item.jumlah ? item.jumlah : 0);
+                    // hs_code
+                    // product_code
+                    // product_name
+                    // production_area_name
+                    // quantity
+                    // wo
+                            data['prod'].forEach(function (item) {
                         row += `
                             <tr>
                                 <td>${no++}</td>
                                 <td>${formatDateIndo(item.created_at)}</td>
-                                <td>${item.materials_code} </td> 
-                                <td><p style="color:blue;">${item.hscode}</p></td> 
-                                <td>${item.materials_name}</td>
-                                <td>${item.desc }</td>
-                                <td>${item.source }</td>
-                                <td>${item.activity }</td>
-                                <td>${item.jumlah} (${item.satuan})</td>
-                                <td>${total} (${item.satuan})</td>
+                                <td>${item.wo} </td> 
+                                <td>${item.production_area_name} </td> 
+                                <td>${item.product_code}</td>
+                                <td><p style="color:blue;">${item.hs_code}</p></td> 
+                                <td>${item.product_name}</td>
+                                <td>${item.quantity}</td>
+                            </tr>
+                        `;
+
+                    });
+                    row += `  <tr>
+                                <td colspan = "8" >Finished Good</td>
+                            </tr>  `
+                    data['wh'].forEach(function (wh) {
+                        row += `
+                            <tr>
+                                <td>${no++}</td>
+                                <td>${formatDateIndo(wh.created_at)}</td>
+                                <td>${wh.wo} </td> 
+                                <td>${wh.production_area_name} </td> 
+                                <td>${wh.product_code}</td>
+                                <td><p style="color:blue;">${wh.hs_code}</p></td> 
+                                <td>${wh.product_name}</td>
+                                <td>${wh.quantity}</td>
                             </tr>
                         `;
 
@@ -234,62 +213,63 @@ window.jsPDF = window.jspdf.jsPDF
             });
         });
 
-        $('#generateReportBtnScrap').on('click', function () {
-            btnReportMt.style.display = 'none'; // Tampilkan konten Production  
-            btnReportSc.style.display = 'block'; // Sembunyikan konten Movement  
-            const startDate = $('#startDateScrap').val();
-            const endDate = $('#endDateScrap').val();
-            const woId = $('#woSelect').val();
+        $('#generateReportBtnMV').on('click', function () {
+            const startDate = $('#startDateMV').val();
+            const endDate = $('#endDateMV').val();
+            // const woId = $('#woSelect').val();
                 // Tambahkan waktu ke endDate
     let startDateTime = startDate + ' 00:00:00';
     let endDateTime = endDate + ' 23:59:59';
 
     // Jika startDate adalah datetime-local, maka format juga
 
-            const materialId = $('#materialSelect').val(); 
+
             $.ajax({
-                url: base_url+'report/materialScrap',  
+                url: base_url+'report/stockMovementReport',  
                 method: 'POST',
                 data: {
                     start_date: startDateTime,
-                    end_date: endDateTime,
-                    woId: woId
+                    end_date: endDateTime
                 },
                 success: function (result) {
                     data = JSON.parse(result);
-                    let balanceBefore = data.balance_before
                     let no = 1;
                     var data = JSON.parse(result);
                     var tableBody = $('#resultTableBody');
                     tableBody.empty(); // Clear existing rows
                     let row = `<thead>
             <tr>
-                <th>No</th>
-                <th>DATE</th>
-                <th>PI</th>
-                <th>WO</th>
-                <th>SCRAP</th>
-                <th>MATERIAL CODE</th>
-                <th>MAERIAL NAME</th>
-                <th>QUANTITY</th>
+                <th>NO</th>  
+                <th>DATE</th>  
+                <th>WO</th>  
+                <th>PRODUCT CODE</th>  
+                <th>HSCODE</th>  
+                <th>NAMA</th>  
+                <th>Production Area Asal</th>  
+                <th>Production Area Tujuan</th>  
+                <th>Warehouse Asal</th>  
+                <th>Warehouse Tujuan</th>  
+                <th>Quantity</th>  
             </tr>
         </thead>`; 
-                         data.forEach(function (item) {
-
-                        row += `
-                            <tr>
-                                <td>${no++}</td>
-                                <td>${formatDateIndo(item.created_at)}</td>
-                                <td>${item.pi}</td>
-                                <td>${item.wo}</td>
-                                <td>${item.sc }</td>
-                                <td>${item.material_code }</td>
-                                <td>${item.material_name } </td>
-                                <td>${item.quantity } (${item.satuan_kode})</td>
-                            </tr>
-                        `;
-
-                    });
+        data.forEach(function (item) {  
+            row += `  
+                <tr>  
+                    <td>${no++}</td>  
+                    <td style="background-color: ${item.created_at ? 'transparent' : '#ffcccb'};">${item.created_at ? formatDateIndo(item.created_at) : ''}</td>  
+                    <td style="background-color: ${item.wo_code ? 'transparent' : '#ffcccb'};">${item.wo_code || ''}</td>  
+                    <td style="background-color: ${item.kode ? 'transparent' : '#ffcccb'};">${item.kode || ''}</td>  
+                    <td style="background-color: ${item.hs_code ? 'transparent' : '#ffcccb'};">${item.hs_code || ''}</td>  
+                    <td style="background-color: ${item.nama ? 'transparent' : '#ffcccb'};">${item.nama || ''}</td>  
+                    <td style="background-color: ${item.production_area_asal_name ? 'transparent' : '#ffcccb'};">${item.production_area_asal_name || ''}</td>  
+                    <td style="background-color: ${item.production_area_tujuan_name ? 'transparent' : '#ffcccb'};">${item.production_area_tujuan_name || ''}</td>  
+                    <td style="background-color: ${item.warehouse_asal_name ? 'transparent' : '#ffcccb'};">${item.warehouse_asal_name || ''}</td>  
+                    <td style="background-color: ${item.warehouse_tujuan_name ? 'transparent' : '#ffcccb'};">${item.warehouse_tujuan_name || ''}</td>  
+                    <td style="background-color: ${item.stock_change ? 'transparent' : '#ffcccb'};">${item.stock_change || ''}</td>  
+                </tr>  
+            `;  
+        });  
+        
 
                     tableBody = row; // Append the row to the table body
                 
@@ -312,8 +292,8 @@ window.jsPDF = window.jspdf.jsPDF
         $('#listLaporanBtnKS').on('click', function () {
             $('#laporanModal').modal('show');
         });
-        $('#listLaporanBtnSC').on('click', function () {
-            $('#laporanScrapModal').modal('show');
+        $('#listLaporanBtnMv').on('click', function () {
+            $('#laporanMovementModal').modal('show');
         });
         // Populate material select options (you can fetch this from your server)
         function loadMaterials() {
@@ -331,25 +311,7 @@ window.jsPDF = window.jspdf.jsPDF
         loadMaterials();
 
         // Generate report on button click
-        $('#generateReportBtn').on('click', function () {
-            const startDate = $('#startDate').val();
-            const endDate = $('#endDate').val();
-            const materialId = $('#materialSelect').val();
 
-            $.ajax({
-                url: 'path/to/your/report/api', // Update with your report API endpoint
-                method: 'POST',
-                data: {
-                    start_date: startDate,
-                    end_date: endDate,
-                    material_id: materialId
-                },
-                success: function (result) {
-                    $('#resultTableContainer').html(result); // Assuming result is HTML
-                    $('#laporanModal').modal('hide');
-                }
-            });
-        });
         $('#printBtn').on('click', function () {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();

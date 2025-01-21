@@ -72,7 +72,7 @@ class MaterialController extends BaseController
           $request = \Config\Services::request();
           
           // Define the columns to select
-          $select_columns = 'materials.*, materials_detail.kite as kite, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan';
+          $select_columns = 'materials.*, materials_detail.kite as kite, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan, materials_detail.hscode as hscode';  
           
           // Define the joins (you can add more joins as needed)
           $joins = [
@@ -102,7 +102,7 @@ class MaterialController extends BaseController
           $column_search = array(
               'materials.name', 
               'materials.kode', 
-              'materials_detail.id', 
+              'materials_detail.hscode', 
           );
           $order = array('materials.id' => 'desc');
   
@@ -122,6 +122,7 @@ class MaterialController extends BaseController
               $row[] = $lists->nama_type;
               $row[] = $lists->kode_satuan;
               $row[] = $lists->satuan;
+              $row[] = $lists->hscode;
 // From joined suppliers table
               $data[] = $row;
           }
@@ -333,6 +334,7 @@ function delete(){
         $dataDet['type_id'] = $param['type'];
         $dataDet['kite'] = $param['kite'];
         $dataDet['satuan_id'] = $param['satuanUkuran'];
+        $dataDet['hscode'] = $param['hscode'];
 
         $mdl = new \App\Models\MdlMaterial();
         $mdlDet = new \App\Models\MdlMaterialDet();

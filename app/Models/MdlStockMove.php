@@ -4,15 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class MdlMaterialDet extends Model
+class MdlStockMove extends Model
 {
-    protected $table            = 'materials_detail';
+    protected $table            = 'stock_movements';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','material_id','type_id','satuan_id','kite','gambar','dimension','grade','color','texture','source','created_at','hscode','updated_at','deleted_at'];
+    protected $allowedFields    = ["id","product_id","wo_id","prod_id_asal","prod_id_tujuan","wh_id_tujuan","wh_id_asal","stock_change","created_at","updated_at","deleted_at"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

@@ -90,11 +90,12 @@ class ReportController extends BaseController
         stock.created_at as created_at, 
         materials.name as materials_name, 
         materials.kode as materials_code,
-        satuan.kode as satuan
+        satuan.kode as satuan,
+        materials_detail.hscode
         ')
             ->join('materials', 'materials.id = stock.id_material')
-        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->where('id_material', $materialId);
 
         if (!empty($startDate) && !empty($endDate)) {
@@ -126,10 +127,11 @@ class ReportController extends BaseController
         material_return_list.created_at as created_at, 
         materials.name as materials_name, 
         satuan.kode as satuan,
+        materials_detail.hscode,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_return_list.id_material') // Join with materials table
             ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->join('material_return', 'material_return.id = material_return_list.id_material_return') // Join with materials table
             ->where('material_return_list.id_material', $materialId)
             ->where('material_return.status', 1);
@@ -165,10 +167,11 @@ class ReportController extends BaseController
         material_requisition_progress.created_at as created_at, 
         materials.name as materials_name, 
         satuan.kode as satuan,
+        materials_detail.hscode,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_requisition_progress.id_material') // Join with materials table
             ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->join('material_requisition_list', 'material_requisition_list.id = material_requisition_progress.id_material_requisition_list') // Join with materials table
             ->join('material_requisition', 'material_requisition.id = material_requisition_list.id_material_requisition') // Join with materials table
             ->where('material_requisition.status', 1)
@@ -204,11 +207,12 @@ class ReportController extends BaseController
         pembelian_detail.jumlah as jumlah, 
         pembelian_detail.created_at as created_at, 
         materials.name as materials_name, 
-         satuan.kode as satuan,
+        satuan.kode as satuan,
+        materials_detail.hscode,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = pembelian_detail.id_material') // Join with materials table
             ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->join('pembelian', 'pembelian.id = pembelian_detail.id_pembelian') // Join with materials table
             ->where('pembelian.posting', 1)
             ->where('pembelian_detail.id_material', $materialId);
@@ -243,12 +247,13 @@ class ReportController extends BaseController
         -(material_destruction_list.jumlah) as jumlah, 
         material_destruction_list.created_at as created_at, 
         materials.name as materials_name, 
-         satuan.kode as satuan,
+        satuan.kode as satuan,
+        materials_detail.hscode,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = material_destruction_list.id_material') // Join with materials table
             ->join('material_destruction', 'material_destruction.id = material_destruction_list.id_material_destruction') // Join with materials table
             ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->where('material_destruction.status', 1)
             ->where('material_destruction_list.id_material', $materialId);
 
@@ -283,10 +288,11 @@ class ReportController extends BaseController
         stock_opname_list.created_at as created_at, 
         materials.name as materials_name, 
          satuan.kode as satuan,
+         materials_detail.hscode,
         materials.kode as materials_code, ') // Select fields from both tables
             ->join('materials', 'materials.id = stock_opname_list.id_material')
             ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
             ->join('stock_opname', 'stock_opname.id = stock_opname_list.id_stock_opname')
             ->where('stock_opname.status', 1)
             ->where('stock_opname_list.id_material', value: $materialId);
@@ -375,9 +381,9 @@ class ReportController extends BaseController
         // Fetch material data based on the ID
 
         $materialData = $materialModel->select('materials.kode as kode, materials.name as name,satuan.kode as satuan_kode, satuan.nama as satuan_nama ')
-        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')        
-        ->where('materials.id',$id)->find();
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
+            ->where('materials.id', $id)->find();
 
 
         // If material data exists, return it as JSON
@@ -388,8 +394,8 @@ class ReportController extends BaseController
                 'data' => [
                     'code' => $data['kode'],
                     'name' => $data['name'],
-                    'admin'=> $userInfo['nama_depan']." ".$userInfo['nama_belakang'],
-                    'satuan'=> $data['satuan_nama']." (".$data['satuan_kode'].")"
+                    'admin' => $userInfo['nama_depan'] . " " . $userInfo['nama_belakang'],
+                    'satuan' => $data['satuan_nama'] . " (" . $data['satuan_kode'] . ")"
                 ]
             ]);
         } else {
@@ -411,8 +417,8 @@ class ReportController extends BaseController
 
         // Fetch material data based on the ID
 
-        $materialData = $Model->select('* ')       
-        ->where('scrap_doc.id_wo',$id)->find();
+        $materialData = $Model->select('* ')
+            ->where('scrap_doc.id_wo', $id)->find();
 
 
         // If material data exists, return it as JSON
@@ -432,36 +438,135 @@ class ReportController extends BaseController
             ]);
         }
     }
-public function materialScrap(){
+    public function materialScrap()
+    {
 
-    $idWO = $_POST['woId'];
-    $endDate = $_POST['end_date'];
-    $startDate = $_POST['start_date'];
+        $idWO = $_POST['woId'];
+        $endDate = $_POST['end_date'];
+        $startDate = $_POST['start_date'];
 
-    // $MdlDoc = new \App\Models\MdlScrapDoc();
-    $mdl = new \App\Models\MdlScrap();
-    $query = $mdl->select('scrap.*, scrap_doc.code sc, work_order.kode as wo, proforma_invoice.invoice_number as pi, materials.kode as material_code, materials.name as material_name, satuan.kode as satuan_kode, satuan.nama as satuan_nama') // Select fields from both tables
-        ->join('scrap_doc', 'scrap_doc.id = scrap.scrap_doc_id')
-        ->join('work_order', 'work_order.id = scrap_doc.id_wo')
-        ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
-        ->join('materials', 'materials.id = scrap.material_id')
-        ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
-        ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left') 
-        ->where('scrap_doc.status', 1)
-        ->where('scrap_doc.id_wo', $idWO);
+        // $MdlDoc = new \App\Models\MdlScrapDoc();
+        $mdl = new \App\Models\MdlScrap();
+        $query = $mdl->select('scrap.*,materials_detail.hscode, scrap_doc.code sc, work_order.kode as wo, proforma_invoice.invoice_number as pi, materials.kode as material_code, materials.name as material_name, satuan.kode as satuan_kode, satuan.nama as satuan_nama') // Select fields from both tables
+            ->join('scrap_doc', 'scrap_doc.id = scrap.scrap_doc_id')
+            ->join('work_order', 'work_order.id = scrap_doc.id_wo')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+            ->join('materials', 'materials.id = scrap.material_id')
+            ->join('materials_detail', 'materials_detail.material_id = materials.id', 'left')
+            ->join('satuan', 'materials_detail.satuan_id = satuan.id', 'left')
+            ->where('scrap_doc.status', 1)
+            ->where('scrap_doc.id_wo', $idWO);
 
-    // Add date range conditions if provided
-    if (!empty($startDate) && !empty($endDate)) {
-        $query->where('scrap_doc.created_at >=', $startDate)
-            ->where('scrap_doc.created_at <=', $endDate);
+        // Add date range conditions if provided
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('scrap_doc.created_at >=', $startDate)
+                ->where('scrap_doc.created_at <=', $endDate);
+        }
+
+        // Fetch the purchase details
+        $data = $query->findAll();
+
+        // Return the data as JSON or load a view as needed
+        return json_encode($data);
     }
+    public function productionReport()
+    {
+        $data['prod'] = $this->getProductionReport($_POST);
+        $data['wh'] = $this->getWHreport($_POST);
+        return json_encode($data);
+    }
+    function getWHreport($params)
+    {
+        $idWO = $params['woId'];
+        $endDate = $params['end_date'];
+        $startDate = $params['start_date'];
+        $mdl = new \App\Models\MdlProductionProgress();
 
-    // Fetch the purchase details
-    $data = $query->findAll();
+        $queryWh = $mdl->select('production_progress.created_at,work_order.kode as wo,
+    product.kode as product_code,
+    product.nama as product_name, 
+    product.hs_code as hs_code, 
+    warehouses.name as production_area_name,
+    production_progress.quantity as quantity 
+') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('warehouses', 'warehouses.id = production_progress.warehouse_id');
+        if (!empty($startDate) && !empty($endDate)) {
+            $queryWh->where('production_progress.created_at >=', $startDate)
+                ->where('production_progress.created_at <=', $endDate)
+                ->where('quantity !=', 0);
+        }
+        if (!empty($idWO)) {
+            $queryWh->where('production_progress.wo_id =', $idWO);
+        }
+        return $queryWh->findAll();
+    }
+    function getProductionReport($params)
+    {
+        $idWO = $params['woId'];
+        $endDate = $params['end_date'];
+        $startDate = $params['start_date'];
+        $mdl = new \App\Models\MdlProductionProgress();
 
-    // Return the data as JSON or load a view as needed
-    return json_encode($data);
-}
+        $queryProd = $mdl->select('production_progress.created_at, work_order.kode as wo,
+                                         product.kode as product_code,
+                                         product.nama as product_name, 
+                                         product.hs_code as hs_code, 
+                                         production_area.name as production_area_name,
+                                         production_progress.quantity as quantity
+                                    ') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('production_area', 'production_area.id = production_progress.production_id');
+        if (!empty($startDate) && !empty($endDate)) {
+            $queryProd->where('production_progress.created_at >=', $startDate)
+                ->where('production_progress.created_at <=', $endDate)
+                ->where('quantity !=', 0);
+        }
+        if (!empty($idWO)) {
+            $queryProd->where('production_progress.wo_id =', $idWO);
+        }
 
 
+
+
+        return $queryProd->findAll();
+
+    }
+    public function stockMovementReport(){
+        $endDate = $_POST['end_date'];
+        $startDate = $_POST['start_date'];
+        $mdl = new \App\Models\MdlStockMove();
+        $query = $mdl->select(' 
+        stock_movements.created_at,
+                work_order.kode AS wo_code, 
+                stock_movements.id,  
+                stock_movements.wo_id,  
+                stock_movements.product_id,  
+                stock_movements.stock_change,  
+                stock_movements.created_at,  
+                stock_movements.updated_at,  
+                stock_movements.stock_change,
+                product.kode,  
+                product.hs_code,  
+                product.nama,  
+                production_area_asal.name AS production_area_asal_name,  
+                production_area_tujuan.name AS production_area_tujuan_name,  
+                warehouses_asal.name AS warehouse_asal_name,  
+                warehouses_tujuan.name AS warehouse_tujuan_name  
+            ')  
+            ->join('work_order', 'work_order.id = stock_movements.wo_id', 'left')  
+            ->join('product', 'product.id = stock_movements.product_id', 'left')  
+            ->join('production_area AS production_area_asal', 'production_area_asal.id = stock_movements.prod_id_asal', 'left')  
+            ->join('production_area AS production_area_tujuan', 'production_area_tujuan.id = stock_movements.prod_id_tujuan', 'left')  
+            ->join('warehouses AS warehouses_asal', 'warehouses_asal.id = stock_movements.wh_id_asal', 'left')  
+            ->join('warehouses AS warehouses_tujuan', 'warehouses_tujuan.id = stock_movements.wh_id_tujuan', 'left') ;
+            
+            if (!empty($startDate) && !empty($endDate)) {
+                $query->where('stock_movements.created_at >=', $startDate)
+                    ->where('stock_movements.created_at <=', $endDate);
+            }
+            return json_encode($query->findAll());
+    }
 }

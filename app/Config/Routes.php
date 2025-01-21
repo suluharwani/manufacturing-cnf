@@ -102,6 +102,7 @@ $routes->get('production/getProductionProduct/(:any)', 'ProductionController::ge
 $routes->get('production/getWarehouseProduct/(:any)', 'ProductionController::getWarehouseProduct/$1',['filter' => 'accessControl:2']);
 $routes->post('production/moveProduction', 'ProductionController::moveProduction',['filter' => 'accessControl:2']);
 $routes->post('production/moveWarehouse', 'ProductionController::moveWarehouse',['filter' => 'accessControl:2']);
+$routes->post('production/moveWarehouseFromProd', 'ProductionController::moveWarehouseFromProd',['filter' => 'accessControl:2']);
 
  
 
@@ -326,10 +327,12 @@ $routes->group('report', function ($routes) {
     $routes->get('material', 'ReportController::material',['filter' => 'accessControl:2']); 
     $routes->get('purchase', 'ReportController::purchase',['filter' => 'accessControl:2']); 
     $routes->post('materialStockCard', 'ReportController::materialStockCard',['filter' => 'accessControl:2']); 
+    $routes->post('productionReport', 'ReportController::productionReport',['filter' => 'accessControl:2']); 
     $routes->get('getHeader', 'ReportController::getHeader',['filter' => 'accessControl:2']); 
     $routes->get('getHeaderScrap', 'ReportController::getHeaderScrap',['filter' => 'accessControl:2']); 
     $routes->post('materialScrap', 'ReportController::materialScrap',['filter' => 'accessControl:2']); 
-
+    $routes->post('stockMovementReport', 'ReportController::stockMovementReport',['filter' => 'accessControl:2']); 
+    
 
 });
 $routes->get('mr/(:any)', 'MaterialRequestController::mr/$1',['filter' => 'accessControl:2']); 

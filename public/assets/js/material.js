@@ -41,7 +41,7 @@ $(document).ready(function() {
       {},
       {mRender: function (data, type, row) {
     //   return  row[1]+" "+row[2]+"</br>"+"<a href=mailto:"+row[3]+">"+row[3]+"</a>";
-        return row[3]
+        return `${row[3]} <br> ${row[8]}`
       }},
       {mRender: function (data, type, row) {
         return row[2]
@@ -50,14 +50,14 @@ $(document).ready(function() {
        return row[5]
      }},
      {mRender: function (data, type, row) {
-       return row[4]; 
+       return `${row[4]}`; 
      }},
     {mRender: function (data, type, row) {
       return `(${row[6]}) ${row[7]}`; 
     }},
 
     {mRender: function (data, type, row) {
-      return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" nama="${row[2]}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" nama="${row[2]}" >Delete</a>`; 
+      return `<a href="javascript:void(0);" class="btn btn-success btn-sm editMaterial" id="${row[1]}" nama="${row[2]}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" id="${row[1]}" nama="${row[2]}" >Delete</a>`; 
     }
   }
   ],
@@ -218,7 +218,7 @@ function tableType(data){
     table+=   `<td>${no++}</td>`;
     table+=   `<td>${d[k].kode}</td>`;
     table+=   `<td>${d[k].nama}</td>`;
-    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" code = "${d[k].kode}">Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" code = "${d[k].kode}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
     table+=   `</tr>`
 
   })
@@ -409,7 +409,7 @@ $(document).on('click', '.editMaterial', function() {
               dataType: 'json'
             })
     ).done(function(typesResponse, satuanUkuranResponse, materialResponse) {
-      const typesData = typesResponse[0];
+      const typesData = typesResponse[0]; 
       const satuanUkuranData = satuanUkuranResponse[0];
           const materialData = materialResponse[0]; // Material details
 
@@ -424,6 +424,10 @@ $(document).on('click', '.editMaterial', function() {
               <div class="form-group">
               <label for="kode">Kode</label>
               <input type="text" class="form-control" id="kode" value="${materialData.kode}" placeholder="Kode">
+              </div>
+              <div class="form-group">
+              <label for="kode">HSCODE</label>
+              <input type="text" class="form-control" id="hscode" value="${materialData.hscode}" placeholder="Hscode">
               </div>
               <div class="form-group">
               <label for="namaMaterial">Nama Material</label>
@@ -454,24 +458,27 @@ $(document).on('click', '.editMaterial', function() {
               focusConfirm: false,
               preConfirm: () => {
                 const kode = Swal.getPopup().querySelector('#kode').value;
+                const hscode = Swal.getPopup().querySelector('#hscode').value;
                 const nama = Swal.getPopup().querySelector('#namaMaterial').value;
                 const type = Swal.getPopup().querySelector('#type').value;
                 const kite = Swal.getPopup().querySelector('#kite').value;
                 const satuanUkuran = Swal.getPopup().querySelector('#satuanUkuran').value;
 
-                if (!kode || !nama || !type || !satuanUkuran|| !kite) {
+                if (!hscode||!kode || !nama || !type || !satuanUkuran|| !kite) {
                   Swal.showValidationMessage('Silakan lengkapi data');
                 }
-                return {kite:kite, id: materialId, kode: kode, nama: nama, type: type, satuanUkuran: satuanUkuran };
+                return {kite:kite, id: materialId, kode: kode, nama: nama, type: type, satuanUkuran: satuanUkuran , hscode:hscode};
               }
             }).then((result) => {
               if (result.isConfirmed) {
                 param = {
                   id: result.value.id,
                   kode: result.value.kode,
+                  hscode: result.value.hscode,
                   nama: result.value.nama,
                   type: result.value.type,
                   kite: result.value.kite,
+                  hscode: result.value.hscode,
                   satuanUkuran: result.value.satuanUkuran
                 }
                 $.ajax({
