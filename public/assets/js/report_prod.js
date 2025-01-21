@@ -128,7 +128,7 @@ window.jsPDF = window.jspdf.jsPDF
 
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
-            const woId = $('#woSelectMV').val();
+            const woId = $('#woSelect').val();
                 // Tambahkan waktu ke endDate
     let startDateTime = startDate + ' 00:00:00';
     let endDateTime = endDate + ' 23:59:59';
@@ -136,7 +136,7 @@ window.jsPDF = window.jspdf.jsPDF
     // Jika startDate adalah datetime-local, maka format juga
 
             $.ajax({
-                url: base_url+'report/productionMoveReport',  
+                url: base_url+'report/productionReport',  
                 method: 'POST',
                 data: {
                     start_date: startDateTime,
