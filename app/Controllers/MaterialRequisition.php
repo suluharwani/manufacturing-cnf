@@ -128,66 +128,66 @@ class MaterialRequisition extends BaseController
 
         return $this->response->setJSON($output);
     }
-    function WoAvailablelistdata($idMR)
-{
-    $db = \Config\Database::connect();
-
-$builder = $db->table('work_order_detail');
-$builder->select('
-    materials.id AS material_id,
-    materials.name AS material_name,
-    satuan.kode AS c_satuan,
-    satuan.nama AS satuan,
-    SUM(billofmaterial.penggunaan * work_order_detail.quantity) AS total_usage,
-    COALESCE(
-        (
-            SELECT SUM(DISTINCT m_progress.jumlah)
-            FROM material_requisition_progress m_progress
-            WHERE m_progress.id_material = materials.id
-        ), 
-        0
-    ) AS terpenuhi,
-    (SUM(billofmaterial.penggunaan * work_order_detail.quantity) - COALESCE(
-        (
-            SELECT SUM(DISTINCT m_progress.jumlah)
-            FROM material_requisition_progress m_progress
-            WHERE m_progress.id_material = materials.id
-        ), 
-        0
-    )) AS remaining_quantity,
-    COALESCE(
-        (
-            SELECT SUM(material_requisition_list.jumlah)
-            FROM material_requisition_list
-            JOIN material_requisition ON material_requisition_list.id_material_requisition = material_requisition.id
-            WHERE material_requisition_list.id_material = materials.id AND material_requisition.status = 1
-        ), 
-        0
-    ) AS total_requisition,
-    COALESCE(
-        (
-            SELECT (SUM(material_requisition_list.jumlah) - total_requisition)
-            FROM material_requisition_list
-            WHERE material_requisition_list.id_material = materials.id
-        ), 
-        0
-    ) AS total_requisition_unposting
-     
-');
-$builder->join('billofmaterial', 'work_order_detail.product_id = billofmaterial.id_product');
-$builder->join('materials', 'materials.id = billofmaterial.id_material');
-$builder->join('materials_detail', 'materials.id = materials_detail.material_id');
-$builder->join('satuan', 'satuan.id = materials_detail.satuan_id');
-$builder->join('material_requisition', 'material_requisition.id_wo = work_order_detail.wo_id');
-$builder->join('material_requisition_list', 'material_requisition_list.id_material_requisition = material_requisition.id');
-$builder->where('material_requisition.id', $idMR);
-$builder->groupBy(['materials.id', 'materials.name']);
-$builder->orderBy('materials.name');
-
-$query = $builder->get();
-$results = $query->getResult();
-return json_encode($results);
-}
+    function WoAvailablelistdata($idMR)  
+    {  
+        $db = \Config\Database::connect();  
+      
+        $builder = $db->table('work_order_detail');  
+        $builder->select('  
+            materials.id AS material_id,  
+            materials.name AS material_name,  
+            satuan.kode AS c_satuan,  
+            satuan.nama AS satuan,  
+            SUM(billofmaterial.penggunaan * work_order_detail.quantity) AS total_usage,  
+            COALESCE(  
+                (  
+                    SELECT SUM(DISTINCT m_progress.jumlah)  
+                    FROM material_requisition_progress m_progress  
+                    WHERE m_progress.id_material = materials.id  
+                ),   
+                0  
+            ) AS terpenuhi,  
+            (SUM(billofmaterial.penggunaan * work_order_detail.quantity) - COALESCE(  
+                (  
+                    SELECT SUM(DISTINCT m_progress.jumlah)  
+                    FROM material_requisition_progress m_progress  
+                    WHERE m_progress.id_material = materials.id  
+                ),   
+                0  
+            )) AS remaining_quantity,  
+            COALESCE(  
+                (  
+                    SELECT SUM(material_requisition_list.jumlah)  
+                    FROM material_requisition_list  
+                    JOIN material_requisition ON material_requisition_list.id_material_requisition = material_requisition.id  
+                    WHERE material_requisition_list.id_material = materials.id AND material_requisition.status = 1  
+                ),   
+                0  
+            ) AS total_requisition,  
+            COALESCE(  
+                (  
+                    SELECT SUM(material_requisition_list.jumlah)  
+                    FROM material_requisition_list  
+                    WHERE material_requisition_list.id_material = materials.id  
+                ),   
+                0  
+            ) AS total_requisition_unposting  
+        ');  
+        $builder->join('billofmaterial', 'work_order_detail.product_id = billofmaterial.id_product');  
+        $builder->join('materials', 'materials.id = billofmaterial.id_material');  
+        $builder->join('materials_detail', 'materials.id = materials_detail.material_id');  
+        $builder->join('satuan', 'satuan.id = materials_detail.satuan_id');  
+        $builder->join('material_requisition', 'material_requisition.id_wo = work_order_detail.wo_id');  
+        $builder->join('material_requisition_list', 'material_requisition_list.id_material_requisition = material_requisition.id', 'left'); // Menggunakan LEFT JOIN  
+        $builder->where('material_requisition.id', $idMR);  
+        $builder->groupBy(['materials.id', 'materials.name']);  
+        $builder->orderBy('materials.name');  
+      
+        $query = $builder->get();  
+        $results = $query->getResult();  
+        return json_encode($results);  
+    }  
+    
 
 public function deleteList($id)
 {
