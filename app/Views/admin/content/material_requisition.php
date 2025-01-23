@@ -62,29 +62,28 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tambahLabel">Pembelian</h5>
+        <h5 class="modal-title" id="tambahLabel">Requisition</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addPembelianForm">
+        <form id="addReq">
+        <div class="mb-3">
+            <label for="mr" class="form-label">MR</label>
+            <input type="text" class="form-control" id="mr" required>
+          </div>
           <div class="mb-3">
-            <label for="supplier" class="form-label">Material</label>
-           <select class="form-control" id="supplier" required>
-              <option value="">Select Supplier</option>
+            <label for="department" class="form-label">DEPARTMENT</label>
+           <select class="form-control" id="department" required>
+              <option value="">Select Department</option>
               <!-- Material options will be added here -->
             </select>
           </div>
           <div class="mb-3">
-            <label for="materialQty" class="form-label">Invoice</label>
-            <input type="text" class="form-control" id="invoice" required>
-          </div>
-          <div class="mb-3">
-            <label for="tanggal_nota" class="form-label">Tanggal Nota</label>
-            <input type="date" class="form-control" id="tanggal_nota" required>
-          </div>
-          <div class="mb-3">
-            <label for="pajak" class="form-label">Pajak (%)</label>
-            <input type="number" class="form-control" id="pajak">
+            <label for="work_order" class="form-label">WORK ORDER</label>
+           <select class="form-control" id="work_order" required>
+              <option value="">Selct WO</option>
+              <!-- Material options will be added here -->
+            </select>
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>

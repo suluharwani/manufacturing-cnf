@@ -39,15 +39,15 @@ class MaterialRequisition extends BaseController
     public function addDocument()
     {
         $userInfo = $_SESSION['auth'];
-        $mdl = new \App\Models\MdlMaterialDestruction();
+        $mdl = new \App\Models\MdlMaterialRequisition();
         $data['code'] = $this->request->getPost('code');
-        $data['remarks'] = $this->request->getPost('remarks');
+        $data['id_wo'] = $this->request->getPost('id_wo');
         $data['id_dept'] = $this->request->getPost('id_dept');
         $data['id_user'] = $userInfo['id'];
 
         $mdl->insert($data);
         if ($mdl->affectedRows() !== 0) {
-            $riwayat = "" . $userInfo['nama_depan'] . " Menambahkan Material Destruction ";
+            $riwayat = "" . $userInfo['nama_depan'] . " Menambahkan Maerial Requisition ";
             $this->changelog->riwayat($riwayat);
             header('HTTP/1.1 200 OK');
         } else {

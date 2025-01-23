@@ -61,7 +61,7 @@ $(document).ready(function() {
 
     }},
     {mRender: function (data, type, row) {
-      if (row[6] == 0) {
+      if (row[6] == 0 || row[6] == null) {
         stat = `<span class="badge bg-warning text-dark">Draft</span>`
       }else{
         stat = `<span class="badge bg-success text-dark">Posted</span>`
@@ -99,38 +99,45 @@ function formatDateTime(datetime) {
   return `${day}-${month}-${year}`;
 }
 
-$('.tambah').click(function() {
+$('.tambah').click(function() { 
     // Reset form di modal
-    $('#addPembelianForm')[0].reset();
+    $('#addReq')[0].reset();
 
     // Ambil opsi material dan masukkan ke dropdown
-    getDepartOption().then(Departoptions => {
-      console.log(Departoptions);
-      $('#department').html(Departoptions);
+    getDepartOption().then(getDepartOption => {
+      console.log(getDepartOption);
+      $('#department').html(getDepartOption);
       $('#tambah').modal('show');
   }).catch(error => {
       Swal.fire('Error', error, 'error');
   });
+  getWOOption().then(getWOOption => {
+    console.log(getWOOption);
+    $('#work_order').html(getWOOption);
+    $('#tambah').modal('show');
+}).catch(error => {
+    Swal.fire('Error', error, 'error');
+});
   });
 
   // Menangani form submit di modal
-  $('#addForm').submit(function(event) {
+  $('#addReq').submit(function(event) {
     event.preventDefault();
 
     // Ambil data dari form
-    var code = $('#code').val();
-    var department = $('#department').val();
-    var remarks = $('#remarks').val();
+    var code = $('#mr').val();
+    var wo = $('#work_order').val();
+    var dept = $('#department').val();
 
 
     // Kirim data melalui AJAX ke server
     $.ajax({
       type: "POST",
-      url: base_url + "pemusnahan/addDocument", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
+      url: base_url + "requisition/addDocument", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
       data: {
         code: code,
-        id_dept: department,
-        remarks: remarks
+        id_dept: dept,
+        id_wo: wo
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material
@@ -172,7 +179,30 @@ $('.tambah').click(function() {
       });
     });
   }
-
+  function getWOOption() {
+    return new Promise((resolve, reject) => {
+  
+      $.ajax({
+        type: 'POST',
+        url: base_url + 'production/getWOList', // Endpoint untuk mendapatkan PI
+        success: function(response) {
+          data = JSON.parse(response);
+          // Buat opsi produk dari data yang diterima
+          var PIoptions = '<option value="">Work Order</option>';
+                data.forEach(function(pi) {
+                    PIoptions += `<option value="${pi.id}">${pi.kode}</option>`;
+                });
+  
+          // Resolving the promise dengan materialPIOptions setelah sukses
+          resolve(PIoptions);
+        },
+        error: function(xhr) {
+          // Menolak promise jika terjadi kesalahan
+          reject('Terjadi kesalahan saat mengambil daftar produk');
+        }
+      });
+    });
+  }
           $('#tabel_serverside').on('click','.delete',function(){
                 const id = $(this).attr('id');
                 const code = $(this).attr('code');
