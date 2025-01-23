@@ -27,14 +27,14 @@ class ProductController extends BaseController
 
   }
 
-    public function index($param)
+    public function breakdownBom($id)
     {
          
         $d = new WarehouseController();
         $data['group'] = 'Admin';
         $data['title'] = 'Breakdown BoM';
-        echo('ok');
-        return  view('admin/content/breakdownMaterial',$data);
+        $data['content'] = view('admin/content/breakdown_bom', $data);
+        return view('admin/index', $data);
     }
            public function listdataProdukJoin()
        {
@@ -337,5 +337,11 @@ public function getBom(){
     $product = $MdlProduct->findAll();
 
     return $this->response->setJSON(['product' => $product]);
+    }
+    public function getProductData($id)
+    {
+        $MdlProduct = new \App\Models\MdlProduct();
+        $product = $MdlProduct->select('product.*, product_category.nama as category')->join('product_category', 'product_category.id = product.id_product_cat')->where('product.id', $id)->first();
+        return $this->response->setJSON(['product' => $product]);
     }
 }

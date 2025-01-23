@@ -52,7 +52,8 @@ $(document).on('click', '.read-more', function () {
 });
 
     // Handle form submission via AJAX
-    $('#addFinishingModal').on('show.bs.modal', function () {
+    $('#addFinishing').on('click', function () {
+        $('#addFinishingModal').modal('show');
         $('#addFinishingForm')[0].reset(); // Reset form
         $('#addFinishingModalLabel').text('Add Finishing Item');
     });

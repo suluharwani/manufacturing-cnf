@@ -235,8 +235,9 @@ $routes->group('stock', function ($routes) {
     $routes->get('get_stock_in_out/(:any)', 'Stock::get_stock/$1',['filter' => 'accessControl:2']); 
     
 });
-
-    $routes->get('breakdownBoM/(:any)', 'ProductController::index/$1',['filter' => 'accessControl:2']);
+ 
+    $routes->get('breakdownBoM/(:any)', 'ProductController::breakdownBom/$1',['filter' => 'accessControl:2']);
+    $routes->get('product/getProductData/(:any)', 'ProductController::getProductData/$1',['filter' => 'accessControl:2']);
 $routes->group('finishing', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('/', 'FinishingController::index',['filter' => 'accessControl:2']); // Halaman utama finishing
     $routes->post('getAll', 'FinishingController::getAll',['filter' => 'accessControl:2']); // Mendapatkan semua data finishing
