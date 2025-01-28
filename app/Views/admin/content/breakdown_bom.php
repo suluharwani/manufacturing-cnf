@@ -73,7 +73,7 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Finishing Items</h6>
-            <button class="btn btn-primary" data-bs-toggle="modal" id="addFinishing">Add New</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" id="addFinishing">Add</button>
         </div>
 
         <div class="table-responsive">
@@ -95,32 +95,22 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Product</h6>
+            <h6 class="mb-0">Modul</h6>
             <button class="btn btn-primary addMaterial">Add</button>
         </div>
         <div class="table-responsive">
 
             <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
-                <thead>
-                    <tr class="text-center">
-                        <th style=" text-align: center;">#</th>
-                        <th style=" text-align: center;">Kode</th>
-                        <th style=" text-align: center;">Nama</th>
-                        <th style=" text-align: center;">Qty</th>
-                        <th style=" text-align: center;">Price</th>
-                        <th style=" text-align: center;">Action</th>
+            <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Picture</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tfoot>
-                    <tr class="text-center">
-                        <th style=" text-align: center;">#</th>
-                        <th style=" text-align: center;">Kode</th>
-                        <th style=" text-align: center;">Nama</th>
-                        <th style=" text-align: center;">Qty</th>
-                        <th style=" text-align: center;">Price</th>
-                        <th style=" text-align: center;">Action</th>
-                    </tr>
-                </tfoot>
+                <tbody></tbody>
             </table>
         </div>
     </div>

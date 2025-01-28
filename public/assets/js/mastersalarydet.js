@@ -140,7 +140,7 @@ $(document).ready(function () {
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
                                 <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
                                 <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print Slip</button>
-                                <button class="btn btn-default btn-sm print-presensi"   idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Print Attendance</button>
+                                <button class="btn btn-default btn-sm print-presensi" namaKaryawan = "${item.pegawai_nama}"  idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Print Attendance</button>
                                 <button class="btn btn-danger btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
                         tableBody.append(row);
@@ -1167,15 +1167,16 @@ function generateRekapGajiHTML(employeeDataList) {
 // Event listener untuk tombol Print Presensi
 $(document).on('click', '.print-presensi', function () {
     const pin = $(this).attr('pinKaryawan');
+    const nama = $(this).attr('namaKaryawan');
     const id = $(this).attr('idKaryawan');
     const startDate = $(this).attr('tglAwal');
     const endDate = $(this).attr('tglAkhir');
 
     // Panggil fungsi untuk mendapatkan data presensi dan cetak
-    printAttendanceReport(pin, id, startDate, endDate);
+    printAttendanceReport(nama,pin, id, startDate, endDate);
 });
 
-function printAttendanceReport(pin, id, startDate, endDate) {
+function printAttendanceReport(nama,pin, id, startDate, endDate) {
     $.ajax({
         url: base_url + 'user/getPresensi',
         type: 'POST',
@@ -1195,7 +1196,7 @@ function printAttendanceReport(pin, id, startDate, endDate) {
                 dataType: 'json',
                 success: function(workDays) {
                     const groupedData = groupAttendanceData(data);
-                    const attendanceHTML = generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate);
+                    const attendanceHTML = generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate, nama, pin);
 
                     const newWindow = window.open();
                     newWindow.document.write(`
@@ -1228,11 +1229,12 @@ function printAttendanceReport(pin, id, startDate, endDate) {
 }
 
 // Fungsi untuk mengenerate HTML presensi untuk dicetak
-function generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate) {
+function generatePrintableAttendanceTable(groupedData, workDays, startDate, endDate, nama, pin) {
     let html = `
     <div class="rekap-presensi">
     <h1>Rekap Presensi Karyawan</h1>
     <p>Periode: ${formatDateWithDayIndonesian(startDate)} - ${formatDateWithDayIndonesian(endDate)}</p>
+    <p>Karyawan: ${pin} - ${nama.toUpperCase()}</p>
     <hr>
     <table class="table table-striped table-bordered">
     <thead>

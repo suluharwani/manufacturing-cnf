@@ -6,6 +6,75 @@ function getLastSegment() {
     return segments[segments.length - 1]; // Mengambil segment terakhir
   }
 $(document).ready(function() {
+    var dataTable = $('#tabel_serverside').DataTable( {
+        "processing" : true,
+        "oLanguage": {
+          "sLengthMenu": "Tampilkan _MENU_ data per halaman",
+          "sSearch": "Pencarian: ",
+          "sZeroRecords": "Maaf, tidak ada data yang ditemukan",
+          "sInfo": "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+          "sInfoEmpty": "Menampilkan 0 s/d 0 dari 0 data",
+          "sInfoFiltered": "(di filter dari _MAX_ total data)",
+          "oPaginate": {
+            "sFirst": "<<",
+            "sLast": ">>",
+            "sPrevious": "<",
+            "sNext": ">"
+        }
+    },
+    "dom": 'Bfrtip',
+    "buttons": [
+        'csv'
+        ],
+    "order": [],
+    "ordering": true,
+    "info": true,
+    "serverSide": true,
+    "stateSave" : true,
+    "scrollX": true,
+    "ajax":{
+          "url" :base_url+"master_penggajian/get_list" , // json datasource 
+          "type": "post",  // method  , by default get
+          // "async": false,
+          "dataType": 'json',
+          "data":{},
+      },
+      
+      columns: [
+        {},
+        {mRender: function (data, type, row) {
+    
+            return row[1]
+        }},
+        {mRender: function (data, type, row) {
+            
+            return row[2]
+        }},
+        {mRender: function (data, type, row) {
+           
+            return row[3]
+        }},
+        {mRender: function (data, type, row) {
+            return row[4]
+        }},
+    
+        {mRender: function (data, type, row) {
+            return row[5]
+        }},
+        ],
+      "columnDefs": [{
+        "targets": [0],
+        "orderable": false
+    }],
+    
+      error: function(){  // error handling
+        $(".tabel_serverside-error").html("");
+        $("#tabel_serverside").append('<tbody class="tabel_serverside-error"><tr><th colspan="3">Data Tidak Ditemukan di Server</th></tr></tbody>');
+        $("#tabel_serverside_processing").css("display","none");
+    
+    }
+    
+    });
     productData()
     function productData(){
         $.ajax({
