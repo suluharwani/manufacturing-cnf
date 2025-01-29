@@ -33,7 +33,7 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-          "url" :base_url+"master_penggajian/get_list" , // json datasource 
+          "url" :base_url+"modul/get_list" , // json datasource 
           "type": "post",  // method  , by default get
           // "async": false,
           "dataType": 'json',

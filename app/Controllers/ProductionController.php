@@ -260,18 +260,26 @@ function getProductByWO($id_production)
         $mdl = new \App\Models\MdlProductionProgress();
         $data = $mdl->select('product.id as product_id, product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity, production_progress.wo_id as wo_id, work_order.kode as wo_code')->
                       join('product', 'product.id = production_progress.product_id')->
-                      join('work_order', 'work_order.id = production_progress.wo_id')->
-                      where('production_id',$id)->get()->getResultArray();
+                      join('work_order', 'work_order.id = production_progress.wo_id')
+                      ->where('production_progress.deleted_at', null)
+                      ->where('production_progress.quantity >', 0)
+                      ->where('production_id', $id)->get()->getResultArray();
         return json_encode($data);
       }
-            function getWarehouseProduct($id){
+      function getWarehouseProduct($id) {
         $mdl = new \App\Models\MdlProductionProgress();
-        $data = $mdl->select('product.id as product_id, product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity, production_progress.wo_id as wo_id, work_order.kode as wo_code')->
-                      join('product', 'product.id = production_progress.product_id')->
-                      join('work_order', 'work_order.id = production_progress.wo_id')->
-                      where('warehouse_id',$id)->get()->getResultArray();
+        $data = $mdl->select('product.id as product_id, product.kode, product.nama, production_progress.id as id, production_progress.quantity as quantity, production_progress.wo_id as wo_id, work_order.kode as wo_code')
+               ->join('product', 'product.id = production_progress.product_id')
+                     ->join('work_order', 'work_order.id = production_progress.wo_id')
+                    ->where('warehouse_id', $id)
+                    ->where('production_progress.deleted_at', null)
+                    ->where('production_progress.quantity >', 0)
+                    ->get()
+                    ->getResultArray();
         return json_encode($data);
-      }
+    }
+    
+      
        public function moveProduction()
     {
         $prodIdAwal = $this->request->getPost('prod_id_awal');  // ID produksi awal

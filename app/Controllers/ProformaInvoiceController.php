@@ -10,37 +10,37 @@ use App\Models\MdlCustomer;
 
 class ProformaInvoiceController extends BaseController
 {
-          protected $changelog;
-  public function __construct()
-  {
-    //   parent::__construct();
-    $this->db      = \Config\Database::connect();
-    $this->session = session();
-    $this->uri = service('uri');
-    helper('form');
-    $this->form_validation = \Config\Services::validation();
-    $this->userValidation = new \App\Controllers\LoginValidation();
-    $this->changelog = new \App\Controllers\Changelog();
+    protected $changelog;
+    public function __construct()
+    {
+        //   parent::__construct();
+        $this->db = \Config\Database::connect();
+        $this->session = session();
+        $this->uri = service('uri');
+        helper('form');
+        $this->form_validation = \Config\Services::validation();
+        $this->userValidation = new \App\Controllers\LoginValidation();
+        $this->changelog = new \App\Controllers\Changelog();
 
-      //if sesion habis
-      //check access
-    $check = new \App\Controllers\CheckAccess();
-    $check->logged();
-      //check access
-    $this->proformaInvoiceDetailModel = new ProformaInvoiceDetail();
+        //if sesion habis
+        //check access
+        $check = new \App\Controllers\CheckAccess();
+        $check->logged();
+        //check access
+        $this->proformaInvoiceDetailModel = new ProformaInvoiceDetail();
 
-  }
+    }
     public function pi($id)
     {
-         $Mdl = new ProformaInvoice();
-    $MdlDetail = new ProformaInvoiceDetail();
-$dataPembelian = $Mdl
-                ->select('country_data.*, proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
-                ->join('customer', 'customer.id = proforma_invoice.customer_id','left')    
-                ->join('currency', 'currency.id = customer.id_currency','left')    
-                ->join('country_data', 'country_data.id_country = customer.id_country','left')    
-                ->where('proforma_invoice.id', $id)->get()->getResultArray();
-// $dataPembelianDetail = $MdlPembelianDetail
+        $Mdl = new ProformaInvoice();
+        $MdlDetail = new ProformaInvoiceDetail();
+        $dataPembelian = $Mdl
+            ->select('country_data.*, proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
+            ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
+            ->join('currency', 'currency.id = customer.id_currency', 'left')
+            ->join('country_data', 'country_data.id_country = customer.id_country', 'left')
+            ->where('proforma_invoice.id', $id)->get()->getResultArray();
+        // $dataPembelianDetail = $MdlPembelianDetail
 //                     ->select('materials.*')
 //                     ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian")
 //                     ->join("materialscountry_datamaterials.id = pembelian_detail.id_material")
@@ -52,180 +52,187 @@ $dataPembelian = $Mdl
 
         // var_dump($data['pi']);
         // die();
-        $data['content'] = view('admin/content/form_pi',$data);
+        $data['content'] = view('admin/content/form_pi', $data);
         return view('admin/index', $data);
     }
-    public function listdataPi($id){
-         $serverside_model = new \App\Models\MdlDatatableJoin();
-           $request = \Config\Services::request();
-           
-           // Define the columns to select
-           $select_columns = 'proforma_invoice_details.*, proforma_invoice_details.id as det_id,product.nama as nama, product.kode as kode,product.id as id_product';
-           
-           // Define the joins (you can add more joins as needed)
-           $joins = [
-                 ['product', 'product.id = proforma_invoice_details.id_product', 'left'],
-           ];
-   
-           $where = ['proforma_invoice_details.invoice_id ' => $id, 'proforma_invoice_details.deleted_at' => NULL];
-   
-           // Column Order Must Match Header Columns in View
-           $column_order = array(
-               NULL, 
-               'product.nama', 
-               'product.kode', 
-               'id_product',
-               'id_product',
-               'id_product',
-               'id_product',
-               'id_product',
-           );
-           $column_search = array(
-               'product.nama', 
-               'product.kode', 
-          
-           );
-           $order = array('proforma_invoice_details.id' => 'desc');
-   
-           // Call the method to get data with dynamic joins and select fields
-           $list = $serverside_model->get_datatables('proforma_invoice_details', $select_columns, $joins, $column_order, $column_search, $order, $where);
+    public function listdataPi($id)
+    {
+        $serverside_model = new \App\Models\MdlDatatableJoin();
+        $request = \Config\Services::request();
 
-           $data = array();
-           $no = $request->getPost("start");
-           foreach ($list as $lists) {
-               $no++;
-               $row = array();
-               $row[] = $no;
-               $row[] = $lists->id_product;
-               $row[] = $lists->nama;
-               $row[] = $lists->kode;
-               $row[] = $lists->quantity;
-               $row[] = $lists->unit_price;
-               $row[] = $lists->total_price;
-               $row[] = $lists->det_id;
+        // Define the columns to select
+        $select_columns = 'proforma_invoice_details.*, proforma_invoice_details.id as det_id,product.nama as nama, product.kode as kode,product.id as id_product';
+
+        // Define the joins (you can add more joins as needed)
+        $joins = [
+            ['product', 'product.id = proforma_invoice_details.id_product', 'left'],
+        ];
+
+        $where = ['proforma_invoice_details.invoice_id ' => $id, 'proforma_invoice_details.deleted_at' => NULL];
+
+        // Column Order Must Match Header Columns in View
+        $column_order = array(
+            NULL,
+            'product.nama',
+            'product.kode',
+            'id_product',
+            'id_product',
+            'id_product',
+            'id_product',
+            'id_product',
+        );
+        $column_search = array(
+            'product.nama',
+            'product.kode',
+
+        );
+        $order = array('proforma_invoice_details.id' => 'desc');
+
+        // Call the method to get data with dynamic joins and select fields
+        $list = $serverside_model->get_datatables('proforma_invoice_details', $select_columns, $joins, $column_order, $column_search, $order, $where);
+
+        $data = array();
+        $no = $request->getPost("start");
+        foreach ($list as $lists) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $lists->id_product;
+            $row[] = $lists->nama;
+            $row[] = $lists->kode;
+            $row[] = $lists->quantity;
+            $row[] = $lists->unit_price;
+            $row[] = $lists->total_price;
+            $row[] = $lists->det_id;
 
 
- // From joined suppliers table
-               $data[] = $row;
-           }
-   
-           $output = array(
-               "draw" => $request->getPost("draw"),
-               "recordsTotal" => $serverside_model->count_all('proforma_invoice_details', $where),
-               "recordsFiltered" => $serverside_model->count_filtered('proforma_invoice_details', $select_columns, $joins, $column_order, $column_search, $order, $where),
-               "data" => $data,
-           );
-          
+            // From joined suppliers table
+            $data[] = $row;
+        }
 
-           return $this->response->setJSON($output);
+        $output = array(
+            "draw" => $request->getPost("draw"),
+            "recordsTotal" => $serverside_model->count_all('proforma_invoice_details', $where),
+            "recordsFiltered" => $serverside_model->count_filtered('proforma_invoice_details', $select_columns, $joins, $column_order, $column_search, $order, $where),
+            "data" => $data,
+        );
+
+
+        return $this->response->setJSON($output);
     }
-    public function listdata(){
-$serverside_model = new \App\Models\MdlDatatableJoin();
-          $request = \Config\Services::request();
-          
-          // Define the columns to select
-          $select_columns = 'proforma_invoice.*, customer.customer_name, customer.code as cus_code, customer.address as customer_address ';
-          
-          // Define the joins (you can add more joins as needed)
-          $joins = [
-              ['customer', 'customer.id = proforma_invoice.customer_id', 'left'],
+    public function listdata()
+    {
+        $serverside_model = new \App\Models\MdlDatatableJoin();
+        $request = \Config\Services::request();
 
-          ];
-  
-          $where = ['proforma_invoice.deleted_at' => NULL];
-  
-          // Column Order Must Match Header Columns in View
-          $column_order = array(
-              NULL, 
-              'proforma_invoice.invoice_number', 
-              'proforma_invoice.invoice_date', 
-              'customer.customer_name',
-              'proforma_invoice.id', 
+        // Define the columns to select
+        $select_columns = 'proforma_invoice.*, customer.customer_name, customer.code as cus_code, customer.address as customer_address ';
 
-          );
-          $column_search = array(
-              'customer.customer_name', 
-              'proforma_invoice.invoice_number', 
-       
-          );
-          $order = array('proforma_invoice.id' => 'desc');
-  
-          // Call the method to get data with dynamic joins and select fields
-          $list = $serverside_model->get_datatables('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where);
-          
-          $data = array();
-          $no = $request->getPost("start");
-          foreach ($list as $lists) {
-              $no++;
-              $row = array();
-              $row[] = $no;
-              $row[] = $lists->id;
-              $row[] = $lists->invoice_number;
-              $row[] = $lists->invoice_date;
-              $row[] = $lists->customer_name;
-              $data[] = $row;
-          }
-  
-          $output = array(
-              "draw" => $request->getPost("draw"),
-              "recordsTotal" => $serverside_model->count_all('proforma_invoice', $where),
-              "recordsFiltered" => $serverside_model->count_filtered('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where),
-              "data" => $data,
-          );
-  
+        // Define the joins (you can add more joins as needed)
+        $joins = [
+            ['customer', 'customer.id = proforma_invoice.customer_id', 'left'],
+
+        ];
+
+        $where = ['proforma_invoice.deleted_at' => NULL];
+
+        // Column Order Must Match Header Columns in View
+        $column_order = array(
+            NULL,
+            'proforma_invoice.invoice_number',
+            'proforma_invoice.invoice_date',
+            'customer.customer_name',
+            'proforma_invoice.id',
+
+        );
+        $column_search = array(
+            'customer.customer_name',
+            'proforma_invoice.invoice_number',
+
+        );
+        $order = array('proforma_invoice.id' => 'desc');
+
+        // Call the method to get data with dynamic joins and select fields
+        $list = $serverside_model->get_datatables('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where);
+
+        $data = array();
+        $no = $request->getPost("start");
+        foreach ($list as $lists) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $lists->id;
+            $row[] = $lists->invoice_number;
+            $row[] = $lists->invoice_date;
+            $row[] = $lists->customer_name;
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $request->getPost("draw"),
+            "recordsTotal" => $serverside_model->count_all('proforma_invoice', $where),
+            "recordsFiltered" => $serverside_model->count_filtered('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where),
+            "data" => $data,
+        );
+
         //   return $this->response->setJSON($output);
-        
-          return json_encode($output);
+
+        return json_encode($output);
     }
-    function getCustomerList(){
+    function getCustomerList()
+    {
         $model = new MdlCustomer();
         $customer = $model->findAll();
 
         return $this->response->setJSON($customer);
-    
-    }
-    public function add(){
-         $mdl = new ProformaInvoice();
-         $mdl->insert($_POST);
 
-           if ($mdl->affectedRows() !== 0) {
-        $riwayat = "Menambahkan Proforma Invoice ";
-        $this->changelog->riwayat($riwayat);
-        header('HTTP/1.1 200 OK');
-    } else {
-        header('HTTP/1.1 500 Internal Server Error');
-        header('Content-Type: application/json; charset=UTF-8');
-        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
     }
-    }
-public function addProduct(){
-             $mdl = new ProformaInvoiceDetail();
-         $mdl->insert($_POST);
+    public function add()
+    {
+        $mdl = new ProformaInvoice();
+        $mdl->insert($_POST);
 
-           if ($mdl->affectedRows() !== 0) {
-        $riwayat = "Menambahkan Proforma Invoice ";
-        $this->changelog->riwayat($riwayat);
-        header('HTTP/1.1 200 OK');
-    } else {
-        header('HTTP/1.1 500 Internal Server Error');
-        header('Content-Type: application/json; charset=UTF-8');
-        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Menambahkan Proforma Invoice ";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
     }
-}
-public function get_list(){
-         $mdl = new ProformaInvoice();
-         $data =  $mdl->orderBy('id','desc')->get()->getResultArray();
+    public function addProduct()
+    {
+        $mdl = new ProformaInvoiceDetail();
+        $mdl->insert($_POST);
+
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Menambahkan Proforma Invoice ";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function get_list()
+    {
+        $mdl = new ProformaInvoice();
+        $data = $mdl->orderBy('id', 'desc')->get()->getResultArray();
         return json_encode($data);
-}
+    }
 
-public function get_list_json(){
-    $mdl = new ProformaInvoice();
-    $pi = $mdl->orderBy('id', 'DESC')->findAll();
+    public function get_list_json()
+    {
+        $mdl = new ProformaInvoice();
+        $pi = $mdl->orderBy('id', 'DESC')->findAll();
 
-    return $this->response->setJSON($pi);
-}
+        return $this->response->setJSON($pi);
+    }
 
- public function getProduct($id)
+    public function getProduct($id)
     {
         // Fetch product data from the model
         $product = $this->proformaInvoiceDetailModel->getProductById($id);
@@ -298,5 +305,250 @@ public function get_list_json(){
             ]);
         }
     }
+    public function piDoc($id)
+    {
+        $Mdl = new ProformaInvoice();
+        $MdlDetail = new ProformaInvoiceDetail();
+        $dataPembelian = $Mdl
+            ->select('country_data.*, proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
+            ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
+            ->join('currency', 'currency.id = customer.id_currency', 'left')
+            ->join('country_data', 'country_data.id_country = customer.id_country', 'left')
+            ->where('proforma_invoice.id', $id)->get()->getResultArray();
+        // $dataPembelianDetail = $MdlPembelianDetail
+        //                     ->select('materials.*')
+        //                     ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian")
+        //                     ->join("materialscountry_datamaterials.id = pembelian_detail.id_material")
+        //                     ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material")
+        //                     ->where('pembelian.id', $idPembelian)->find();
+        // var_dump($dataPembelianDetail);
+        // die();
+        $data['pi'] = $dataPembelian;
+
+        // var_dump($data['pi']);
+        // die();
+        $data['content'] = view('admin/content/form_pi_doc', $data);
+        return view('admin/index', $data);
+    }
+    public function upload()
+    {
+        $validation = \Config\Services::validation();
+
+        $validation->setRules([
+            'file' => [
+                'label' => 'File',
+                'rules' => 'uploaded[file]|max_size[file,1024]|mime_in[file,application/pdf,image/jpg,image/jpeg,image/png]',
+                'errors' => [
+                    'uploaded' => 'Please select a file to upload.',
+                    'max_size' => 'File size must be less than 1MB.',
+                    'mime_in' => 'Only PDF, JPG, JPEG, and PNG files are allowed.'
+                ]
+            ],
+            'document_name' => [
+                'label' => 'Document Name',
+                'rules' => 'required',
+            ],
+            'document_code' => [
+                'label' => 'Document Code',
+                'rules' => 'required',
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            // Get the validation errors
+            $errors = $validation->getErrors();
+
+            // Format the errors into a string
+            $errorMessage = implode(", ", $errors);
+
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $errorMessage
+            ]);
+        }
+
+        $file = $this->request->getFile('file');
+
+        if ($file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            $file->move(ROOTPATH . 'public/uploads', $newName);
+
+            $model = new \App\Models\MdlDocumentPi();
+            $data = [
+                'id_pi' => $this->request->getPost('id_pi'),  // Assuming you have an id_pi field in your form
+                // 'document' => $file->getName(),
+                'file_path' => 'uploads/' . $newName,
+                'document' => $this->request->getPost('document_name'),
+                'code' => $this->request->getPost('document_code')
+            ];
+
+            if ($model->insert($data)) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'File uploaded successfully.'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Failed to save file information to the database.'
+                ]);
+            }
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'File upload failed.'
+            ]);
+        }
+    }
+    public function file($id)
+    {
+        $serverside_model = new \App\Models\MdlDatatableJoin();
+        $request = \Config\Services::request();
+
+        // Define the columns to select
+        $select_columns = 'document_pi.*';
+
+        // Define the joins (you can add more joins as needed)
+        $joins = [
+        ];
+
+        $where = ['document_pi.id_pi ' => $id, 'document_pi.deleted_at' => NULL];
+
+        // Column Order Must Match Header Columns in View
+        $column_order = array(
+            NULL,
+            'document_pi.code',
+            'document_pi.document',
+            'path_file',
+            'id',
+        );
+        $column_search = array(
+            'document_pi.code',
+            'document_pi.document',
+
+        );
+        $order = array('document_pi.id' => 'desc');
+
+        // Call the method to get data with dynamic joins and select fields
+        $list = $serverside_model->get_datatables('document_pi', $select_columns, $joins, $column_order, $column_search, $order, $where);
+
+        $data = array();
+        $no = $request->getPost("start");
+        foreach ($list as $lists) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $lists->code;
+            $row[] = $lists->document;
+            $row[] = $lists->file_path;
+            $row[] = $lists->id;
+            $row[] = $lists->created_at;
+
+
+            // From joined suppliers table
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $request->getPost("draw"),
+            "recordsTotal" => $serverside_model->count_all('document_pi', $where),
+            "recordsFiltered" => $serverside_model->count_filtered('document_pi', $select_columns, $joins, $column_order, $column_search, $order, $where),
+            "data" => $data,
+        );
+
+
+        return $this->response->setJSON($output);
+    }
+    public function updateDocument()
+    {
+        $id = $this->request->getPost('id');
+        $documentName = $this->request->getPost('document_name');
+        $documentCode = $this->request->getPost('document_code');
+    
+        $model = new \App\Models\MdlDocumentPi();
+    
+        // Validate input
+        if (empty($documentName) || empty($documentCode)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Document name and code are required.'
+            ]);
+        }
+    
+        // Update the document
+        $data = [
+            'document' => $documentName,
+            'code' => $documentCode,
+            'updated_at' => date('Y-m-d H:i:s') // Update the timestamp
+        ];
+    
+        if ($model->update($id, $data)) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Document updated successfully.'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to update document.'
+            ]);
+        }
+    }
+    
+
+    public function delete($id)
+    {
+        $model = new \App\Models\MdlDocumentPi();
+    
+        // Find the document by ID
+        $document = $model->find($id);
+    
+        if ($document) {
+            // Get the file path
+            $filePath = FCPATH . $document['file_path']; // FCPATH is the path to the public folder
+    
+            // Delete the document from the database
+            if ($model->delete($id)) {
+                // Check if the file exists and delete it
+                if (file_exists($filePath)) {
+                    unlink($filePath); // Delete the file
+                }
+    
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Document deleted successfully.'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Failed to delete document from the database.'
+                ]);
+            }
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Document not found.'
+            ]);
+        }
+    }
+    
+public function getDocumentDetails()
+{
+    $id = $this->request->getGet('id');
+    $model = new \App\Models\MdlDocumentPi();
+    $document = $model->find($id);
+
+    if ($document) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'document' => $document
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Document not found.'
+        ]);
+    }
+}
 
 }

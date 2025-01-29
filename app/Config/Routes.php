@@ -279,16 +279,23 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
 $routes->group('proformainvoice', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
     $routes->post('getCustomerList', 'ProformaInvoiceController::getCustomerList',['filter' => 'accessControl:2']); 
+    $routes->post('upload', 'ProformaInvoiceController::upload',['filter' => 'accessControl:2']); 
     $routes->post('add', 'ProformaInvoiceController::add',['filter' => 'accessControl:2']); 
     $routes->post('listdata', 'ProformaInvoiceController::listdata',['filter' => 'accessControl:2']); 
     $routes->post('get_list', 'ProformaInvoiceController::get_list',['filter' => 'accessControl:2']); 
     $routes->post('get_list_json', 'ProformaInvoiceController::get_list_json',['filter' => 'accessControl:2']); 
     $routes->get('pi/(:any)', 'ProformaInvoiceController::pi/$1',['filter' => 'accessControl:2']); 
+    $routes->get('piDoc/(:any)', 'ProformaInvoiceController::piDoc/$1',['filter' => 'accessControl:2']); 
     $routes->post('listdataPi/(:any)', 'ProformaInvoiceController::listdataPi/$1',['filter' => 'accessControl:2']); 
     $routes->post('addProduct', 'ProformaInvoiceController::addProduct',['filter' => 'accessControl:2']); 
     $routes->get('getProduct/(:num)', 'ProformaInvoiceController::getProduct/$1',['filter' => 'accessControl:2']);
     $routes->post('updateProduct/(:num)', 'ProformaInvoiceController::updateProduct/$1',['filter' => 'accessControl:2']);
     $routes->post('deleteProduct/(:num)', 'ProformaInvoiceController::deleteProduct/$1',['filter' => 'accessControl:2']);
+    $routes->post('update/(:num)', 'ProformaInvoiceController::update/$1',['filter' => 'accessControl:2']);
+    $routes->post('file/(:num)', 'ProformaInvoiceController::file/$1',['filter' => 'accessControl:2']);
+    $routes->get('getDocumentDetails', 'ProformaInvoiceController::getDocumentDetails',['filter' => 'accessControl:2']);
+    $routes->post('updateDocument', 'ProformaInvoiceController::updateDocument',['filter' => 'accessControl:2']);
+    $routes->delete('delete/(:num)', 'ProformaInvoiceController::delete/$1',['filter' => 'accessControl:2']);
 
 
 });
