@@ -10,7 +10,7 @@ class ProformaInvoice extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = ['id','invoice_number','invoice_date','customer_id','customer_address','id_currency','etd','eta','payment_terms','remarks','status','updated_at','deleted_at','created_at'];
 

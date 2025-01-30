@@ -50,8 +50,11 @@ $(document).ready(function() {
     }},
     {mRender: function (data, type, row) {
      return `
-     <a href="${base_url}proformainvoice/piDoc/${row[1]}" target="_blank" class="btn btn-success btn-sm showDocumentShipment" id="${row[1]}" >Document&Shipment</a>
-     <a href="${base_url}proformainvoice/pi/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[1]}" >Detail</a>`; 
+     <a href="${base_url}proformainvoice/piDoc/${row[1]}" target="_blank" class="btn btn-warning btn-sm showDocumentShipment" id="${row[1]}" >Document&Shipment</a>
+     <a href="${base_url}proformainvoice/pi/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[1]}" >Detail</a>
+     <a href="javascript:void(0);" class="btn btn-danger btn-sm deletePi" id="${row[1]}" invoice = "${row[2]}" >Delete</a>
+     `; 
+   
     }}
   ],
   "columnDefs": [{
@@ -68,7 +71,24 @@ $(document).ready(function() {
 
 });
 })
+function getCurrentDate() {
+    // Create a new Date object for the current date
+    const currentDate = new Date();
+
+    // Extract the year, month, and day
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(currentDate.getDate()).padStart(2, '0');
+
+    // Format the date as YYYY-MM-DD
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Return the formatted date
+    return formattedDate;
+}
+
 $('.tambahProformaInvoice').on('click', function () {
+    const currentDate =getCurrentDate();
     // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
     Swal.fire({
         title: `Tambah Proforma Invoice`,
@@ -101,7 +121,7 @@ $('.tambahProformaInvoice').on('click', function () {
             type: "POST",
             url: base_url + '/proformainvoice/add',
             async: false,
-            data: { invoice_number: result.value.kode, customer_id: result.value.customerId },
+            data: { invoice_number: result.value.kode, customer_id: result.value.customerId , invoice_date :currentDate},
             success: function (data) {
                  $('#tabel_serverside').DataTable().ajax.reload();
                 Swal.fire({
@@ -178,3 +198,31 @@ function getCustomerOption() {
         });
     });
 }
+
+$('#tabel_serverside').on('click','.deletePi',function(){
+    const id = $(this).attr('id');
+    const invoice = $(this).attr('invoice');
+    Swal.fire({
+        title: 'Anda yakin ingin menghapus invoice: '+invoice+'?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: base_url + '/proformainvoice/deleteinvoice/'+id, 
+                type: 'post',
+                success: function(response) {
+                    Swal.fire('Dihapus!', response.message, 'success');
+                    $('#tabel_serverside').DataTable().ajax.reload();
+
+                },
+                error: function(xhr) {
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire('Oops...', d.message, 'error');
+                }
+            });
+        }
+    });
+});
