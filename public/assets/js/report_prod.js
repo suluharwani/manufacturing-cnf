@@ -178,7 +178,7 @@ window.jsPDF = window.jspdf.jsPDF
                                 <td>${item.wo} </td> 
                                 <td>${item.production_area_name} </td> 
                                 <td>${item.product_code}</td>
-                                <td><p style="color:blue;">${item.hs_code}</p></td> 
+                                <td><p style="color:blue;" onclick="checkHsCode('${item.hs_code}')">${item.hs_code}</p></td> 
                                 <td>${item.product_name}</td>
                                 <td>${item.quantity}</td>
                             </tr>
@@ -196,7 +196,7 @@ window.jsPDF = window.jspdf.jsPDF
                                 <td>${wh.wo} </td> 
                                 <td>${wh.production_area_name} </td> 
                                 <td>${wh.product_code}</td>
-                                <td><p style="color:blue;">${wh.hs_code}</p></td> 
+                                <td><p style="color:blue;" onclick="checkHsCode('${wh.hs_code}')">${wh.hs_code}</p></td> 
                                 <td>${wh.product_name}</td>
                                 <td>${wh.quantity}</td>
                             </tr>
@@ -205,7 +205,7 @@ window.jsPDF = window.jspdf.jsPDF
                     });
 
                     tableBody = row; // Append the row to the table body
-                
+                    console.log(tableBody);
                     $('#resultTableContainer').html(tableBody); // Update the table container
                     $('#laporanModal').modal('hide');
 

@@ -35,4 +35,6 @@
 
     <!-- Template Javascript -->
     <script src="<?=base_url('assets/dashmin-1.0.0/')?>js/main.js"></script>
+    <script type="text/javascript" src="<?= base_url('assets') ?>/js/hscode.js"></script>
+
 </html>

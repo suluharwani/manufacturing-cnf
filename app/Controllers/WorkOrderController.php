@@ -40,14 +40,14 @@ class WorkOrderController extends BaseController
            $request = \Config\Services::request();
            
            // Define the columns to select
-           $select_columns = 'work_order.*, proforma_invoice.invoice_number';
+           $select_columns = 'work_order.*, proforma_invoice.invoice_number, proforma_invoice.status';
            
            // Define the joins (you can add more joins as needed)
            $joins = [
                  ['proforma_invoice', 'proforma_invoice.id = work_order.invoice_id', 'left'],
            ];
    
-           $where = ['work_order.id !=' => 0, 'work_order.deleted_at' => NULL];
+           $where = ['work_order.id !=' => 0, 'work_order.deleted_at' => NULL,];
    
            // Column Order Must Match Header Columns in View
            $column_order = array(
@@ -72,6 +72,7 @@ class WorkOrderController extends BaseController
            $data = array();
            $no = $request->getPost("start");
            foreach ($list as $lists) {
+            if ($lists->status == null) {
                $no++;
                $row = array();
                $row[] = $no;
@@ -81,9 +82,11 @@ class WorkOrderController extends BaseController
                $row[] = $lists->kode;
                $row[] = $lists->start;
                $row[] = $lists->end;
+               $row[] = $lists->status;
 
  // From joined suppliers table
                $data[] = $row;
+            }
            }
    
            $output = array(

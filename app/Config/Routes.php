@@ -17,6 +17,7 @@ $routes->get('/dashboard/getCountryData', 'DashboardController::getCountryData',
 $routes->get('productionArea', 'Home::productionArea',['filter' => 'accessControl:1']);
 $routes->get('department', 'Home::department',['filter' => 'accessControl:1']);
 $routes->get('material_request', 'Home::materialRequest',['filter' => 'accessControl:2']);
+$routes->get('hscode/check_hs_code', 'Home::check_hs_code',['filter' => 'accessControl:2']);
 
 
 $routes->get('/supplier', 'Home::supplier',['filter' => 'accessControl:1']);  
@@ -336,6 +337,7 @@ $routes->group('report', function ($routes) {
     $routes->get('purchase', 'ReportController::purchase',['filter' => 'accessControl:2']); 
     $routes->post('materialStockCard', 'ReportController::materialStockCard',['filter' => 'accessControl:2']); 
     $routes->post('productionReport', 'ReportController::productionReport',['filter' => 'accessControl:2']); 
+    $routes->post('productionReportPIByProduct', 'ReportController::productionReportPIByProduct',['filter' => 'accessControl:2']); 
     $routes->get('getHeader', 'ReportController::getHeader',['filter' => 'accessControl:2']); 
     $routes->get('getHeaderScrap', 'ReportController::getHeaderScrap',['filter' => 'accessControl:2']); 
     $routes->post('materialScrap', 'ReportController::materialScrap',['filter' => 'accessControl:2']); 

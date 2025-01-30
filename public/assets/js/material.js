@@ -41,7 +41,7 @@ $(document).ready(function() {
       {},
       {mRender: function (data, type, row) {
     //   return  row[1]+" "+row[2]+"</br>"+"<a href=mailto:"+row[3]+">"+row[3]+"</a>";
-        return `${row[3]} <br> ${row[8]}`
+        return `${row[3]} <br> <p style="color:blue;" onclick="checkHsCode('${row[8]}')">${row[8]}</p> `
       }},
       {mRender: function (data, type, row) {
         return row[2]

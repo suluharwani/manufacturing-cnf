@@ -312,5 +312,39 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material_requisition_progress');
         return view('admin/index', $data);
     }
+    public function check_hs_code() {
+        $term = $_GET['term'];
 
+        if (empty($term)) {
+            echo json_encode(['status' => 'error', 'message' => 'HS Code term is required.']);
+            return;
+        }
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://hs-code-harmonized-system.p.rapidapi.com/code?term=" . urlencode($term),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => [
+                "x-rapidapi-host: hs-code-harmonized-system.p.rapidapi.com",
+                "x-rapidapi-key: fd47581e71mshaf2d7feb7752fa7p1920a9jsn96228f76aa27"
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            echo json_encode(['status' => 'error', 'message' => 'cURL Error #' . $err]);
+        } else {
+            echo $response;
+        }
+    }
 }

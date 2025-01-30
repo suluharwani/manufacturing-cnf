@@ -217,10 +217,23 @@ $(document).ready(function() {
         return row[5]
     }},
     {mRender: function (data, type, row) {
-        return`
-         <button class="btn btn-warning btn-sm editBtn" id = "${row[7]}">Edit</button>
-         <button class="btn btn-danger btn-sm deleteBtn" id = "${row[7]}">Delete</button>
-        `
+      if(row[9] == 1){
+        return 'Posted'
+      }else if(row[9] == 2){
+        return 'Delivered'
+      }else{
+        return 'Production'
+      }
+  }},
+    {mRender: function (data, type, row) {
+      if(row[9] == 1){
+        return 'Posted'
+      }else if(row[9] == 2){
+        return 'Delivered'
+      }else{
+        return ` <button class="btn btn-warning btn-sm viewProd" totalOrder = "${row[4]}" idProd = "${row[1]}">View Production</button>`
+      }
+
     }},
   ],
   "columnDefs": [{
@@ -643,85 +656,7 @@ $(document).on('click', '.editMaterial', function(e) {
         });
     });
 
-$(document).on('click', '.editBtn', function(e) {
-    e.preventDefault();
-    
-    var productId = $(this).attr('id');
-    
-    $.ajax({
-        url: base_url + 'proformainvoice/getProduct/' + productId,
-        type: 'GET',
-        success: function(response) {
-            if (response.status === 'success') {
-                var product = response.data;
-                
-                Swal.fire({
-                    title: 'Edit Product',
-                    html: `
-        <form id="form_edit_product">
-            
-            <div class="form-group">
-                <label for="hs_code">HS Code</label>
-                <input type="text" class="form-control" value="${product.hs_code}" disabled />
-            </div>
-            <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" class="form-control" id="quantity" value="${product.quantity}" placeholder="Quantity" />
-            </div>
-            <div class="form-group">
-                <label for="unit_price">Unit Price</label>
-                <input type="number" class="form-control" id="unit_price" value="${product.unit_price}" placeholder="Unit Price" />
-            </div>
-              <div class="form-group">
-                <label for="remarks">Remark</label>
-                <input type="text" class="form-control" id="remarks" value="${product.remarks}" placeholder="Item Description" />
-            </div>
-        </form>
-    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Update',
-                    cancelButtonText: 'Cancel',
-                    preConfirm: function() {
-                        return {
-                            id_product: $('#id_product').val(),
-                            remarks: $('#remarks').val(),
-                            hs_code: $('#hs_code').val(),
-                            quantity: $('#quantity').val(),
-                            unit_price: $('#unit_price').val(),
-                            total_price: $('#total_price').val()
-                        };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var updatedData = result.value;
-                        
-                        $.ajax({
-                            url: base_url + 'proformainvoice/updateProduct/' + product.id,
-                            type: 'POST',
-                            data: updatedData,
-                            success: function(response) {
-                                if (response.status === 'success') {
-                                    Swal.fire('Updated!', 'Product details have been updated.', 'success');
-                                    // Reload your table or update UI here
-                                } else {
-                                    Swal.fire('Error', 'Failed to update product.', 'error');
-                                }
-                            },
-                            error: function() {
-                                Swal.fire('Error', 'Failed to update product.', 'error');
-                            }
-                        });
-                    }
-                });
-            } else {
-                Swal.fire('Error', 'Product not found.', 'error');
-            }
-        },
-        error: function() {
-            Swal.fire('Error', 'Failed to fetch product data.', 'error');
-        }
-    });
-});
+
 $(document).on('click', '.deleteBtn', function(e) {
     e.preventDefault();
     
@@ -931,3 +866,136 @@ $(document).on('click', '.editBtnDoc', function() {
       }
   });
 });
+$('#generateReportBtnProd').on('click', function () {
+
+  
+});
+$(document).on('click', '.viewProd', function(e) {
+  e.preventDefault();
+  const totalOrder = $(this).attr('totalOrder');
+  const prodId = $(this).attr('idProd');
+  const piId = getLastSegment();
+      // Tambahkan waktu ke endDate
+
+
+// Jika startDate adalah datetime-local, maka format juga
+
+  $.ajax({
+      url: base_url+'report/productionReportPIByProduct',  
+      method: 'POST',
+      data: {
+        prodId: prodId,
+        piId: piId,
+      },
+      success: function (result) {
+          data = JSON.parse(result);
+          
+          let no = 1;
+          let no_ = 1;
+          let qt_wh = 0;
+          let qt_prod = 0;
+          var data = JSON.parse(result);
+          var tableBody = $('#resultTableBody');
+          tableBody.empty(); // Clear existing rows
+          let row = `<thead>
+          
+  <tr>
+      <th>No</th>
+      <th>DATE</th>
+      <th>WORK ORDER</th>
+      <th>PRODUCTION AREA</th>
+      <th>CODE</th>
+      <th>HSCODE</th>
+      <th>NAME</th>
+      <th>QUANTITY</th>
+  </tr>
+</thead>`; // Initialize the row variable
+          // Loop through the pembelian array and create table rows
+          // hs_code
+          // product_code
+          // product_name
+          // production_area_name
+          // quantity
+          // wo
+                  data['prod'].forEach(function (item) {
+              row += `
+              ${qt_prod += parseInt(item.quantity)}
+                  <tr>
+                      <td>${no++}</td>
+                      <td>${formatDateIndo(item.created_at)}</td>
+                      <td>${item.wo} </td> 
+                      <td>${item.production_area_name} </td> 
+                      <td>${item.product_code}</td>
+                       <td><p style="color:blue;" onclick="checkHsCode('${item.hs_code}')">${item.hs_code}</p></td>
+                      <td>${item.product_name}</td>
+                      <td>${item.quantity}</td>
+                  </tr>
+              `;
+
+          });
+          row += `  <tr>
+                      <td colspan = "8" >Finished Good</td>
+                  </tr>  `
+          data['wh'].forEach(function (wh) {
+
+              row += `
+                  ${qt_wh += parseInt(wh.quantity)}
+
+                  <tr>
+                      <td>${no_++}</td>
+                      <td>${formatDateIndo(wh.created_at)}</td>
+                      <td>${wh.wo} </td> 
+                      <td>${wh.production_area_name} </td> 
+                      <td>${wh.product_code}</td>
+                      <td><p style="color:blue;" onclick="checkHsCode('${wh.hs_code}')">${wh.hs_code}</p></td>
+                      <td>${wh.product_name}</td>
+                      <td>${wh.quantity}</td>
+                  </tr>
+              `;
+
+          });
+
+          tableBody = row; // Append the row to the table body
+          
+          $('#totalOrder').html(parseInt(totalOrder)); // Update the table container
+          $('#unProgress').html(parseInt(totalOrder)-(parseInt(qt_prod)+parseInt(qt_wh))); // Update the table container
+          $('#qtprod').html(qt_prod); // Update the table container
+          $('#qtwh').html(qt_wh); // Update the table container
+          $('#totalProd').html(parseInt(qt_prod)+parseInt(qt_wh)); // Update the table container
+          $('#resultTableContainer').html(tableBody); // Update the table container
+          $('#resultTableContainer').html(tableBody); // Update the table container
+          $('#prodView').modal('show');
+
+      }
+  });
+});
+
+
+function formatDateIndo(dateString) {
+  // Create a new Date object from the input date string
+  const date = new Date(dateString);
+
+  // Get the day, month, and year
+  const day = String(date.getDate()).padStart(2, '0'); // Pad with leading zero if needed
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const year = date.getFullYear();
+
+  // Return the formatted date in DD/MM/YYYY
+  return `${day}/${month}/${year}`;
+}
+function formatAngka(angka) {
+  // Memisahkan bagian desimal dan ribuan
+  let [bagianRibuan, bagianDesimal] = angka.toString().split(".");
+  
+  // Menambahkan titik sebagai pemisah ribuan
+  bagianRibuan = bagianRibuan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  
+  // Mengatur bagian desimal, maksimal 2 angka
+  if (bagianDesimal) {
+      bagianDesimal = bagianDesimal.substring(0, 2);
+  } else {
+      bagianDesimal = "00"; // Jika tidak ada bagian desimal
+  }
+  
+  return `${bagianRibuan},${bagianDesimal}`;
+}

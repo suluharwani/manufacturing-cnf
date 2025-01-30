@@ -1,13 +1,36 @@
 <link rel="stylesheet" type="text/css" href="<?= base_url('assets') ?>/datatables/datatables.min.css" />
 <style>
-  /* Tambahan minimal CSS untuk fixed header */
-  thead th {
-    position: sticky;
-    top: 0;
-    background-color: #343a40;
-    /* Warna background yang sama dengan header */
-    z-index: 100;
-  }
+body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .table-container {
+            width: 100%; /* Memastikan div memenuhi lebar kontainer */
+            overflow-x: auto; /* Menambahkan scroll horizontal jika diperlukan */
+            border: 1px solid #ccc; /* Border untuk div */
+            border-radius: 5px; /* Sudut melengkung */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Bayangan */
+        }
+
+        table {
+            width: 100%; /* Tabel memenuhi lebar div */
+            border-collapse: collapse; /* Menghilangkan jarak antara border sel */
+        }
+
+        th, td {
+            padding: 12px; /* Ruang dalam sel */
+            text-align: left; /* Rata kiri */
+            border-bottom: 1px solid #ddd; /* Garis bawah sel */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Warna latar belakang header */
+        }
+
+        tr:hover {
+            background-color: #f1f1f1; /* Warna latar belakang saat hover */
+        }
 </style>
 
 
@@ -100,6 +123,7 @@
             <th style=" text-align: center;">Qty</th>
             <th style=" text-align: center;">Price</th>
             <th style=" text-align: center;">Status</th>
+            <th style=" text-align: center;">Action</th>
           </tr>
         </thead>
         <tfoot>
@@ -110,6 +134,7 @@
             <th style=" text-align: center;">Qty</th>
             <th style=" text-align: center;">Price</th>
             <th style=" text-align: center;">Status</th>
+            <th style=" text-align: center;">Action</th>
           </tr>
         </tfoot>
       </table>
@@ -160,7 +185,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog ">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addMaterialModalLabel">Add Material</h5>
@@ -193,6 +218,60 @@
     </div>
   </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="prodView" tabindex="-1" aria-labelledby="prodViewLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="prodViewLabel">Production</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between">
+        <div class="card border-warning mb-3" style="max-width: 18rem;">
+            <div class="card-header bg-warning text-white">Order</div>
+            <div class="card-body text-warning text-center">
+              
+              <p class="card-text"><h1><span id="totalOrder">0</span></h1></p>
+            </div>
+          </div>
+          <div class="card border-warning mb-3" style="max-width: 18rem;">
+            <div class="card-header bg-warning text-white">Production</div>
+            <div class="card-body text-warning text-center">
+              
+              <p class="card-text"><h1><span id="qtprod">0</span></h1></p>
+            </div>
+          </div>
+          <div class="card border-success mb-3" style="max-width: 18rem;">
+            <div class="card-header bg-success text-white">Warehouse</div>
+            <div class="card-body text-success text-center">
+              
+              <p class="card-text"><h1><span id="qtwh">0</span></h1></p>
+            </div>
+          </div>
+          <div class="card border-danger mb-3" style="max-width: 18rem;">
+            <div class="card-header bg-danger text-white">Waiting Progress</div>
+            <div class="card-body text-danger text-center">
+              
+              <p class="card-text"><h1><span id="unProgress">0</span></h1></p>
+            </div>
+          </div>
+          <div class="card border-primary mb-3" style="max-width: 18rem;">
+            <div class="card-header bg-primary text-white">Total Production</div>
+            <div class="card-body text-primary text-center">
+              
+              <p class="card-text"><h1><span id="totalProd">0</span></h1></p>
+            </div>
+          </div>
+        </div>
+        <div id="resultTableContainer" class="table-responsive">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+
+                        <!-- Results will be displayed here -->
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/form_pi_doc.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

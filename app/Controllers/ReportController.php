@@ -475,6 +475,12 @@ class ReportController extends BaseController
         $data['wh'] = $this->getWHreport($_POST);
         return json_encode($data);
     }
+    public function productionReportPIByProduct()
+    {
+        $data['prod'] = $this->getProductionReportPIByProduct($_POST);
+        $data['wh'] = $this->getWHreportPIByProduct(params: $_POST);
+        return json_encode($data);
+    }
     function getWHreport($params)
     {
         $idWO = $params['woId'];
@@ -499,6 +505,61 @@ class ReportController extends BaseController
         }
         if (!empty($idWO)) {
             $queryWh->where('production_progress.wo_id =', $idWO);
+        }
+        return $queryWh->findAll();
+    }
+    function getProductionReportPIByProduct($params)
+    {
+        $prodId = $params['prodId'];
+        $piId = $params['piId'];
+        $mdl = new \App\Models\MdlProductionProgress();
+
+        $queryProd = $mdl->select('production_progress.created_at, work_order.kode as wo,
+                                         product.kode as product_code,
+                                         product.nama as product_name, 
+                                         product.hs_code as hs_code, 
+                                         production_area.name as production_area_name,
+                                         production_progress.quantity as quantity
+                                    ') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('production_area', 'production_area.id = production_progress.production_id');
+            $queryProd->where('production_progress.product_id =', $prodId);
+
+        if (!empty($prodId)) {
+            $queryProd->where('proforma_invoice.id =', $piId)->where('quantity !=', 0);;
+        }
+
+
+
+
+        return $queryProd->findAll();
+
+    }
+
+    function getWHreportPIByProduct($params)
+    {
+        $prodId = $params['prodId'];
+        $piId = $params['piId'];
+        $mdl = new \App\Models\MdlProductionProgress();
+
+        $queryWh = $mdl->select('production_progress.created_at,work_order.kode as wo,
+    product.kode as product_code,
+    product.nama as product_name, 
+    product.hs_code as hs_code, 
+    warehouses.name as production_area_name,
+    production_progress.quantity as quantity 
+') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('warehouses', 'warehouses.id = production_progress.warehouse_id');
+            $queryWh->where('production_progress.product_id =', $prodId);
+
+        if (!empty($prodId)) {
+            $queryWh->where('work_order.invoice_id =', $piId)->where('quantity !=', 0);;
+            
         }
         return $queryWh->findAll();
     }
@@ -534,6 +595,7 @@ class ReportController extends BaseController
         return $queryProd->findAll();
 
     }
+
     public function stockMovementReport(){
         $endDate = $_POST['end_date'];
         $startDate = $_POST['start_date'];

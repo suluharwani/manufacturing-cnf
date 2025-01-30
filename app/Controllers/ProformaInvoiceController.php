@@ -61,11 +61,12 @@ class ProformaInvoiceController extends BaseController
         $request = \Config\Services::request();
 
         // Define the columns to select
-        $select_columns = 'proforma_invoice_details.*, proforma_invoice_details.id as det_id,product.nama as nama, product.kode as kode,product.id as id_product';
+        $select_columns = 'proforma_invoice.status as status,proforma_invoice.invoice_number as pi, proforma_invoice_details.*, proforma_invoice_details.id as det_id,product.nama as nama, product.kode as kode,product.id as id_product';
 
         // Define the joins (you can add more joins as needed)
         $joins = [
             ['product', 'product.id = proforma_invoice_details.id_product', 'left'],
+            ['proforma_invoice', 'proforma_invoice.id = proforma_invoice_details.invoice_id', 'left'],
         ];
 
         $where = ['proforma_invoice_details.invoice_id ' => $id, 'proforma_invoice_details.deleted_at' => NULL];
@@ -104,6 +105,8 @@ class ProformaInvoiceController extends BaseController
             $row[] = $lists->unit_price;
             $row[] = $lists->total_price;
             $row[] = $lists->det_id;
+            $row[] = $lists->pi;
+            $row[] = $lists->status;
 
 
             // From joined suppliers table
