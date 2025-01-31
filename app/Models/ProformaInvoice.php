@@ -43,4 +43,57 @@ class ProformaInvoice extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function getInvoiceData($id)
+    {
+        // Fetch the proforma invoice
+        $invoice = $this->find($id);
+
+        // Fetch the invoice details
+        $details = $this->db->table('proforma_invoice_details')
+            ->where('invoice_id', $id)
+            ->get()
+            ->getResultArray();
+
+        // Fetch product details for each item
+        foreach ($details as &$detail) {
+            $product = $this->db->table('product')
+                ->where('id', $detail['id_product'])
+                ->get()
+                ->getRowArray();
+            $detail['product'] = $product;
+        }
+
+        return [
+            'invoice' => $invoice,
+            'details' => $details,
+        ];
+    }
+    public function getDeliveryNoteData($id)
+    {
+        // Fetch the proforma invoice
+        $invoice = $this->find($id);
+
+        // Fetch the invoice details
+        $details = $this->db->table('proforma_invoice_details')
+            ->where('invoice_id', $id)
+            ->get()
+            ->getResultArray();
+
+        // Fetch product details for each item
+        foreach ($details as &$detail) {
+            $product = $this->db->table('product')
+            ->select('product.*, product_details.*')
+                 ->join('product_details', 'product.id = product_details.id_product', 'left')
+                ->where('product.id', $detail['id_product'])
+                ->get()
+                ->getRowArray();
+            $detail['product'] = $product;
+        }
+
+        return [
+            'invoice' => $invoice,
+            'details' => $details,
+        ];
+    }
 }

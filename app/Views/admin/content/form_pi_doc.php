@@ -110,7 +110,13 @@ body {
   <div class="bg-light text-center rounded p-4">
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h6 class="mb-0">Product</h6>
-      <button class="btn btn-primary finish">Finish Production</button>
+      <?php if ($pi[0]['status'] == 1){?>
+        <button class="btn btn-warning printButton"> Print Invoice</button>
+        <button class="btn btn-warning printDeliveryButton"> Print Delivery Note</button>
+        <button class="btn btn-warning batalFinish"> Cancel Finish Production</button>
+      <?php } else{?>
+        <button class="btn btn-primary finish">Finish Production</button>
+      <?php } ?>
     </div>
     <div class="table-responsive">
 

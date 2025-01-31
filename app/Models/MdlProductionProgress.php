@@ -140,4 +140,68 @@ class MdlProductionProgress extends Model
 
         return false;  // Data tidak ditemukan
     }
+    public function finish($id)
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // Soft delete all entries in production_progress where work_order.invoice_id matches the provided id
+            $sqlDelete = "
+                UPDATE production_progress pp
+                JOIN work_order wo ON pp.wo_id = wo.id
+                SET pp.deleted_at = NOW()
+                WHERE wo.invoice_id = ? AND pp.deleted_at IS NULL
+            ";
+            $db->query($sqlDelete, [$id]);
+
+            // Update the status field in proforma_invoice to 1 for the record with the given id
+            $sqlUpdate = "
+                UPDATE proforma_invoice
+                SET status = 1
+                WHERE id = ?
+            ";
+            $db->query($sqlUpdate, [$id]);
+
+            // Commit the transaction
+            $db->transCommit();
+            return true;
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of error
+            $db->transRollback();
+            return false;
+        }
+    }
+    public function batalFinish($id)
+    {
+        $db = \Config\Database::connect();
+        $db->transBegin();
+
+        try {
+            // Reset the deleted_at column in production_progress where work_order.invoice_id matches the provided id
+            $sqlReset = "
+                UPDATE production_progress pp
+                JOIN work_order wo ON pp.wo_id = wo.id
+                SET pp.deleted_at = NULL
+                WHERE wo.invoice_id = ? AND pp.deleted_at IS NOT NULL
+            ";
+            $db->query($sqlReset, [$id]);
+
+            // Reset the status field in proforma_invoice to NULL for the record with the given id
+            $sqlUpdateStatus = "
+                UPDATE proforma_invoice
+                SET status = NULL
+                WHERE id = ?
+            ";
+            $db->query($sqlUpdateStatus, [$id]);
+
+            // Commit the transaction
+            $db->transCommit();
+            return true;
+        } catch (\Exception $e) {
+            // Rollback the transaction in case of error
+            $db->transRollback();
+            return false;
+        }
+    }
 }

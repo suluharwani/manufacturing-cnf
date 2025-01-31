@@ -969,7 +969,7 @@ $(document).on('click', '.viewProd', function(e) {
       }
   });
 });
-
+ 
 
 function formatDateIndo(dateString) {
   // Create a new Date object from the input date string
@@ -999,3 +999,106 @@ function formatAngka(angka) {
   
   return `${bagianRibuan},${bagianDesimal}`;
 }
+$(document).on('click', '.finish', function(e) {
+  e.preventDefault();
+  var id = getLastSegment();
+
+  // Menampilkan konfirmasi dengan SweetAlert
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Please ensure that all production tasks are completed before clicking the 'Finish' button!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3fe86c',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, finish it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Jika konfirmasi diterima, lakukan penghapusan
+      $.ajax({
+        type: "POST",
+        url: base_url + "proformainvoice/finish/" + id, // Endpoint untuk menghapus material
+        data: {},
+        success: function(response) {
+          if (response.status === 'success') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Finished!',
+              text: 'Proforma invoice has been completed.',
+            });
+            location.reload(true);// Reload halaman untuk memperbarui data
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Cannot process request!',
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error connecting to the server!',
+          });
+        }
+      });
+    }
+  });
+});
+$(document).on('click', '.batalFinish', function(e) {
+  e.preventDefault();
+  var id = getLastSegment();
+
+  // Menampilkan konfirmasi dengan SweetAlert
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "Please ensure that all production tasks are completed before clicking the 'Finish' button!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3fe86c',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, finish it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Jika konfirmasi diterima, lakukan penghapusan
+      $.ajax({
+        type: "POST",
+        url: base_url + "proformainvoice/batalFinish/" + id, // Endpoint untuk menghapus material
+        data: {},
+        success: function(response) {
+          if (response.status === 'success') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Finished!',
+              text: 'Proforma invoice has been canceled.',
+            });
+            location.reload(true);// Reload halaman untuk memperbarui data
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Cannot process request!',
+            });
+          }
+        },
+        error: function() {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error connecting to the server!',
+          });
+        }
+      });
+    }
+  });
+});
+
+$('.printButton').on('click', function() {
+  var invoiceId = getLastSegment(); // Replace with the actual invoice ID
+  window.open(base_url + "proformainvoice/print/" + invoiceId, '_blank');
+});
+$('.printDeliveryButton').on('click', function() {
+  var invoiceId = getLastSegment(); // Replace with the actual invoice ID
+  window.open(base_url + "proformainvoice/delivery_note/" + invoiceId, '_blank');
+});

@@ -298,7 +298,11 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->post('updateDocument', 'ProformaInvoiceController::updateDocument',['filter' => 'accessControl:2']);
     $routes->delete('delete/(:num)', 'ProformaInvoiceController::delete/$1',['filter' => 'accessControl:2']);
     $routes->post('deleteinvoice/(:num)', 'ProformaInvoiceController::deleteinvoice/$1',['filter' => 'accessControl:2']);
-    
+    $routes->post('finish/(:num)', 'ProformaInvoiceController::finish/$1',['filter' => 'accessControl:2']);
+    $routes->post('batalFinish/(:num)', 'ProformaInvoiceController::batalFinish/$1',['filter' => 'accessControl:2']);
+    $routes->get('print/(:num)', 'ProformaInvoiceController::print/$1',['filter' => 'accessControl:2']);
+    $routes->get('delivery_note/(:num)', 'ProformaInvoiceController::printDeliveryNote/$1',['filter' => 'accessControl:2']);
+
 
 });
 $routes->group('wo', function ($routes) {

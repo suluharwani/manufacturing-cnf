@@ -7,7 +7,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\ProformaInvoice;
 use App\Models\ProformaInvoiceDetail;
 use App\Models\MdlCustomer;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class ProformaInvoiceController extends BaseController
 {
     protected $changelog;
@@ -567,5 +568,77 @@ public function getDocumentDetails()
         ]);
     }
 }
+public function finish($id){
+    $productionModel = new \App\Models\MdlProductionProgress();
+
+        if ($productionModel->finish($id)) {
+            return $this->response->setStatusCode(200)->setJSON(['status'=> "success",'message' => 'Production progress soft deleted and proforma invoice status updated successfully.']);
+        } else {
+            return $this->response->setStatusCode(500)->setJSON(['message' => 'Error: Failed to update production progress and proforma invoice status.']);
+        }
+}
+public function batalFinish($id)
+{
+    $productionModel = new \App\Models\MdlProductionProgress();
+
+
+    if ($productionModel->batalFinish($id)) {
+        return $this->response->setStatusCode(200)->setJSON(['status' => 'success', 'message' => 'Production progress reset and proforma invoice status reset successfully.']);
+    } else {
+        return $this->response->setStatusCode(500)->setJSON(['status' => 'error', 'message' => 'Error: Failed to reset production progress and proforma invoice status.']);
+    }
+}
+
+public function print($id)
+{
+    $invoiceModel = new ProformaInvoice();
+    $data = $invoiceModel->getInvoiceData($id);
+
+    // Load the view and pass the data
+    $html = view('admin/content/report/invoice', $data);
+
+    // Initialize Dompdf
+    $options = new Options();
+    $options->set('defaultFont', 'Arial');
+    $dompdf = new Dompdf($options);
+
+    // Load HTML content
+    $dompdf->loadHtml($html);
+
+    // (Optional) Setup the paper size and orientation
+    $dompdf->setPaper('A4', 'portrait');
+
+    // Render the HTML as PDF
+    $dompdf->render();
+
+    // Output the generated PDF to Browser
+    $dompdf->stream("invoice_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
+}
+public function printDeliveryNote($id)
+    {
+        $deliveryNoteModel = new ProformaInvoice();
+        $data = $deliveryNoteModel->getDeliveryNoteData($id);
+
+        // Load the view and pass the data
+        $html = view('admin/content/report/deliveryNote', $data);
+
+
+        // Initialize Dompdf
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $dompdf = new Dompdf($options);
+
+        // Load HTML content
+        $dompdf->loadHtml($html);
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser
+        $dompdf->stream("surat_jalan_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
+    }
 
 }
