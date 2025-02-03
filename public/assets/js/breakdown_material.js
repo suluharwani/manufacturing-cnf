@@ -33,7 +33,7 @@ $(document).ready(function() {
     "stateSave" : true,
     "scrollX": true,
     "ajax":{
-          "url" :base_url+"modul/get_list" , // json datasource 
+          "url" :base_url+"product/modul/"+getLastSegment() , // json datasource 
           "type": "post",  // method  , by default get
           // "async": false,
           "dataType": 'json',
@@ -42,10 +42,7 @@ $(document).ready(function() {
       
       columns: [
         {},
-        {mRender: function (data, type, row) {
-    
-            return row[1]
-        }},
+
         {mRender: function (data, type, row) {
             
             return row[2]
@@ -102,9 +99,9 @@ $(document).ready(function() {
       });
       }
 });
-$('.finising').on('click',function(){
-
-    $('#finisingModal').modal('show')
-    
-    
-    })
+$('.addModul').on('click', function () {
+  console.log('addModul');
+  $('#addModulModal').modal('show');
+  $('#addModulForm')[0].reset(); // Reset form
+  $('#addModulModalLabel').text('Add Modul Product');
+});

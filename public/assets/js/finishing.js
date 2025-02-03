@@ -1,6 +1,10 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/";
-
+function getLastSegment() {
+    var pathname = window.location.pathname; // Mendapatkan path dari URL
+    var segments = pathname.split('/').filter(function(segment) { return segment.length > 0; });
+    return segments[segments.length - 1]; // Mengambil segment terakhir
+  }
 $(document).ready(function () {
 const table = $('#finishingTable').DataTable({
     ajax: {
@@ -33,6 +37,7 @@ const table = $('#finishingTable').DataTable({
             data: null,
             render: (data) =>
                 `
+                    <button class="btn btn-warning bomFinishing" data-id="${data.id}">Bill of material</button>
                     <button class="btn btn-warning edit" data-id="${data.id}">Edit Data</button>
                     <button class="btn btn-info edit-picture" data-id="${data.id}">Edit Picture</button>
                     <button class="btn btn-danger delete" data-id="${data.id}">Delete</button>
@@ -211,3 +216,260 @@ $(document).on('click', '.delete', function () {
 });
 
 });
+
+$(document).on('click', '.bomFinishing', function () {
+    const idModul = $(this).data('id'); // Mengambil ID order dari atribut id
+    const idProduct = getLastSegment();
+    // Buat AJAX request untuk mengambil daftar produk
+    $.ajax({
+      type: 'GET',
+      url: base_url + 'product/getMaterial', // Endpoint untuk mendapatkan produk
+      success: function (response) {
+        let materialOptions = '';
+  
+        // Buat opsi produk dari data yang diterima
+        response.material.forEach(material => {
+          materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+        });
+        orderMaterialHtml = getOrderMaterial(materialOptions,idProduct);
+      
+  
+        // Tampilkan modal dengan form produk
+        Swal.fire({
+          title: 'Bill of Material',
+          html: orderMaterialHtml,
+          width: '800px',
+          showCancelButton: true,
+          confirmButtonText: 'Simpan',
+          cancelButtonText: 'Batal',
+          preConfirm: () => {
+            // Ambil data dari form
+            const formData = $('#form_order_list').serializeArray();
+            // Konversi form data menjadi format array of objects yang lebih mudah dibaca
+            const processedData = convertFormDataToObject(formData);
+            return processedData;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const data = result.value;
+  
+            // Kirim data produk ke server untuk disimpan
+            $.ajax({
+              type: 'POST',
+              url: base_url + 'product/saveBom', // Endpoint untuk menyimpan produk dalam order
+              data: {
+                idProduct: idProduct,
+                idModul: idModul,
+                data: data
+              },
+              success: function (response) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Produk berhasil ditambahkan ke order',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              },
+              error: function (xhr) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Terjadi kesalahan saat menyimpan produk',
+                  footer: '<a href="">Why do I have this issue?</a>'
+                });
+              }
+            });
+          }
+        });
+      },
+      error: function (xhr) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Terjadi kesalahan saat mengambil daftar produk',
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      }
+    });
+  });
+  $(document).on('click', '.remove-product', function () {
+    $(this).closest('tr').remove();
+  });
+  function getOrderMaterial(materialOptions, idProduct) {
+    let orderMaterialHtml = '';
+  
+    $.ajax({
+      type: "POST",
+      url: base_url + "product/getBom",
+      async: false,
+      data: { idProduct: idProduct },
+      success: function(data) {
+        const parsedData = JSON.parse(data);
+        if (parsedData.length > 0) {
+  
+          orderMaterialHtml += `
+            <form id="form_order_list">
+              <table class="table table-bordered" id="order_material_table">
+                <thead>
+                  <tr>
+                    <th>Nama Material</th>
+                    <th>Ukuran</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+  
+          // Menampilkan data yang ada di response JSON
+          parsedData.forEach((item) => {
+            let materialOptionsHtml = materialOptions.split('</option>'); // Memecah opsi material
+            materialOptionsHtml = materialOptionsHtml.map(option => {
+              if (option.includes('value="' + item.id_material + '"')) {
+                return option.replace('<option', '<option selected="selected"');
+              }
+              return option;
+            });
+  
+            orderMaterialHtml += `
+              <tr>
+                <td>
+                  <select class="form-control" name="id_material[]">
+                    ${materialOptionsHtml.join('</option>')} <!-- Gabungkan kembali pilihan -->
+                  </select>
+                </td>
+                <td>
+                  <input type="number" class="form-control material-penggunaan" name="penggunaan[]" value="${item.penggunaan}" placeholder="Masukkan ukuran">
+                </td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                </td>
+              </tr>
+            `;
+          });
+  
+          orderMaterialHtml += `
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+            </form>
+          `;
+        } else {
+          orderMaterialHtml += `
+            <form id="form_order_list">
+              <table class="table table-bordered" id="order_material_table">
+                <thead>
+                  <tr>
+                    <th>Nama Material</th>
+                    <th>Ukuran</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <select class="form-control" name="id_material[]">
+                        ${materialOptions}
+                      </select>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+            </form>
+          `;
+        }
+      },
+      error: function(xhr) {
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      }
+    });
+  
+    return orderMaterialHtml;
+  }
+
+  $(document).on('click', '#addProduct', async function() {
+    try {
+      // Menunggu materialOptions yang diambil dari getMaterialOption
+      let materialOptions = await getMaterialOption();
+      console.log(materialOptions);
+  
+      let newRow = `
+        <tr>
+          <td>
+            <select class="form-control material-select" name="id_material[]">
+              ${materialOptions}
+            </select>
+          </td>
+          <td>
+            <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+          </td>
+          <td>
+            <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+          </td>
+        </tr>
+      `;
+  
+      // Menambahkan baris baru ke tabel
+      $('#order_material_table tbody').append(newRow);
+    } catch (error) {
+      // Menangani error jika ada
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: error,
+        footer: '<a href="">Why do I have this issue?</a>'
+      });
+    }
+  });
+  function getMaterialOption() {
+    return new Promise((resolve, reject) => {
+      let materialOptions = '';
+  
+      $.ajax({
+        type: 'GET',
+        url: base_url + 'product/getMaterial', // Endpoint untuk mendapatkan produk
+        success: function (response) {
+          // Buat opsi produk dari data yang diterima
+          response.material.forEach(material => {
+            materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+          });
+  
+          // Resolving the promise with the materialOptions after success
+          resolve(materialOptions);
+        },
+        error: function (xhr) {
+          // Reject the promise in case of error
+          reject('Terjadi kesalahan saat mengambil daftar produk');
+        }
+      });
+    });
+  }  
+  $(document).on('click', '.remove-material', function() {
+    $(this).closest('tr').remove(); // Menghapus baris material
+  });
+  function convertFormDataToObject(formData) {
+    const dataObj = {};
+    
+    formData.forEach(item => {
+      const name = item.name.replace('[]', ''); // Hilangkan tanda []
+      if (!dataObj[name]) {
+        dataObj[name] = [];
+      }
+      dataObj[name].push(item.value);
+    });
+  
+    return dataObj;
+  }
+  

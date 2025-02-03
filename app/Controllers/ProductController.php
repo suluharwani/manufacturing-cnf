@@ -280,6 +280,7 @@ public function getMaterial()
     public function saveBom()
 {
     $idProduct = $this->request->getPost('idProduct');
+    $idModul = $this->request->getPost('idModul');
     $dataPost = $this->request->getPost('data');
     $model = new \App\Models\MdlBillOfMaterial();
 
@@ -294,11 +295,12 @@ public function getMaterial()
     for ($i = 0; $i < count($dataPost['id_material']); $i++) {
         $data = [
             'id_product'   => $idProduct,
+            'id_modul'   => $idModul,
             'id_material' => $dataPost['id_material'][$i],
             'penggunaan'      => $dataPost['penggunaan'][$i],  // Menyimpan harga manual
         ];
 
-        $model->insert($data);
+        $model->insert(row: $data);
     }
 
     return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
@@ -344,39 +346,38 @@ public function getBom(){
         $product = $MdlProduct->select('product.*, product_category.nama as category')->join('product_category', 'product_category.id = product.id_product_cat')->where('product.id', $id)->first();
         return $this->response->setJSON(['product' => $product]);
     }
-    public function modul(){
+    public function modul($id_product){
       $serverside_model = new \App\Models\MdlDatatableJoin();
                 $request = \Config\Services::request();
                 
                 // Define the columns to select
-                $select_columns = 'proforma_invoice.*, customer.customer_name, customer.code as cus_code, customer.address as customer_address ';
+                $select_columns = 'product.id as id_product, product.kode as code, product.nama as nama, modul.*';
                 
                 // Define the joins (you can add more joins as needed)
                 $joins = [
-                    ['customer', 'customer.id = proforma_invoice.customer_id', 'left'],
+                    ['product', 'modul.id_product = product.id', 'left'],
       
                 ];
         
-                $where = ['proforma_invoice.deleted_at' => NULL];
+                $where = ['modul.deleted_at' => NULL, 'modul.id_product'=>$id_product,];
         
                 // Column Order Must Match Header Columns in View
                 $column_order = array(
                     NULL, 
-                    'proforma_invoice.invoice_number', 
-                    'proforma_invoice.invoice_date', 
-                    'customer.customer_name',
-                    'proforma_invoice.id', 
+                    'product.id', 
+                    'product.id', 
+                    'product.id',
+                    'product.id', 
       
                 );
                 $column_search = array(
-                    'customer.customer_name', 
-                    'proforma_invoice.invoice_number', 
+                    'modul.desc'
              
                 );
-                $order = array('proforma_invoice.id' => 'desc');
+                $order = array('modul.id' => 'desc');
         
                 // Call the method to get data with dynamic joins and select fields
-                $list = $serverside_model->get_datatables('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where);
+                $list = $serverside_model->get_datatables('modul', $select_columns, $joins, $column_order, $column_search, $order, $where);
                 
                 $data = array();
                 $no = $request->getPost("start");
@@ -385,16 +386,16 @@ public function getBom(){
                     $row = array();
                     $row[] = $no;
                     $row[] = $lists->id;
-                    $row[] = $lists->invoice_number;
-                    $row[] = $lists->invoice_date;
+                    $row[] = $lists->code;
+                    $row[] = $lists->id_product;
                     $row[] = $lists->customer_name;
                     $data[] = $row;
                 }
         
                 $output = array(
                     "draw" => $request->getPost("draw"),
-                    "recordsTotal" => $serverside_model->count_all('proforma_invoice', $where),
-                    "recordsFiltered" => $serverside_model->count_filtered('proforma_invoice', $select_columns, $joins, $column_order, $column_search, $order, $where),
+                    "recordsTotal" => $serverside_model->count_all('modul', $where),
+                    "recordsFiltered" => $serverside_model->count_filtered('modul', $select_columns, $joins, $column_order, $column_search, $order, $where),
                     "data" => $data,
                 );
         

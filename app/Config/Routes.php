@@ -209,6 +209,8 @@ $routes->group('product', function ($routes) {
     $routes->post('saveBom', 'ProductController::saveBom',['filter' => 'accessControl:2']);
     $routes->post('getBom', 'ProductController::getBom',['filter' => 'accessControl:2']);
     $routes->get('getProduct', 'ProductController::getProduct',['filter' => 'accessControl:2']);
+    $routes->post('modul/(:any)', 'ProductController::modul/$1',['filter' => 'accessControl:2']);
+
 });
 $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('list', 'SupplierController::listdataSupplierJoin',['filter' => 'accessControl:2']); // Route untuk menampilkan data supplier
