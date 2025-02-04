@@ -243,8 +243,8 @@ $routes->group('stock', function ($routes) {
     $routes->get('product/getProductData/(:any)', 'ProductController::getProductData/$1',['filter' => 'accessControl:2']);
 $routes->group('finishing', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('/', 'FinishingController::index',['filter' => 'accessControl:2']); // Halaman utama finishing
-    $routes->post('getAll', 'FinishingController::getAll',['filter' => 'accessControl:2']); // Mendapatkan semua data finishing
-    $routes->post('create', 'FinishingController::create',['filter' => 'accessControl:2']); // Menambahkan data finishing baru
+    $routes->post('getAll/(:any)', 'FinishingController::getAll/$1',['filter' => 'accessControl:2']); // Mendapatkan semua data finishing
+    $routes->post('create/(:any)', 'FinishingController::create/$1',['filter' => 'accessControl:2']); // Menambahkan data finishing baru
     $routes->post('update/(:num)', 'FinishingController::update/$1',['filter' => 'accessControl:2']); // Memperbarui data finishing berdasarkan ID
     $routes->delete('delete/(:num)', 'FinishingController::delete/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
     $routes->post('get', 'FinishingController::get',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
@@ -437,4 +437,14 @@ $routes->group('scrap', function ($routes) {
     $routes->post('posting/(:any)', 'ScrapController::posting/$1',['filter' => 'accessControl:2']); 
     
     
+});
+
+$routes->group('modul', function ($routes) {
+    // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
+    $routes->post('create/(:any)', 'ProductController::createModul/$1',['filter' => 'accessControl:2']); 
+    // $routes->get('data', 'ProductController::addcat',['filter' => 'accessControl:2']); 
+    // $routes->post('update', 'ProductController::addcat',['filter' => 'accessControl:2']); 
+    // $routes->post('delete', 'ProductController::addcat',['filter' => 'accessControl:2']); 
+
+
 });

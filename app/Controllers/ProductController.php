@@ -285,8 +285,8 @@ public function getMaterial()
     $model = new \App\Models\MdlBillOfMaterial();
 
     // Simpan setiap produk yang dipilih ke tabel order_list
-    if ($model->where('id_product', $idProduct)->countAllResults()>0) {
-    $model->where('id_product', $idProduct)->delete();
+    if ($model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->countAllResults()>0) {
+    $model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->delete();
         
     }
     // var_dump($dataPost);
@@ -309,7 +309,8 @@ public function getBom(){
     $model = new \App\Models\MdlBillOfMaterial();
 
     $idProduct = $this->request->getPost('idProduct');
-    return json_encode($model->where('id_product', $idProduct)->findAll());
+    $idModul = $this->request->getPost('idModul');
+    return json_encode($model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->findAll());
 }
     public function searchMaterial()
     {
@@ -388,7 +389,9 @@ public function getBom(){
                     $row[] = $lists->id;
                     $row[] = $lists->code;
                     $row[] = $lists->id_product;
-                    $row[] = $lists->customer_name;
+                    $row[] = $lists->name;
+                    $row[] = $lists->desc;
+                    $row[] = $lists->picture;
                     $data[] = $row;
                 }
         
@@ -403,4 +406,40 @@ public function getBom(){
               
                 return json_encode($output);
           }
+
+          public function createModul($id)
+{
+    $validation = \Config\Services::validation();
+    $rules = [
+        'name' => 'required',
+        'desc' => 'required',
+        'picture' => 'uploaded[picture]|is_image[picture]|max_size[picture,2048]',
+    ];
+
+    if (!$this->validate($rules)) {
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => $validation->getErrors(),
+        ]);
+    }
+
+    $file = $this->request->getFile('picture');
+    $fileName = $file->getRandomName();
+    $file->move('uploads/modul', $fileName);
+
+    $data = [
+        'name' => $this->request->getPost('name'),
+        'desc' => $this->request->getPost('desc'),
+        'picture' => $fileName,
+        'id_product' => $id,
+    ];
+
+    $model = new \App\Models\MdlModul();
+    $model->insert($data);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'message' => 'Item added successfully',
+    ]);
+}
 }

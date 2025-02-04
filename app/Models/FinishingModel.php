@@ -8,5 +8,5 @@ class FinishingModel extends Model
 {
     protected $table = 'finishing';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['id', 'name', 'description', 'picture'];
+    protected $allowedFields = ['id', 'id_product','name', 'description', 'picture'];
 }

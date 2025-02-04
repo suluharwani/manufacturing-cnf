@@ -12,15 +12,15 @@ class FinishingController extends BaseController
         return view('finishing/index');
     }
 
-    public function getAll()
+    public function getAll($id)
     {
         $model = new FinishingModel();
-        $data = $model->findAll();
+        $data = $model->where('id_product',$id)->findAll();
 
         return $this->response->setJSON(['data' => $data]);
     }
 
-public function create()
+public function create($id)
 {
     $validation = \Config\Services::validation();
     $rules = [
@@ -29,7 +29,7 @@ public function create()
         'picture' => 'uploaded[picture]|is_image[picture]|max_size[picture,2048]',
     ];
 
-    if (!$this->validate($rules)) {
+    if (!$this->validate(rules: $rules)) {
         return $this->response->setJSON([
             'status' => false,
             'errors' => $validation->getErrors(),
@@ -42,6 +42,7 @@ public function create()
 
     $data = [
         'name' => $this->request->getPost('name'),
+        'id_product' => $id,
         'description' => $this->request->getPost('description'),
         'picture' => $fileName,
     ];
