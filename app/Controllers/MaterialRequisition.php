@@ -138,20 +138,28 @@ class MaterialRequisition extends BaseController
             materials.name AS material_name,  
             satuan.kode AS c_satuan,  
             satuan.nama AS satuan,  
-            SUM(billofmaterial.penggunaan * work_order_detail.quantity) AS total_usage,  
-            COALESCE(  
-                (  
-                    SELECT SUM(DISTINCT m_progress.jumlah)  
-                    FROM material_requisition_progress m_progress  
-                    WHERE m_progress.id_material = materials.id  
-                ),   
-                0  
-            ) AS terpenuhi,  
+           SUM(billofmaterial.penggunaan * work_order_detail.quantity) AS total_usage,  
+        COALESCE(  
+            (  
+                SELECT SUM(DISTINCT m_progress.jumlah)  
+                FROM material_requisition_progress m_progress  
+                JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id 
+                JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id 
+                JOIN work_order  ON material_requisition.id_wo = work_order.id 
+                JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
+                WHERE m_progress.id_material = materials.id AND pi.id = work_order.invoice_id  
+            ),   
+            0  
+        ) AS terpenuhi,  
             (SUM(billofmaterial.penggunaan * work_order_detail.quantity) - COALESCE(  
                 (  
                     SELECT SUM(DISTINCT m_progress.jumlah)  
                     FROM material_requisition_progress m_progress  
-                    WHERE m_progress.id_material = materials.id  
+                JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id 
+                JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id 
+                JOIN work_order  ON material_requisition.id_wo = work_order.id 
+                JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
+                WHERE m_progress.id_material = materials.id AND pi.id = work_order.invoice_id  
                 ),   
                 0  
             )) AS remaining_quantity,  
@@ -179,6 +187,8 @@ class MaterialRequisition extends BaseController
         $builder->join('satuan', 'satuan.id = materials_detail.satuan_id');  
         $builder->join('material_requisition', 'material_requisition.id_wo = work_order_detail.wo_id');  
         $builder->join('material_requisition_list', 'material_requisition_list.id_material_requisition = material_requisition.id', 'left'); // Menggunakan LEFT JOIN  
+        $builder->join('work_order', 'work_order_detail.wo_id = work_order.id');
+        $builder->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id');
         $builder->where('material_requisition.id', $idMR);  
         $builder->groupBy(['materials.id', 'materials.name']);  
         $builder->orderBy('materials.name');  
