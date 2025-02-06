@@ -293,3 +293,189 @@ $(document).on('click', '.delete', function () {
     return dataObj;
   }
   
+  
+//finishing
+
+$(document).on('click', '.bomFinishing', function () {
+    const idModul = $(this).data('id'); // Mengambil ID order dari atribut id
+    const idProduct = getLastSegment();
+    // Buat AJAX request untuk mengambil daftar produk
+    $.ajax({
+      type: 'GET',
+      url: base_url + 'product/getMaterial', // Endpoint untuk mendapatkan produk
+      success: function (response) {
+        let materialOptions = '';
+  
+        // Buat opsi produk dari data yang diterima
+        response.material.forEach(material => {
+          materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+        });
+        orderMaterialHtml = getOrderMaterial(materialOptions,idProduct,idModul);
+      
+  
+        // Tampilkan modal dengan form produk
+        Swal.fire({
+          title: 'Bill of Material Finishing',
+          html: orderMaterialHtml,
+          width: '800px',
+          showCancelButton: true,
+          confirmButtonText: 'Simpan',
+          cancelButtonText: 'Batal',
+          preConfirm: () => {
+            // Ambil data dari form
+            const formData = $('#form_order_list').serializeArray();
+            // Konversi form data menjadi format array of objects yang lebih mudah dibaca
+            const processedData = convertFormDataToObject(formData);
+            return processedData;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const data = result.value;
+  
+            // Kirim data produk ke server untuk disimpan
+            $.ajax({
+              type: 'POST',
+              url: base_url + 'product/saveBomFinishing', // Endpoint untuk menyimpan produk dalam order
+              data: {
+                idProduct: idProduct,
+                idModul: idModul,
+                data: data
+              },
+              success: function (response) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Produk berhasil ditambahkan ke order',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              },
+              error: function (xhr) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Terjadi kesalahan saat menyimpan produk',
+                  footer: '<a href="">Why do I have this issue?</a>'
+                });
+              }
+            });
+          }
+        });
+      },
+      error: function (xhr) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Terjadi kesalahan saat mengambil daftar produk',
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      }
+    });
+  });
+  
+  $(document).on('click', '.remove-product', function () {
+    $(this).closest('tr').remove();
+  });
+  function getOrderMaterial(materialOptions, idProduct, idModul) {
+    let orderMaterialHtml = '';
+  
+    $.ajax({
+      type: "POST",
+      url: base_url + "product/getBomFinishing",
+      async: false,
+      data: { idProduct: idProduct ,idModul:idModul},
+      success: function(data) {
+        const parsedData = JSON.parse(data);
+        if (parsedData.length > 0) {
+  
+          orderMaterialHtml += `
+            <form id="form_order_list">
+              <table class="table table-bordered" id="order_material_table">
+                <thead>
+                  <tr>
+                    <th>Nama Material</th>
+                    <th>Ukuran</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+  
+          // Menampilkan data yang ada di response JSON
+          parsedData.forEach((item) => {
+            let materialOptionsHtml = materialOptions.split('</option>'); // Memecah opsi material
+            materialOptionsHtml = materialOptionsHtml.map(option => {
+              if (option.includes('value="' + item.id_material + '"')) {
+                return option.replace('<option', '<option selected="selected"');
+              }
+              return option;
+            });
+  
+            orderMaterialHtml += `
+              <tr>
+                <td>
+                  <select class="form-control" name="id_material[]">
+                    ${materialOptionsHtml.join('</option>')} <!-- Gabungkan kembali pilihan -->
+                  </select>
+                </td>
+                <td>
+                  <input type="number" class="form-control material-penggunaan" name="penggunaan[]" value="${item.penggunaan}" placeholder="Masukkan ukuran">
+                </td>
+                <td>
+                  <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                </td>
+              </tr>
+            `;
+          });
+  
+          orderMaterialHtml += `
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+            </form>
+          `;
+        } else {
+          orderMaterialHtml += `
+            <form id="form_order_list">
+              <table class="table table-bordered" id="order_material_table">
+                <thead>
+                  <tr>
+                    <th>Nama Material</th>
+                    <th>Ukuran</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <select class="form-control" name="id_material[]">
+                        ${materialOptions}
+                      </select>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" id="addProduct">Tambah Material</button>
+            </form>
+          `;
+        }
+      },
+      error: function(xhr) {
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      }
+    });
+  
+    return orderMaterialHtml;
+  }
+  

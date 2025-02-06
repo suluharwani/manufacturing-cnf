@@ -305,12 +305,47 @@ public function getMaterial()
 
     return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
 }
+public function saveBomFinishing()
+{
+    $idProduct = $this->request->getPost('idProduct');
+    $idModul = $this->request->getPost('idModul');
+    $dataPost = $this->request->getPost('data');
+    $model = new \App\Models\MdlBillOfMaterialFinishing();
+
+    // Simpan setiap produk yang dipilih ke tabel order_list
+    if ($model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->countAllResults()>0) {
+    $model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->delete();
+        
+    }
+    // var_dump($dataPost);
+    // die();
+    
+    for ($i = 0; $i < count($dataPost['id_material']); $i++) {
+        $data = [
+            'id_product'   => $idProduct,
+            'id_modul'   => $idModul,
+            'id_material' => $dataPost['id_material'][$i],
+            'penggunaan'      => $dataPost['penggunaan'][$i],  // Menyimpan harga manual
+        ];
+
+        $model->insert(row: $data);
+    }
+
+    return $this->response->setJSON(['message' => 'Produk berhasil ditambahkan ke order']);
+}
 public function getBom(){
     $model = new \App\Models\MdlBillOfMaterial();
 
     $idProduct = $this->request->getPost('idProduct');
     $idModul = $this->request->getPost('idModul');
     return json_encode($model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->findAll());
+}
+public function getBomFinishing(){
+  $model = new \App\Models\MdlBillOfMaterialFinishing();
+
+  $idProduct = $this->request->getPost('idProduct');
+  $idModul = $this->request->getPost('idModul');
+  return json_encode($model->where(array('id_product'=>$idProduct, 'id_modul'=>$idModul))->findAll());
 }
     public function searchMaterial()
     {

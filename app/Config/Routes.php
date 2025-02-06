@@ -207,7 +207,9 @@ $routes->group('product', function ($routes) {
     $routes->get('getMaterial', 'ProductController::getMaterial',['filter' => 'accessControl:2']);
     $routes->get('searchMaterial', 'ProductController::searchMaterial',['filter' => 'accessControl:2']);
     $routes->post('saveBom', 'ProductController::saveBom',['filter' => 'accessControl:2']);
+    $routes->post('saveBomFinishing', 'ProductController::saveBomFinishing',['filter' => 'accessControl:2']);
     $routes->post('getBom', 'ProductController::getBom',['filter' => 'accessControl:2']);
+    $routes->post('getBomFinishing', 'ProductController::getBomFinishing',['filter' => 'accessControl:2']);
     $routes->get('getProduct', 'ProductController::getProduct',['filter' => 'accessControl:2']);
     $routes->post('modul/(:any)', 'ProductController::modul/$1',['filter' => 'accessControl:2']);
 
