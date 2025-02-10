@@ -133,7 +133,7 @@ $('#addModulForm').on('submit', function (e) {
           alert('An error occurred while adding the item.');
       },
   });
-});
+}); 
 $(document).on('click', '.bomModul', function () {
   const idModul = $(this).data('id'); // Mengambil ID order dari atribut id
   const idProduct = getLastSegment();
@@ -148,7 +148,7 @@ $(document).on('click', '.bomModul', function () {
       response.material.forEach(material => {
         materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
       });
-      orderMaterialHtml = getOrderMaterial(materialOptions,idProduct,idModul);
+      orderMaterialHtml = getOrderMaterialModul(materialOptions,idProduct,idModul);
     
 
       // Tampilkan modal dengan form produk
@@ -213,7 +213,7 @@ $(document).on('click', '.bomModul', function () {
 $(document).on('click', '.remove-product', function () {
   $(this).closest('tr').remove();
 });
-function getOrderMaterial(materialOptions, idProduct, idModul) {
+function getOrderMaterialModul(materialOptions, idProduct, idModul) {
   let orderMaterialHtml = '';
 
   $.ajax({

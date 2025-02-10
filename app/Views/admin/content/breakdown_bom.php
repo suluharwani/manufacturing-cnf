@@ -275,7 +275,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="++++" tabindex="-1" aria-labelledby="addFinishingModalLabel" aria-hidden="true">
+<div class="modal fade" id="addFinishingModal" tabindex="-1" aria-labelledby="addFinishingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <form id="addFinishingForm" enctype="multipart/form-data" method="post">
             <div class="modal-content">
