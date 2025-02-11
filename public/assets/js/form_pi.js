@@ -33,7 +33,7 @@ $(document).ready(function() {
   
   function getFinishingOption(productId) {
     return new Promise((resolve, reject) => {
-      let finishingOptions = '';
+      let finishingOptions = '<option value="">Tanpa Finishing</option>';
   
       $.ajax({
         type: 'POST',
