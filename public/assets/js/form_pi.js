@@ -7,19 +7,19 @@ function getLastSegment() {
   return segments[segments.length - 1]; // Mengambil segment terakhir
 }
 $(document).ready(function() {
-    function getProductOption() {
+  function getProductOption() {
     return new Promise((resolve, reject) => {
-      let productOptions  = '';
-
+      let productOptions = '';
+  
       $.ajax({
         type: 'GET',
         url: base_url + 'product/getProduct', // Endpoint untuk mendapatkan produk
         success: function(response) {
           // Buat opsi produk dari data yang diterima
           response.product.forEach(product => {
-            productOptions += `<option value="${product.id}">${product.kode} - ${product.nama})</option>`;
+            productOptions += `<option value="${product.id}">${product.kode} - ${product.nama}</option>`;
           });
-
+  
           // Resolving the promise dengan productOptions setelah sukses
           resolve(productOptions);
         },
@@ -30,14 +30,36 @@ $(document).ready(function() {
       });
     });
   }
-    // Ketika tombol "Add" diklik
-
-
- // Ketika tombol "Add" diklik, tampilkan modal dan ambil data material
+  
+  function getFinishingOption(productId) {
+    return new Promise((resolve, reject) => {
+      let finishingOptions = '';
+  
+      $.ajax({
+        type: 'POST',
+        url: base_url + 'finishing/getAll/'+productId, // Endpoint untuk mendapatkan finishing
+        success: function(response) {
+          // Buat opsi finishing dari data yang diterima
+          response.data.forEach(finishing => {
+            finishingOptions += `<option value="${finishing.id}">${finishing.name}</option>`;
+          });
+  
+          // Resolving the promise dengan finishingOptions setelah sukses
+          resolve(finishingOptions);
+        },
+        error: function(xhr) {
+          // Menolak promise jika terjadi kesalahan
+          reject('Terjadi kesalahan saat mengambil daftar finishing');
+        }
+      });
+    });
+  }
+  
+  // Ketika tombol "Add" diklik, tampilkan modal dan ambil data material
   $('.addMaterial').click(function() {
     // Reset form di modal
     $('#addForm')[0].reset();
-
+  
     // Ambil opsi material dan masukkan ke dropdown
     getProductOption().then(function(options) {
       $('#id_product').html(options); // Masukkan opsi ke dalam elemen select
@@ -46,6 +68,22 @@ $(document).ready(function() {
       alert(error); // Tampilkan error jika gagal mengambil data
     });
   });
+  
+  // Ketika produk dipilih, ambil opsi finishing
+  $('#id_product').change(function() {
+    const productId = $(this).val();
+  
+    if (productId) {
+      getFinishingOption(productId).then(function(options) {
+        $('#id_finishing').html(options); // Masukkan opsi ke dalam elemen select finishing
+      }).catch(function(error) {
+        alert(error); // Tampilkan error jika gagal mengambil data finishing
+      });
+    } else {
+      $('#id_finishing').html(''); // Kosongkan dropdown finishing jika tidak ada produk yang dipilih
+    }
+  });
+  
 
   // Menangani form submit di modal
 
@@ -139,7 +177,7 @@ $(document).ready(function() {
         return row[3]
     }},
     {mRender: function (data, type, row) {
-        return row[2]
+        return `${row[2]} ${row[10]==null?'': '- '+row[10]}` // Menampilkan kode produk dan nama produk
     }},
     {mRender: function (data, type, row) {
         return row[4]
@@ -167,7 +205,7 @@ $(document).ready(function() {
   }
 
 });
-})
+
 function formatNumber(number, decimals = 2, decimalSeparator = ".", thousandSeparator = ",") {
     // Memastikan angka dalam format yang benar
     const num = parseFloat(number);
@@ -240,6 +278,7 @@ function loadSupplierList() {
     var quantity = $('#quantity').val();
     var unit_price = $('#unit_price').val();
     var id_currency = $('#id_currency').val();
+    var finishing_id = $('#id_finishing').val();
     invoice_id = getLastSegment()
 
     // Kirim data melalui AJAX ke server
@@ -247,6 +286,7 @@ function loadSupplierList() {
       type: "POST",
       url: base_url + "proformainvoice/addProduct", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
       data: {
+        finishing_id:finishing_id,
         id_product: id_product,
         quantity: quantity,
         unit_price: unit_price,
@@ -674,6 +714,7 @@ $(document).on('click', '.deleteBtn', function(e) {
                 success: function(response) {
                     if (response.status === 'success') {
                         Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+                        dataTable.ajax.reload();
                         // Reload your table or update UI here
                     } else {
                         Swal.fire('Error', 'Failed to delete product.', 'error');
@@ -686,3 +727,4 @@ $(document).on('click', '.deleteBtn', function(e) {
         }
     });
 });
+})

@@ -131,31 +131,40 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="addMaterialModalLabel">Add Material</h5>
+        <h5 class="modal-title" id="addMaterialModalLabel">Add Product</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addForm">
-          <div class="mb-3">
-            <label for="id_product" class="form-label">Product</label>
-           <select class="form-control" id="id_product" required>
-              <option value="">Select Product</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" class="form-control" id="quantity" required>
-          </div>
-          <div class="mb-3">
-            <label for="unit_price" class="form-label">Harga</label>
-            <input type="number" class="form-control" id="unit_price" required> <span> Currency: <?=$pi[0]['curr_code'].'-'.$pi[0]['curr_name']?></span>
-            <input type="text" class="form-control" id="id_currency" value="<?=$pi[0]['curr_id']?>" hidden>
-            
-          </div>
-         
+      <form id="addForm">
+  <div class="mb-3">
+    <label for="id_product" class="form-label">Product</label>
+    <select class="form-control" id="id_product" required>
+      <option value="">Select Product</option>
+    </select>
+  </div>
+  
+  <div class="mb-3">
+    <label for="id_finishing" class="form-label">Finishing</label>
+    <select class="form-control" id="id_finishing" >
+      <option value="">Select Finishing</option>
+    </select>
+  </div>
+  
+  <div class="mb-3">
+    <label for="quantity" class="form-label">Quantity</label>
+    <input type="number" class="form-control" id="quantity" required>
+  </div>
+  
+  <div class="mb-3">
+    <label for="unit_price" class="form-label">Harga</label>
+    <input type="number" class="form-control" id="unit_price" required>
+    <span> Currency: <?=$pi[0]['curr_code'].'-'.$pi[0]['curr_name']?></span>
+    <input type="text" class="form-control" id="id_currency" value="<?=$pi[0]['curr_id']?>" hidden>
+  </div>
 
-          <button type="submit" class="btn btn-primary">Save</button>
-        </form>
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
       </div>
     </div>
   </div>

@@ -248,7 +248,7 @@ $routes->group('finishing', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('getAll/(:any)', 'FinishingController::getAll/$1',['filter' => 'accessControl:2']); // Mendapatkan semua data finishing
     $routes->post('create/(:any)', 'FinishingController::create/$1',['filter' => 'accessControl:2']); // Menambahkan data finishing baru
     $routes->post('update/(:num)', 'FinishingController::update/$1',['filter' => 'accessControl:2']); // Memperbarui data finishing berdasarkan ID
-    $routes->delete('delete/(:num)', 'FinishingController::delete/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
+    $routes->post('delete/(:num)', 'FinishingController::delete/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
     $routes->post('get', 'FinishingController::get',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
     $routes->post('updatePicture', 'FinishingController::updatePicture',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
     $routes->post('updateData', 'FinishingController::updateData',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
@@ -442,11 +442,13 @@ $routes->group('scrap', function ($routes) {
 });
 
 $routes->group('modul', function ($routes) {
-    // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
+    $routes->post('updatePicture', 'ProductController::updatePicture',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
+
+    $routes->post('get', 'ProductController::get',['filter' => 'accessControl:2']); 
     $routes->post('create/(:any)', 'ProductController::createModul/$1',['filter' => 'accessControl:2']); 
     // $routes->get('data', 'ProductController::addcat',['filter' => 'accessControl:2']); 
-    // $routes->post('update', 'ProductController::addcat',['filter' => 'accessControl:2']); 
-    // $routes->post('delete', 'ProductController::addcat',['filter' => 'accessControl:2']); 
+    $routes->post('updateData', 'ProductController::updateData',['filter' => 'accessControl:2']); 
+    $routes->post('delete/(:any)', 'ProductController::deleteModul/$1',['filter' => 'accessControl:2']); 
 
 
 });

@@ -104,9 +104,9 @@ $(document).on('click', '.read-more', function () {
                     const data = response.data;
                     $('#editFinishingModal').modal('show');
                     $('#editFinishingModalLabel').text('Edit Finishing Item');
-                    $('#editFinishingForm #id').val(data.id); // Populate hidden ID field
-                    $('#editFinishingForm #name').val(data.name);
-                    $('#editFinishingForm #description').val(data.description);
+                    $('#idFinishing').val(data.id); // Populate hidden ID field
+                    $('#nameFinishing').val(data.name);
+                    $('#descriptionFinishing').val(data.description);
                 } else {
                     Swal.fire('Success', response.message, 'success');
                 }
@@ -119,15 +119,17 @@ $(document).on('click', '.read-more', function () {
     });
 
     // Submit Edit Form
-    $('#editFinishingForm').on('submit', function (e) {
+    $('#editFinishingFormBtn').on('click', function (e) {
         e.preventDefault();
-
-        const formData = $(this).serialize();
+        id = $('#idFinishing').val(); // Populate hidden ID field
+        name = $('#nameFinishing').val();
+        description = $('#descriptionFinishing').val();
+        
 
         $.ajax({
             url: base_url + 'finishing/updateData',
             type: 'POST',
-            data: formData,
+            data: {id:id,name:name,description:description},
             success: function (response) {
                 if (response.status) {
                     Swal.fire('Success', response.message, 'success');

@@ -15,6 +15,7 @@ class ProformaInvoiceDetail extends Model
     protected $allowedFields    = [ 'id',
                                     'invoice_id',
                                     'id_product',
+                                    'finishing_id',
                                     'id_currency',
                                     'item_description',
                                     'hs_code',

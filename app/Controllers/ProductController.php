@@ -477,4 +477,133 @@ public function getBomFinishing(){
         'message' => 'Item added successfully',
     ]);
 }
+public function updatePicture()
+{
+    $id = $this->request->getPost('id'); // Mengambil ID dari request POST
+
+    if (!$id) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Invalid request: ID is required.',
+        ]);
+    }
+
+    $model = new \App\Models\MdlModul();
+    $item = $model->find($id);
+
+    if (!$item) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Item not found.',
+        ]);
+    }
+
+    if (!$this->validate(['picture' => 'uploaded[picture]|is_image[picture]|max_size[picture,2048]'])) {
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => $this->validator->getErrors(),
+        ]);
+    }
+
+    $file = $this->request->getFile('picture');
+    $fileName = $file->getRandomName();
+    $file->move('uploads/modul', $fileName);
+
+    if ($item['picture']) {
+        unlink('uploads/modul/' . $item['picture']); // Menghapus gambar lama
+    }
+
+    $model->update($id, ['picture' => $fileName]);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'message' => 'Picture updated successfully.',
+    ]);
+}
+public function get()
+{
+    $id = $this->request->getPost('id'); // Mengambil ID dari request POST
+
+    if (!$id) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Invalid request: ID is required.',
+        ]);
+    }
+
+    $model = new \App\Models\MdlModul();
+    $item = $model->find($id); // Mencari data berdasarkan ID
+
+    if ($item) {
+        return $this->response->setJSON([
+            'status' => true,
+            'data' => $item,
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => false,
+        'message' => 'Item not found.',
+    ]);
+}
+public function updateData()
+{
+    $id = $this->request->getPost('id'); // Mengambil ID dari request POST
+    $data = $this->request->getPost();
+
+    if (!$id) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Invalid request: ID is required.',
+        ]);
+    }
+
+    $validation = \Config\Services::validation();
+    $rules = [
+        'name' => 'required',
+        'desc' => 'required',
+    ];
+
+    if (!$this->validate($rules)) {
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => $validation->getErrors(),
+        ]);
+    }
+
+    $model = new \App\Models\MdlModul();
+    $item = $model->find($id);
+
+    if (!$item) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Item not found.',
+        ]);
+    }
+
+    $model->update($id, $data);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'message' => 'Item updated successfully.',
+    ]);
+}
+
+public function deleteModul($id)
+{
+    $model = new \App\Models\MdlModul();
+    $item = $model->find($id);
+
+    if ($item) {
+        if ($item['picture']) {
+            unlink('uploads/modul/' . $item['picture']);
+        }
+
+        $model->delete($id);
+
+        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+    }
+
+    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
 }

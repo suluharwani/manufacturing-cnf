@@ -57,9 +57,9 @@ $(document).ready(function() {
     
         {mRender: function (data, type, row) {
             return `<button class="btn btn-warning bomModul" data-id="${row[1]}" data-id_product="${row[3]}">Bill of material</button>
-                    <button class="btn btn-warning edit" data-id="${row[1]}">Edit Data</button>
-                    <button class="btn btn-info edit-picture" data-id="${row[1]}">Edit Picture</button>
-                    <button class="btn btn-danger delete" data-id="${row[1]}" data-id_product="${row[3]}">Delete</button>`
+                    <button class="btn btn-warning editModul" data-id="${row[1]}">Edit Data</button>
+                    <button class="btn btn-info edit-picture-modul" data-id="${row[1]}">Edit Picture</button>
+                    <button class="btn btn-danger deleteModul" data-id="${row[1]}" data-id_product="${row[3]}">Delete</button>`
         }},
         ],
       "columnDefs": [{
@@ -101,7 +101,7 @@ $(document).ready(function() {
         }
       });
       }
-});
+
 $('.addModul').on('click', function () {
   console.log('addModul');
   $('#addModulModal').modal('show');
@@ -123,7 +123,7 @@ $('#addModulForm').on('submit', function (e) {
           if (response.status) {
               Swal.fire('Success', response.message, 'success');
               $('#addModulModal').modal('hide');
-              table.ajax.reload();
+              dataTable.ajax.reload();
           } else {
               alert(response.errors ? JSON.stringify(response.errors) : response.message);
           }
@@ -316,3 +316,122 @@ function getOrderMaterialModul(materialOptions, idProduct, idModul) {
 
   return orderMaterialHtml;
 }
+
+$(document).on('click', '.edit-picture-modul', function () {
+  const id = $(this).data('id');
+  $('#editPictureModulModal').modal('show');
+  $('#editPictureModulModal #id').val(id);
+});
+$('#editPictureModulForm').on('submit', function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  $.ajax({
+      url: base_url + 'modul/updatePicture',
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+          if (response.status) {
+              Swal.fire('Success', response.message, 'success');
+              $('#editPictureModal').modal('hide');
+              dataTable.ajax.reload();
+          } else {
+              alert(response.errors ? JSON.stringify(response.errors) : response.message);
+          }
+      },
+      error: function (xhr) {
+          console.error(xhr.responseText);
+          alert('An error occurred while updating the picture.');
+      },
+  });
+});
+$(document).on('click', '.editModul', function () {
+  const id = $(this).data('id');
+
+  $.ajax({
+      url: base_url + 'modul/get',
+      type: 'POST',
+      data: { id: id },
+      success: function (response) {
+          if (response.status) {
+              const data = response.data;
+              $('#editModulModal').modal('show');
+              $('#editModulModalLabel').text('Edit Modul Item');
+              $('#idModul').val(data.id); // Populate hidden ID field
+              $('#nameModul').val(data.name);
+              $('#descriptionModul').val(data.desc);
+          } else {
+              Swal.fire('Success', response.message, 'success');
+          }
+      },
+      error: function (xhr) {
+          console.error(xhr.responseText);
+          alert('Failed to fetch item details.');
+      },
+  });
+});
+$('#editModulFormBtn').on('click', function (e) {
+  e.preventDefault();
+  id = $('#idModul').val(); // Populate hidden ID field
+  name = $('#nameModul').val();
+  description = $('#descriptionModul').val();
+  
+
+  $.ajax({
+      url: base_url + 'modul/updateData',
+      type: 'POST',
+      data: {id:id,name:name,desc:description},
+      success: function (response) {
+          if (response.status) {
+              Swal.fire('Success', response.message, 'success');
+              $('#editModulModal').modal('hide');
+              dataTable.ajax.reload();
+          } else {
+              alert(response.errors ? JSON.stringify(response.errors) : response.message);
+          }
+      },
+      error: function (xhr) {
+          console.error(xhr.responseText);
+          alert('An error occurred while updating the item.');
+      },
+  });
+});
+
+$(document).on('click', '.deleteModul', function () {
+  const id = $(this).data('id');
+
+  // SweetAlert Confirmation
+  Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+      if (result.isConfirmed) {
+          $.ajax({
+              url: base_url + `modul/delete/${id}`,
+              method: 'POST', // Menggunakan POST untuk kompatibilitas umum
+              data: { id: id },
+              success: (response) => {
+                  if (response.status) {
+                      Swal.fire('Deleted!', response.message, 'success');
+                      dataTable.ajax.reload();
+                  } else {
+                      Swal.fire('Error', response.message, 'error');
+                  }
+              },
+              error: (xhr) => {
+                  console.error(xhr.responseText);
+                  Swal.fire('Error', 'An error occurred while deleting the item.', 'error');
+              },
+          });
+      }
+  });
+});
+});

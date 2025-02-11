@@ -140,29 +140,54 @@
 </div>
 
 
-
+<div class="modal fade" id="editModulModal" tabindex="-1" aria-labelledby="editModulModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editFinising" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModulModalLabel">Edit Modul Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="idModul" name="id">
+                    <div class="mb-3">
+                        <label for="nameModul" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="nameModul" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descriptionModul" class="form-label">Description</label>
+                        <textarea class="form-control" id="descriptionModul" name="description" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id= "editModulFormBtn" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="modal fade" id="editFinishingModal" tabindex="-1" aria-labelledby="editFinishingModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="editFinishingForm" method="post">
+        <form id="editFinising" method="post">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editFinishingModalLabel">Edit Finishing Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="id" name="id">
+                    <input type="hidden" id="idFinishing" name="id">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <label for="nameFinishing" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="nameFinishing" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        <label for="descriptionFinishing" class="form-label">Description</label>
+                        <textarea class="form-control" id="descriptionFinishing" name="description" rows="3" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" id= "editFinishingFormBtn" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </form>
@@ -177,6 +202,29 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editPictureModalLabel">Edit Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="id" name="id">
+                    <div class="mb-3">
+                        <label for="picture" class="form-label">Picture</label>
+                        <input type="file" class="form-control" id="picture" name="picture" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Update Picture</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="editPictureModulModal" tabindex="-1" aria-labelledby="editPictureModulModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editPictureModulForm" enctype="multipart/form-data">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPictureModulModalLabel">Edit Picture</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
