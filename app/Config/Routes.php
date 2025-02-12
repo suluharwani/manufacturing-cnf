@@ -411,6 +411,7 @@ $routes->group('requisition', function ($routes) {
     $routes->post('datamd/(:any)', 'MaterialRequisition::datamd/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'MaterialRequisition::posting/$1',['filter' => 'accessControl:2']); 
     $routes->get('WoAvailablelistdata/(:any)', 'MaterialRequisition::WoAvailablelistdata/$1',['filter' => 'accessControl:2']); 
+    $routes->get('WoAvailablelistdatafinishing/(:any)', 'MaterialRequisition::WoAvailablelistdatafinishing/$1',['filter' => 'accessControl:2']); 
     $routes->get('dataRequestList/(:any)', 'MaterialRequisition::dataRequestList/$1',['filter' => 'accessControl:2']); 
     $routes->post('submitRequest', 'MaterialRequisition::submitRequest',['filter' => 'accessControl:2']); 
     $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 

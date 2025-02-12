@@ -53,48 +53,61 @@ $(document).ready(function () {
 
   async function tableWO() {
     try {
-      const data = await $.ajax({
-        url: base_url + "requisition/WoAvailablelistdata/" + getLastSegment(),
-        type: "GET",
-        dataType: "json",
-      });
-
+      // Menggunakan Promise.all untuk melakukan dua permintaan AJAX secara bersamaan
+      const [data1, data2] = await Promise.all([
+        $.ajax({
+          url: base_url + "requisition/WoAvailablelistdata/" + getLastSegment(),
+          type: "GET",
+          dataType: "json",
+        }),
+        $.ajax({
+          url: base_url + "requisition/WoAvailablelistdatafinishing/" + getLastSegment(),
+          type: "GET",
+          dataType: "json",
+        })
+      ]);
+  
+      // Menggabungkan kedua array data
+      const combinedData = [...data1, ...data2];
+  
       var tableBody = $("#materialTable tbody");
       tableBody.empty(); // Clear existing rows
       let no = 1;
-
-      for (const item of data) {
+  
+      for (const item of combinedData) {
         const totalStock = await getTotalStock(item.material_id);
         const max_request = Math.min(totalStock, item.remaining_quantity);
-        if(statusDoc == 'Posted'){
-          button = `Document Posted`
-        }else{
-           button = (max_request <= 0) 
-          ? 'Not available' 
-          : `<button class="btn btn-primary request" max = "${max_request}" material_id = "${item.material_id}" name= "${item.material_name}">Request</button>`;
+        let button;
+  
+        if (statusDoc === 'Posted') {
+          button = `Document Posted`;
+        } else {
+          button = (max_request <= 0) 
+            ? 'Not available' 
+            : `<button class="btn btn-primary request" max="${max_request}" material_id="${item.material_id}" name="${item.material_name}">Request</button>`;
         }
-        
-
+  
         var row = `<tr>
-                    <td>${no++}</td>
-                    <td>${item.material_name}</td>
-                    <td>${item.satuan} (${item.c_satuan})</td>
-                    <td>${item.total_usage}</td>
-                    <td>${item.terpenuhi}</td>
-                    <td>${item.remaining_quantity}</td>
-                    <td>${item.total_requisition}</td>
-                    <td>${item.total_requisition_unposting}</td>
-                    <td>${totalStock}</td>
-                    <td>${max_request}</td>
-                    <td>${button}</td>
-                    <td></td>
-                </tr>`;
+                      <td>${no++}</td>
+                      <td>${item.material_name}</td>
+                      <td>${item.satuan} (${item.c_satuan})</td>
+                      <td>${item.total_usage}</td>
+                      <td>${item.terpenuhi}</td>
+                      <td>${item.remaining_quantity}</td>
+                      <td>${item.total_requisition}</td>
+                      <td>${item.total_requisition_unposting}</td>
+                      <td>${totalStock}</td>
+                      <td>${max_request}</td>
+                      <td>${button}</td>
+                      <td></td>
+                  </tr>`;
         tableBody.append(row);
       }
     } catch (error) {
       console.error("AJAX Error: ", error);
     }
   }
+  
 
   async function getTotalStock(id) {
     const endpoint = base_url + 'stock/get_stock_in_out/' + id;
