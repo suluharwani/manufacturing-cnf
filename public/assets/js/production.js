@@ -462,7 +462,7 @@ function fetchDataProdArea(id, produksi = null,wo_id=null,wo_code=null) {
                             <td>${item.nama}</td>
                             <td>${item.quantity}</td>
                             <td>
-                                <button class="btn btn-warning btn-sm moveBtn" data-produksi = "${produksi}" data-nama ="${item.nama}" data-id="${item.id}" data-wo_id = "${item.wo_id}" data-product_id = "${item.product_id}">Move Production</button>
+                                <button class="btn btn-warning btn-sm moveBtn" data-produksi = "${produksi}" data-nama ="${item.nama}" data-id="${item.id}" data-wo_id = "${item.wo_id}" data-product_id = "${item.product_id}"  data-prod_id = "${id}">Move Production</button>
                                 <button class="btn btn-success btn-sm moveBtnWarehouseFromProd" data-product_id = "${item.product_id}"  data-wo_id = "${item.wo_id}"  data-produksi = "${produksi}" data-nama ="${item.nama}" data-id="${item.id}" data-prod_id = "${id}">Move Warehouse</button>
                             </td>
                         </tr>
@@ -546,7 +546,7 @@ $(document).on('click', '.moveBtnWarehouseFromProd', function() {
                         },
                         success: function(data) {
                              $('#productionModal').modal('show');
-                             fetchDataProdArea(prod_id_awal);
+                             fetchDataProdArea(prod_awal);
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',
@@ -689,6 +689,7 @@ $(document).on('click', '.moveBtnWarehouseFromProd', function() {
 
   $(document).on('click', '.moveBtn', function() {
     let prod_id_awal = $(this).data('id');
+    let prod_awal = $(this).data('prod_id');
     let produksi = $(this).data('produksi');
     let nama = $(this).data('nama');
     let wo_id = $(this).data('wo_id');
@@ -746,7 +747,7 @@ $(document).on('click', '.moveBtnWarehouseFromProd', function() {
                         },
                         success: function(data) {
                              $('#productionModal').modal('show');
-                             fetchDataProdArea(prod_id_awal);
+                             fetchDataProdArea(prod_awal);
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',
