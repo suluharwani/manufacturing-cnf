@@ -254,7 +254,7 @@ function getPi($id_wo)
                         ->join('work_order_detail', 'work_order_detail.product_id = proforma_invoice_details.id_product', 'left')
                         ->join('product', 'product.id = proforma_invoice_details.id_product', 'left')
                         ->where('proforma_invoice_details.invoice_id', $id_pi) // Filter by invoice_id from proforma_invoice_details
-                        ->where('work_order_detail.wo_id', $id_wo) // Filter by invoice_id from proforma_invoice_details
+                        // ->where('work_order_detail.wo_id', $id_wo) // Filter by invoice_id from proforma_invoice_details
                         ->groupBy('proforma_invoice_details.id_product') // Group by product_id from proforma_invoice_details
                         ->get()
                         ->getResultArray();
