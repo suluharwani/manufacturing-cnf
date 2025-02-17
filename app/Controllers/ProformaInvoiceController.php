@@ -3,6 +3,9 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\MdlBillOfMaterial;
+use App\Models\MdlMaterial;
+use App\Models\MdlProduct;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\ProformaInvoice;
 use App\Models\ProformaInvoiceDetail;
@@ -644,4 +647,85 @@ public function printDeliveryNote($id)
         $dompdf->stream("surat_jalan_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
     }
 
+
+public function printInvoiceNeed($invoice_id)
+    {
+        // Load models
+        $proformaInvoiceDetailsModel = new ProformaInvoiceDetail();
+        $billOfMaterialModel = new MdlBillOfMaterial();
+        $materialsModel = new MdlMaterial();
+        $productModel = new MdlProduct();
+        $pi = new ProformaInvoice();
+
+        // Query 1: Ambil data produk dan quantity
+        $query0 = $pi
+        ->select('*')
+        
+        ->where('proforma_invoice.id', $invoice_id)
+        ->findAll();
+        $query1 = $proformaInvoiceDetailsModel
+            ->select('product.nama,product.kode as kode, proforma_invoice_details.quantity')
+            ->join('product', 'product.id = proforma_invoice_details.id_product')
+            ->where('proforma_invoice_details.invoice_id', $invoice_id)
+            ->findAll();
+
+        // Query 2: Ambil data material dan penggunaan dari billofmaterialfinishing
+        $query2 = $proformaInvoiceDetailsModel
+        ->select('m.id AS material_id, m.name AS material_name, m.kode AS material_code, 
+                  FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+                  pid.quantity, pid.id_product, p.nama AS product, 
+                  FORMAT(SUM(COALESCE(bom.penggunaan, 0)) * pid.quantity, 3) AS total_penggunaan,
+                   satuan.nama as satuan, type.nama as type')
+        ->from('proforma_invoice_details pid')
+        ->join('billofmaterialfinishing bom', 'pid.id_product = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('product p', 'pid.id_product = p.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->where('pid.invoice_id', $invoice_id)
+        ->groupBy('m.id, m.name, m.kode, p.id')
+        ->orderBy('p.id')
+        ->findAll();
+
+        // Query 3: Ambil data material dan penggunaan dari billofmaterial
+        $query3 = $proformaInvoiceDetailsModel
+            ->select('m.id AS material_id, m.name AS material_name, m.kode AS material_code, 
+                      FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+                      pid.quantity, pid.id_product, p.nama AS product, 
+                      FORMAT(SUM(COALESCE(bom.penggunaan, 0)) * pid.quantity, 3) AS total_penggunaan,
+                      satuan.nama as satuan, type.nama as type')
+            ->from('proforma_invoice_details pid', true)
+            ->join('billofmaterial bom', 'pid.id_product = bom.id_product', 'left')
+            ->join('materials m', 'bom.id_material = m.id')
+            ->join('product p', 'pid.id_product = p.id')
+            ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+            ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+            ->join('type', 'type.id = materials_detail.type_id', 'left')
+            ->where('pid.invoice_id', $invoice_id)
+            ->groupBy('m.id, m.name, m.kode, p.id')
+            ->orderBy('p.id')
+            ->findAll();
+
+        // Data untuk dikirim ke view
+        $data = [
+            'invoice_id' => $invoice_id,
+            'query0' => $query0,
+            'query1' => $query1,
+            'query2' => $query2,
+            'query3' => $query3,
+        ];
+
+        // Load view dengan data
+        $html = view('admin/content/printPR', $data);
+
+        // Setup Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Output PDF
+        $dompdf->stream("PR_{$invoice_id}.pdf", ["Attachment" => false]);
+    }
 }

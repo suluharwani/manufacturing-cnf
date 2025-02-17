@@ -306,7 +306,8 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->post('batalFinish/(:num)', 'ProformaInvoiceController::batalFinish/$1',['filter' => 'accessControl:2']);
     $routes->get('print/(:num)', 'ProformaInvoiceController::print/$1',['filter' => 'accessControl:2']);
     $routes->get('delivery_note/(:num)', 'ProformaInvoiceController::printDeliveryNote/$1',['filter' => 'accessControl:2']);
-
+    $routes->get('printInvoiceNeed/(:num)', 'ProformaInvoiceController::printInvoiceNeed/$1',['filter' => 'accessControl:2']);
+    
 
 });
 $routes->group('wo', function ($routes) {

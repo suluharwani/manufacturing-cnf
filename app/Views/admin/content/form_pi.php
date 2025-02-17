@@ -75,11 +75,11 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
   </form>
-                        <button class= "btn btn-secondary updatePI">Update</button>
-                        <button class= "btn btn-primary statusPI">Status</button>
-                        <button class= "btn btn-secondary alokasiPI">Alokasi Material</button>
-                        <button class= "btn btn-warning purchaseRequestPI">Purchase Request</button>
-                        <button class= "btn btn-success postingPI">Posting</button>
+                       
+  <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('proformainvoice/printInvoiceNeed') ?>/<?= $pi[0]['id'] ?>'">
+    Alokasi Material
+</button>
+                 
 
 </div>
                     </div>

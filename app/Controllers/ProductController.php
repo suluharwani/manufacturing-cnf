@@ -272,7 +272,7 @@ public function getMaterial()
                 ->join('satuan', 'materials_detail.satuan_id = satuan.id' )
                 ->join('stock', 'stock.id_material = materials.id' ,'left')
                 ->join('currency', 'currency.id = stock.id_currency','left')    
-
+                ->orderBy('materials.name', 'ASC')
                 ->findAll();
 
     return $this->response->setJSON(['material' => $material]);
