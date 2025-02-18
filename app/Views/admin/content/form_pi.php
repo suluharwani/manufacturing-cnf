@@ -79,6 +79,9 @@
   <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('proformainvoice/printInvoiceNeed') ?>/<?= $pi[0]['id'] ?>'">
     Alokasi Material
 </button>
+<button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('proformainvoice/printPi') ?>/<?= $pi[0]['id'] ?>'">
+    Print PI
+</button>
                  
 
 </div>

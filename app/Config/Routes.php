@@ -307,6 +307,7 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->get('print/(:num)', 'ProformaInvoiceController::print/$1',['filter' => 'accessControl:2']);
     $routes->get('delivery_note/(:num)', 'ProformaInvoiceController::printDeliveryNote/$1',['filter' => 'accessControl:2']);
     $routes->get('printInvoiceNeed/(:num)', 'ProformaInvoiceController::printInvoiceNeed/$1',['filter' => 'accessControl:2']);
+    $routes->get('printPi/(:num)', 'ProformaInvoiceController::printPi/$1',['filter' => 'accessControl:2']);
     
 
 });

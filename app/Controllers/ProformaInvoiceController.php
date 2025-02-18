@@ -732,4 +732,38 @@ public function printInvoiceNeed($invoice_id)
         // Output PDF
         $dompdf->stream("PR_{$invoice_id}.pdf", ["Attachment" => false]);
     }
+
+    
+    public function printPi($id){
+        // Konfigurasi opsi Dompdf
+        $mdlPi = new ProformaInvoice();
+        $mdlPiDet = new ProformaInvoiceDetail();
+        $data['pi'] = $mdlPi->select('*')->join('customer', 'customer.id = proforma_invoice.customer_id')->where('proforma_invoice.id', $id)->first();
+        $data['piDet'] = $mdlPiDet->where('invoice_id', $id)->findAll();
+        $options = new Options();
+        $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$dompdf = new Dompdf($options);
+
+
+    
+        // Data untuk tampilan
+        $data['title'] = 'Proforma Invoice';
+        $html = view('admin/content/printPi', $data);
+    
+        // Load HTML ke Dompdf
+        $dompdf->loadHtml($html);
+    
+        // Atur ukuran kertas A4 dan orientasi landscape
+        $dompdf->setPaper('A4', 'landscape');
+    
+        // Render PDF
+        $dompdf->render();
+    
+        // Output PDF ke browser tanpa mengunduh otomatis
+        $dompdf->stream("pi_{$id}.pdf", ["Attachment" => false]);
+    }
+    
 }
