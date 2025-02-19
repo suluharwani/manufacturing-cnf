@@ -183,7 +183,7 @@ $(document).ready(function() {
         return row[4]
     }},
     {mRender: function (data, type, row) {
-        return row[5]
+        return formatCurrency(row[5])
     }},
     {mRender: function (data, type, row) {
         return`
@@ -309,6 +309,57 @@ function loadSupplierList() {
       }
     });
   });
+
+  $('.updatePI').click(function() {
+    let customer_address = $('#customer_address').val();
+    let eta = $('#eta').val();
+    let etd = $('#etd').val();
+    let loading_date = $('#loading_date').val();
+    let vessel = $('#vessel').val();
+    let cus_po = $('#cus_po').val();
+    let charge = $('#charge').val();
+    let deposit = $('#deposit').val();
+    let end_prod = $('#end_prod').val();
+    let port_loading = $('#port_loading').val();
+    let port_discharge = $('#port_discharge').val();
+    let id =  getLastSegment();
+
+    $.ajax({
+      type: 'post',
+      url: base_url + 'proformainvoice/update/' + id,
+      async: false,
+      data: {
+        customer_address: customer_address,
+        eta: eta,
+        etd: etd,
+        loading_date: loading_date,
+        vessel: vessel,
+        cus_po: cus_po,
+        charge: charge,
+        deposit: deposit,
+        end_prod: end_prod,
+        port_loading: port_loading,
+        port_discharge: port_discharge,
+      },
+      success: function(data) {
+
+        Swal.fire({
+          title: 'Good job!',
+          text: 'Data updated!',
+          icon: 'success'
+        });
+      },
+      error: function(xhr) {
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: `${d.message}`,
+          footer: '<a href="">Why do I have this issue?</a>'
+        });
+      }
+    });
+  })
 $('.postingPembelian').click(function() {
   let id = getLastSegment();
 
@@ -637,11 +688,15 @@ $(document).on('click', '.editBtn', function(e) {
             </div>
             <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <input type="number" class="form-control" id="quantity" value="${product.quantity}" placeholder="Quantity" />
+                <input type="number" class="form-control" id="p_quantity" value="${product.quantity}" placeholder="Quantity" />
             </div>
             <div class="form-group">
                 <label for="unit_price">Unit Price</label>
-                <input type="number" class="form-control" id="unit_price" value="${product.unit_price}" placeholder="Unit Price" />
+                <input type="number" class="form-control" id="p_unit_price" value="${product.unit_price}" placeholder="Unit Price" />
+            </div>
+            <div class="form-group">
+                <label for="disc">Discount %</label>
+                <input type="number" class="form-control" id="disc" value="${product.disc}" placeholder="Item Description" />
             </div>
               <div class="form-group">
                 <label for="remarks">Remark</label>
@@ -654,12 +709,13 @@ $(document).on('click', '.editBtn', function(e) {
                     cancelButtonText: 'Cancel',
                     preConfirm: function() {
                         return {
-                            id_product: $('#id_product').val(),
+                            id_product: productId,
+                            id_pi: getLastSegment(),
                             remarks: $('#remarks').val(),
-                            hs_code: $('#hs_code').val(),
-                            quantity: $('#quantity').val(),
-                            unit_price: $('#unit_price').val(),
-                            total_price: $('#total_price').val()
+                            quantity: $('#p_quantity').val(),
+                            unit_price: $('#p_unit_price').val(),
+                            disc: $('#disc').val(),
+                         
                         };
                     }
                 }).then((result) => {
@@ -667,7 +723,7 @@ $(document).on('click', '.editBtn', function(e) {
                         var updatedData = result.value;
                         
                         $.ajax({
-                            url: base_url + 'proformainvoice/updateProduct/' + product.id,
+                            url: base_url + 'proformainvoice/updateProduct/' + productId,
                             type: 'POST',
                             data: updatedData,
                             success: function(response) {
@@ -727,4 +783,24 @@ $(document).on('click', '.deleteBtn', function(e) {
         }
     });
 });
+function formatCurrency(number, decimals = 0, decimalSeparator = '.', thousandSeparator = ',') {
+  // Validasi input harus numeric
+  if (isNaN(number)) {
+      throw new Error('Input must be a numeric value');
+  }
+
+  // Konversi ke angka float
+  const num = parseFloat(number);
+
+  // Pisahkan angka menjadi bagian integer dan desimal
+  let [integerPart, decimalPart] = num.toFixed(decimals).split('.');
+
+  // Tambahkan separator ribuan ke bagian integer
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+
+  // Gabungkan kembali jika ada desimal
+  return decimals > 0 ? integerPart + decimalSeparator + decimalPart : integerPart;
+}
+
+
 })

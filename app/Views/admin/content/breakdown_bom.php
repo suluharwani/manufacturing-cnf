@@ -51,6 +51,20 @@
 
                         </div>
                     </div>
+                    <div class="row mb-3">
+                        <label for="category" class="col-md-3 col-form-label">DIMENSION</label>
+                        <div class="col-md-9">
+                        <label for="category" class="col-md-3 col-form-label">Product Length (mm)</label>
+                            <input type="number" class="form-control" id="length" placeholder="length (mm)">
+                            <label for="category" class="col-md-3 col-form-label">Product Width (mm)</label>
+                            <input type="number" class="form-control" id="width" placeholder="width (mm)">
+                            <label for="category" class="col-md-3 col-form-label">Product Height (mm)</label>
+                            <input type="number" class="form-control" id="height" placeholder="height (mm)">
+                            <label for="category" class="col-md-3 col-form-label">Product Packaging (m³)</label>
+                            <input type="number" class="form-control" id="cbm" placeholder="cbm (m³)">
+                        </div>
+                    </div>
+                <button class="btn btn-primary updateDimension">Update Dimension</button>
 
                     <!--  -->
 
@@ -59,11 +73,11 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
                 </form>
-                <button class="btn btn-secondary finising">Finishing</button>
+                <!-- <button class="btn btn-secondary finising">Finishing</button>
                 <button class="btn btn-primary modul">Modul</button>
                 <button class="btn btn-warning dimension">Dimension</button>
                 <button class="btn btn-info design">Design</button>
-                <button class="btn btn-success updateBoM">Update BoM</button>
+                <button class="btn btn-success updateBoM">Update BoM</button> -->
 
             </div>
         </div>

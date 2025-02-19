@@ -21,6 +21,7 @@ class ProformaInvoiceDetail extends Model
                                     'hs_code',
                                     'quantity',
                                     'unit',
+                                    'disc',
                                     'unit_price',
                                     'total_price' ,
                                     'remarks',

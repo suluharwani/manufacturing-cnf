@@ -70,7 +70,7 @@
             </div>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
-                        class="fa fa-archive me-2"></i>Pre-production</a>
+                        class="fa fa-archive me-2"></i>Document</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('proformainvoice') ?>" class="dropdown-item">Proforma Invoice</a>
                     <a href="<?= base_url('work_order') ?>" class="dropdown-item">Work Orders</a>

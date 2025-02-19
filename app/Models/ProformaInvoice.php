@@ -12,7 +12,7 @@ class ProformaInvoice extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','invoice_number','invoice_date','customer_id','customer_address','id_currency','etd','eta','payment_terms','remarks','status','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','port_loading','port_discharge','end_prod','charge','deposit','invoice_number','invoice_date','customer_id','customer_address','id_currency','etd','eta','payment_terms','remarks','status','vessel','cus_po','loading_date','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

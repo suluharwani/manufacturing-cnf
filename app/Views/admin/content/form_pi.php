@@ -51,6 +51,18 @@
       </div>
     </div>
     <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">Port Loading</label>
+      <div class="col-md-9">
+        <input type="text" class="form-control" id="port_loading"  value="<?=$pi[0]['port_loading']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">Port Dischage</label>
+      <div class="col-md-9">
+        <input type="text" class="form-control" id="port_discharge"  value="<?=$pi[0]['port_discharge']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
       <label  class="col-md-3 col-form-label">Currency</label>
       <div class="col-md-9">
         <input type="text" class="form-control"  value="<?=$pi[0]['curr_name']?>" disabled>
@@ -59,15 +71,52 @@
     <div class="row mb-3">
       <label  class="col-md-3 col-form-label">ETD</label>
       <div class="col-md-9">
-        <input type="date" class="form-control"  value="<?=$pi[0]['etd']?>" >
+        <input type="date" class="form-control" id="etd"  value="<?=$pi[0]['etd']?>" >
       </div>
     </div>
     <div class="row mb-3">
       <label  class="col-md-3 col-form-label">ETA</label>
       <div class="col-md-9">
-        <input type="date" class="form-control"  value="<?=$pi[0]['eta']?>" >
+        <input type="date" class="form-control" id="eta"  value="<?=$pi[0]['eta']?>" >
       </div>
     </div>
+    <div class="row mb-3">
+      <label  class="col-md-3 col-form-label">End of Production</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control" id="end_prod"  value="<?=$pi[0]['end_prod']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">Loading Date</label>
+      <div class="col-md-9">
+      <input type="date" class="form-control" id="loading_date"  value="<?=$pi[0]['loading_date']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">Vessel Name</label>
+      <div class="col-md-9">
+      <input type="text" class="form-control" id="vessel"  value="<?=$pi[0]['vessel']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">Customer PO</label>
+      <div class="col-md-9">
+      <input type="text" class="form-control" id="cus_po" value="<?=$pi[0]['cus_po']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">Charge</label>
+      <div class="col-md-9">
+      <input type="text" class="form-control" id="charge" value="<?=$pi[0]['charge']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">Deposit</label>
+      <div class="col-md-9">
+      <input type="text" class="form-control" id="deposit" value="<?=$pi[0]['deposit']?>" >
+      </div>
+    </div>
+
 <!--  -->
 
     <!-- Tombol Kirim -->
@@ -75,7 +124,7 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
   </form>
-                       
+  <button class="btn btn-primary updatePI">Update</button>                     
   <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('proformainvoice/printInvoiceNeed') ?>/<?= $pi[0]['id'] ?>'">
     Alokasi Material
 </button>

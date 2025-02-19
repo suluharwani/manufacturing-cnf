@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\MdlProduct;
 use CodeIgniter\HTTP\ResponseInterface;
 use AllowDynamicProperties; 
 class ProductController extends BaseController
@@ -605,5 +606,18 @@ public function deleteModul($id)
     }
 
     return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
+function updateDimension($id){
+    $model = new MdlProduct();
+    $model->update($id, $_POST);
+    if ($model->affectedRows() !== 0) {
+        $riwayat = "Mengubah Dimensi Product id: {$id} ";
+        $this->changelog->riwayat($riwayat);
+        header('HTTP/1.1 200 OK');
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+    }
 }
 }

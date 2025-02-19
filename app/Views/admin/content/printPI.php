@@ -1,3 +1,52 @@
+
+<?php
+function formatCurrency($number, $decimals = 0, $decimalSeparator = '.', $thousandSeparator = ',') {
+    // Validasi input harus numeric
+    if(!is_numeric($number)) {
+        throw new InvalidArgumentException('Input must be a numeric value');
+    }
+    
+    // Format angka sesuai parameter
+    return number_format(
+        (float)$number,
+        $decimals,
+        $decimalSeparator,
+        $thousandSeparator
+    );
+
+}
+function formatDate($dateString) {
+    // Ubah string menjadi objek DateTime
+    $date = DateTime::createFromFormat('Y-m-d', $dateString);
+    
+    // Periksa apakah tanggal valid
+    if (!$date) {
+        return "-";
+    }
+
+    // Format ke dalam bahasa Inggris: "Month Day, Year"
+    return $date->format('F j, Y');
+}
+function hargaDisc($price, $discount) {
+    // Validasi input harus numerik
+
+    // Jika discount 0, kembalikan harga asli
+    if ($discount == 0) {
+        return $price;
+    }
+
+    // Hitung harga setelah diskon
+    $discountedPrice = $price - ($price * ($discount / 100));
+
+    return $discountedPrice;
+}
+function convertcm($mm) {
+    if (empty($mm) && $mm !== 0 && $mm !== '0') {
+        return "-";
+    }
+    return $mm / 10;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +60,7 @@
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10pt;
+            font-size: 9pt;
             margin: 0;
         }
         .a4-container {
@@ -51,17 +100,31 @@
 </head>
 <body>
     <div class="a4-container">
-        <h2 class="header">PROFORMA INVOICE</h2>
+
+        <table width="100%" >
+    <tr>
+        <td width="15%" style="border: none; !important;">
+            <img src="<?=base_url('assets/')?>cnf.png" alt="Company Logo" height="70">
+        </td>
+        <td width="15%" style="border: none; !important;">
+        Desa Suwawal<br>RT 02 RW 01 <br> Mlonggo, Jepara<br>Jawa Tengah 59452 <br> Indonesia
+
+        </td>
+        <td width="70%" align="left" style="border: none; !important;">
+            <h2>PROFORMA INVOICE</h2>
+        </td>
+    </tr>
+</table>
 
         <!-- Informasi Header -->
         <table>
             <tr>
                 <td width="70%">PI NUMBER: <?=$pi['invoice_number']?></td>
-                <td>PI DATE: <?=$pi['invoice_date']?></td>
+                <td>PI DATE: <?=formatDate($pi['invoice_date'])?></td>
             </tr>
             <tr>
                 <td>CUSTOMER: <?=$pi['customer_name']?></td>
-                <td>CONTAINER #170</td>
+                <td>PO: <?=$pi['cus_po']?></td>
             </tr>
         </table>
 
@@ -69,19 +132,48 @@
         <table width="100%">
     <tr>
         <td width="50%">
-            <strong>Bill To:</strong><br>
+            <strong>Customer Detail:</strong><br>
             <?=$pi['address']?><br>
             Contact: <?=$pi['contact_name']?><br>
             Phone: <?=$pi['contact_phone']?><br>
-            Email: <?=$pi['contact_email']?>
+            Email: <?=$pi['contact_email']?><br>
+            <?=$pi['customer_address']?><br>
         </td>
         <td width="50%">
-            <strong>Ship To:</strong><br>
-            PORT OF LOADING: SEMARANG, INDONESIA<br>
-            PORT OF DISCHARGE: <?=$pi['city']?>, <?=$pi['state']?><br><br>
-            VESSEL NAME: -<br>
-            LOADING DATE: -
-        </td>
+    <table border="1" cellspacing="0" cellpadding="5" width="100%">
+        <tr>
+            <td colspan="2"><strong>Ship To:</strong></td>
+        </tr>
+        <tr>
+            <td>PORT OF LOADING</td>
+            <td><?=$pi['port_loading']?></td>
+        </tr>
+        <tr>
+            <td>PORT OF DISCHARGE</td>
+            <td><?=$pi['port_discharge']?></td>
+        </tr>
+        <tr>
+            <td>VESSEL NAME</td>
+            <td> <?=$pi['vessel']?></td>
+        </tr>
+        <tr>
+            <td>ETD</td>
+            <td> <?=formatDate($pi['etd'])?></td>
+        </tr>
+        <tr>
+            <td>ETA</td>
+            <td> <?=formatDate($pi['eta'])?></td>
+        </tr>
+        <tr>
+            <td>END OF PRODUCTION</td>
+            <td> <?=formatDate($pi['end_prod'])?></td>
+        </tr>
+        <tr>
+            <td>LOADING DATE</td>
+            <td> <?=formatDate($pi['loading_date'])?></td>
+        </tr>
+    </table>
+</td>
     </tr>
 </table>
 
@@ -92,36 +184,78 @@
                 <tr>
                     <th>Code</th>
                     <th>Product Name</th>
+                    <th>Picture</th>
                     <th>Description</th>
+                    <th>Finishing Picture</th>
+                    <th>HS Code</th>
                     <th>Qty</th>
                     <th>Size (cm)</th>
                     <th>CBM</th>
                     <th>Price/Unit</th>
+                    <th>Disc %</th>
+                    <th>Final Price</th>
                     <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Baris produk (diulang untuk setiap item) -->
+                 <?php 
+                 $tot_qty = 0;
+                 $tot_price = 0;
+                 $tot_cbm = 0;
+                 foreach ($piDet as $item) {
+                    $finalPrice =  hargaDisc($item['unit_price'], $item['disc']);
+
+                    $tot_qty += $item['quantity'];
+                    $tot_price += $item['quantity']*$finalPrice;
+                    $tot_cbm += $item['p_cbm'];
+                    ?>
                 <tr>
-                    <td>HEL10</td>
-                    <td>DESK</td>
-                    <td>FINISHING FRENCH STAIN</td>
-                    <td>12</td>
-                    <td>140x78x70</td>
-                    <td>0.743</td>
-                    <td>557</td>
-                    <td>6,684</td>
+
+                    <td><?=$item['p_code']?></td>
+                    <td><?=$item['p_name']?></td>
+                    <td><img src="<?=base_url('assets/upload/thumb/').$item['p_picture']?>" height="40"></img></td>
+                    <td><?=$item['remarks']?></td>
+                    <td><img src="<?=base_url('uploads/finishing/').$item['f_picture']?>" height="40"></img></td>
+                    <td><?=$item['p_hs_code']?></td>
+                    <td><?=formatCurrency($item['quantity'])?></td>
+                    <td><?=convertcm($item['p_length'])."x".convertcm($item['p_width'])."x".convertcm($item['p_height'])?></td>
+                    <td><?=$item['p_cbm']?></td>
+                    <td><?=$item['currency_code']." ".formatCurrency($item['unit_price'])?></td>
+                    <td><?=$item['disc']?></td>
+                    <td><?=$item['currency_code']." ".formatCurrency( $finalPrice)?></td>
+                    
+                    <td><?=$item['currency_code']." ".formatCurrency($finalPrice*$item['quantity'])?></td>
+
                 </tr>
+                <?php } ?>
                 <!-- Tambahkan baris lain sesuai kebutuhan -->
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="3">TOTAL</td>
-                    <td>211</td>
+                    <td colspan="6">TOTAL</td>
+                    <td><?=$tot_qty?></td>
                     <td></td>
-                    <td>12.345</td>
-                    <td></td>
-                    <td>45,678</td>
+                    <td><?=$tot_cbm?></td>
+                    <td colspan="3"></td>
+
+  
+                    <td><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
+                </tr>
+                <tr>
+                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td>CHARGE</td>
+                    <td><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
+                </tr>
+                <tr>
+                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td>DEPOSIT</td>
+                    <td><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
+                </tr>
+                <tr>
+                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td>GRAND TOTAL</td>
+                    <td><?=$item['currency_code']." ".formatCurrency($tot_price+$pi['charge']-$pi['deposit'])?></td>
                 </tr>
             </tfoot>
         </table>
@@ -163,8 +297,8 @@
         <table class="signature-section">
             <tr><th colspan="2">CONFIRM ORDER</th></tr>
             <tr>
-                <td width="50%">Send Date:<br><br></td>
-                <td>Stamp & Sign:<br><br></td>
+                <td width="50%">Factory Stamp & Sign:<br><br><br><br></td>
+                <td width="50%">Customer Stamp & Sign:<br><br><br><br></td>
             </tr>
         </table>
 

@@ -265,18 +265,14 @@ class ProformaInvoiceController extends BaseController
     // Update product details
     public function updateProduct($id)
     {
+        $id_pi = $this->request->getPost('id_pi');
+        $id = $this->request->getPost('id_product');
+
         $data = [
-            'invoice_id' => $this->request->getPost('invoice_id'),
-            'id_product' => $this->request->getPost('id_product'),
-            'id_currency' => $this->request->getPost('id_currency'),
-            'item_description' => $this->request->getPost('item_description'),
-            'hs_code' => $this->request->getPost('hs_code'),
-            'quantity' => $this->request->getPost('quantity'),
-            'unit' => $this->request->getPost('unit'),
-            'unit_price' => $this->request->getPost('unit_price'),
-            'total_price' => $this->request->getPost('total_price'),
             'remarks' => $this->request->getPost('remarks'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'quantity' => $this->request->getPost('quantity'),
+            'unit_price' => $this->request->getPost('unit_price'),
+            'disc' => $this->request->getPost('disc')
         ];
 
         $updateResult = $this->proformaInvoiceDetailModel->updateProduct($id, $data);
@@ -739,12 +735,44 @@ public function printInvoiceNeed($invoice_id)
         $mdlPi = new ProformaInvoice();
         $mdlPiDet = new ProformaInvoiceDetail();
         $data['pi'] = $mdlPi->select('*')->join('customer', 'customer.id = proforma_invoice.customer_id')->where('proforma_invoice.id', $id)->first();
-        $data['piDet'] = $mdlPiDet->where('invoice_id', $id)->findAll();
+        $data['piDet'] = $mdlPiDet->select('product.kode as p_code,
+            product.nama as p_name,
+            product.hs_code as p_hs_code,
+            product.picture as p_picture,
+            product.length as p_length,
+            product.width as p_width,
+            product.height as p_height,
+            product.cbm as p_cbm,
+            finishing.name as f_name,
+            finishing.description as f_desc,
+            finishing.picture as f_picture,
+            product_details.dept as pd_dept,
+            product_details.length_mm as length_mm,
+            product_details.height_mm as height_mm,
+            product_details.width_mm as width_mm,
+            product_details.nw_kg as nw_kg,
+            product_details.gw_kg as gw_kg,
+            product_details.cbm as cbm,
+            proforma_invoice_details.disc as disc,
+            proforma_invoice_details.quantity as quantity,
+            proforma_invoice_details.unit_price as unit_price,
+            proforma_invoice_details.remarks as remarks,
+            currency.kode as currency_code,
+            currency.nama as currency_name
+            ')
+                                  ->join('product',
+                                   'proforma_invoice_details.id_product = product.id', 'left')
+                                  ->join('product_details','product.id = product_details.id_product', 'left')
+                                  ->join('finishing', 'finishing.id = proforma_invoice_details.finishing_id', 'left')
+                                  ->join('currency', 'currency.id = proforma_invoice_details.id_currency', 'left')
+                                  ->where('invoice_id', $id)
+                                  ->findAll();
         $options = new Options();
         $options = new Options();
 $options->set('isHtml5ParserEnabled', true);
 $options->set('isPhpEnabled', true);
 $options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
 $dompdf = new Dompdf($options);
 
 
@@ -764,6 +792,20 @@ $dompdf = new Dompdf($options);
     
         // Output PDF ke browser tanpa mengunduh otomatis
         $dompdf->stream("pi_{$id}.pdf", ["Attachment" => false]);
+    }
+
+    public function update($id){
+        $model = new ProformaInvoice();
+        $model->update($id, $_POST);
+        if ($model->affectedRows() !== 0) {
+            $riwayat = "Mengubah Proforma Invoice ";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
     }
     
 }

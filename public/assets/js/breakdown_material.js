@@ -87,7 +87,10 @@ $(document).ready(function() {
            $('#hscode').val(res.hs_code);
            $('#category').val(res.category);
            $('#product_name').val(res.nama);
-           $('#desc').html(res.text);
+           $('#length').val(res.length);
+           $('#width').val(res.width);
+           $('#height').val(res.height);
+           $('#cbm').val(res.cbm);
             
          },
          error: function(xhr){
@@ -434,4 +437,44 @@ $(document).on('click', '.deleteModul', function () {
       }
   });
 });
+
+$('.updateDimension').click(function() {
+
+  let length = $('#length').val();
+  let width = $('#width').val();
+  let height = $('#height').val();
+  let cbm = $('#cbm').val();
+
+  let id =  getLastSegment();
+
+  $.ajax({
+    type: 'post',
+    url: base_url + 'product/updateDimension/' + id,
+    async: false,
+    data: {
+      length: length,
+      width: width,
+      height: height,
+      cbm: cbm,
+      
+    },
+    success: function(data) {
+
+      Swal.fire({
+        title: 'Good job!',
+        text: 'Data updated!',
+        icon: 'success'
+      });
+    },
+    error: function(xhr) {
+      let d = JSON.parse(xhr.responseText);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: `${d.message}`,
+        footer: '<a href="">Why do I have this issue?</a>'
+      });
+    }
+  });
+})
 });

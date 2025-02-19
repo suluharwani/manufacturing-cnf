@@ -212,6 +212,7 @@ $routes->group('product', function ($routes) {
     $routes->post('getBomFinishing', 'ProductController::getBomFinishing',['filter' => 'accessControl:2']);
     $routes->get('getProduct', 'ProductController::getProduct',['filter' => 'accessControl:2']);
     $routes->post('modul/(:any)', 'ProductController::modul/$1',['filter' => 'accessControl:2']);
+    $routes->post('updateDimension/(:any)', 'ProductController::updateDimension/$1',['filter' => 'accessControl:2']);
 
 });
 $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
@@ -308,6 +309,7 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->get('delivery_note/(:num)', 'ProformaInvoiceController::printDeliveryNote/$1',['filter' => 'accessControl:2']);
     $routes->get('printInvoiceNeed/(:num)', 'ProformaInvoiceController::printInvoiceNeed/$1',['filter' => 'accessControl:2']);
     $routes->get('printPi/(:num)', 'ProformaInvoiceController::printPi/$1',['filter' => 'accessControl:2']);
+    $routes->post('update/(:num)', 'ProformaInvoiceController::update/$1',['filter' => 'accessControl:2']);
     
 
 });
