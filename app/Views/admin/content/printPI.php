@@ -80,6 +80,7 @@ function convertcm($mm) {
             border: 1px solid black;
             padding: 5px;
             vertical-align: top;
+            
         }
         .header {
             text-align: center;
@@ -117,7 +118,7 @@ function convertcm($mm) {
 </table>
 
         <!-- Informasi Header -->
-        <table>
+        <table >
             <tr>
                 <td width="70%">PI NUMBER: <?=$pi['invoice_number']?></td>
                 <td>PI DATE: <?=formatDate($pi['invoice_date'])?></td>
@@ -131,7 +132,7 @@ function convertcm($mm) {
         <!-- Informasi Customer -->
         <table width="100%">
     <tr>
-        <td width="50%">
+        <td width="25%">
             <strong>Customer Detail:</strong><br>
             <?=$pi['address']?><br>
             Contact: <?=$pi['contact_name']?><br>
@@ -139,40 +140,38 @@ function convertcm($mm) {
             Email: <?=$pi['contact_email']?><br>
             <?=$pi['customer_address']?><br>
         </td>
-        <td width="50%">
-    <table border="1" cellspacing="0" cellpadding="5" width="100%">
-        <tr>
-            <td colspan="2"><strong>Ship To:</strong></td>
-        </tr>
-        <tr>
-            <td>PORT OF LOADING</td>
-            <td><?=$pi['port_loading']?></td>
-        </tr>
-        <tr>
-            <td>PORT OF DISCHARGE</td>
-            <td><?=$pi['port_discharge']?></td>
-        </tr>
-        <tr>
-            <td>VESSEL NAME</td>
-            <td> <?=$pi['vessel']?></td>
-        </tr>
-        <tr>
-            <td>ETD</td>
-            <td> <?=formatDate($pi['etd'])?></td>
-        </tr>
-        <tr>
-            <td>ETA</td>
-            <td> <?=formatDate($pi['eta'])?></td>
-        </tr>
-        <tr>
-            <td>END OF PRODUCTION</td>
-            <td> <?=formatDate($pi['end_prod'])?></td>
-        </tr>
-        <tr>
-            <td>LOADING DATE</td>
-            <td> <?=formatDate($pi['loading_date'])?></td>
-        </tr>
-    </table>
+        <td width="75%">
+        <table border="1" cellspacing="0" cellpadding="5" width="100%">
+    <tr>
+        <td colspan="2"><strong>Ship To:</strong></td>
+        <td colspan="2"><strong>Shipment Details:</strong></td>
+    </tr>
+    <tr>
+        <td>PORT OF LOADING</td>
+        <td><?=$pi['port_loading']?></td>
+        <td>VESSEL NAME</td>
+        <td><?=$pi['vessel']?></td>
+    </tr>
+    <tr>
+        <td>PORT OF DISCHARGE</td>
+        <td><?=$pi['port_discharge']?></td>
+        <td>ETD</td>
+        <td><?=formatDate($pi['etd'])?></td>
+    </tr>
+    <tr>
+        <td>END OF PRODUCTION</td>
+        <td><?=formatDate($pi['end_prod'])?></td>
+        <td>ETA</td>
+        <td><?=formatDate($pi['eta'])?></td>
+    </tr>
+    <tr>
+        <td>LOADING DATE</td>
+        <td><?=formatDate($pi['loading_date'])?></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
 </td>
     </tr>
 </table>
@@ -194,7 +193,7 @@ function convertcm($mm) {
                     <th>Price/Unit</th>
                     <th>Disc %</th>
                     <th>Final Price</th>
-                    <th>Total</th>
+                    <th style="width: 50px">Total Price</th>
                 </tr>
             </thead>
             <tbody>
