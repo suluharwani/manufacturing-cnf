@@ -17,7 +17,7 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="container mt-5">
-                <h2>Material Requisition Form</h2>
+                <h2>Purchase Request Form</h2>
                 <?php
 
                 ?>
@@ -32,6 +32,9 @@
                     <div class="row mb-3">
                         <label for="invoice" class="col-md-3 col-form-label">PI</label>
                         <div class="col-md-9">
+                        
+                            <input type="text" class="form-control" value="<?= $mr['dept_id'] ?>" id="dept_id"placeholder="Invoice" disabled hidden>
+                            <input type="text" class="form-control" value="<?= $mr['id_pi'] ?>" id="id_pi"placeholder="Invoice" disabled hidden>
                             <input type="text" class="form-control" value="<?= $mr['pi'] ?>" id="invoice"
                                 placeholder="Invoice" disabled>
                         </div>
@@ -112,11 +115,23 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Material Request List</h6>
+            <h6 class="mb-0">Purchase Request List</h6>
             <div>
-            <button id="printRekapGaji" class="btn btn-primary">Posting</button>
-<a id="exportExcelLink" href="#" class="btn btn-success">
-    <i class="fa fa-file-excel"></i> Print
+            <button id="deleteAll" class="btn btn-danger">Delete All</button>
+            <button id="importPI" class="btn btn-warning">Import PI</button>
+            <?php
+            if($mr['status'] == 0){?>
+            <button id="posting" class="btn btn-primary">Posting</button>
+            <?php 
+            }else{?>
+            <button id="batalPosting" class="btn btn-secondary">Batal Posting</button>
+
+            <?php
+            }
+            ?>
+            
+<a id="printPR" onclick="window.location.href='<?= base_url('materialrequest/printPR') ?>/<?= $mr['id'] ?>'"class="btn btn-success">
+    <i class="fa fa-file"></i> Print
 </a>
             </div>
             
@@ -127,13 +142,12 @@
                 <tr>
                     <th>#</th>
                     <th>Code</th>
+                    <th>HS CODE</th>
+                    <th>KITE</th>
                     <th>Name</th>
                     <th>PI</th>
-                    <th>Supplier</th>
                     <th>Department</th>
                     <th>Quantity</th>
-                    <th>Price/Unit</th>
-                    <th>Total</th>
                     <th>Action</th>
                 </tr>
             </thead>

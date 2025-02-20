@@ -367,9 +367,15 @@ $routes->group('materialrequest', function ($routes) {
     $routes->get('material_request', 'MaterialRequestController::index',['filter' => 'accessControl:2']); 
     $routes->post('add', 'MaterialRequestController::add',['filter' => 'accessControl:2']); 
     $routes->post('addMR', 'MaterialRequestController::addMR',['filter' => 'accessControl:2']); 
-    $routes->post('datamr/(:any)', 'MaterialRequestController::datamr/$1',['filter' => 'accessControl:2']); 
+    $routes->get('datamr/(:any)', 'MaterialRequestController::datamr/$1',['filter' => 'accessControl:2']); 
     $routes->post('deleteList/(:any)', 'MaterialRequestController::deleteList/$1',['filter' => 'accessControl:2']);
     $routes->get('getMR/(:any)', 'MaterialRequestController::getMR/$1',['filter' => 'accessControl:2']);
+    $routes->post('importPI', 'MaterialRequestController::importPI',['filter' => 'accessControl:2']);
+    $routes->post('deleteAll', 'MaterialRequestController::deleteAll',['filter' => 'accessControl:2']);
+    $routes->post('posting', 'MaterialRequestController::posting',['filter' => 'accessControl:2']);
+    $routes->post('batalPosting', 'MaterialRequestController::batalPosting',['filter' => 'accessControl:2']);
+    $routes->post('updateQty', 'MaterialRequestController::updateQty',['filter' => 'accessControl:2']);
+    $routes->get('printPR/(:num)', 'MaterialRequestController::printPR/$1',['filter' => 'accessControl:2']);
 
 });
 

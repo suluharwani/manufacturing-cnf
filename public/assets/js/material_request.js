@@ -132,11 +132,10 @@ function dateFormater(date) {
                     <option value="">Proforma Invoice</option>
                 </select>
             </div>
-           
             <div class="form-group">
-                <label for="supplier">supplier</label>
-                <select id="supplier" class="form-control">
-                    <option value="">Supplier</option>
+                <label for="department">Department</label>
+                <select id="department" class="form-control">
+                    <option value="">Pilih Department</option>
                 </select>
             </div>
             <div class="form-group">
@@ -149,13 +148,12 @@ function dateFormater(date) {
         preConfirm: () => {
             const kode = Swal.getPopup().querySelector('#kode').value;
             const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
-            const supplier = Swal.getPopup().querySelector('#supplier').value;
             const department = Swal.getPopup().querySelector('#department').value;
             const remarks = Swal.getPopup().querySelector('#remarks').value;
-            if (!kode || !proforma_invoice || !supplier || !department || !remarks) {
+            if (!kode || !proforma_invoice || !department || !remarks) {
                 Swal.showValidationMessage('Silakan lengkapi data');
             }
-            return {department:department, kode: kode, proforma_invoice: proforma_invoice, supplier:supplier , remarks:remarks };
+            return {department:department, kode: kode, proforma_invoice: proforma_invoice , remarks:remarks };
         }
     }).then((result) => {
         $.ajax({
@@ -163,7 +161,7 @@ function dateFormater(date) {
             url: base_url + '/materialrequest/add',
             async: false,
             // 'kode','dept_id', 'id_pi', 'status', 'remarks',
-            data: { kode: result.value.kode, dept_id: result.value.department,id_pi:result.value.proforma_invoice, supplier:result.value.supplier, status:0, remarks:result.value.remarks },
+            data: { kode: result.value.kode, dept_id: result.value.department,id_pi:result.value.proforma_invoice,status:0, remarks:result.value.remarks },
             success: function (data) {
                  $('#tabel_serverside').DataTable().ajax.reload();
                 Swal.fire({
@@ -193,11 +191,7 @@ function dateFormater(date) {
     });
 
     // Menambahkan opsi customer ke select dropdown
-    getSupplierOption().then(options => {
-        $('#supplier').html(options); // Isi select dengan opsi customer
-    }).catch(error => {
-        Swal.fire('Error', error, 'error');
-    });
+
     getPIOption().then(PIoptions => {
       console.log(PIoptions);
       $('#proforma_invoice').html(PIoptions); // Isi select dengan opsi customer
@@ -226,7 +220,7 @@ function generateCode() {
   const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
   
   // Gabungkan semuanya menjadi format PIXXXXXXXX
-  const code = `MR${year}${month}${day}${randomNumStr}`;
+  const code = `PR${year}${month}${day}${randomNumStr}`;
   
   return code;
 }
@@ -264,7 +258,7 @@ function getPIOption() {
       url: base_url + '/proformainvoice/get_list_json', // Endpoint untuk mendapatkan PI
       success: function(response) {
         // Buat opsi produk dari data yang diterima
-        var PIoptions = '<option value="">Pilih Supplier</option>';
+        var PIoptions = '<option value="">Pilih Proforma Invoice</option>';
               response.forEach(function(pi) {
                   PIoptions += `<option value="${pi.id}">${pi.invoice_number}</option>`;
               });

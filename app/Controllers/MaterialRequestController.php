@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use AllowDynamicProperties;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class MaterialRequestController extends BaseController
 {
     protected $changelog;
@@ -109,11 +111,13 @@ class MaterialRequestController extends BaseController
     }
     function datamr($id_mr){
         $mdl = new \App\Models\MdlMaterialRequestList();
-        $data = $mdl->select('material_request_list.*,supplier.supplier_name as supplier, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep')
+        $data = $mdl->select('material_request.status, material_request_list.*, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep, satuan.kode as satuan, satuan.nama as nama_satuan, materials_detail.kite as kite,    materials_detail.hscode as hs_code')
                     ->join('materials', 'materials.id = material_request_list.id_material', 'left')
+                    ->join('materials_detail', 'materials.id = materials_detail.material_id', 'left')
+                    ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
                     ->join('proforma_invoice', 'proforma_invoice.id = material_request_list.id_pi', 'left')
                     ->join('department', 'department.id = material_request_list.id_dept', 'left')
-                    ->join('supplier', 'supplier.id = material_request_list.id_sup', 'left')
+                    ->join('material_request', 'material_request_list.id_mr = material_request.id', 'left')
                     ->where('id_mr', $id_mr)->findAll();
         return json_encode($data);
 
@@ -163,6 +167,108 @@ class MaterialRequestController extends BaseController
             // Return an error message if no data found
             return json_encode(['message' => 'Material Request not found', 'code' => 404]);
         }
+    }
+    public function importPi(){
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        $mdl->importMaterialUsage($_POST['idMR'], $_POST['idPI'], $_POST['idDept']);
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Import Material Request List MR: {$_POST['idMR']},PI: {$_POST['idPI']}";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function deleteAll(){
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        $mdl->where('id_mr', $_POST['idMR'])->delete();
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = 'Menghapus Semua Material Request List';
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function posting(){
+        $mdl = new \App\Models\MdlMaterialRequest();
+        $mdl->update($_POST['idMR'], ['status' => 1]);
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Mengubah status Material Request ke posting";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function batalPosting(){
+        $mdl = new \App\Models\MdlMaterialRequest();
+        $mdl->update($_POST['idMR'], ['status' => 0]);
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Mengubah status Material Request ke batal posting";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function updateQty(){
+        $mdl = new \App\Models\MdlMaterialRequestList();
+        $params =$_POST['params'];
+        $id = $params['id'];
+        $quantity = $params['quantity'];
+        $mdl->update($id,  ['quantity' => $quantity]);
+        if ($mdl->affectedRows() !== 0) {
+            $riwayat = "Mengubah quantity Material Request List id: {$id} kuantitas: {$quantity}";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(['message'=> 'Tidak ada perubahan pada data', 'code' => 1]));
+        }
+    }
+    public function printPR($id){
+        // Konfigurasi opsi Dompdf
+        $mdl = new \App\Models\MdlMaterialRequest();
+        $data['pr'] = $mdl->select('department.name as department, material_request.*,proforma_invoice.invoice_number as pi')
+                    ->join('proforma_invoice', 'proforma_invoice.id = material_request.id_pi', 'left')
+                    ->join('department', 'material_request.dept_id = department.id', 'left')
+                        ->where('material_request.id', $id)->first();
+        $data['prDet'] = $this->datamr($id);
+        $options = new Options();
+        $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+
+    
+        // Data untuk tampilan
+        $data['title'] = 'Proforma Invoice';
+        $html = view('admin/content/printPRForm', $data);
+    
+        // Load HTML ke Dompdf
+        $dompdf->loadHtml($html);
+    
+        // Atur ukuran kertas A4 dan orientasi landscape
+        $dompdf->setPaper('A4', 'landscape');
+    
+        // Render PDF
+        $dompdf->render();
+    
+        // Output PDF ke browser tanpa mengunduh otomatis
+        $dompdf->stream("PR_{$id}.pdf", ["Attachment" => false]);
     }
 
 }

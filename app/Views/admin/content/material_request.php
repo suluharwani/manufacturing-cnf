@@ -20,7 +20,7 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Material Request</h6>
+            <h6 class="mb-0">Purchase Request</h6>
             <button class="btn btn-primary tambahMaterialRequest">Add</button>
         </div>
         <div class="table-responsive">

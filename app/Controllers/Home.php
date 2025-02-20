@@ -265,8 +265,8 @@ class Home extends BaseController
         return view('admin/index', $data);
     }
     public function materialRequest(){
-        $data['group'] = 'Material Request';
-        $data['title'] = 'Material Request';
+        $data['group'] = 'Purchase Request';
+        $data['title'] = 'Purchase Request';
         $data['content'] = view('admin/content/material_request');
         return view('admin/index', $data);
     }

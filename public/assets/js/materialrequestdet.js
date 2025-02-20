@@ -86,6 +86,124 @@ $(document).ready(function () {
   }
 
 });
+$('#importPI').on('click',function(){
+  const idPI = $('#id_pi').val();
+  const idDept = $('#dept_id').val();
+  
+  const idMR = masterId;
+  Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `Data dari PI akan ditambahkan ke PR!`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya!'
+  }).then((result) => {
+      if (result.isConfirmed) { 
+          $.ajax({
+              type: "POST",
+              url: base_url + '/materialrequest/importPI' ,
+              data: {idPI,idMR,idDept},
+              success: function() {
+                // dataTable.DataTable().ajax.reload();
+                  Swal.fire('Sukses', 'Dokumen berhasil diposting.', 'success');
+                  loadData();
+              },
+              error: function() {
+                  Swal.fire('Error', 'Gagal.', 'error');
+              }
+          });
+      }
+  });
+})
+$('#deleteAll').on('click',function(){
+  
+  const idMR = masterId;
+  Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `Data material PR akan dihapus!`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya!'
+  }).then((result) => {
+      if (result.isConfirmed) { 
+          $.ajax({
+              type: "POST",
+              url: base_url + '/materialrequest/deleteAll' ,
+              data: {idMR},
+              success: function() {
+                // dataTable.DataTable().ajax.reload();
+                  Swal.fire('Sukses', 'Data berhasil dihapus.', 'success');
+                  loadData();
+              },
+              error: function() {
+                  Swal.fire('Error', 'Gagal.', 'error');
+              }
+          });
+      }
+  });
+})
+$('#posting').on('click',function(){
+  
+  const idMR = masterId;
+  Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `PR akan diposting!`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya!'
+  }).then((result) => {
+      if (result.isConfirmed) { 
+          $.ajax({
+              type: "POST",
+              url: base_url + '/materialrequest/posting' ,
+              data: {idMR},
+              success: function() {
+                // dataTable.DataTable().ajax.reload();
+                  Swal.fire('Sukses', 'Data berhasil diposting.', 'success');
+                  location.reload();
+              },
+              error: function() {
+                  Swal.fire('Error', 'Gagal.', 'error');
+              }
+          });
+      }
+  });
+})
+$('#batalPosting').on('click',function(){
+  
+  const idMR = masterId;
+  Swal.fire({
+      title: 'Apakah Anda yakin?',
+      text: `PR akan dibatalkan posting!`,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya!'
+  }).then((result) => {
+      if (result.isConfirmed) { 
+          $.ajax({
+              type: "POST",
+              url: base_url + '/materialrequest/batalPosting' ,
+              data: {idMR},
+              success: function() {
+                // dataTable.DataTable().ajax.reload();
+                  Swal.fire('Sukses', 'Data berhasil diposting.', 'success');
+                  location.reload();
+              },
+              error: function() {
+                  Swal.fire('Error', 'Gagal.', 'error');
+              }
+          });
+      }
+  });
+})
 });
 
 
@@ -110,18 +228,8 @@ $('#tabel_serverside').on('click', '.addMR', function () {
                 </select>
             </div>
               <div class="form-group">
-                  <label for="supplier">supplier</label>
-                  <select id="supplier" class="form-control">
-                      <option value="">Supplier</option>
-                  </select>
-              </div>
-              <div class="form-group">
                   <label for="quantity">Quantity</label>
                   <input type="text" class="form-control" id="quantity" aria-describedby="quantityHelp" placeholder="quantity">
-              </div>
-              <div class="form-group">
-                  <label for="price">Price</label>
-                  <input type="text" class="form-control" id="price" aria-describedby="priceHelp" placeholder="price">
               </div>
               <div class="form-group">
                   <label for="kode">Remarks</label>
@@ -132,20 +240,16 @@ $('#tabel_serverside').on('click', '.addMR', function () {
           focusConfirm: false,
           preConfirm: () => {
               const department = Swal.getPopup().querySelector('#department').value;
-              const supplier = Swal.getPopup().querySelector('#supplier').value;
               const remarks = Swal.getPopup().querySelector('#remarks').value;
               const quantity = Swal.getPopup().querySelector('#quantity').value;
-              const price = Swal.getPopup().querySelector('#price').value;
               const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
-              if ( !remarks || !quantity || !price) {
+              if ( !remarks || !quantity ) {
                   Swal.showValidationMessage('Silakan lengkapi data');
               }
               return {proforma_invoice:proforma_invoice,
                 department:department,
-                 supplier: supplier,
                  remarks:remarks ,
-                 quantity:quantity,
-                 price:price};
+                 quantity:quantity};
           }
       }).then((result) => {
         $.ajax({
@@ -157,9 +261,9 @@ $('#tabel_serverside').on('click', '.addMR', function () {
                 id_mr: masterId,
                 id_material: id,
                 id_dept: result.value.department,
-                id_sup: result.value.supplier,
+               
                 quantity: result.value.quantity,
-                price: result.value.price,
+               
                 remarks: result.value.remarks
             },
             success: function (data) {
@@ -208,29 +312,35 @@ $('#tabel_serverside').on('click', '.addMR', function () {
      function loadData() {
             $.ajax({
                 url: base_url+'/materialrequest/datamr/'+masterId,
-                type: 'post',
+                type: 'get',
                 dataType: 'json',
                 success: function(response) {
                     // Mengosongkan tabel sebelum memuat data baru
                     var tableBody = $('#data-body');
                     tableBody.empty();
                     no = 1
+
                     // Menampilkan data ke dalam tabel
                     response.forEach(function(item) {
+                      if(item.status == 1){
+                        button = `Posted`;
+                      }else{
+                        button = ` <button class="btn btn-warning btn-sm updateList" data-nama = "${item.material}" data-satuan = "${item.satuan}" data-quantity = "${item.quantity}"  data-id="${item.id}">Edit</button>
+                            <button class="btn btn-danger btn-sm deleteList"  data-id="${item.id}">Delete</button>`;
+                      }
                         var row = `<tr>
                             <td>${no++}</td>
                             <td>${item.code}</td>
+                            <td>${item.hs_code}</td>
+                            <td>${item.kite}</td>
                             <td>${item.material}</td>
                             <td>${item.pi}</td>
-                            <td>${item.supplier}</td>
                             <td>${item.dep}</td>
-                            <td>${item.quantity}</td>
-                            <td>${item.price}</td>
-                            <td>${parseFloat(item.price*item.quantity)}</td>
+                            <td>${item.quantity} ${item.satuan}</td>
                            
                             <td>
-                            <button class="btn btn-success btn-sm updateList"  data-id="${item.id}">Edit</button>
-                            <button class="btn btn-success btn-sm deleteList"  data-id="${item.id}">Delete</button>
+
+                           ${button}
                              
                             </td>   
                         </tr>`;
@@ -240,10 +350,67 @@ $('#tabel_serverside').on('click', '.addMR', function () {
                 error: function(xhr, status, error) {
                     // Menampilkan pesan kesalahan jika terjadi error
                     console.error('Error: ' + status + ' - ' + error);
-                    alert('Gagal memuat data penggajian.');
+                    alert('Gagal memuat data .');
                 }
             });
         }
+        $('#data-body').on('click','.updateList',function(){
+          let id = $(this).data('id');
+          let nama = $(this).data('nama');
+          let quantity = $(this).data('quantity');
+          let satuan = $(this).data('satuan');
+        
+          Swal.fire({
+            title: `Edit ${nama} `,
+            html: `<form id="form_edit_data">
+            <div class="form-group">
+            <label for="quantity">Quantity (${satuan})</label>
+            <input type="text" class="form-control" id="quantity" aria-describedby="quantity" placeholder="quantity" value= "${quantity}">
+            </div>
+            </form>
+            `,
+            confirmButtonText: 'Update',
+            focusConfirm: false,
+            preConfirm: () => {
+              const quantity = Swal.getPopup().querySelector('#quantity').value
+              if (!quantity) {
+                Swal.showValidationMessage('Silakan lengkapi data')
+              }
+              
+              return {quantity }
+            }
+          }).then((result) => {
+            params = {quantity:result.value.quantity,id:id}
+            $.ajax({
+              type : "POST",
+              url  : base_url+'/materialrequest/updateQty',
+              async : false,
+              // dataType : "JSON",
+              data : {params},
+              success: function(data){
+                loadData();
+                Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: `Quantity ${nama} berhasil diubah menjadi ${result.value.quantity}.`,
+                  showConfirmButton: false,
+                  timer: 2500
+                })
+              },
+              error: function(xhr){
+                let d = JSON.parse(xhr.responseText);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: `${d.message}`,
+                  footer: '<a href="">Why do I have this issue?</a>'
+                })
+              }
+            });
+        
+          })
+        });
+
         $('#data-body').on('click', '.deleteList', function () {
           const id = $(this).data('id');
           Swal.fire({
@@ -368,3 +535,5 @@ function formatDate(datetime) {
       });
     });
   }
+
+  
