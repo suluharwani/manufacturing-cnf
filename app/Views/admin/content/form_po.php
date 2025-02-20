@@ -79,9 +79,9 @@
 
         </form>
         <button class="btn btn-secondary updatePO">Update</button>
-        <button class="btn btn-secondary alokasiPI">Alokasi Material</button>
-        <button class="btn btn-warning purchaseRequestPI">Purchase Request</button>
-        <button class="btn btn-success postingPI">Posting</button>
+        <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('purchase/printPo') ?>/<?= $po[0]['id'] ?>'">
+    Print PO
+</button>
 
       </div>
     </div>

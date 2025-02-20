@@ -6,7 +6,8 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\MdlPurchaseOrder;
 use App\Models\MdlPurchaseOrderList;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class PurchaseController extends BaseController
 {
     protected $changelog;
@@ -236,4 +237,53 @@ public function mr(){
     $data['content'] = view('admin/content/material_request');
     return view('admin/index', $data);
 }    
+public function printPo($id){
+    // Konfigurasi opsi Dompdf
+    $mdl = new \App\Models\MdlPurchaseOrder();
+    $data['po'] = $mdl->select('
+        purchase_order.*,
+        purchase_order.code as po,
+        supplier.*,
+        currency.kode as curr_code,
+        currency.nama as curr_name')
+        ->join('supplier', 'supplier.id = purchase_order.supplier_id', 'left')
+        ->join('currency', 'currency.id = supplier.id_currency', 'left')
+        ->where('purchase_order.id', $id)->first();
+        $Mdl = new MdlPurchaseOrderList();
+        $data['poDet']  = $Mdl
+            ->select(' purchase_order_list.vat, purchase_order_list.remarks, purchase_order_list.quantity, purchase_order_list.price, materials.name, materials.kode,materials_detail.kite, materials_detail.hscode,satuan.kode as satuan, currency.kode as curr_code, currency.nama as curr_name')
+            ->join('purchase_order', 'purchase_order.id = purchase_order_list.id_po', 'left')
+            ->join('supplier', 'supplier.id = purchase_order.supplier_id', 'left')
+            ->join('currency', 'currency.id = supplier.id_currency', 'left')
+            ->join('materials', 'materials.id = purchase_order_list.id_material', 'left')
+            ->join('materials_detail', 'materials.id = materials_detail.material_id', 'left')
+            ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+            ->where('purchase_order_list.id_po', $id)->get()->getResultArray();
+    $options = new Options();
+    $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+
+
+    // Data untuk tampilan
+    $data['title'] = 'Proforma Invoice';
+    $html = view('admin/content/printPO', $data);
+
+    // Load HTML ke Dompdf
+    $dompdf->loadHtml($html);
+
+    // Atur ukuran kertas A4 dan orientasi landscape
+    $dompdf->setPaper('A4', 'landscape');
+
+    // Render PDF
+    $dompdf->render();
+
+    // Output PDF ke browser tanpa mengunduh otomatis
+    $dompdf->stream("PR_{$id}.pdf", ["Attachment" => false]);
+}
+
 }

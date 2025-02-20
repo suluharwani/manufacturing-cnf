@@ -337,6 +337,7 @@ $routes->group('purchase', function ($routes) {
     $routes->get('po/(:any)', 'PurchaseController::po/$1',['filter' => 'accessControl:2']); 
     $routes->post('update/(:any)', 'PurchaseController::update/$1',['filter' => 'accessControl:2']); 
     $routes->post('addPOList', 'PurchaseController::addPOList',['filter' => 'accessControl:2']); 
+    $routes->get('printPo/(:any)', 'PurchaseController::printPo/$1',['filter' => 'accessControl:2']); 
 
 });
 

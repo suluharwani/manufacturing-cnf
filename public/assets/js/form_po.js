@@ -19,7 +19,7 @@ $(document).ready(function() {
           response.material.forEach(material => {
             materialOptions += `<option value="${material.id}" 
                                       data-price="${material.price}">
-                                  ${material.name} - ${material.nama_satuan}(${material.kode_satuan}) - ${material.curr_code} ${material.price}
+                                  ${material.name} - ${material.nama_satuan}(${material.kode_satuan}) 
                                </option>`;
           });
 
