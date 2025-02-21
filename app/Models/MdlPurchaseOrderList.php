@@ -12,7 +12,7 @@ class MdlPurchaseOrderList extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_po','id_material','quantity','price','remarks','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','vat','id_po','id_material','quantity','price','remarks','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

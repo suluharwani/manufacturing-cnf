@@ -186,6 +186,7 @@ class PurchaseController extends BaseController
             $row[] = $lists->det_id;
             $row[] = $lists->remarks;
             $row[] = $lists->list_id;
+            $row[] = $lists->vat;
 
 
 

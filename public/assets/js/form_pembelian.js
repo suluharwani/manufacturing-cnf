@@ -65,6 +65,7 @@ $(document).ready(function() {
                 $('#supplier').val(data.id); // Atur nilai dropdown ke ID Supplier yang terpilih
                 $('#country').val(data.country_name); // Isi Country
                 $('#currency').val(data.currency_name); // Isi Currency
+                $('#id_currency').val(data.id_currency); // Isi Currency
             } else {
                 // Jika tidak ada data, reset form
                 $('#supplier').val('');
@@ -680,3 +681,64 @@ $(document).on('click', '.editMaterial', function(e) {
         });
     });
 
+    $('.importPO').on('click',function(){
+      let curr = $('#id_currency').val();
+      Swal.fire({
+        title: `Import From Purchase Order`,
+        // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
+        html:`<form id="form_add_data">
+        <div class="form-group">
+        <label for="kode">Kode</label>
+        <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
+        </div>
+        </form>`,
+        confirmButtonText: 'Confirm',
+        focusConfirm: false,
+        preConfirm: () => {
+          const kode = Swal.getPopup().querySelector('#kode').value
+          if (!kode) {
+            Swal.showValidationMessage('Silakan lengkapi data')
+          }
+          return {kode:kode }
+        }
+      }).then((result) => {
+        $.ajax({
+          type : "POST",
+          url  : base_url+'/pembelian/importpo',
+          async : false,
+          // dataType : "JSON",
+          data : {kode:result.value.kode,id:getLastSegment(), curr:curr},
+          success: function(data){
+            if (data.status == true) {
+              $('#tabel_serverside').DataTable().ajax.reload();
+              Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: `${data.message}`,
+                showConfirmButton: false,
+                timer: 1500
+              })
+
+          }else{
+            Swal.fire({
+              position: 'center',
+              icon: 'error',
+              title: `${data.message}`,
+              showConfirmButton: false,
+              timer: 1500
+            })
+          }
+        },
+          error: function(xhr){
+            let d = JSON.parse(xhr.responseText);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: `${d.message}`,
+              footer: '<a href="">Why do I have this issue?</a>'
+            })
+          }
+        });
+    
+      })
+    })

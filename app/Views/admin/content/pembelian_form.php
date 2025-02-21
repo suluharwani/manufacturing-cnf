@@ -49,6 +49,8 @@
     <div class="row mb-3">
       <label for="lastName" class="col-md-3 col-form-label">Currency</label>
       <div class="col-md-9">
+      
+        <input type="text" class="form-control" id="id_currency" disabled hidden>
         <input type="text" class="form-control" id="currency" disabled>
       </div>
     </div>
@@ -61,7 +63,7 @@
 
     <!-- Tombol Kirim -->
     <button type="button" class="btn btn-primary saveSupplier">Update Supplier</button>
-    <button type="button" class="btn btn-warning saveSupplier">Import PO</button>
+    <button type="button" class="btn btn-warning importPO">Import PO</button>
     <?php
     if ($pembelian[0]['posting'] == 0||$pembelian[0]['posting'] == "0") {?>
     <button type="button" class="btn btn-success postingPembelian">Posting Pembelian</button>

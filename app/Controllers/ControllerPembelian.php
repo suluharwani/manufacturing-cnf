@@ -11,6 +11,8 @@ use App\Models\MdlCountry;
 use App\Models\MdlSupplier;
 use App\Models\MdlCurrency;
 use App\Models\MdlStock;
+use App\Models\MdlPurchaseOrder;
+use App\Models\MdlPurchaseOrderList;
 class ControllerPembelian extends BaseController
 {
     protected $changelog;
@@ -572,6 +574,112 @@ public function unposting()
               header('Content-Type: application/json; charset=UTF-8');
               die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
+
+    }
+    public function importpo(){
+        $code = $_POST['kode'];
+        $id = $_POST['id'];
+        $curr = $_POST['curr'];
+        return $this->importPOToPembelianDetail($code, $id, $curr);
+
+    }
+    public function importPOToPembelianDetail($poCode, $idPembelian, $curr)
+    {
+        // Load models
+        $poModel = new MdlPurchaseOrder();
+        $poListModel = new MdlPurchaseOrderList();
+        $pembelianDetailModel = new MdlPembelianDetail();
+    
+        // Get PO ID based on PO Code
+        $po = $poModel->where('code', $poCode)->first();
+        if (!$po) {
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "Purchase Order dengan code $poCode tidak ditemukan."
+            ]);  
+        }
+    
+        $poId = $po['id'];
+    
+        // Get PO List based on PO ID
+        $poList = $poListModel->where('id_po', $poId)->findAll();
+        if (empty($poList)) {
+            return $this->response->setJSON([
+                "status" => false,
+                "message" => "Tidak ada data di Purchase Order List untuk PO ID $poId."
+            ]);
+        }
+    
+        // Insert or update data into Pembelian Detail
+        foreach ($poList as $item) {
+            // Cek apakah sudah ada data dengan id_pembelian dan id_material yang sama
+            $existingDetail = $pembelianDetailModel
+                ->where('id_pembelian', $idPembelian)
+                ->where('id_material', $item['id_material'])
+                ->first();
+    
+            if ($existingDetail) {
+                // Jika sudah ada, update jumlahnya
+                $newJumlah = $existingDetail['jumlah'] + $item['quantity'];
+                $pembelianDetailModel->update($existingDetail['id'], ['jumlah' => $newJumlah]);
+            } else {
+                // Jika belum ada, insert data baru
+                $data = [
+                    'id_pembelian' => $idPembelian,
+                    'id_material' => $item['id_material'],
+                    'id_currency' => $curr,
+                    'jumlah' => $item['quantity'],
+                    'harga' => $item['price'],
+                    'status_pembayaran' => 0,
+                    'diskon1' => 0,
+                    'diskon2' => 0,
+                    'diskon3' => 0,
+                    'pajak' => $item['vat'],
+                    'potongan' => 0,
+                ];
+                $pembelianDetailModel->insert($data);
+            }
+        }
+    
+        return $this->response->setJSON([
+            "status" => true,
+            "message" => "Data berhasil diimpor ke Pembelian Detail."
+        ]);
+    }
+    
+    public function printGRN($id){
+        $MdlPembelian = new MdlPembelian();
+        $MdlPembelianDetail = new MdlPembelianDetail();
+
+        $data['pembelian'] = $MdlPembelian
+                ->select('pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
+                ->join('supplier', 'supplier.id = pembelian.id_supplier')   
+                ->join('currency', 'currency.id = supplier.id_currency')
+                ->where('pembelian.id', $id)->get()->getResultArray();
+        $data['PembelianDetail'] = $MdlPembelianDetail 
+                ->select('pembelian_detail.id as id_pembelian_detail,
+                            pembelian_detail.id_material,
+                            pembelian_detail.id_currency,
+                            pembelian_detail.jumlah,
+                            pembelian_detail.harga,
+                            pembelian_detail.id_currency,
+                            pembelian_detail.diskon1,
+                            pembelian_detail.diskon2,
+                            pembelian_detail.diskon3,
+                            pembelian_detail.pajak,
+                            pembelian_detail.potongan,
+                            materials.kode as material_kode,
+                            materials.name as material_name,
+                            currency.kode as kode_currency,
+                            currency.nama as nama_currency,
+                            currency.rate')
+                ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian", 'left')
+                ->join('supplier', 'supplier.id = pembelian.id_supplier', 'left')
+                ->join("materials","materials.id = pembelian_detail.id_material", 'left')
+                ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
+                ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left')
+                ->where('pembelian_detail.id_pembelian', $id)->get()->getResultArray();
+        return json_encode($data);
 
     }
 }

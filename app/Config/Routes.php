@@ -277,8 +277,10 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->get('get/(:segment)', 'ControllerPembelian::get/$1',['filter' => 'accessControl:2']);  // Menghapus material
     $routes->post('posting', 'ControllerPembelian::posting',['filter' => 'accessControl:2']);  
     $routes->post('unposting', 'ControllerPembelian::unposting',['filter' => 'accessControl:2']); 
+    $routes->post('importpo', 'ControllerPembelian::importpo',['filter' => 'accessControl:2']); 
+    $routes->get('printGRN/(:any)', 'ControllerPembelian::printGRN/$1',['filter' => 'accessControl:2']); 
 
-
+    
     
 });
 

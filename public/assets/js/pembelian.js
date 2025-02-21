@@ -77,6 +77,7 @@ $(document).ready(function() {
 
 });
 })
+
 function formatNumber(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
@@ -164,7 +165,7 @@ $('.tambahPembelian').click(function() {
         }
       });
     });
-  }
+  } 
 
           $('#tabel_serverside').on('click','.deleteInvoice',function(){
                 const id = $(this).attr('id');

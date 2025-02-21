@@ -119,17 +119,23 @@
             <th style=" text-align: center;">Nama</th>
             <th style=" text-align: center;">Qty</th>
             <th style=" text-align: center;">Price</th>
+            <th style=" text-align: center;">VAT %</th>
+            <th style=" text-align: center;">Price After VAT</th>
+            <th style=" text-align: center;">Total Price</th>
             <th style=" text-align: center;">Remarks</th>
             <th style=" text-align: center;">Action</th>
           </tr>
         </thead>
         <tfoot>
           <tr class="text-center">
-            <th style=" text-align: center;">#</th>
+          <th style=" text-align: center;">#</th>
             <th style=" text-align: center;">Kode</th>
             <th style=" text-align: center;">Nama</th>
             <th style=" text-align: center;">Qty</th>
             <th style=" text-align: center;">Price</th>
+            <th style=" text-align: center;">VAT %</th>
+            <th style=" text-align: center;">Price After VAT</th>
+            <th style=" text-align: center;">Total Price</th>
             <th style=" text-align: center;">Remarks</th>
             <th style=" text-align: center;">Action</th>
           </tr>

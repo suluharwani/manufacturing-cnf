@@ -160,9 +160,18 @@ $('#id_material').on('change', function() {
     {mRender: function (data, type, row) {
         return row[5]
     }},
+    {mRender: function (data, type, row) {
+      return row[9]
+  }},
+  {mRender: function (data, type, row) {
+    return priceAfterVAT(parseFloat(row[5]), parseFloat(row[9]));
+}},
+{mRender: function (data, type, row) {
+  return (parseFloat(row[4])*priceAfterVAT(parseFloat(row[5]), parseFloat(row[9]))).toFixed(2);
+}},
         {mRender: function (data, type, row) {
         return row[7]
-    }},
+    }}, 
     {mRender: function (data, type, row) {
         return`
          <button class="btn btn-warning btn-sm editBtn" id = "${row[8]}">Edit</button>
@@ -184,6 +193,15 @@ $('#id_material').on('change', function() {
 
 });
 })
+function priceAfterVAT(price, vat) {
+  // Jika VAT null atau 0, harga tetap
+  if (vat === null || vat === 0) {
+      return price;
+  }
+
+  // Jika VAT tersedia, hitung harga setelah VAT
+  return price + (price * (vat / 100));
+}
 function formatNumber(number, decimals = 2, decimalSeparator = ".", thousandSeparator = ",") {
     // Memastikan angka dalam format yang benar
     const num = parseFloat(number);
@@ -699,6 +717,10 @@ $(document).on('click', '.editBtn', function(e) {
                 <label for="unit_price">Unit Price</label>
                 <input type="number" class="form-control" id="e_price" value="${product.price}" placeholder="Unit Price" />
             </div>
+            <div class="form-group">
+                <label for="unit_price">VAT %</label>
+                <input type="number" class="form-control" id="e_vat" value="${product.vat}" placeholder="VAT" />
+            </div>
               <div class="form-group">
                 <label for="remarks">Remark</label>
                 <input type="text" class="form-control" id="e_remarks" value="${product.remarks}" placeholder="Item Description" />
@@ -713,6 +735,7 @@ $(document).on('click', '.editBtn', function(e) {
                             remarks: $('#e_remarks').val(),
                             quantity: $('#e_quantity').val(),
                             price: $('#e_price').val(),
+                            vat: $('#e_vat').val(),
                         };
                     }
                 }).then((result) => {
