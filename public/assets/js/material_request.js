@@ -150,7 +150,7 @@ function dateFormater(date) {
             const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
             const department = Swal.getPopup().querySelector('#department').value;
             const remarks = Swal.getPopup().querySelector('#remarks').value;
-            if (!kode || !proforma_invoice || !department || !remarks) {
+            if (!kode || !department || !remarks) {
                 Swal.showValidationMessage('Silakan lengkapi data');
             }
             return {department:department, kode: kode, proforma_invoice: proforma_invoice , remarks:remarks };

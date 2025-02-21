@@ -185,7 +185,7 @@ http://www.chakranaga.com<br>
         </tr>
         <tr>
             <th align="left">TOP</th>
-            <td align="left"></td>
+            <td align="left"><?=$po['top']?></td>
         </tr>
         <tr>
             <th align="left">ARRIVAL TARGET</th>
@@ -277,8 +277,8 @@ http://www.chakranaga.com<br>
                 <td width="50%">Acknowledge By,<br><br><br><br>___________<br>Accounting Manager</td>
                 <td width="50%">Approved By,<br><br><br><br>___________<br>Director/Commissioner</td>
             </tr>
-            <tr><th colspan="2">SPECIAL INSTRUCTION</th></tr>
-            <tr><th colspan="2"><?=$po['remarks']?></th></tr>
+            <tr><th colspan="2" align="left">SPECIAL INSTRUCTION</th></tr>
+            <tr><th colspan="2"  align="left"><?=$po['remarks']?></th></tr>
         </table>
 
         <!-- Catatan Kaki -->

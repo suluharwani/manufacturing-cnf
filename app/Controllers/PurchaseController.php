@@ -143,7 +143,7 @@ class PurchaseController extends BaseController
         $request = \Config\Services::request();
 
         // Define the columns to select
-        $select_columns = 'purchase_order_list.*, purchase_order_list.id as det_id,materials.name as nama, materials.kode as kode,materials.id as id_material, purchase_order_list.remarks as remarks';
+        $select_columns = 'purchase_order_list.*,purchase_order_list.id as list_id, purchase_order_list.id as det_id,materials.name as nama, materials.kode as kode,materials.id as id_material, purchase_order_list.remarks as remarks';
 
         // Define the joins (you can add more joins as needed)
         $joins = [
@@ -185,6 +185,8 @@ class PurchaseController extends BaseController
             $row[] = $lists->price;
             $row[] = $lists->det_id;
             $row[] = $lists->remarks;
+            $row[] = $lists->list_id;
+
 
 
             // From joined suppliers table
@@ -285,5 +287,57 @@ $dompdf = new Dompdf($options);
     // Output PDF ke browser tanpa mengunduh otomatis
     $dompdf->stream("PR_{$id}.pdf", ["Attachment" => false]);
 }
+public function deleteProduct($id){
+    $mdl = new MdlPurchaseOrderList();
+    $mdl->delete($id);
+    if ($mdl->affectedRows() !== 0) {
+        $riwayat = 'Menghapus Purchase Order List';
+        $this->changelog->riwayat($riwayat);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Product deleted successfully'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to delete product'
+        ]);
+    }
+}
+public function getMaterial($id){
+    $mdl = new \App\Models\MdlPurchaseOrderList();
+    $data = $mdl->join('materials', 'materials.id = purchase_order_list.id_material', 'left')
+        ->where('purchase_order_list.id', $id)->first();
+    if ($data) {
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Data not found'
+        ]);
+    }
+}
+public function updateMaterial($id){
+    $mdl = new \App\Models\MdlPurchaseOrderList();
+    $mdl->update($id, $_POST);
+    if ($mdl->affectedRows() !== 0) {
+        $riwayat = 'Mengubah Purchase Order List';
+        $this->changelog->riwayat($riwayat);
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Product updated successfully'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to update product'
+        ]);
+    }
+}
 
 }
+

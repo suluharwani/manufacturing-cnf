@@ -338,7 +338,10 @@ $routes->group('purchase', function ($routes) {
     $routes->post('update/(:any)', 'PurchaseController::update/$1',['filter' => 'accessControl:2']); 
     $routes->post('addPOList', 'PurchaseController::addPOList',['filter' => 'accessControl:2']); 
     $routes->get('printPo/(:any)', 'PurchaseController::printPo/$1',['filter' => 'accessControl:2']); 
-
+    $routes->post('deleteProduct/(:any)', 'PurchaseController::deleteProduct/$1',['filter' => 'accessControl:2']); 
+    $routes->post('getMaterial/(:any)', 'PurchaseController::getMaterial/$1',['filter' => 'accessControl:2']); 
+    $routes->post('updateMaterial/(:any)', 'PurchaseController::updateMaterial/$1',['filter' => 'accessControl:2']); 
+    
 });
 
 $routes->group('report', function ($routes) {

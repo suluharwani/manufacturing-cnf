@@ -71,6 +71,18 @@
               <input type="date" class="form-control" id="po_arrival_target" value="<?= $po[0]['arrival_target'] ?>">
             </div>
           </div>
+          <div class="row mb-3">
+            <label class="col-md-3 col-form-label">Special Instruction</label>
+            <div class="col-md-9">
+              <input type="text" class="form-control" id="remarks" value="<?= $po[0]['remarks'] ?>">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-md-3 col-form-label">TOP</label>
+            <div class="col-md-9">
+              <input type="text" class="form-control" id="top" value="<?= $po[0]['top'] ?>">
+            </div>
+          </div>
           <!--  -->
 
           <!-- Tombol Kirim -->
@@ -92,7 +104,7 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h6 class="mb-0">Material</h6>
       <div>
-        <button class="btn btn-primary importMaterial">Import</button>
+        <!-- <button class="btn btn-primary importMaterial">Import</button> -->
         <button class="btn btn-primary addMaterial">Add</button>
       </div>
 
