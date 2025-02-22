@@ -57,10 +57,28 @@ function hargapajak($harga, $pajak) {
     // Hitung harga dengan pajak
     return $harga + ($harga * ($pajak / 100));
 }
+function calculateDiscount($price, $discount1 = null, $discount2 = null, $discount3 = null) {
+    // Jika diskon null atau 0, anggap tidak ada diskon
+    $discount1 = ($discount1 !== null && $discount1 > 0) ? $discount1 : 0;
+    $discount2 = ($discount2 !== null && $discount2 > 0) ? $discount2 : 0;
+    $discount3 = ($discount3 !== null && $discount3 > 0) ? $discount3 : 0;
+    
+    // Hitung harga setelah diskon 1
+    $priceAfterDiscount1 = $price - ($price * ($discount1 / 100));
+    
+    // Hitung harga setelah diskon 2
+    $priceAfterDiscount2 = $priceAfterDiscount1 - ($priceAfterDiscount1 * ($discount2 / 100));
+    
+    // Hitung harga setelah diskon 3
+    $finalPrice = $priceAfterDiscount2 - ($priceAfterDiscount2 * ($discount3 / 100));
+    
+    return $finalPrice;
+}
+
 ?>
 
 <?php
-// var_dump($po);
+// var_dump($grn);
 // die();
 ?>
 <!DOCTYPE html>
@@ -132,7 +150,7 @@ http://www.chakranaga.com<br>
 
         </td>
         <td width="70%" align="right" style="border: none; !important;">
-            <h2>PURCHASE ORDER</h2>
+            <h2>GOODS RECEIPT NOTE</h2>
         </td>
     </tr>
 </table>
@@ -140,8 +158,8 @@ http://www.chakranaga.com<br>
         <!-- Informasi Header -->
         <table >
             <tr>
-                <td width="50%">P0 NUMBER: <?=$po['po']?></td>
-                <td>PO DATE: <?=formatDate($po['date'])?></td>
+                <td width="50%">INVOICE: <?=$grn['invoice']?></td>
+                <td>DATE: <?=formatDate($grn['tanggal_nota'])?></td>
             </tr>
             <tr>
                 <td colspan="2">Invoice must reference this purchase order and 
@@ -151,24 +169,24 @@ http://www.chakranaga.com<br>
                 <td>
                 <table >
         <tr>
-            <th align="left">To</th>
-            <td align="left"><?=$po['supplier_name']?></td>
+            <th align="left">FROM</th>
+            <td align="left"><?=$grn['supplier_name']?></td>
         </tr>
         <tr>
             <th align="left">ADDRESS</th>
-            <td align="left"><?=$po['address']?></td>
+            <td align="left"><?=$grn['address']?></td>
         </tr>
         <tr>
             <th align="left">PHONE</th>
-            <td align="left"><?=$po['contact_phone']?></td>
+            <td align="left"><?=$grn['contact_phone']?></td>
         </tr>
         <tr>
             <th align="left">EMAIL</th>
-            <td align="left"><?=$po['contact_email']?></td>
+            <td align="left"><?=$grn['contact_email']?></td>
         </tr>
         <tr>
             <th align="left">CURRENCY</th>
-            <td align="left"><?=$po['curr_name']?></td>
+            <td align="left"><?=formatDate($grn['curr_name'])?></td>
         </tr>
       </table>
 
@@ -176,7 +194,7 @@ http://www.chakranaga.com<br>
                 <td>
                 <table >
         <tr>
-            <th align="left">FROM</th>
+            <th align="left">TO</th>
             <td align="left">PT CHAKRA NAGA FURNITURE</td>
         </tr>
         <tr>
@@ -184,13 +202,10 @@ http://www.chakranaga.com<br>
             <td align="left">Desa Suwawal 02/01, Kec. Mlonggo, Kab. Jepara 59452</td>
         </tr>
         <tr>
-            <th align="left">TOP</th>
-            <td align="left"><?=$po['top']?></td>
+            <th align="left">TOP DATE</th>
+            <td align="left"><?=$grn['tanggal_jatuh_tempo']?></td>
         </tr>
-        <tr>
-            <th align="left">ARRIVAL TARGET</th>
-            <td align="left"><?=formatDate($po['arrival_target'])?></td>
-        </tr>
+
 
       </table>
 
@@ -215,6 +230,9 @@ http://www.chakranaga.com<br>
                     <th>Qty</th>
                     <th>UOM</th>
                     <th>Price</th>
+                    <th>Disc 1</th>
+                    <th>Disc 2</th>
+                    <th>Disc 3</th>
                     <th>VAT %</th>
                     <th>Total</th>
                     <th>Remark</th>
@@ -228,22 +246,25 @@ http://www.chakranaga.com<br>
                  $tot_price = 0;
                  $tot_cbm = 0;
                  $grand_total = 0;
-                 foreach ($poDet as $data) {
-                    $tot_qty += $data['quantity'];
-                    $tot_price =hargapajak($data['price'], $data['vat'])*$data['quantity'];
+                 foreach ($grnDet as $data) {
+                    $tot_qty += $data['jumlah'];
+                    $tot_price =hargapajak(calculateDiscount($data['harga'], $data['diskon1'], $data['diskon2'],$data['diskon3']), $data['vat'])*$data['jumlah'];
                     $grand_total += $tot_price;
                     ?>
                 <tr>
 
                     <td><?=$no++?></td>
-                    <td><?=$data['kode']?></td>
+                    <td><?=$data['material_kode']?></td>
                     <td><?=$data['hscode']?></td>
-                    <td><?=$data['name']?></td>
-                    <td><?=$data['quantity']?></td>
+                    <td><?=$data['material_name']?></td>
+                    <td><?=$data['jumlah']?></td>
                     <td><?=$data['satuan']?></td>
-                    <td><?=$data['price']." ".$data['curr_code']?></td>
+                    <td><?=$data['harga']." ".$data['kode_currency']?></td>
+                    <td><?=$data['diskon1']?></td>
+                    <td><?=$data['diskon2']?></td>
+                    <td><?=$data['diskon3']?></td>
                     <td><?=$data['vat']?></td>
-                    <td><?=$tot_price." ".$data['curr_code']?></td>
+                    <td><?=$tot_price." ".$data['kode_currency']?></td>
                     
                     <td><?=$data['remarks']?></td>
 
@@ -253,8 +274,8 @@ http://www.chakranaga.com<br>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8">GRAND TOTAL</td>
-                    <td><?=$grand_total." ".$data['curr_code']?></td>
+                    <td colspan="11">GRAND TOTAL</td>
+                    <td><?=$grand_total." ".$data['kode_currency']?></td>
                     <td></td>
                     
 
@@ -268,7 +289,7 @@ http://www.chakranaga.com<br>
         <!-- Bank Details -->
         <!-- Confirm Order -->
         <table class="signature-section">
-            <tr><th colspan="2">CONFIRM PURCHASE REQUEST</th></tr>
+            <tr><th colspan="2">CONFIRM GOODS RECEIPT NOTE</th></tr>
             <tr>
                 <td width="50%">Prepared By,<br><br><br><br>___________<br>Purchasing Dept</td>
                 <td width="50%">Approved By,<br><br><br><br>___________<br>General Manager</td>
@@ -278,7 +299,7 @@ http://www.chakranaga.com<br>
                 <td width="50%">Approved By,<br><br><br><br>___________<br>Director/Commissioner</td>
             </tr>
             <tr><th colspan="2" align="left">SPECIAL INSTRUCTION</th></tr>
-            <tr><th colspan="2"  align="left"><?=$po['remarks']?></th></tr>
+            <tr><th colspan="2"  align="left"><?=$grn['remarks']?></th></tr>
         </table>
 
         <!-- Catatan Kaki -->

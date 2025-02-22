@@ -13,6 +13,8 @@ use App\Models\MdlCurrency;
 use App\Models\MdlStock;
 use App\Models\MdlPurchaseOrder;
 use App\Models\MdlPurchaseOrderList;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class ControllerPembelian extends BaseController
 {
     protected $changelog;
@@ -651,12 +653,12 @@ public function unposting()
         $MdlPembelian = new MdlPembelian();
         $MdlPembelianDetail = new MdlPembelianDetail();
 
-        $data['pembelian'] = $MdlPembelian
-                ->select('pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
+        $data['grn'] = $MdlPembelian
+                ->select('pembelian.*, supplier.supplier_name,supplier.*, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
                 ->join('supplier', 'supplier.id = pembelian.id_supplier')   
                 ->join('currency', 'currency.id = supplier.id_currency')
-                ->where('pembelian.id', $id)->get()->getResultArray();
-        $data['PembelianDetail'] = $MdlPembelianDetail 
+                ->where('pembelian.id', $id)->get()->getResultArray()[0];
+        $data['grnDet'] = $MdlPembelianDetail 
                 ->select('pembelian_detail.id as id_pembelian_detail,
                             pembelian_detail.id_material,
                             pembelian_detail.id_currency,
@@ -666,20 +668,47 @@ public function unposting()
                             pembelian_detail.diskon1,
                             pembelian_detail.diskon2,
                             pembelian_detail.diskon3,
-                            pembelian_detail.pajak,
+                            pembelian_detail.remarks,
+                            pembelian_detail.pajak as vat,
                             pembelian_detail.potongan,
                             materials.kode as material_kode,
                             materials.name as material_name,
                             currency.kode as kode_currency,
                             currency.nama as nama_currency,
-                            currency.rate')
+                            currency.rate, materials_detail.hscode,satuan.kode as satuan, satuan.nama as nama_satuan'
+                            )
                 ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian", 'left')
                 ->join('supplier', 'supplier.id = pembelian.id_supplier', 'left')
                 ->join("materials","materials.id = pembelian_detail.id_material", 'left')
                 ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
                 ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left')
+                ->join("satuan","satuan.id = materials_detail.satuan_id", 'left')
                 ->where('pembelian_detail.id_pembelian', $id)->get()->getResultArray();
-        return json_encode($data);
+        // return json_encode($data);
+        $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+
+    
+        // Data untuk tampilan
+        $data['title'] = 'Proforma Invoice';
+        $html = view('admin/content/printGRN', $data); 
+    
+        // Load HTML ke Dompdf
+        $dompdf->loadHtml($html);
+    
+        // Atur ukuran kertas A4 dan orientasi landscape
+        $dompdf->setPaper('A4', 'landscape');
+    
+        // Render PDF
+        $dompdf->render();
+    
+        // Output PDF ke browser tanpa mengunduh otomatis
+        $dompdf->stream("GRN_{$id}.pdf", ["Attachment" => false]);
 
     }
 }

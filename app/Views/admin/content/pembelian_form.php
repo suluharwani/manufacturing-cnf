@@ -10,7 +10,10 @@
     }
 </style>
 
-
+<?php
+// var_dump($pembelian);
+// die();
+?>
 
 <!-- Recent Sales Start -->
 <div class="container-fluid pt-4 px-4">
@@ -73,7 +76,11 @@
     <?php
     }
     ?>
+
   </form>
+  <button class="btn btn-secondary" onclick="window.location.href='<?= base_url('pembelian/printGRN')?>/<?=$pembelian[0]['id'] ?>'">
+    Print PO
+</button>
 </div>
                     </div>
                            </div>

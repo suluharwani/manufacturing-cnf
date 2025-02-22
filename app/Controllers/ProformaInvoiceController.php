@@ -768,7 +768,6 @@ public function printInvoiceNeed($invoice_id)
                                   ->where('invoice_id', $id)
                                   ->findAll();
         $options = new Options();
-        $options = new Options();
 $options->set('isHtml5ParserEnabled', true);
 $options->set('isPhpEnabled', true);
 $options->set('defaultFont', 'Helvetica');
