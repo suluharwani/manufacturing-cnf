@@ -69,6 +69,13 @@
             </select>
           </div>
           <div class="mb-3">
+            <label for="po" class="form-label">Material</label>
+           <select class="form-control" id="po" required>
+              <option value="">Select Purchase Order</option>
+              <!-- Material options will be added here -->
+            </select>
+          </div>
+          <div class="mb-3">
             <label for="materialQty" class="form-label">Invoice</label>
             <input type="text" class="form-control" id="invoice" required>
           </div>

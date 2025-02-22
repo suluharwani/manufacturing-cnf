@@ -29,9 +29,9 @@
       </div>
     </div>
     <div class="row mb-3">
-      <label for="invoice" class="col-md-3 col-form-label">PO</label>
+      <label for="po" class="col-md-3 col-form-label">PO</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" value="" id="invoice" placeholder="Invoice" disabled>
+        <input type="text" class="form-control" value="<?=$pembelian[0]['po']?>" id="po" placeholder="PO" disabled>
       </div>
     </div>
         <div class="row mb-3">

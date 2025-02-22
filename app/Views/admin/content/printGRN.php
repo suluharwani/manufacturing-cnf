@@ -27,7 +27,22 @@ function formatDate($dateString) {
     // Format ke dalam bahasa Inggris: "Month Day, Year"
     return $date->format('F j, Y');
 }
+function formatDateJam($input) {
+    // Jika input adalah angka (timestamp)
+    if (is_numeric(value: $input)) {
+        $date = new DateTime();
+        $date->setTimestamp($input);
+    } else {
+        // Jika input adalah string dalam format datetime
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $input);
+        if (!$date) {
+            return "-";
+        }
+    }
 
+    // Format ke dalam bahasa Inggris: "Month Day, Year H:i:s"
+    return $date->format('F j, Y');
+}
 
 function hargaDisc($pOice, $discount) {
     // Validasi input harus numerik
@@ -159,11 +174,10 @@ http://www.chakranaga.com<br>
         <table >
             <tr>
                 <td width="50%">INVOICE: <?=$grn['invoice']?></td>
-                <td>DATE: <?=formatDate($grn['tanggal_nota'])?></td>
+                <td>DATE: <?=formatDateJam($grn['tanggal_nota'])?></td>
             </tr>
             <tr>
-                <td colspan="2">Invoice must reference this purchase order and 
-                match PO line items in order to process payment</td>
+                <td colspan="2">PO: <?=$grn['po']?></td>
             </tr>
             <tr>
                 <td>
@@ -186,7 +200,7 @@ http://www.chakranaga.com<br>
         </tr>
         <tr>
             <th align="left">CURRENCY</th>
-            <td align="left"><?=formatDate($grn['curr_name'])?></td>
+            <td align="left"><?=$grn['curr_name']?></td>
         </tr>
       </table>
 
@@ -230,9 +244,6 @@ http://www.chakranaga.com<br>
                     <th>Qty</th>
                     <th>UOM</th>
                     <th>Price</th>
-                    <th>Disc 1</th>
-                    <th>Disc 2</th>
-                    <th>Disc 3</th>
                     <th>VAT %</th>
                     <th>Total</th>
                     <th>Remark</th>
@@ -260,9 +271,6 @@ http://www.chakranaga.com<br>
                     <td><?=$data['jumlah']?></td>
                     <td><?=$data['satuan']?></td>
                     <td><?=$data['harga']." ".$data['kode_currency']?></td>
-                    <td><?=$data['diskon1']?></td>
-                    <td><?=$data['diskon2']?></td>
-                    <td><?=$data['diskon3']?></td>
                     <td><?=$data['vat']?></td>
                     <td><?=$tot_price." ".$data['kode_currency']?></td>
                     
@@ -274,7 +282,7 @@ http://www.chakranaga.com<br>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="11">GRAND TOTAL</td>
+                    <td colspan="8">GRAND TOTAL</td>
                     <td><?=$grand_total." ".$data['kode_currency']?></td>
                     <td></td>
                     
@@ -291,15 +299,10 @@ http://www.chakranaga.com<br>
         <table class="signature-section">
             <tr><th colspan="2">CONFIRM GOODS RECEIPT NOTE</th></tr>
             <tr>
-                <td width="50%">Prepared By,<br><br><br><br>___________<br>Purchasing Dept</td>
-                <td width="50%">Approved By,<br><br><br><br>___________<br>General Manager</td>
+                <td width="50%">Prepared By,<br><br><br><br>___________<br>Logistic Dept</td>
+                <td width="50%">Approved By,<br><br><br><br>___________<br>Purchasing Manager</td>
             </tr>
-            <tr>
-                <td width="50%">Acknowledge By,<br><br><br><br>___________<br>Accounting Manager</td>
-                <td width="50%">Approved By,<br><br><br><br>___________<br>Director/Commissioner</td>
-            </tr>
-            <tr><th colspan="2" align="left">SPECIAL INSTRUCTION</th></tr>
-            <tr><th colspan="2"  align="left"><?=$grn['remarks']?></th></tr>
+
         </table>
 
         <!-- Catatan Kaki -->

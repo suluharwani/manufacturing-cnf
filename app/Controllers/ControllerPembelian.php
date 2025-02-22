@@ -98,9 +98,10 @@ function pembelianForm($idPembelian){
     $MdlPembelian = new MdlPembelian();
     $MdlPembelianDetail = new MdlPembelianDetail();
 $dataPembelian = $MdlPembelian
-                ->select('pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
+                ->select('purchase_order.code as po,pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
                 ->join('supplier', 'supplier.id = pembelian.id_supplier')   
                 ->join('currency', 'currency.id = supplier.id_currency')    
+                ->join('purchase_order', 'purchase_order.id = pembelian.id_po', 'left')    
                 ->where('pembelian.id', $idPembelian)->get()->getResultArray();
 // $dataPembelianDetail = $MdlPembelianDetail
 //                     ->select('materials.*')
@@ -582,6 +583,8 @@ public function unposting()
         $code = $_POST['kode'];
         $id = $_POST['id'];
         $curr = $_POST['curr'];
+        
+
         return $this->importPOToPembelianDetail($code, $id, $curr);
 
     }
@@ -591,6 +594,9 @@ public function unposting()
         $poModel = new MdlPurchaseOrder();
         $poListModel = new MdlPurchaseOrderList();
         $pembelianDetailModel = new MdlPembelianDetail();
+
+        $mdlPembelian = new MdlPembelian();
+       
     
         // Get PO ID based on PO Code
         $po = $poModel->where('code', $poCode)->first();
@@ -602,6 +608,9 @@ public function unposting()
         }
     
         $poId = $po['id'];
+
+        //update po
+        $mdlPembelian->set(array('id_po'=>$poId))->where('id',$idPembelian)->update();
     
         // Get PO List based on PO ID
         $poList = $poListModel->where('id_po', $poId)->findAll();
@@ -654,9 +663,10 @@ public function unposting()
         $MdlPembelianDetail = new MdlPembelianDetail();
 
         $data['grn'] = $MdlPembelian
-                ->select('pembelian.*, supplier.supplier_name,supplier.*, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
+                ->select('purchase_order.code as po, pembelian.*, supplier.supplier_name,supplier.*, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
                 ->join('supplier', 'supplier.id = pembelian.id_supplier')   
                 ->join('currency', 'currency.id = supplier.id_currency')
+                ->join('purchase_order', 'purchase_order.id = pembelian.id_po', 'left')
                 ->where('pembelian.id', $id)->get()->getResultArray()[0];
         $data['grnDet'] = $MdlPembelianDetail 
                 ->select('pembelian_detail.id as id_pembelian_detail,

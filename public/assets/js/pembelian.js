@@ -96,6 +96,7 @@ $('.tambahPembelian').click(function() {
     // Ambil opsi material dan masukkan ke dropdown
     getSupplierOption().then(function(options) {
       $('#supplier').html(options); // Masukkan opsi ke dalam elemen select
+      $('#po').html(options); // Masukkan opsi ke dalam elemen select
       $('#tambahPembelianModal').modal('show'); // Tampilkan modal
     }).catch(function(error) {
       alert(error); // Tampilkan error jika gagal mengambil data
@@ -143,6 +144,7 @@ $('.tambahPembelian').click(function() {
     });
   });
 
+  
   function getSupplierOption() {
     return new Promise((resolve, reject) => {
 
