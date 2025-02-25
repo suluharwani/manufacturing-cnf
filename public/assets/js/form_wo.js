@@ -83,7 +83,7 @@ function piTable(id_wo){
     table+=   `<td>${d[k].kode}</td>`;
     table+=   `<td>${d[k].nama}</td>`;
     table+=   `<td>${d[k].qty_tersedia}</td>`;
-    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm add" max = "${d[k].qty_tersedia}" id="${d[k].id_product}" nama = "${d[k].nama}" code = "${d[k].kode}">Add</a>`;
+    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm add" max = "${d[k].qty_tersedia}" finishing_id="${d[k].finishing_id}" id="${d[k].id_product}" nama = "${d[k].nama}" code = "${d[k].kode}">Add</a>`;
     table+=   `</tr>`
 
   })
@@ -122,6 +122,7 @@ function piTable(id_wo){
         let productNama = $(this).attr('nama');
         let productCode = $(this).attr('code');
         let max = $(this).attr('max');
+        let finishing_id = $(this).attr('finishing_id');
         let wo_id = getLastSegment();
         // showAddProductPopup(productId, productNama, productCode);
  
@@ -148,7 +149,7 @@ function piTable(id_wo){
             type: "POST",
             url: base_url + '/workOrder/addDetail',
             async: false,
-            data: { quantity: result.value.quantity, product_id:productId, wo_id:wo_id },
+            data: { quantity: result.value.quantity, product_id:productId, wo_id:wo_id , finishing_id:finishing_id},
             success: function (data) {
                  $('#tabel_serverside').DataTable().ajax.reload();
                 Swal.fire({
@@ -215,3 +216,35 @@ function piTable(id_wo){
         }
     });
 });
+
+
+$('.updateWO').on('click', function () {
+  let release_date = $('#release_date').val();
+  let manufacture_finishes = $('#manufacture_finishes').val();
+  let loading_date = $('#loading_date').val();
+
+  $.ajax({
+    type: "POST",
+    url: base_url + '/workOrder/updateDate/'+getLastSegment(),
+    data: {release_date,manufacture_finishes,loading_date},
+    success: function(response) {
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: 'Date has been updated',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    },
+    error: function(xhr) {
+        let d = JSON.parse(xhr.responseText);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: `${d.message}`,
+            footer: '<a href="">Why do I have this issue?</a>'
+        });
+    }
+});
+})

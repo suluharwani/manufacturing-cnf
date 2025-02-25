@@ -20,7 +20,7 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                        <div class="container mt-5">
-  <h2>Form Pembelian</h2>
+  <h2>Form GRN</h2>
   <form>
     <div class="row mb-3">
       <label for="invoice" class="col-md-3 col-form-label">Invoice</label>
@@ -79,7 +79,7 @@
 
   </form>
   <button class="btn btn-secondary" onclick="window.location.href='<?= base_url('pembelian/printGRN')?>/<?=$pembelian[0]['id'] ?>'">
-    Print PO
+    Print GRN
 </button>
 </div>
                     </div>
@@ -101,10 +101,10 @@
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Qty</th>
                   <th style=" text-align: center;">Harga Dasar</th>
-                  <th style=" text-align: center;">Disc 1</th>
+                  <!-- <th style=" text-align: center;">Disc 1</th>
                   <th style=" text-align: center;">Disc 2</th>
                   <th style=" text-align: center;">Disc 3</th>
-                  <th style=" text-align: center;">Potongan</th>
+                  <th style=" text-align: center;">Potongan</th> -->
                   <th style=" text-align: center;">Pajak</th>
                   <th style=" text-align: center;">Harga Akhir/Satuan</th>
                   <th style=" text-align: center;">Kurs Rp/Satuan</th>
@@ -120,10 +120,10 @@
                   <th style=" text-align: center;">Nama</th>
                   <th style=" text-align: center;">Qty</th>
                   <th style=" text-align: center;">Harga Dasar</th>
-                  <th style=" text-align: center;">Disc 1</th>
+                  <!-- <th style=" text-align: center;">Disc 1</th>
                   <th style=" text-align: center;">Disc 2</th>
                   <th style=" text-align: center;">Disc 3</th>
-                  <th style=" text-align: center;">Potongan</th>
+                  <th style=" text-align: center;">Potongan</th> -->
                   <th style=" text-align: center;">Pajak</th>
                   <th style=" text-align: center;">Harga Akhir/Satuan</th>
                   <th style=" text-align: center;">Kurs Rp/Satuan</th>
@@ -171,7 +171,7 @@
             <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']?>" hidden>
             
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label for="disc1" class="form-label">Discount 1</label>
             <input type="number" class="form-control" id="disc1">
           </div>
@@ -186,7 +186,7 @@
            <div class="mb-3">
             <label for="potongan" class="form-label">potongan</label>
             <input type="number" class="form-control" id="potongan">
-          </div>
+          </div> -->
           <div class="mb-3">
             <label for="pajak_barang" class="form-label">Pajak (%)</label>
             <input type="number" class="form-control" value="<?=$pembelian[0]['pajak']?>" id="pajak_barang" >

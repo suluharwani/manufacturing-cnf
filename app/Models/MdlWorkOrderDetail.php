@@ -12,7 +12,7 @@ class MdlWorkOrderDetail extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','wo_id','product_id','quantity','updated_at','deleted_at','created_at'];
+    protected $allowedFields    = ['id','wo_id','finishing_id','product_id','quantity','updated_at','deleted_at','created_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

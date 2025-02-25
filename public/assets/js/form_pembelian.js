@@ -148,18 +148,18 @@ $(document).ready(function() {
     {mRender: function (data, type, row) {
         return `${formatNumber(row[4])} ${row[5]}`
     }},
-     {mRender: function (data, type, row) {
-        return `${row[10]}%`
-    }},
-     {mRender: function (data, type, row) {
-        return `${row[11]}%`
-    }},
-     {mRender: function (data, type, row) {
-        return `${row[12]}%`
-    }},
-    {mRender: function (data, type, row) {
-        return `${row[14]} ${row[5]}`
-    }},
+    //  {mRender: function (data, type, row) {
+    //     return `${row[10]}%`
+    // }},
+    //  {mRender: function (data, type, row) {
+    //     return `${row[11]}%`
+    // }},
+    //  {mRender: function (data, type, row) {
+    //     return `${row[12]}%`
+    // }},
+    // {mRender: function (data, type, row) {
+    //     return `${row[14]} ${row[5]}`
+    // }},
     {mRender: function (data, type, row) {
         return `${row[13]}%`
     }},
@@ -558,53 +558,51 @@ $(document).on('click', '.editMaterial', function(e) {
         var materialId = $(this).data('id');
         
         // Menggunakan AJAX untuk mendapatkan data material
+        // <div  class="form-group">
+        //                         <label for="disc1">Discount 1 (%)</label>
+        //                         <input type="number" id="disc1" class="form-control" value="${material.diskon1}" />
+        //                     </div>
+        //                     <div  class="form-group">
+        //                         <label for="disc2">Discount 2 (%)</label>
+        //                         <input type="number" id="disc2" class="form-control" value="${material.diskon2}" />
+        //                     </div>
+        //                     <div  class="form-group">
+        //                         <label for="disc3">Discount 3 (%)</label>
+        //                         <input type="number" id="disc3" class="form-control" value="${material.diskon3}" />
+        //                     </div>
+        //                     <div  class="form-group">
+        //                         <label for="potongan">Potongan (${material.kode_currency})</label>
+        //                         <input type="number" id="potongan" class="form-control" value="${material.potongan}" />
+        //                     </div>
         $.ajax({
             url: base_url+'pembelian/get/' + materialId,  // Endpoint untuk mengambil data material
             type: 'GET',
             success: function(response) {
-                if (response.status === 'success') {
-                    var material = response.data;
-                    
+                    var material = JSON.parse(response);                    
                     // Tampilkan SweetAlert dengan form edit
+                    console.log(material);
                     Swal.fire({
                         title: 'Edit Material',
                         html: `
-                            <input type="hidden" id="materialId" value="${material.id}" />
-                            <div>
+
+                            <input type="hidden" id="materialId" value="${material.id_pembelian_detail}" />
+                            <div  class="form-group">
                                 <label for="materialCode">Material Code</label>
-                                <input type="text" id="materialCode" class="swal2-input" value="${material.material_code}" required />
+                                <input type="text" id="materialCode" class="form-control" value="${material.material_kode}" required />
                             </div>
-                            <div>
+                            <div  class="form-group">
                                 <label for="materialQty">Quantity</label>
-                                <input type="number" id="materialQty" class="swal2-input" value="${material.material_qty}" required />
+                                <input type="number" id="materialQty" class="form-control" value="${material.jumlah}" required />
                             </div>
-                            <div>
-                                <label for="harga">Harga</label>
-                                <input type="number" id="harga" class="swal2-input" value="${material.harga}" required />
+                            <div  class="form-group">
+                                <label for="harga">Harga (${material.kode_currency})</label>
+                                <input type="number" id="harga" class="form-control" value="${material.harga}" required />
                             </div>
-                            <div>
-                                <label for="id_currency">Currency</label>
-                                <input type="number" id="id_currency" class="swal2-input" value="${material.id_currency}" required />
-                            </div>
-                            <div>
-                                <label for="disc1">Discount 1</label>
-                                <input type="number" id="disc1" class="swal2-input" value="${material.disc1}" />
-                            </div>
-                            <div>
-                                <label for="disc2">Discount 2</label>
-                                <input type="number" id="disc2" class="swal2-input" value="${material.disc2}" />
-                            </div>
-                            <div>
-                                <label for="disc3">Discount 3</label>
-                                <input type="number" id="disc3" class="swal2-input" value="${material.disc3}" />
-                            </div>
-                            <div>
-                                <label for="potongan">Potongan</label>
-                                <input type="number" id="potongan" class="swal2-input" value="${material.potongan}" />
-                            </div>
-                            <div>
-                                <label for="pajak">Tax</label>
-                                <input type="number" id="pajak" class="swal2-input" value="${material.pajak}" />
+
+                            
+                            <div  class="form-group">
+                                <label for="pajak">Tax (%)</label>
+                                <input type="number" id="pajak" class="form-control" value="${material.pajak}" />
                             </div>
                         `,
                         showCancelButton: true,
@@ -617,10 +615,10 @@ $(document).on('click', '.editMaterial', function(e) {
                                 materialQty: $('#materialQty').val(),
                                 harga: $('#harga').val(),
                                 id_currency: $('#id_currency').val(),
-                                disc1: $('#disc1').val(),
-                                disc2: $('#disc2').val(),
-                                disc3: $('#disc3').val(),
-                                potongan: $('#potongan').val(),
+                                // disc1: $('#disc1').val(),
+                                // disc2: $('#disc2').val(),
+                                // disc3: $('#disc3').val(),
+                                // potongan: $('#potongan').val(),
                                 pajak: $('#pajak').val()
                             };
                             return updatedData;
@@ -663,13 +661,7 @@ $(document).on('click', '.editMaterial', function(e) {
                             });
                         }
                     });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Material not found.'
-                    });
-                }
+
             },
             error: function() {
                 Swal.fire({

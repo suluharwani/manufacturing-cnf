@@ -4,7 +4,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class ScrapController extends BaseController
 {
     protected $changelog;
@@ -263,5 +264,46 @@ function posting($id) {
         header('Content-Type: application/json; charset=UTF-8');
         die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
     }
+}
+public function printScrap($id){
+    $model = new \App\Models\MdlScrap();
+    $data['material'] = $model->select('scrap.*, materials.kode, materials.name, scrap.quantity as quantity, satuan.kode as satuan')
+    ->join('materials', 'materials.id = scrap.material_id')
+    ->join('materials_detail', 'materials_detail.material_id = materials.id')
+    ->join('satuan', 'satuan.id = materials_detail.satuan_id')
+    ->where('scrap_doc_id', $id)->get()->getResultArray();
+
+
+    $Mdl = new \App\Models\MdlScrapDoc();
+    $data['doc'] = $Mdl
+                ->select('proforma_invoice.invoice_number as pi, work_order.kode as wo_code, department.name as dept_name, scrap_doc.*')
+                ->join('work_order', 'work_order.id = scrap_doc.id_wo', 'left')
+                ->join('department', 'department.id = scrap_doc.id_dept','left')    
+                ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id','left')    
+                ->where('scrap_doc.id', $id)->get()->getResultArray()[0];
+    $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+
+
+    // Data untuk tampilan
+    $data['title'] = 'Proforma Invoice';
+    $html = view('admin/content/printScrap', $data);
+
+    // Load HTML ke Dompdf
+    $dompdf->loadHtml($html);
+
+    // Atur ukuran kertas A4 dan orientasi landscape
+    $dompdf->setPaper('A4', 'landscape');
+
+    // Render PDF
+    $dompdf->render();
+
+    // Output PDF ke browser tanpa mengunduh otomatis
+    $dompdf->stream("scrap_{$id}.pdf", ["Attachment" => false]);
 }
 }

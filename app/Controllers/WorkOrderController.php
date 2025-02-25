@@ -3,8 +3,11 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\MdlWorkOrder;
 use CodeIgniter\HTTP\ResponseInterface;
 use AllowDynamicProperties; 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class WorkOrderController extends BaseController
 {
   protected $changelog;
@@ -156,7 +159,7 @@ class WorkOrderController extends BaseController
          $Mdl = new \App\Models\MdlWorkOrder();
          $MdlDetail = new \App\Models\MdlWorkOrderDetail();
 $dataPembelian = $Mdl
-                ->select('proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name, work_order.kode, work_order.start, work_order.end')
+                ->select('proforma_invoice.*, work_order.id as id_wo, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name, work_order.kode, work_order.start, work_order.end, work_order.release_date, work_order.manufacture_finishes, work_order.loading_date')
                 ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id','left')    
                 ->join('customer', 'customer.id = proforma_invoice.customer_id','left')    
                 ->join('currency', 'currency.id = customer.id_currency','left')    
@@ -319,5 +322,47 @@ function getWo($id_wo){
          return $this->response->setJSON($data);
 
     }
+    public function print($id)
+{
+    $mdl = new MdlWorkOrder();
+
+    $data = $mdl->getPrintData($id);
+
+    // Load the view and pass the data
+    $html = view('admin/content/printWO', $data);
+
+    // Initialize Dompdf
+    $options = new Options();
+    $options->set('defaultFont', 'Arial');
+    $options->set('isRemoteEnabled', true);
+    $dompdf = new Dompdf($options);
+
+    // Load HTML content
+    $dompdf->loadHtml($html);
+
+    // (Optional) Setup the paper size and orientation
+    $dompdf->setPaper('A4', 'portrait');
+
+    // Render the HTML as PDF
+    $dompdf->render();
+
+    // Output the generated PDF to Browser
+    $dompdf->stream("WO_{$data['invoice']['kode']}.pdf", ["Attachment" => false]);
+}
+public function updateDate($id){
+    $mdl = new MdlWorkOrder();
+    $mdl->set($_POST);
+    $mdl->where('id',$id);
+    $mdl->update();
+    if ($mdl->affectedRows()!=0) {
+      $riwayat = "update wo date";
+      $this->changelog->riwayat($riwayat);
+      header('HTTP/1.1 200 OK');
+    }else {
+      header('HTTP/1.1 500 Internal Server Error');
+      header('Content-Type: application/json; charset=UTF-8');
+      die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
+    }
+}
    
 }

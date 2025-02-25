@@ -279,6 +279,7 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('unposting', 'ControllerPembelian::unposting',['filter' => 'accessControl:2']); 
     $routes->post('importpo', 'ControllerPembelian::importpo',['filter' => 'accessControl:2']); 
     $routes->get('printGRN/(:any)', 'ControllerPembelian::printGRN/$1',['filter' => 'accessControl:2']); 
+    $routes->post('form/material/update/(:any)', 'ControllerPembelian::updateMaterial/$1',['filter' => 'accessControl:2']); 
 
     
     
@@ -322,8 +323,11 @@ $routes->group('wo', function ($routes) {
     $routes->post('listdata', 'WorkOrderController::listdataWorkOrder',['filter' => 'accessControl:2']); 
     $routes->post('add', 'WorkOrderController::add',['filter' => 'accessControl:2']); 
     $routes->get('(:any)', 'WorkOrderController::wo/$1',['filter' => 'accessControl:2']); 
+   
 
 });
+    $routes->post('workOrder/updateDate/(:num)', 'WorkOrderController::updateDate/$1',['filter' => 'accessControl:2']); 
+    $routes->get('printWO/(:any)', 'WorkOrderController::print/$1',['filter' => 'accessControl:2']); 
     $routes->get('WogetPi/(:any)', 'WorkOrderController::getPi/$1',['filter' => 'accessControl:2']); 
     $routes->post('workOrder/addDetail', 'WorkOrderController::addDetail',['filter' => 'accessControl:2']); 
     $routes->get('getWo/(:any)', 'WorkOrderController::getWo/$1',['filter' => 'accessControl:2']); 
@@ -454,6 +458,7 @@ $routes->group('scrap', function ($routes) {
     $routes->get('materialScrapList/(:any)', 'ScrapController::materialScrapList/$1',['filter' => 'accessControl:2']); 
     $routes->post('deleteList/(:any)', 'ScrapController::deleteList/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'ScrapController::posting/$1',['filter' => 'accessControl:2']); 
+    $routes->get('printScrap/(:any)', 'ScrapController::printScrap/$1',['filter' => 'accessControl:2']); 
     
     
 });

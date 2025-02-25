@@ -9,7 +9,10 @@
         z-index: 100;
     }
 </style>
-
+<?php
+// var_dump($wo[0]);
+// die();
+?>
 
 
 <!-- Recent Sales Start -->
@@ -17,7 +20,7 @@
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                        <div class="container mt-5">
-  <h2>Form PI</h2>
+  <h2>Form WO</h2>
   <form>
     <div class="row mb-3">
       <label for="invoice" class="col-md-3 col-form-label">Invoice</label>
@@ -39,15 +42,33 @@
       </div>
     </div>
     <div class="row mb-3">
-      <label for="lastName" class="col-md-3 col-form-label">Country</label>
+      <label for="lastName" class="col-md-3 col-form-label">Address</label>
       <div class="col-md-9">
-       <input type="text" class="form-control" id="country" disabled>
+       <input type="text" class="form-control" id="country" value="<?=$wo[0]['customer_address']?>" disabled>
       </div>
     </div>
     <div class="row mb-3">
       <label for="lastName" class="col-md-3 col-form-label">Currency</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" id="currency" disabled>
+        <input type="text" class="form-control" id="currency" value="<?=$wo[0]['curr_name']?>" disabled>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="lastName" class="col-md-3 col-form-label">RELEASE DATE</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control" id="release_date" value="<?=$wo[0]['release_date']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="lastName" class="col-md-3 col-form-label">MANUFACTURE FINISHES</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control" id="manufacture_finishes" value="<?=$wo[0]['manufacture_finishes']?>">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="lastName" class="col-md-3 col-form-label">LOADING DATE</label>
+      <div class="col-md-9">
+        <input type="date" class="form-control" id="loading_date" value="<?=$wo[0]['loading_date']?>">
       </div>
     </div>
 <!--  -->
@@ -57,6 +78,7 @@
     <button type="button" class="btn btn-warning saveSupplier">Import PO</button> -->
 
   </form>
+  <button type="button" class="btn btn-primary updateWO">Update</button>
 </div>
                     </div>
                            </div>
@@ -98,6 +120,9 @@
              <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">Product WO</h6>
+                        <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('printWO') ?>/<?= $wo[0]['id_wo'] ?>'">
+    Print WO
+</button>
                         <button class= "btn btn-primary addMaterial">Add</button>
                     </div>
                     <div class="table-responsive">

@@ -447,7 +447,7 @@ return view('admin/index', $data);
     }
     function get($id){
         $MdlPembelianDetail = new MdlPembelianDetail();
-        return $MdlPembelianDetail->select('pembelian_detail.id as id_pembelian_detail,
+        $data = $MdlPembelianDetail->select('pembelian_detail.id as id_pembelian_detail,
                             pembelian_detail.id_material,
                             pembelian_detail.id_currency,
                             pembelian_detail.jumlah,
@@ -468,7 +468,8 @@ return view('admin/index', $data);
         ->join("materials","materials.id = pembelian_detail.id_material", 'left')
         ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
         ->join("materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left')
-        ->where("pembelian_detail.id ", $id)->findAll();
+        ->where("pembelian_detail.id ", $id)->get()->getResultArray();
+        return json_encode($data[0]);
     }
 public function unposting()
 {
@@ -521,7 +522,7 @@ public function unposting()
     $data = $MdlPembelianDetail
                 ->where('id_pembelian', $id)
                 ->findAll();
-
+    
     // Perulangan untuk setiap detail pembelian
     foreach ($data as $detail) {
               $hargaDasar = $detail['harga'];
@@ -535,7 +536,7 @@ public function unposting()
       $hargaSetelahDiskon = $hargaDasar - ($hargaDasar * ($diskon1 / 100)) - ($hargaDasar * ($diskon2 / 100)) - ($hargaDasar * ($diskon3 / 100)) - $potongan;
 
       // Menghitung pajak dari harga setelah diskon
-      $hargaDenganPajak = $hargaSetelahDiskon + ($hargaSetelahDiskon * ($pajak / 100));
+      $hargaDenganPajak = $hargaSetelahDiskon + ($hargaSetelahDiskon * ((float)$detail['pajak'] / 100));
 
         // Cek apakah data material sudah ada di tabel stock
         $existingStock = $MdlStock->where('id_material', $detail['id_material'])->first();
