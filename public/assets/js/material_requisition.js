@@ -57,9 +57,14 @@ $(document).ready(function() {
 
     }},
     {mRender: function (data, type, row) {
-      return row[5]
+      return `${row[5]}`
 
     }},
+    {mRender: function (data, type, row) {
+      return `${row[9]}`
+
+    }},
+    
     {mRender: function (data, type, row) {
       if (row[6] == 0 || row[6] == null) {
         stat = `<span class="badge bg-warning text-dark">Draft</span>`
@@ -102,7 +107,7 @@ function formatDateTime(datetime) {
 $('.tambah').click(function() { 
     // Reset form di modal
     $('#addReq')[0].reset();
-
+ 
     // Ambil opsi material dan masukkan ke dropdown
     getDepartOption().then(getDepartOption => {
       console.log(getDepartOption);
@@ -128,8 +133,10 @@ $('.tambah').click(function() {
     var code = $('#mr').val();
     var wo = $('#work_order').val();
     var dept = $('#department').val();
+    var requestor = $('#requestor').val();
+    var remarks = $('#remarks').val();
 
-
+    
     // Kirim data melalui AJAX ke server
     $.ajax({
       type: "POST",
@@ -137,7 +144,8 @@ $('.tambah').click(function() {
       data: {
         code: code,
         id_dept: dept,
-        id_wo: wo
+        id_wo: wo,
+        remarks: remarks,
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material

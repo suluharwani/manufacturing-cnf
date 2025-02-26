@@ -46,9 +46,9 @@
                         <div class="col-md-9">
                             <input type="text" class="form-control" id="department" value="<?= $mreq['dep'] ?>" disabled>
                         </div>
-                    </div>
+                    </div> 
                     <div class="row mb-3">
-                        <label for="lastName" class="col-md-3 col-form-label">Materail Requisition</label>
+                        <label for="lastName" class="col-md-3 col-form-label">Material Requisition Code</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" value="<?= $mreq['code'] ?>" id="mrn" disabled>
                         </div>
@@ -110,6 +110,9 @@
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Product WO</h6>
+            <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('requisition/print') ?>/<?= $mreq['id'] ?>'">
+    Print
+</button>
             <?php if ($mreq['status'] == 1) { ?>
                 <button class="btn btn-danger batalposting">Unposting</button>
             <?php } else { ?>

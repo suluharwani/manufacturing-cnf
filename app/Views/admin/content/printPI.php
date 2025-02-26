@@ -64,16 +64,16 @@ function convertcm($mm) {
             margin: 0;
         }
         .a4-container {
-            width: 21cm;
+            width: 27cm;
             min-height: 29.7cm;
             margin: 0 auto;
-            padding: 1cm;
+            padding: 0cm;
             box-sizing: border-box;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 5px 0;
+            margin: 0px 0;
             page-break-inside: avoid;
         }
         th, td {
@@ -112,7 +112,7 @@ function convertcm($mm) {
 
         </td>
         <td width="70%" align="left" style="border: none; !important;">
-            <h2>PROFORMA INVOICE</h2>
+            <h2 align = "right">PROFORMA INVOICE</h2>
         </td>
     </tr>
 </table>
@@ -220,11 +220,11 @@ function convertcm($mm) {
                     <td><?=formatCurrency($item['quantity'])?></td>
                     <td><?=convertcm($item['p_length'])."x".convertcm($item['p_width'])."x".convertcm($item['p_height'])?></td>
                     <td><?=$item['p_cbm']?></td>
-                    <td><?=$item['currency_code']." ".formatCurrency($item['unit_price'])?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($item['unit_price'])?></td>
                     <td><?=$item['disc']?></td>
-                    <td><?=$item['currency_code']." ".formatCurrency( $finalPrice)?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency( $finalPrice)?></td>
                     
-                    <td><?=$item['currency_code']." ".formatCurrency($finalPrice*$item['quantity'])?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($finalPrice*$item['quantity'])?></td>
 
                 </tr>
                 <?php } ?>
@@ -239,17 +239,17 @@ function convertcm($mm) {
                     <td colspan="3"></td>
 
   
-                    <td><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
                 </tr>
                 <tr>
                     <td colspan = "11" style="border: none; !important;"></td>
                     <td>CHARGE</td>
-                    <td><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
                 </tr>
                 <tr>
                     <td colspan = "11" style="border: none; !important;"></td>
                     <td>DEPOSIT</td>
-                    <td><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
+                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
                 </tr>
                 <tr>
                     <td colspan = "11" style="border: none; !important;"></td>

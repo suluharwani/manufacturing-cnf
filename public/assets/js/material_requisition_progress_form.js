@@ -128,16 +128,16 @@ $(document).on('click', '.request', function(e) {
     text: `The maximum request you can make is ${maxRequest}. Please enter the quantity:`,
     input: 'number',
     inputAttributes: {
-      min: 1,
+      min: 0.01,
       max: maxRequest,
     },
     inputValidator: (value) => {
       if (!value) {
         return 'You need to enter a value!';
       }
-      if (value < 1 || value > parseFloat(maxRequest)) {
+      if (value < 0.01 || value > parseFloat(maxRequest)) {
         console.log(true);
-        return `The value must be between 1 and ${maxRequest}`;
+        return `The value must be between 0.01 and ${maxRequest}`;
       }else{
         console.log(false);
       }
@@ -300,15 +300,15 @@ $(document).on('click', '.edit-request', function(e) {
     input: 'number',
     inputValue: currentQuantity,
     inputAttributes: {
-      min: 1,
+      min: 0.01,
       max: maxRequest,
     },
     inputValidator: (value) => {
       if (!value) {
         return 'You need to enter a value!';
       }
-      if (value < 1 || value > parseFloat(maxRequest)) {
-        return `The value must be between 1 and ${maxRequest}`;
+      if (value < 0.01 || value > parseFloat(maxRequest)) {
+        return `The value must be between 0.01 and ${maxRequest}`;
       }
     },
     showCancelButton: true,

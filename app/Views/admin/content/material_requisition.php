@@ -20,8 +20,8 @@
 <div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Data</h6>
-                        <button class= "btn btn-primary tambah">Tambah</button>
+                        <h6 class="mb-0">Data</h6> 
+                        <button class= "btn btn-primary tambah">ADD</button>
                     </div>
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
@@ -33,7 +33,8 @@
                   <th style=" text-align: center;">PI</th>
                   <th style=" text-align: center;">WO</th>
                   <th style=" text-align: center;">DEPARTMENT</th>
-                  <th style=" text-align: center;">ADMIN/REQUESTOR</th>
+                  <th style=" text-align: center;">ADMIN</th>
+                  <th style=" text-align: center;">REQUESTOR</th>
                   <th style=" text-align: center;">STATUS</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -46,7 +47,8 @@
                   <th style=" text-align: center;">PI</th>
                   <th style=" text-align: center;">WO</th>
                   <th style=" text-align: center;">DEPARTMENT</th>
-                  <th style=" text-align: center;">ADMIN/REQUESTOR</th>
+                  <th style=" text-align: center;">ADMIN</th>
+                  <th style=" text-align: center;">REQUESTOR</th>
                   <th style=" text-align: center;">STATUS</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -72,6 +74,10 @@
             <input type="text" class="form-control" id="mr" required>
           </div>
           <div class="mb-3">
+            <label for="mr" class="form-label">Requestor</label>
+            <input type="text" class="form-control" id="requestor" value="<?= session()->get('auth')['name'] ?>" required>
+          </div>
+          <div class="mb-3">
             <label for="department" class="form-label">DEPARTMENT</label>
            <select class="form-control" id="department" required>
               <option value="">Select Department</option>
@@ -84,6 +90,10 @@
               <option value="">Selct WO</option>
               <!-- Material options will be added here -->
             </select>
+          </div>
+          <div class="mb-3">
+            <label for="mr" class="form-label">Remarks</label>
+            <input type="text" class="form-control" id="remarks" required>
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>

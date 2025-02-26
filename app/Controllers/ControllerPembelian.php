@@ -360,10 +360,10 @@ return view('admin/index', $data);
         $data['jumlah'] = $_POST['materialQty'];
         $data['harga'] = $_POST['harga'];
         $data['id_currency'] = $_POST['id_currency'];
-        $data['diskon1'] = $_POST['disc1'];
-        $data['diskon2'] = $_POST['disc2'];
-        $data['diskon3'] = $_POST['disc3'];
-        $data['potongan'] = $_POST['potongan'];
+        // $data['diskon1'] = $_POST['disc1'];
+        // $data['diskon2'] = $_POST['disc2'];
+        // $data['diskon3'] = $_POST['disc3'];
+        // $data['potongan'] = $_POST['potongan'];
         $data['pajak'] = $_POST['pajak'];
         $data['id_pembelian'] = $_POST['id_pembelian'];
 
