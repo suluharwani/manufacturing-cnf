@@ -137,71 +137,79 @@ class MaterialRequisition extends BaseController
     function WoAvailablelistdata($idMR)  
     {  
         $db = \Config\Database::connect();  
-      
+
         $builder = $db->table('work_order_detail');  
         $builder->select('  
             materials.id AS material_id,  
             materials.name AS material_name,  
             satuan.kode AS c_satuan,  
             satuan.nama AS satuan,  
-           SUM(billofmaterial.penggunaan * work_order_detail.quantity) AS total_usage,  
-        COALESCE(  
-            (  
-                SELECT SUM(DISTINCT m_progress.jumlah)  
-                FROM material_requisition_progress m_progress  
-                JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id 
-                JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id 
-                JOIN work_order  ON material_requisition.id_wo = work_order.id 
-                JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
-                WHERE m_progress.id_material = materials.id AND pi.id = work_order.invoice_id  
-            ),   
-            0  
-        ) AS terpenuhi,  
-            (SUM(billofmaterial.penggunaan * work_order_detail.quantity) - COALESCE(  
+             billofmaterial.penggunaan,
+            work_order_detail.quantity,
+            COALESCE(  
                 (  
                     SELECT SUM(DISTINCT m_progress.jumlah)  
                     FROM material_requisition_progress m_progress  
-                JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id 
-                JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id 
-                JOIN work_order  ON material_requisition.id_wo = work_order.id 
-                JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
-                WHERE m_progress.id_material = materials.id AND pi.id = work_order.invoice_id  
+                    JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id  
+                    JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id  
+                    JOIN work_order ON material_requisition.id_wo = work_order.id  
+                    JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
+                    WHERE m_progress.id_material = materials.id  
+                      AND material_requisition.id = ' . $idMR . '  
                 ),   
                 0  
-            )) AS remaining_quantity,  
+            ) AS terpenuhi,  
+            ROUND((SUM(billofmaterial.penggunaan * work_order_detail.quantity) - COALESCE(  
+                (  
+                    SELECT SUM(DISTINCT m_progress.jumlah)  
+                    FROM material_requisition_progress m_progress  
+                    JOIN material_requisition_list ON m_progress.id_material_requisition_list = material_requisition_list.id  
+                    JOIN material_requisition wo ON material_requisition_list.id_material_requisition = material_requisition.id  
+                    JOIN work_order ON material_requisition.id_wo = work_order.id  
+                    JOIN proforma_invoice pi ON work_order.invoice_id = pi.id  
+                    WHERE m_progress.id_material = materials.id  
+                      AND material_requisition.id = ' . $idMR . '  
+                ),   
+                0  
+            )),2) AS remaining_quantity,  
             COALESCE(  
                 (  
-                    SELECT SUM(material_requisition_list.jumlah)  
+                    SELECT ROUND(SUM(material_requisition_list.jumlah),2)  
                     FROM material_requisition_list  
                     JOIN material_requisition ON material_requisition_list.id_material_requisition = material_requisition.id  
-                    WHERE material_requisition_list.id_material = materials.id AND material_requisition.status = 1  
+                    WHERE material_requisition_list.id_material = materials.id  
+                      AND material_requisition.status = 1  
+                      AND material_requisition.id = ' . $idMR . '  
                 ),   
                 0  
             ) AS total_requisition,  
             COALESCE(  
                 (  
-                    SELECT SUM(material_requisition_list.jumlah)  
+                    SELECT ROUND(SUM(material_requisition_list.jumlah),2)  
                     FROM material_requisition_list  
                     WHERE material_requisition_list.id_material = materials.id  
+                      AND material_requisition_list.id_material_requisition = ' . $idMR . '  
                 ),   
                 0  
             ) AS total_requisition_unposting  
         ');  
+        
         $builder->join('billofmaterial', 'work_order_detail.product_id = billofmaterial.id_product');  
         $builder->join('materials', 'materials.id = billofmaterial.id_material');  
         $builder->join('materials_detail', 'materials.id = materials_detail.material_id');  
         $builder->join('satuan', 'satuan.id = materials_detail.satuan_id');  
         $builder->join('material_requisition', 'material_requisition.id_wo = work_order_detail.wo_id');  
-        $builder->join('material_requisition_list', 'material_requisition_list.id_material_requisition = material_requisition.id', 'left'); // Menggunakan LEFT JOIN  
-        $builder->join('work_order', 'work_order_detail.wo_id = work_order.id');
-        $builder->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id');
+        $builder->join('material_requisition_list', 'material_requisition_list.id_material_requisition = material_requisition.id', 'left');  
+        $builder->join('work_order', 'work_order_detail.wo_id = work_order.id');  
+        $builder->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id');  
+        
         $builder->where('material_requisition.id', $idMR);  
         $builder->groupBy(['materials.id', 'materials.name']);  
         $builder->orderBy('materials.name');  
-      
+        
         $query = $builder->get();  
         $results = $query->getResult();  
-        return json_encode($results);  
+        return json_encode($results);
     }  
     function WoAvailablelistdatafinishing($idMR)  
     {  
@@ -213,7 +221,8 @@ class MaterialRequisition extends BaseController
             materials.name AS material_name,  
             satuan.kode AS c_satuan,  
             satuan.nama AS satuan,  
-           SUM(billofmaterialfinishing.penggunaan * work_order_detail.quantity) AS total_usage,  
+            billofmaterialfinishing.penggunaan,
+            work_order_detail.quantity,
         COALESCE(  
             (  
                 SELECT SUM(DISTINCT m_progress.jumlah)  
@@ -226,7 +235,7 @@ class MaterialRequisition extends BaseController
             ),   
             0  
         ) AS terpenuhi,  
-            (SUM(billofmaterialfinishing.penggunaan * work_order_detail.quantity) - COALESCE(  
+            ROUND((SUM(billofmaterialfinishing.penggunaan * work_order_detail.quantity) - COALESCE(  
                 (  
                     SELECT SUM(DISTINCT m_progress.jumlah)  
                     FROM material_requisition_progress m_progress  
@@ -237,10 +246,10 @@ class MaterialRequisition extends BaseController
                 WHERE m_progress.id_material = materials.id AND pi.id = work_order.invoice_id  
                 ),   
                 0  
-            )) AS remaining_quantity,  
+            )),2) AS remaining_quantity,  
             COALESCE(  
                 (  
-                    SELECT SUM(material_requisition_list.jumlah)  
+                    SELECT ROUND(SUM(material_requisition_list.jumlah),2)  
                     FROM material_requisition_list  
                     JOIN material_requisition ON material_requisition_list.id_material_requisition = material_requisition.id  
                     WHERE material_requisition_list.id_material = materials.id AND material_requisition.status = 1  
@@ -249,7 +258,7 @@ class MaterialRequisition extends BaseController
             ) AS total_requisition,  
             COALESCE(  
                 (  
-                    SELECT SUM(material_requisition_list.jumlah)  
+                    SELECT ROUND(SUM(material_requisition_list.jumlah),2)  
                     FROM material_requisition_list  
                     WHERE material_requisition_list.id_material = materials.id  
                 ),   

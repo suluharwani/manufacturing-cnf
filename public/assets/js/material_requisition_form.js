@@ -91,9 +91,9 @@ $(document).ready(function () {
                       <td>${no++}</td>
                       <td>${item.material_name}</td>
                       <td>${item.satuan} (${item.c_satuan})</td>
-                      <td>${item.total_usage}</td>
+                      <td>${(item.quantity*item.penggunaan).toFixed(2)} </td>
                       <td>${item.terpenuhi}</td>
-                      <td>${item.remaining_quantity}</td>
+                      <td>${(item.remaining_quantity)}</td>
                       <td>${item.total_requisition}</td>
                       <td>${item.total_requisition_unposting}</td>
                       <td>${totalStock}</td>
