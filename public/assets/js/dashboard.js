@@ -137,3 +137,49 @@ function tableCountry(data){
   })
   $('#country').html(table)
 }
+
+dataPI()
+function dataPI(){
+  $.ajax({
+    type : "get",
+    url  : base_url+"dashboard/getPIReport",
+    async : false,
+    success: function(data){
+     tablePI(data);
+
+   },
+   error: function(xhr){
+    let d = JSON.parse(xhr.responseText);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: `${d.message}`,
+      footer: '<a href="">Why do I have this issue?</a>'
+    })
+  }
+});
+}
+function tablePI(data) {
+  d = JSON.parse(data);
+  console.log(d);
+  let no = 1;
+  let table = '';
+  let arrow = '';
+
+  $.each(d, function(k, v) {
+
+    table += `<tr>`;
+    table += `<td>${no++}</td>`;
+    table += `<td>${d[k].invoice_number}</td>`;
+    table += `<td>${d[k].customer_name}</td>`;
+    table += `<td>${d[k].cus_po}</td>`;
+    table += `<td>${parseFloat(d[k].total_quantity)}</td>`;
+    table += `<td>${parseFloat(d[k].total_quantity)-(parseFloat(d[k].warehouse_quantity)+parseFloat(d[k].warehouse_quantity))}</td>`;
+    table += `<td>${d[k].production_quantity}</td>`;
+    table += `<td>${d[k].warehouse_quantity}</td>`;
+    table += `<td><a href="${base_url}/proformainvoice/piDoc/${d[k].id}" class="btn btn-info btn-sm">View</a></td>`;
+    table += `</tr>`;
+  });
+
+  $('#tableProduction').html(table);
+}

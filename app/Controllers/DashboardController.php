@@ -108,4 +108,79 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             ])->setStatusCode(500);
         }
     }
+    function getProductionReportPI($id)
+    {
+
+        $mdl = new \App\Models\MdlProductionProgress();
+
+        $queryProd = $mdl->select('production_progress.created_at, work_order.kode as wo,
+                                         product.kode as product_code,
+                                         product.nama as product_name, 
+                                         product.hs_code as hs_code, 
+                                         production_area.name as production_area_name,
+                                         production_progress.quantity as quantity
+                                    ') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('production_area', 'production_area.id = production_progress.production_id');
+   
+
+        if (!empty($id)) {
+            $queryProd->where('proforma_invoice.id =', $id)->where('quantity !=', 0);;
+        }
+
+
+
+
+        return json_encode($queryProd->findAll());
+
+    }
+
+    function getWHreportPI($id)
+    {
+
+        $mdl = new \App\Models\MdlProductionProgress();
+
+        $queryWh = $mdl->select('production_progress.created_at,work_order.kode as wo,
+    product.kode as product_code,
+    product.nama as product_name, 
+    product.hs_code as hs_code, 
+    warehouses.name as production_area_name,
+    production_progress.quantity as quantity 
+') // Select fields from both tables
+            ->join('work_order', 'work_order.id = production_progress.wo_id')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+            ->join('product', 'product.id = production_progress.product_id')
+            ->join('warehouses', 'warehouses.id = production_progress.warehouse_id');
+
+        if (!empty($id)) {
+            $queryWh->where('work_order.invoice_id =', $id)->where('quantity !=', 0);;
+            
+        }
+        return json_encode($queryWh->findAll());
+    }
+ public function getPIReport(){
+    $mdl = new \App\Models\Proformainvoice();
+    $data = $mdl
+    ->select('proforma_invoice.id as id, proforma_invoice.invoice_number, proforma_invoice.cus_po, customer.customer_name, 
+              COALESCE((SELECT SUM(pid.quantity) 
+               FROM proforma_invoice_details pid 
+               WHERE pid.invoice_id = proforma_invoice.id), 0) as total_quantity, 
+              COALESCE((SELECT SUM(pp.quantity) 
+               FROM production_progress pp 
+               JOIN work_order wo ON pp.wo_id = wo.id 
+               WHERE wo.invoice_id = proforma_invoice.id AND pp.warehouse_id != 0), 0) as production_quantity,
+              COALESCE((SELECT SUM(pp.quantity) 
+               FROM production_progress pp 
+               JOIN work_order wo ON pp.wo_id = wo.id 
+               WHERE wo.invoice_id = proforma_invoice.id AND pp.production_id != 0), 0) as warehouse_quantity')
+    ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
+    ->where('proforma_invoice.status', null)
+    ->where('proforma_invoice.deleted_at', null)
+    ->groupBy('proforma_invoice.id')
+    ->get()
+    ->getResultArray();
+    return json_encode($data);
+ }
 }
