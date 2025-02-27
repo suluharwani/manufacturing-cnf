@@ -667,12 +667,22 @@ public function printInvoiceNeed($invoice_id)
 
         // Query 2: Ambil data material dan penggunaan dari billofmaterialfinishing
         $query2 = $proformaInvoiceDetailsModel
-        ->select('m.id AS material_id, m.name AS material_name, m.kode AS material_code, 
-                  FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
-                  pid.quantity, pid.id_product, p.nama AS product, 
-                  FORMAT(SUM(COALESCE(bom.penggunaan, 0)) * pid.quantity, 3) AS total_penggunaan,
-                  satuan.nama as satuan, type.nama as type, finishing.name AS finishing_name,
-                  finishing.id AS finishing_id, finishing.id as modul_id, materials_detail.kite as kite')
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+            pid.quantity, 
+            pid.id_product, 
+            p.nama AS product, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)) * pid.quantity, 3) AS total_penggunaan,
+            satuan.nama as satuan, 
+            type.nama as type, 
+            finishing.name AS finishing_name,
+            finishing.id AS finishing_id, 
+            finishing.id as modul_id, 
+            materials_detail.kite as kite
+        ')
         ->from('proforma_invoice_details pid')
         ->join('billofmaterialfinishing bom', 'pid.id_product = bom.id_product', 'left')
         ->join('materials m', 'bom.id_material = m.id')
@@ -680,10 +690,10 @@ public function printInvoiceNeed($invoice_id)
         ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
         ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
         ->join('type', 'type.id = materials_detail.type_id', 'left')
-        ->join('finishing ', 'bom.id_modul  =  finishing.id', 'left')
+        ->join('finishing', 'bom.id_modul = finishing.id', 'left')
         ->where('pid.invoice_id', $invoice_id)
-        ->groupBy('m.id, m.name, m.kode, p.id,finishing.id')
-        ->orderBy(' finishing.id,p.id')
+        ->groupBy('m.id, m.name, m.kode, p.id, finishing.id, pid.quantity, pid.id_product, satuan.nama, type.nama, finishing.name, materials_detail.kite')
+        ->orderBy('finishing.id, p.id')
         ->findAll();
 
         // Query 3: Ambil data material dan penggunaan dari billofmaterial
