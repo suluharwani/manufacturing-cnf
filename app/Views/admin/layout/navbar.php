@@ -95,6 +95,10 @@
                     <a href="<?= base_url('record_scrap') ?>" class="dropdown-item">Record Scrap</a>
                 </div>
             </div>
+            <?php
+                    if (session()->has('auth')) {
+                        if (session()->get('auth')['email'] != 'beacukai@mail.com') {
+                            ?>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
                         class="fa fa-user me-2"></i>User</a>
@@ -115,7 +119,8 @@
                     <a href="<?= base_url('master_salary') ?>" class="dropdown-item">Master Salary</a>
                 </div>
             </div>
-
+            <?php }
+        } ?> 
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle " data-bs-toggle="dropdown"><i
                         class="far fa-file-alt me-2"></i>Report</a>
