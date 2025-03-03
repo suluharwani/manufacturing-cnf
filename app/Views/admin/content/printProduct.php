@@ -98,10 +98,10 @@ function hargapajak($harga, $pajak) {
             margin: 0;
         }
         .a4-container {
-            width: 18cm;
+            width: 20cm;
             min-height: 29.7cm;
             margin: 0 auto;
-            padding: 1cm;
+            padding: 0cm;
             box-sizing: border-box;
         }
         table {
@@ -176,6 +176,7 @@ http://www.chakranaga.com<br>
                     <th>#</th>
                     <th>Created</th>
                     <th>Last Update</th>
+                    <th>Status</th>
                     <th>Code</th>
                     <th>Name</th>
                     <th>HS Code</th>
@@ -193,12 +194,18 @@ http://www.chakranaga.com<br>
                  $total = 0;
                  foreach ($product as $data) {
                     $total += $data['quantity'];
+                    if ($data['deleted_at'] == null) {
+                        $status = 'On Progress';
+                    }else{
+                        $status = 'Done';
+                    }
                     ?>
                 <tr>
 
                     <td><?=$no++?></td>
                     <td><?=formatDateJam($data['created_at'])?></td>
                     <td><?=formatDateJam($data['updated_at'])?></td>
+                    <td><?=$status?></td>
                     <td><?=$data['product_code']?></td>
                     <td><?=$data['product_name']?></td>
                     <td><?=$data['hs_code']?></td>
@@ -215,7 +222,7 @@ http://www.chakranaga.com<br>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="10" align="center">Total</td>
+                    <td colspan="11" align="center">Total</td>
                     <td><?=$total?></td>
 
                     
