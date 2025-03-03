@@ -4,9 +4,18 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class ReportController extends BaseController
 {
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+        $this->session = session();
+        helper(['form', 'url']);
+        $this->form_validation = \Config\Services::validation();
+
+    }
     public function index()
     {
         //
@@ -525,10 +534,11 @@ class ReportController extends BaseController
             ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
             ->join('product', 'product.id = production_progress.product_id')
             ->join('production_area', 'production_area.id = production_progress.production_id');
-            $queryProd->where('production_progress.product_id =', $prodId);
+        $queryProd->where('production_progress.product_id =', $prodId);
 
         if (!empty($prodId)) {
-            $queryProd->where('proforma_invoice.id =', $piId)->where('quantity !=', 0);;
+            $queryProd->where('proforma_invoice.id =', $piId)->where('quantity !=', 0);
+            ;
         }
 
 
@@ -555,11 +565,12 @@ class ReportController extends BaseController
             ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
             ->join('product', 'product.id = production_progress.product_id')
             ->join('warehouses', 'warehouses.id = production_progress.warehouse_id');
-            $queryWh->where('production_progress.product_id =', $prodId);
+        $queryWh->where('production_progress.product_id =', $prodId);
 
         if (!empty($prodId)) {
-            $queryWh->where('work_order.invoice_id =', $piId)->where('quantity !=', 0);;
-            
+            $queryWh->where('work_order.invoice_id =', $piId)->where('quantity !=', 0);
+            ;
+
         }
         return $queryWh->findAll();
     }
@@ -596,7 +607,8 @@ class ReportController extends BaseController
 
     }
 
-    public function stockMovementReport(){
+    public function stockMovementReport()
+    {
         $endDate = $_POST['end_date'];
         $startDate = $_POST['start_date'];
         $mdl = new \App\Models\MdlStockMove();
@@ -617,18 +629,113 @@ class ReportController extends BaseController
                 production_area_tujuan.name AS production_area_tujuan_name,  
                 warehouses_asal.name AS warehouse_asal_name,  
                 warehouses_tujuan.name AS warehouse_tujuan_name  
-            ')  
-            ->join('work_order', 'work_order.id = stock_movements.wo_id', 'left')  
-            ->join('product', 'product.id = stock_movements.product_id', 'left')  
-            ->join('production_area AS production_area_asal', 'production_area_asal.id = stock_movements.prod_id_asal', 'left')  
-            ->join('production_area AS production_area_tujuan', 'production_area_tujuan.id = stock_movements.prod_id_tujuan', 'left')  
-            ->join('warehouses AS warehouses_asal', 'warehouses_asal.id = stock_movements.wh_id_asal', 'left')  
-            ->join('warehouses AS warehouses_tujuan', 'warehouses_tujuan.id = stock_movements.wh_id_tujuan', 'left') ;
+            ')
+            ->join('work_order', 'work_order.id = stock_movements.wo_id', 'left')
+            ->join('product', 'product.id = stock_movements.product_id', 'left')
+            ->join('production_area AS production_area_asal', 'production_area_asal.id = stock_movements.prod_id_asal', 'left')
+            ->join('production_area AS production_area_tujuan', 'production_area_tujuan.id = stock_movements.prod_id_tujuan', 'left')
+            ->join('warehouses AS warehouses_asal', 'warehouses_asal.id = stock_movements.wh_id_asal', 'left')
+            ->join('warehouses AS warehouses_tujuan', 'warehouses_tujuan.id = stock_movements.wh_id_tujuan', 'left');
+
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->where('stock_movements.created_at >=', $startDate)
+                ->where('stock_movements.created_at <=', $endDate);
+        }
+        return json_encode($query->findAll());
+    }
+    public function searchProduct()
+    {
+        $model = new \App\Models\ProformaInvoice();
+
+        // Ambil parameter dari request
+        $id_product = $this->request->getGet('id_product');
+        $start_date = $this->request->getGet('start_date');
+        $end_date = $this->request->getGet('end_date');
+        $status = $this->request->getGet('status'); // null atau 1
+        $loading_date_filled = $this->request->getGet('loading_date_filled'); // true atau false
+
+        // Panggil fungsi searchInvoices di model
+        $results = $model->searchInvoices($id_product, $start_date, $end_date, $status, $loading_date_filled);
+
+        // Tampilkan hasil
+        return json_encode($results);
+        // return view('invoice_search_results', ['results' => $results]);
+    }
+    public function finishedGoodReport()
+    {
+        $startDate = $this->request->getGet('startDate');
+        $endDate = $this->request->getGet('endDate');
+        $productId = $this->request->getGet('productId');
+        $role = $this->request->getGet('role');
+        // $startDate = $this->request->getGet('startDate');
+        // $endDate = $this->request->getGet('endDate');
+        // $productId = $this->request->getGet('productId');
+        // $role = $this->request->getGet('role');
+        $mdl = new \App\Models\MdlProductionProgress();
+        $query = $mdl->select('production_progress.*,
+         product.kode as product_code,
+         product.nama as product_name,
+         product.hs_code as hs_code, 
+         production_area.name as production_area_name, 
+         warehouses.name as warehouse_name, work_order.kode as wo_code, proforma_invoice.invoice_number as pi_number')
+            ->join('product', 'product.id = production_progress.product_id', 'left')
+            ->join('production_area', 'production_area.id = production_progress.production_id', 'left')
+            ->join('warehouses', 'warehouses.id = production_progress.warehouse_id','left')
+            ->join('work_order', 'work_order.id = production_progress.wo_id', 'left')
+            ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id', 'left')
+            ->join('product_details', 'product.id = product_details.id_product', 'left');
+            $query->where('production_progress.quantity !=', 0);
             
-            if (!empty($startDate) && !empty($endDate)) {
-                $query->where('stock_movements.created_at >=', $startDate)
-                    ->where('stock_movements.created_at <=', $endDate);
+            if (isset($productId)) {
+                $query->where('production_progress.product_id', $productId);
             }
-            return json_encode($query->findAll());
+        if (isset($endDate)) {
+            $query->where('production_progress.created_at <', $endDate);
+        }
+        if (isset($startDate)) {
+            $query->where('production_progress.created_at >', $startDate);
+        }
+        
+
+        if ($role == 'production') {
+            $query->where('production_progress.warehouse_id', 0);
+        } else if ($role == 'warehouse') {
+
+            $query->where('production_progress.production_id', 0);
+        }else{
+            
+        }
+        
+        $data['role'] = $role;
+        $data['startDate'] = $startDate;
+        $data['endDate'] = $endDate;
+        $data['product'] = $query->get()->getResultArray();
+        // $data['role'] = json_encode( $this->db->getLastQuery()->getQuery());
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('defaultFont', 'Helvetica');
+        $options->set('isRemoteEnabled', true); 
+        $dompdf = new Dompdf($options);
+        
+        
+        
+            // Data untuk tampilan
+            $data['title'] = 'Proforma Invoice';
+            $html = view('admin/content/printProduct', $data);
+        
+            // Load HTML ke Dompdf
+            $dompdf->loadHtml($html);
+        
+            // Atur ukuran kertas A4 dan orientasi landscape
+            $dompdf->setPaper('A4', 'landscape');
+        
+            // Render PDF
+            $dompdf->render();
+        
+            // Output PDF ke browser tanpa mengunduh otomatis
+            $dompdf->stream("product_{$productId}_{$role}.pdf", ["Attachment" => false]);
+        // return json_encode( $this->db->getLastQuery()->getQuery());
     }
 }

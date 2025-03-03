@@ -96,5 +96,38 @@ class ProformaInvoice extends Model
             'details' => $details,
         ];
     }
+    public function searchInvoices($id_product, $start_date, $end_date, $status, $loading_date_filled)
+    {
+        $builder = $this->db->table('proforma_invoice');
+        $builder->select('proforma_invoice.*, proforma_invoice_details.*');
+        $builder->join('proforma_invoice_details', 'proforma_invoice.id = proforma_invoice_details.invoice_id', 'left');
+
+        // Filter berdasarkan id_product
+        if (!empty($id_product)) {
+            $builder->where('proforma_invoice_details.id_product', $id_product);
+        }
+
+        // Filter berdasarkan rentang tanggal created_at
+        if (!empty($start_date) && !empty($end_date)) {
+            $builder->where('proforma_invoice.created_at >=', $start_date);
+            $builder->where('proforma_invoice.created_at <=', $end_date);
+        }
+
+        // Filter berdasarkan status (null atau 1)
+        if ($status !== null) {
+            $builder->where('proforma_invoice.status', $status);
+        } else {
+            $builder->where('proforma_invoice.status IS NULL');
+        }
+
+        // Filter berdasarkan loading_date (terisi atau null)
+        if ($loading_date_filled) {
+            $builder->where('proforma_invoice.loading_date IS NOT NULL');
+        } else {
+            $builder->where('proforma_invoice.loading_date IS NULL');
+        }
+
+        return $builder->get()->getResultArray();
+    }
 }
 

@@ -368,7 +368,9 @@ $routes->group('report', function ($routes) {
     $routes->get('getHeaderScrap', 'ReportController::getHeaderScrap',['filter' => 'accessControl:2']); 
     $routes->post('materialScrap', 'ReportController::materialScrap',['filter' => 'accessControl:2']); 
     $routes->post('stockMovementReport', 'ReportController::stockMovementReport',['filter' => 'accessControl:2']); 
+    $routes->post('searchProduct', 'ReportController::searchProduct',['filter' => 'accessControl:2']); 
     
+    $routes->get('finishedGoodReport', 'ReportController::finishedGoodReport',['filter' => 'accessControl:2']); 
 
 });
 $routes->get('mr/(:any)', 'MaterialRequestController::mr/$1',['filter' => 'accessControl:2']); 

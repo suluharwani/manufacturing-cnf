@@ -316,19 +316,19 @@ window.jsPDF = window.jspdf.jsPDF
             $('#laporanScrapModal').modal('show');
         });
         // Populate material select options (you can fetch this from your server)
-        function loadMaterials() {
-            $.ajax({
-                url: 'path/to/your/materials/api', // Update with your API endpoint
-                method: 'GET',
-                success: function (data) {
-                    data.forEach(function (material) {
-                        $('#materialSelect').append(new Option(material.name, material.id));
-                    });
-                }
-            });
-        }
+        // function loadMaterials() {
+        //     $.ajax({
+        //         url: 'path/to/your/materials/api', // Update with your API endpoint
+        //         method: 'GET',
+        //         success: function (data) {
+        //             data.forEach(function (material) {
+        //                 $('#materialSelect').append(new Option(material.name, material.id));
+        //             });
+        //         }
+        //     });
+        // }
 
-        loadMaterials();
+        // loadMaterials();
 
         // Generate report on button click
         $('#generateReportBtn').on('click', function () {

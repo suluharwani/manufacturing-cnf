@@ -6,7 +6,9 @@ window.jsPDF = window.jspdf.jsPDF
         $('#listLaporanBtnPd').on('click', function () {
             $('#laporanModal').modal('show'); 
         });
-
+        $('#listLaporanBtnP').on('click', function () {
+            $('#laporanProductModal').modal('show'); 
+        });
 
         function loadMwo() {
             $.ajax({
@@ -122,6 +124,18 @@ window.jsPDF = window.jspdf.jsPDF
         $('#searchWoInput').on('focus', function() {  
             $('#woDropdownMenu').addClass('show');  
         });  
+        $('#generateProductReport').on('click', function () {
+
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            const productId = $('#productSelect').val();
+            const role = $('#selectlist').val();               // Tambahkan waktu ke endDate
+            let startDateTime = startDate + ' 00:00:00';
+            let endDateTime = endDate + ' 23:59:59';
+            url = base_url+'report/finishedGoodReport?startDate='+startDateTime+'&endDate='+endDateTime+'&productId='+productId+'&role='+role;
+            window.location.assign(url);
+            
+        })
 
         // Generate report on button click
         $('#generateReportBtnProd').on('click', function () {
@@ -296,19 +310,6 @@ window.jsPDF = window.jspdf.jsPDF
             $('#laporanMovementModal').modal('show');
         });
         // Populate material select options (you can fetch this from your server)
-        function loadMaterials() {
-            $.ajax({
-                url: 'path/to/your/materials/api', // Update with your API endpoint
-                method: 'GET',
-                success: function (data) {
-                    data.forEach(function (material) {
-                        $('#materialSelect').append(new Option(material.name, material.id));
-                    });
-                }
-            });
-        }
-
-        loadMaterials();
 
         // Generate report on button click
 
@@ -603,3 +604,78 @@ window.jsPDF = window.jspdf.jsPDF
         
         return `${bagianRibuan},${bagianDesimal}`;
     }
+
+    $('#searchButton').click(function() {
+        // Ambil data dari form
+        const id_product = $('#id_product').val();
+        const start_date = $('#start_date').val();
+        const end_date = $('#end_date').val();
+        const status = $('#status').val();
+        const loading_date_filled = $('#loading_date_filled').val();
+
+        // Kirim request AJAX
+        $.ajax({
+            url: base_url+'report/searchProduct', // URL ke controller
+            type: 'POST',
+            data: {
+                id_product: id_product,
+                start_date: start_date,
+                end_date: end_date,
+                status: status,
+                loading_date_filled: loading_date_filled
+            },
+            success: function(response) {
+                // Tampilkan hasil di div #results
+                $('#results').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                $('#results').html('<p>Error loading data.</p>');
+            }
+        })
+    });
+    function loadProduct() {
+        $.ajax({
+            url: base_url + 'product/getProduct', // Update with your API endpoint
+            method: 'GET',
+            success: function (data) {
+                // Clear exproductptions
+                $('#productOptions').empty();
+
+                // Populate the dropdown with new options
+                data.product.forEach(function (product) {
+                    $('#productOptions').append(`
+                        <a class="dropdown-item" href="#" data-id="${product.id}">${product.nama}</a>
+                    `);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading products: ", error);
+            }
+        });
+    }
+
+    loadProduct();
+
+    $('#searchInput').on('input', function() {
+        var searchValue = $(this).val().toLowerCase();
+        $('#productOptions .dropdown-item').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+        });
+    });
+    // Handle selection
+    $(document).on('click', '.dropdown-item', function() {
+        var selectedMaterial = $(this).text();
+        var selectedId = $(this).data('id');
+        $('#searchInput').val(selectedMaterial); // Set the input value
+        $('#dropdownMenu').removeClass('show'); // Hide the dropdown
+        // You can store the selected ID in a hidden input or use it as needed
+        // console.log("Selected Material ID: ", selectedId);
+        $('#productSelect').val(selectedId); // Set the selected material ID
+
+    });
+
+    // Show dropdown on focus
+    $('#searchInput').on('focus', function() {
+        $('#dropdownMenu').addClass('show');
+    });
