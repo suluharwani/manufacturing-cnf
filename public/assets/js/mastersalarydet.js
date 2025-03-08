@@ -333,7 +333,7 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
                 : `${Math.floor(overtimeMinutes1 / 60)} jam ${Math.floor(overtimeMinutes1 % 60)} menit`;
 
             // Apply red background if totalHours == 0
-            const rowClass = totalHours <= 0 ? 'class="bg-danger"' : ''; // Assign class if totalHours is 0
+            const rowClass = totalHours <= 0 ? 'class="bg-warning"' : ''; // Assign class if totalHours is 0
 
             html += `
             <tr ${rowClass}>

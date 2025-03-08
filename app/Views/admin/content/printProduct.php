@@ -150,7 +150,7 @@ http://www.chakranaga.com<br>
 
         </td>
         <td width="70%" align="right" style="border: none; !important;">
-            <h2>PRODUCTION</h2>
+            <h2>Finished Good</h2>
         </td>
     </tr>
 </table>
@@ -158,7 +158,7 @@ http://www.chakranaga.com<br>
         <!-- Informasi Header -->
         <table >
             <tr>
-                <td width="50%"><?=$role?> </td>
+                <td width="50%">Location :<?=$role?> </td>
                 <td><?=formatDateJam($startDate)?> - <?=formatDateJam($endDate)?></td>
             </tr>
 
@@ -194,10 +194,12 @@ http://www.chakranaga.com<br>
                  $total = 0;
                  foreach ($product as $data) {
                     $total += $data['quantity'];
-                    if ($data['deleted_at'] == null) {
+                    if ($data['status_delivery'] == 0) {
                         $status = 'On Progress';
-                    }else{
-                        $status = 'Done';
+                    }else if ($data['status_delivery'] == 1) {
+                        $status = 'Waiting Delivery';
+                    }else if ($data['status_delivery'] == 2) {
+                        $status = 'Delivered';
                     }
                     ?>
                 <tr>

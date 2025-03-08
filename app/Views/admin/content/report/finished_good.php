@@ -78,6 +78,7 @@ tr:nth-child(even) {
                                             <option value="all" disabled>Select Product Status</option>
                                             <option value="production">Production</option>
                                             <option value="warehouse">Finish Production</option>
+                                            <option value="delivery">Finish Production</option>
                                         </select>
 
                                     </div>

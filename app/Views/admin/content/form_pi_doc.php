@@ -93,6 +93,17 @@ body {
               <input type="date" class="form-control" value="<?= $pi[0]['eta'] ?>">
             </div>
           </div>
+          <div class="row mb-3">
+            <label class="col-md-3 col-form-label">Status</label>
+            <div class="col-md-9">
+              <select name="status_delivery" class="form-control" id="status_delivery">
+                <option class="form-control" value="0" <?php if ($pi[0]['status_delivery'] == 0) echo 'selected' ?>>On Production Progress</option>
+                <option class="form-control" value="1" <?php if ($pi[0]['status_delivery'] == 1) echo 'selected' ?>>Waiting Delivery</option>
+                <option class="form-control" value="2" <?php if ($pi[0]['status_delivery'] == 2) echo 'selected' ?>>Delivered</option>
+              </select>
+              
+            </div>
+          </div>
           <!--  -->
 
           <!-- Tombol Kirim -->

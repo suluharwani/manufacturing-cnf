@@ -673,6 +673,7 @@ class ReportController extends BaseController
         // $role = $this->request->getGet('role');
         $mdl = new \App\Models\MdlProductionProgress();
         $query = $mdl->select('production_progress.*,
+        proforma_invoice.status_delivery as status_delivery,
          product.kode as product_code,
          product.nama as product_name,
          product.hs_code as hs_code, 
@@ -702,7 +703,8 @@ class ReportController extends BaseController
         } else if ($role == 'warehouse') {
 
             $query->where('production_progress.production_id', 0);
-        }else{
+        }else if ($role == 'delivery'){
+            $query->where('proforma_invoice.status_delivery !=', 0);
             
         }
         
