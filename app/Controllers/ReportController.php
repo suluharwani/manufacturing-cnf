@@ -674,6 +674,12 @@ class ReportController extends BaseController
         $mdl = new \App\Models\MdlProductionProgress();
         $query = $mdl->select('production_progress.*,
         proforma_invoice.status_delivery as status_delivery,
+        proforma_invoice.peb as peb,
+        proforma_invoice.tgl_peb as tgl_peb,
+        customer.customer_name as customer_name,
+        customer.state as state,
+        currency.kode as currency_code,
+        currency.nama as currency_name,
          product.kode as product_code,
          product.nama as product_name,
          product.hs_code as hs_code, 
@@ -684,7 +690,9 @@ class ReportController extends BaseController
             ->join('warehouses', 'warehouses.id = production_progress.warehouse_id','left')
             ->join('work_order', 'work_order.id = production_progress.wo_id', 'left')
             ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id', 'left')
-            ->join('product_details', 'product.id = product_details.id_product', 'left');
+            ->join('product_details', 'product.id = product_details.id_product', 'left')
+            ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
+            ->join('currency', 'currency.id = customer.id_currency', 'left');
             $query->where('production_progress.quantity !=', 0);
             
             if (isset($productId)) {

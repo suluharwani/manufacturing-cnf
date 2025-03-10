@@ -323,6 +323,8 @@ function loadSupplierList() {
     let port_loading = $('#port_loading').val();
     let port_discharge = $('#port_discharge').val();
     let status_delivery = $('#status_delivery').val();
+    let peb = $('#peb').val();
+    let tgl_peb = $('#tgl_peb').val();
     let id =  getLastSegment();
 
     $.ajax({
@@ -341,7 +343,9 @@ function loadSupplierList() {
         end_prod: end_prod,
         port_loading: port_loading,
         port_discharge: port_discharge,
-        status_delivery:status_delivery
+        status_delivery:status_delivery,
+        peb: peb,
+        tgl_peb: tgl_peb
       },
       success: function(data) {
 

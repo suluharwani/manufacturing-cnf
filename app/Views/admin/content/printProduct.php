@@ -94,7 +94,7 @@ function hargapajak($harga, $pajak) {
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 9pt;
+            font-size: 8pt;
             margin: 0;
         }
         .a4-container {
@@ -158,7 +158,7 @@ http://www.chakranaga.com<br>
         <!-- Informasi Header -->
         <table >
             <tr>
-                <td width="50%">Location :<?=$role?> </td>
+                <!-- <td width="50%">Location :<?=$role?> </td> -->
                 <td><?=formatDateJam($startDate)?> - <?=formatDateJam($endDate)?></td>
             </tr>
 
@@ -175,7 +175,9 @@ http://www.chakranaga.com<br>
                 <tr>
                     <th>#</th>
                     <th>Created</th>
-                    <th>Last Update</th>
+                    <th>Customer</th>
+                    <th>PEB</th>
+                    <th>PEB Date</th>
                     <th>Status</th>
                     <th>Code</th>
                     <th>Name</th>
@@ -203,10 +205,15 @@ http://www.chakranaga.com<br>
                     }
                     ?>
                 <tr>
-
+                <!-- customer.customer_name as customer_name,
+        customer.state as state,
+        currency.kode as currency_code,
+        currency.nama as currency_name, -->
                     <td><?=$no++?></td>
                     <td><?=formatDateJam($data['created_at'])?></td>
-                    <td><?=formatDateJam($data['updated_at'])?></td>
+                    <td><?=$data['customer_name']?> - <?=$data['state']?> -  <?=$data['currency_name']?>(<?=$data['currency_code']?>)</td>
+                    <td><?=$data['peb']?></td>
+                    <td><?=formatDate($data['tgl_peb'])?></td>
                     <td><?=$status?></td>
                     <td><?=$data['product_code']?></td>
                     <td><?=$data['product_name']?></td>
@@ -224,7 +231,7 @@ http://www.chakranaga.com<br>
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="11" align="center">Total</td>
+                    <td colspan="13" align="center">Total</td>
                     <td><?=$total?></td>
 
                     

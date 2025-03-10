@@ -21,7 +21,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    background: linear-gradient(135deg, #11cb21 0%, #2575fc 100%);
     clip-path: polygon(0 0, 100% 0, 100% 50%, 0 100%);
     z-index: -1;
     animation: backgroundAnimation 10s infinite alternate;

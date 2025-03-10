@@ -99,6 +99,18 @@
       </div>
     </div>
     <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">PEB</label>
+      <div class="col-md-9">
+      <input type="text" class="form-control" id="peb" value="<?=$pi[0]['peb']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="customer_address" class="col-md-3 col-form-label">PEB Date</label>
+      <div class="col-md-9">
+      <input type="date" class="form-control" id="tgl_peb"  value="<?=$pi[0]['tgl_peb']?>" >
+      </div>
+    </div>
+    <div class="row mb-3">
       <label for="customer_address" class="col-md-3 col-form-label">Customer PO</label>
       <div class="col-md-9">
       <input type="text" class="form-control" id="cus_po" value="<?=$pi[0]['cus_po']?>" >
