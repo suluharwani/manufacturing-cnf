@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\MdlProduct;
 use CodeIgniter\HTTP\ResponseInterface;
 use AllowDynamicProperties; 
+use Dompdf\Dompdf;
+use Dompdf\Options;
 class ProductController extends BaseController
 {
       protected $changelog;
@@ -620,4 +622,92 @@ function updateDimension($id){
         die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
     }
 }
+public function printBom($productId, $finishingId)   {
+        // Load models
+
+        $productModel = new MdlProduct();
+
+        // Query 1: Ambil data produk dan quantity
+        $query1 = $productModel
+        ->select('* , finishing.name AS finishing')
+        ->join('finishing', 'product.id = finishing.id_product', 'left')
+        ->where('product.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->findAll();
+        // $query1 = $proformaInvoiceDetailsModel
+        //     ->select('product.nama,product.kode as kode, proforma_invoice_details.quantity')
+        //     ->join('product', 'product.id = proforma_invoice_details.id_product')
+        //     ->where('proforma_invoice_details.invoice_id', $invoice_id)
+        //     ->findAll();
+
+        // Query 2: Ambil data material dan penggunaan dari billofmaterialfinishing
+        $query2 = $productModel
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+    
+           p.id, 
+            p.nama AS product, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)) , 3) AS total_penggunaan,
+            satuan.nama as satuan, 
+            type.nama as type, 
+            finishing.name AS finishing_name,
+            finishing.id AS finishing_id, 
+            finishing.id as modul_id, 
+            materials_detail.kite as kite
+        ')
+        ->from('product p')
+        ->join('billofmaterialfinishing bom', 'p.id = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->join('finishing', 'bom.id_modul = finishing.id', 'left')
+        ->where('p.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->groupBy('m.id, m.name, m.kode, p.id, finishing.id,p.id, satuan.nama, type.nama, finishing.name, materials_detail.kite')
+        ->orderBy('finishing.id, p.id')
+        ->findAll();
+
+        // Query 3: Ambil data material dan penggunaan dari billofmaterial
+        $query3 = $productModel
+            ->select('m.id AS material_id, m.name AS material_name, m.kode AS material_code, 
+                      FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+                    p.id, p.nama AS product, 
+                      FORMAT(SUM(COALESCE(bom.penggunaan, 0)) , 3) AS total_penggunaan,
+                      satuan.nama as satuan, type.nama as type, modul.name AS modul_name,
+                      modul.code AS modul_code, modul.id as modul_id ,materials_detail.kite as kite')
+            ->from('product p', true)
+            ->join('billofmaterial bom', 'p.id = bom.id_product', 'left')
+            ->join('materials m', 'bom.id_material = m.id')
+            ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+            ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+            ->join('type', 'type.id = materials_detail.type_id', 'left')
+            ->join('modul ', 'bom.id_modul  =  modul.id', 'left')
+            ->where('p.id', $productId)
+            ->groupBy('m.id, m.name, m.kode, p.id, modul.id')
+            ->orderBy('modul.id,p.id')
+            ->findAll();
+
+        // Data untuk dikirim ke view
+        $data = [
+            'query1' => $query1,
+            'query2' => $query2,
+            'query3' => $query3,
+        ];
+
+        // Load view dengan data
+        $html = view('admin/content/printBOM', $data);
+
+        // Setup Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Output PDF
+        $dompdf->stream("BOM_{$productId}.pdf", ["Attachment" => false]);
+    }
 }

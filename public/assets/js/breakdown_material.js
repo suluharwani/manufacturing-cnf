@@ -56,7 +56,8 @@ $(document).ready(function() {
         }},
     
         {mRender: function (data, type, row) {
-            return `<button class="btn btn-warning bomModul" data-id="${row[1]}" data-id_product="${row[3]}">Bill of material</button>
+            return `
+            <button class="btn btn-warning bomModul" data-id="${row[1]}" data-id_product="${row[3]}">Bill of material</button>
                     <button class="btn btn-warning editModul" data-id="${row[1]}">Edit Data</button>
                     <button class="btn btn-info edit-picture-modul" data-id="${row[1]}">Edit Picture</button>
                     <button class="btn btn-danger deleteModul" data-id="${row[1]}" data-id_product="${row[3]}">Delete</button>`

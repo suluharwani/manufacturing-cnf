@@ -216,6 +216,7 @@ $routes->group('product', function ($routes) {
     $routes->get('getProduct', 'ProductController::getProduct',['filter' => 'accessControl:2']);
     $routes->post('modul/(:any)', 'ProductController::modul/$1',['filter' => 'accessControl:2']);
     $routes->post('updateDimension/(:any)', 'ProductController::updateDimension/$1',['filter' => 'accessControl:2']);
+    $routes->get('printBom/(:any)/(:any)', 'ProductController::printBom/$1/$2',['filter' => 'accessControl:2']); 
 
 });
 $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
