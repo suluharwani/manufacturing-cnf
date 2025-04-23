@@ -710,4 +710,57 @@ public function printBom($productId, $finishingId)   {
         // Output PDF
         $dompdf->stream("BOM_{$productId}.pdf", ["Attachment" => false]);
     }
+    function labourCost($id){
+        $data['group'] = 'Admin';
+        $data['title'] = 'Labour Cost';
+        $data['content'] = view('admin/content/labour_cost', $data);
+        return view('admin/index', $data);
+    }
+    public function labourCreate($id)
+{
+    $validation = \Config\Services::validation();
+    $rules = [
+        'process' => 'required',
+    ];
+
+    if (!$this->validate(rules: $rules)) {
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => $validation->getErrors(),
+        ]);
+    }
+
+
+
+    $data = $this->request->getPost();
+    $data['product_id'] = $id;
+    $data['total_cost_idr'] = ($this->request->getPost('wage_per_hours') * $this->request->getPost('time_hours') * $this->request->getPost('total_worker'))+$this->request->getPost('cost');
+    $model = new \App\Models\MdlLabourCost();
+    $model->insert($data);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'message' => 'Item added successfully',
+    ]);
+}
+public function getLabour($id)
+{
+    $model = new \App\Models\MdlLabourCost();
+    $data = $model->where('product_id',value: $id)->findAll();
+
+    return $this->response->setJSON(['data' => $data]);
+}
+function deleteLabour($id)
+{
+    $model = new \App\Models\MdlLabourCost();
+    $item = $model->find($id);
+
+    if ($item) {
+        $model->delete($id);
+
+        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+    }
+
+    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
 }

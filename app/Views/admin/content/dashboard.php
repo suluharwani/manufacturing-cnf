@@ -91,7 +91,7 @@
         </div>
     </div>
 
-    <div class="col-sm-12 col-md-6 col-xl-6">
+    <!-- <div class="col-sm-12 col-md-6 col-xl-6">
         <div class="h-100 bg-light rounded p-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="mb-0">To Do List</h6>
@@ -147,7 +147,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
 </div>
 <!-- Widgets End -->

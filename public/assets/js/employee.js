@@ -55,7 +55,7 @@ $(document).ready(function() {
           <a href="javascript:void(0);" class="btn btn-secondary btn-sm varGaji" id="${row[1]}" pin="${row[4]}">Harian</a>
           <a href="javascript:void(0);" class="btn btn-secondary btn-sm varTunjangan"  name = "${row[2]}" id="${row[1]}" pin="${row[4]}">Tunjangan</a>
           <a href="javascript:void(0);" class="btn btn-secondary btn-sm varPotongan" name = "${row[2]}" id="${row[1]}" pin="${row[4]}">Potongan</a>
-          <a href="javascript:void(0);" class="btn btn-secondary btn-sm varData" id="${row[1]}" pin="${row[4]}">Data</a>
+          <a href="javascript:void(0);" class="btn btn-secondary btn-sm varData" id="${row[1]}" pin="${row[4]}" nama="${row[2]}">Data</a>
           <a href="javascript:void(0);" class="btn btn-warning btn-sm showDet" id="${row[1]}" pin="${row[4]}">View Detail</a>
           <a href="javascript:void(0);" class="btn btn-primary btn-sm showPresensi" id="${row[1]}" pin="${row[4]}" nama="${row[2]}">Presensi</a>
           <a href="javascript:void(0);" class="btn btn-success btn-sm showGaji" id="${row[1]}" pin="${row[4]}">Gaji</a>`;
@@ -842,7 +842,20 @@ function formatDateIndonesian(dateString) {
 
 
   });
+  $(document).on('click', '.varData', function() {
+    var pin = $(this).attr('pin');
+    var id = $(this).attr('id');
+    var name = $(this).attr('name');
+          $('#dataEmployeeName').val(name); 
+          $('#dataEmployeeId').val(id); 
+          $('#dataEmployeePin').val(pin); 
 
+    fetchDeductionOptions();
+    fetchDeductionsUser(id);
+    $('#dataModal').modal('show');
+
+
+  });
 
 //allowance
 

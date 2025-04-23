@@ -312,8 +312,8 @@ $('.tambahMaterial').on('click', function() {
             <div class="form-group">
             <label for="type">Import Export Status</label>
             <select class="form-control" id="kite">
-            <option value="kite">KITE</option>
-            <option value="non_kite">Non-KITE</option>
+            <option value="KITE">KITE</option>
+            <option value="NON KITE">Non-KITE</option>
             </select>
             </div>
             </form>
@@ -448,8 +448,8 @@ $(document).on('click', '.editMaterial', function() {
                <div class="form-group">
             <label for="type">Import Export Status</label>
             <select class="form-control" id="kite">
-            <option value="kite" ${materialData.kite == 'kite' ? 'selected' : ''}>KITE</option>
-            <option value="non_kite"${materialData.kite == 'non_kite' ? 'selected' : ''}>Non-KITE</option>
+            <option value="KITE" ${materialData.kite == 'KITE' ? 'selected' : ''}>KITE</option>
+            <option value="NON KITE"${materialData.kite == 'NON KITE' ? 'selected' : ''}>NON KITE</option>
             </select>
             </div>
               </form>

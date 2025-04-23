@@ -225,7 +225,7 @@
 </div>
 
 
-<!-- Modal for managing potongan (deduction) -->
+<!-- Modal for managing potongan (data) -->
 <div class="modal fade" id="potonganModal" tabindex="-1" aria-labelledby="potonganModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -281,7 +281,61 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="potonganModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="potonganModalLabel">Manage Data Karyawan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="potonganForm">
+                    <!-- Form for adding new potongan -->
+                        <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="dataEmployeeName" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="namaTunjangan" class="form-label">ID/PIN</label>
+                        <input type="number" class="form-control" id="dataEmployeeId" disabled>
+                        <input type="number" class="form-control" id="dataEmployeePin" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="namaPotongan" class="form-label">Nama Potongan</label>
+                        <select class="form-select" id="dataSelect" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="jumlahPotongan" class="form-label">Jumlah Potongan</label>
+                        <input type="number" class="form-control" id="jumlahPotongan" placeholder="Enter data Amount" required>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="addPotonganBtn">Add Potongan</button>
+                </form>
 
+                <hr>
+
+                <!-- Table to display and manage potongan -->
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="potonganTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Potongan</th>
+                                <th>Jumlah</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically populated here by AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/employee.js"></script>
