@@ -165,7 +165,7 @@ http://www.chakranaga.com<br>
 
         </td>
         <td width="70%" align="right" style="border: none; !important;">
-            <h2>GOODS RECEIPT NOTE</h2>
+            <h2>GOODS RECEIVED NOTE</h2>
         </td>
     </tr>
 </table>
