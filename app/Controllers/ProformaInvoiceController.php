@@ -784,7 +784,8 @@ $options->set('defaultFont', 'Helvetica');
 $options->set('isRemoteEnabled', true); 
 $dompdf = new Dompdf($options);
 
-
+// var_dump($data['piDet']);
+// die();
     
         // Data untuk tampilan
         $data['title'] = 'Proforma Invoice';

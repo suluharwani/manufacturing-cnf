@@ -185,6 +185,7 @@ function convertcm($mm) {
                     <th>Product Name</th>
                     <th>Picture</th>
                     <th>Description</th>
+                    <th>Finishing</th>
                     <th>Finishing Picture</th>
                     <th>HS Code</th>
                     <th>Qty</th>
@@ -215,6 +216,7 @@ function convertcm($mm) {
                     <td><?=$item['p_name']?></td>
                     <td><img src="<?=base_url('assets/upload/thumb/').$item['p_picture']?>" height="40"></img></td>
                     <td><?=$item['remarks']?></td>
+                    <td><?=$item['f_name']?></td>
                     <td><img src="<?=base_url('uploads/finishing/').$item['f_picture']?>" height="40"></img></td>
                     <td><?=$item['p_hs_code']?></td>
                     <td><?=formatCurrency($item['quantity'])?></td>
@@ -232,7 +234,7 @@ function convertcm($mm) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6">TOTAL</td>
+                    <td colspan="7">TOTAL</td>
                     <td><?=$tot_qty?></td>
                     <td></td>
                     <td><?=$tot_cbm?></td>
@@ -242,17 +244,17 @@ function convertcm($mm) {
                     <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
                 </tr>
                 <tr>
-                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td colspan = "12" style="border: none; !important;"></td>
                     <td>CHARGE</td>
                     <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
                 </tr>
                 <tr>
-                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td colspan = "12" style="border: none; !important;"></td>
                     <td>DEPOSIT</td>
                     <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
                 </tr>
                 <tr>
-                    <td colspan = "11" style="border: none; !important;"></td>
+                    <td colspan = "12" style="border: none; !important;"></td>
                     <td>GRAND TOTAL</td>
                     <td><?=$item['currency_code']." ".formatCurrency($tot_price+$pi['charge']-$pi['deposit'])?></td>
                 </tr>
