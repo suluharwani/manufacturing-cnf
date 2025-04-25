@@ -55,8 +55,8 @@ class MdlWorkOrder extends Model
         $details = $this->db->table('work_order_detail')
             ->select('work_order_detail.*, product.*, finishing.name as finishing_name, finishing.picture as f_picture')
             ->where('wo_id', $id)
-            ->join('product', 'product.id = work_order_detail.product_id')
-            ->join('finishing', 'finishing.id = work_order_detail.finishing_id')
+            ->join('product', 'product.id = work_order_detail.product_id', 'left')
+            ->join('finishing', 'finishing.id = work_order_detail.finishing_id', 'left')
             ->get()
             ->getResultArray();
 
