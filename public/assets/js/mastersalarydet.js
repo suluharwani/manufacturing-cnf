@@ -140,6 +140,7 @@ $(document).ready(function () {
                                 <a href="javascript:void(0);" class="btn btn-primary btn-sm varTunjangan"  name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Tunjangan</a>
                                 <a href="javascript:void(0);" class="btn btn-warning btn-sm varPotongan" name = "${item.pegawai_nama}" id="${item.karyawan_id}" pin="${item.pegawai_pin}">Potongan</a>
                                 <button class="btn btn-default btn-sm print-slip" data-id="${item.karyawan_id}">Print Slip</button>
+                                <button class="btn btn-default btn-sm print-slip-v2" data-id="${item.karyawan_id}">Print Slip V2</button>
                                 <button class="btn btn-default btn-sm print-presensi" namaKaryawan = "${item.pegawai_nama}"  idKaryawan = "${item.karyawan_id}" pinKaryawan="${item.pegawai_pin}" tglAwal = "${formatDate(item.tanggal_awal_penggajian)}" tglAkhir= "${formatDate(item.tanggal_akhir_penggajian)}" data-id="${item.karyawan_id}" nama="${item.pegawai_nama}">Print Attendance</button>
                                 <button class="btn btn-danger btn-sm delete-from-payroll" data-id="${item.karyawan_id}">Delete</button> </td>
                         </tr>`;
@@ -765,7 +766,191 @@ $(document).on('click', '.print-slip', function () {
         }
     });
 });
+$(document).on('click', '.print-slip-v2', function () {
+  const employeeId = $(this).data('id');
+  const $button = $(this);
 
+    const originalText = $button.html();
+    
+  $button.html('<i class="fa fa-spinner fa-spin"></i> Loading...').prop('disabled', true);
+  downloadslip(employeeId);
+  // Tampilkan loading indicator
+  $button.html(originalText).prop('disabled', false);
+});
+function downloadslip(employeeId){
+
+  
+  $.ajax({
+      url: base_url + '/MasterPenggajianDetailController/getEmployeeSalarySlip/' + employeeId + '/' + masterId,
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+          if (response) {
+              // Pastikan jsPDF sudah dimuat
+              if (typeof jsPDF !== 'undefined') {
+                  generateSalarySlipPDF(response);
+              } else {
+                  // Jika jsPDF belum dimuat, muat dulu librarynya
+                  loadJS('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', function() {
+                      generateSalarySlipPDF(response);
+                  });
+              }
+          } else {
+              alert('Data karyawan tidak ditemukan.');
+          }
+      },
+      error: function(xhr, status, error) {
+          console.error('Error: ' + status + ' - ' + error);
+          alert('Gagal memuat data slip gaji.');
+      },
+      complete: function() {
+          // Kembalikan tombol ke state semula
+          // $button.html(originalText).prop('disabled', false);
+      }
+  });
+}
+// Fungsi untuk memuat script JS secara dinamis
+function loadJS(src, callback) {
+  const script = document.createElement('script');
+  script.src = src;
+  script.onload = callback;
+  document.head.appendChild(script);
+}
+
+
+function generateSalarySlipPDF(employeeData) {
+  // Buat instance jsPDF
+  const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+  
+  // Data pegawai
+  let pegawai = employeeData.pegawai;
+  
+  // Fungsi untuk menambahkan teks dengan margin
+  const addText = (text, x, y, options = {}) => {
+    doc.setTextColor(options.color || 0);
+    doc.setFontSize(options.size || 12);
+    doc.setFont(options.font || 'helvetica', options.style || 'normal');
+    doc.text(text, x, y);
+  };
+  
+  // Fungsi untuk membuat tabel
+  const createTable = (data, startY) => {
+    let y = startY;
+    const lineHeight = 7;
+    const margin = 15;
+    
+    data.forEach((row, i) => {
+      // Header tabel
+      if (i === 0) {
+        doc.setFillColor(200, 200, 200);
+        doc.rect(margin, y, 180, lineHeight, 'F');
+        doc.setTextColor(0);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+      } else {
+        doc.setFont('helvetica', 'normal');
+      }
+      
+      doc.text(row[0], margin + 2, y + 5);
+      doc.text(row[1], margin + 100, y + 5, { align: 'right' });
+      
+      // Garis bawah
+      if (i === 0 || i === data.length - 1) {
+        doc.line(margin, y + lineHeight, margin + 180, y + lineHeight);
+      }
+      
+      y += lineHeight;
+    });
+    
+    return y;
+  };
+  
+  // Header slip gaji
+  addText('Slip Gaji Karyawan', 105, 20, { size: 16, style: 'bold', align: 'center' });
+  doc.line(15, 25, 195, 25);
+  
+  // Informasi operator
+  addText('Operator', 15, 35, { size: 12, style: 'bold' });
+  addText(`Nama Karyawan: ${pegawai.pemilik_rekening}`, 15, 42);
+  addText(`Nama Alias: ${employeeData.pegawai_nama}`, 15, 49);
+  addText(`ID Karyawan: ${employeeData.karyawan_id}`, 15, 56);
+  addText(`Rekening: ${pegawai.bank} - ${pegawai.bank_account}`, 15, 63);
+  addText(`Periode Gaji: ${formatDate(employeeData.tanggal_awal_penggajian)} - ${formatDate(employeeData.tanggal_akhir_penggajian)}`, 15, 70);
+  
+  // Rincian gaji
+  addText('Rincian Gaji', 15, 85, { size: 12, style: 'bold' });
+  
+  const salaryData = [
+    ['Nama', 'Amount (Rp)'],
+    ['Gaji Harian Senin-Sabtu', employeeData.salary_slip_details.salary_mon_sat],
+    ['Gaji Minggu', employeeData.salary_slip_details.sunday_salary],
+    ['Gaji Lembur', employeeData.salary_slip_details.all_overtime],
+    ['Gaji Kotor', employeeData.salary_slip_details.gross_salary],
+    ['Tunjangan', employeeData.salary_slip_details.allowances],
+    ['Potongan', employeeData.salary_slip_details.deductions],
+    ['Gaji Bersih', employeeData.salary_slip_details.net_salary]
+  ];
+  
+  let currentY = createTable(salaryData, 90);
+  
+  // Rincian tunjangan dan potongan (side by side)
+  currentY += 10;
+  addText('Rincian Tunjangan', 15, currentY, { size: 12, style: 'bold' });
+  
+  const allowanceData = [['Nama', 'Amount (Rp)']];
+  $.each(employeeData.allowance, function(index, allowance) {
+    allowanceData.push([allowance.Nama, numberFormat(allowance.amount)]);
+  });
+  
+  currentY = createTable(allowanceData, currentY + 5);
+  
+  currentY += 10;
+  addText('Rincian Potongan', 15, currentY, { size: 12, style: 'bold' });
+  
+  const deductionData = [['Nama', 'Amount (Rp)']];
+  $.each(employeeData.deduction, function(index, deduction) {
+    deductionData.push([deduction.Nama, numberFormat(deduction.amount)]);
+  });
+  
+  currentY = createTable(deductionData, currentY + 5);
+  
+  // Footer
+  currentY += 15;
+  addText(`Slip gaji ini dihasilkan pada ${formatDate(new Date())}`, 15, currentY, { size: 10 });
+  
+  // Tanda tangan
+  currentY += 20;
+  doc.line(15, currentY, 195, currentY);
+  
+  // Kolom penerima
+  addText('Tanggal:', 30, currentY + 15);
+  addText('Penerima,', 30, currentY + 30);
+  addText(pegawai.pemilik_rekening, 30, currentY + 60);
+  
+  // Kolom GM
+  addText('General Manager,', 130, currentY + 30);
+  
+  // Tambahkan gambar tanda tangan jika diperlukan
+  // doc.addImage('ttd_cnf.png', 'PNG', 130, currentY + 35, 40, 20);
+  
+  addText('ARY SETIAJI', 130, currentY + 60);
+  
+  // Simpan PDF
+  doc.save(`Slip_Gaji_${employeeData.pegawai_nama}_${employeeData.karyawan_id}.pdf`);
+}
+
+// Fungsi helper untuk format tanggal
+// function formatDate(date) {
+//   if (!date) return '';
+//   const d = new Date(date);
+//   return d.toLocaleDateString('id-ID');
+// }
+
+// // Fungsi helper untuk format angka
+// function numberFormat(num) {
+//   return new Intl.NumberFormat('id-ID').format(num);
+// }
 
   $(document).on('click', '.varTunjangan', function() {
     var pin = $(this).attr('pin');
@@ -1083,7 +1268,27 @@ function formatRupiah(amount) {
             }
         });
     });
-
+    
+    $(document).on('click', '#downloadBatch', function () {
+      $.ajax({
+        url: base_url + '/MasterPenggajianDetailController/dataEmployeeMaster/' + masterId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+          d =response;
+          // console.log(response[0].karyawan_id)
+          $.each(response, function(k, v){
+            downloadslip(d[k].karyawan_id)
+       
+                })
+        },
+        error: function(xhr, status, error) {
+            console.error('Error: ' + status + ' - ' + error);
+            alert('Gagal memuat data rekap gaji.');
+        }
+    });
+      // downloadslip(55);
+  });
 $(document).on('click', '#printRekapGaji', function () {
     // Panggil fungsi untuk mendapatkan dan mencetak data rekap gaji
     printRekapGajiHTML(masterId);

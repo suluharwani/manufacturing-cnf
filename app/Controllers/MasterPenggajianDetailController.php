@@ -570,19 +570,22 @@ public function deleteEmployeeFromPayroll()
 
     
     $netSalary = ($grossSalary+ $totalAllowance) - $totalDeduction;
-    
+    $salary_mon_sat = $totalNormalSalary+$saturday;
+    $all_overtime = $totalOvertime1Salary+$totalOvertime2Salary+$totalOvertime3Salary;
     // Struktur rincian untuk slip gaji
     return [
-        'basic_salary' => number_format($totalNormalSalary, 2, ',', '.'), // Gaji Pokok
-        'sunday_salary' => number_format($sunday, 2, ',', '.'), // Gaji Pokok
-        'saturday_salary' => number_format($saturday, 2, ',', '.'), // Gaji Pokok
-        'overtime1_salary' => number_format($totalOvertime1Salary, 2, ',', '.'), // Gaji Lembur Level 1
-        'overtime2_salary' => number_format($totalOvertime2Salary, 2, ',', '.'), // Gaji Lembur Level 2
-        'overtime3_salary' => number_format($totalOvertime3Salary, 2, ',', '.'), // Gaji Lembur Level 3
-        'gross_salary' => number_format($grossSalary, 2, ',', '.'), // Gaji Kotor
-        'allowances' => number_format($totalAllowance, 2, ',', '.'), // Tunjangan
-        'deductions' => number_format($totalDeduction, 2, ',', '.'), // Potongan
-        'net_salary' => number_format($netSalary, 2, ',', '.') // Gaji Bersih
+        'basic_salary' => number_format($totalNormalSalary, 0, ',', '.'), // Gaji Pokok
+        'sunday_salary' => number_format($sunday, 0, ',', '.'), // Gaji Pokok
+        'saturday_salary' => number_format($saturday, 0, ',', '.'), // Gaji Pokok
+        'overtime1_salary' => number_format($totalOvertime1Salary, 0, ',', '.'), // Gaji Lembur Level 1
+        'overtime2_salary' => number_format($totalOvertime2Salary, 0, ',', '.'), // Gaji Lembur Level 2
+        'overtime3_salary' => number_format($totalOvertime3Salary, 0, ',', '.'), // Gaji Lembur Level 3
+        'gross_salary' => number_format($grossSalary, 0, ',', '.'), // Gaji Kotor
+        'allowances' => number_format($totalAllowance, 0, ',', '.'), // Tunjangan
+        'deductions' => number_format($totalDeduction, 0, ',', '.'), // Potongan
+        'net_salary' => number_format($netSalary, 0, ',', '.'), // Gaji Bersih
+        'salary_mon_sat'=> number_format($salary_mon_sat, 0, ',', '.'),
+        'all_overtime'=> number_format($all_overtime, 0, ',', '.'),
     ];
 }
 public function getEmployeeSalarySlip($employeeId, $penggajianId)

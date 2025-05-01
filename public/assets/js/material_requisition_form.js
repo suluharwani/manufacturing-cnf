@@ -76,7 +76,7 @@ $(document).ready(function () {
   
       for (const item of combinedData) {
         const totalStock = await getTotalStock(item.material_id);
-        const max_request = Math.min(totalStock, item.remaining_quantity);
+        const max_request = Math.ceil(Math.min(totalStock, item.remaining_quantity));
         let button;
   
         if (statusDoc === 'Posted') {
@@ -216,7 +216,7 @@ $(document).on('click', '.delete', function(e) {
         url: base_url + "requisition/deleteList/" + id, // Endpoint untuk menghapus material
         data: {},
         success: function(response) {
-          if (response.status === 'success') {
+    
             Swal.fire({
               icon: 'success',
               title: 'Deleted!',
@@ -224,19 +224,14 @@ $(document).on('click', '.delete', function(e) {
             });
             tableWO();
             tabel_requisition();
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Error deleting material!',
-            });
-          }
+     
+          
         },
         error: function() {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Error connecting to the server!',
+            text: 'Error deleting material!',
           });
         }
       });

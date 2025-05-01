@@ -295,7 +295,7 @@ public function deleteList($id)
     $dataBeforeDelete = $mdl->where('id', $id)->first();
 
     if ($dataBeforeDelete) {
-        $mdl->delete();
+        $mdl->where('id', $id)->delete();
 
         if ($mdl->affectedRows() != 0) {
             $riwayat = "{$userInfo['nama_depan']} {$userInfo['nama_belakang']} menghapus dokumen id: {$id} dengan data: " . json_encode($dataBeforeDelete);

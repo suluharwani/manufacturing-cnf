@@ -190,7 +190,7 @@ function getWeekNumber($date) {
                     <th>Code</th>
                     <th>Product Name</th>
                     <th>Picture</th>
-                    <th>Description</th>
+                    <th>Finishing</th>
                     <th>Finishing Picture</th>
                     <th>Qty</th>
                     <th>Size (cm)</th>

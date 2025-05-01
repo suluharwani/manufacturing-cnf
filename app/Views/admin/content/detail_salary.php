@@ -58,6 +58,7 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Detail Master Payroll</h6>
             <div>
+            <button id="downloadBatch" class="btn btn-warning">Download Batch Gaji</button>
             <button id="printRekapGaji" class="btn btn-primary">Print Rekap Gaji</button>
 <a id="exportExcelLink" href="#" class="btn btn-success">
     <i class="fa fa-file-excel"></i> Unduh Rekap Gaji (Excel)
@@ -264,7 +265,7 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/mastersalarydet.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>  
 <script>
