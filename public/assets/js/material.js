@@ -464,7 +464,7 @@ $(document).on('click', '.editMaterial', function() {
                 const kite = Swal.getPopup().querySelector('#kite').value;
                 const satuanUkuran = Swal.getPopup().querySelector('#satuanUkuran').value;
 
-                if (!hscode||!kode || !nama || !type || !satuanUkuran|| !kite) {
+                if (!kode || !nama || !type || !satuanUkuran|| !kite) {
                   Swal.showValidationMessage('Silakan lengkapi data');
                 }
                 return {kite:kite, id: materialId, kode: kode, nama: nama, type: type, satuanUkuran: satuanUkuran , hscode:hscode};
