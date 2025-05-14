@@ -763,4 +763,24 @@ function deleteLabour($id)
 
     return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
 }
+public function inputbom($id, $id_modul)
+{
+    $data['content'] = view('admin/content/input_bom', ['id_product' => $id, 'id_modul' => $id_modul]);
+        return view('admin/index', $data);
+}
+public function databom($id, $id_modul)
+{
+    $model = new \App\Models\MdlBillOfMaterial();
+    $data = $model->join('materials', 'materials.id = billofmaterial.id_material')
+                  ->join('materials_detail', 'materials_detail.material_id = billofmaterial.id_material')
+                  ->join('satuan', 'satuan.id = materials_detail.satuan_id')
+                  ->where(array('billofmaterial.id_product'=>$id, 'billofmaterial.id_modul'=>$id_modul))
+                  ->findAll();
+    if ($data) {
+        return $this->response->setJSON($data);
+    } else {
+        return $this->response->setJSON(['message' => 'Data not found'], 404);
+
+    }
+}
 }
