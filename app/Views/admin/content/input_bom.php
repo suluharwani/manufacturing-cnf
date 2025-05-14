@@ -1,4 +1,6 @@
-<link rel="stylesheet" type="text/css" href="<?= base_url('assets') ?>/datatables/datatables.min.css" />
+<?php 
+use App\Database\Migrations\Product;
+?><link rel="stylesheet" type="text/css" href="<?= base_url('assets') ?>/datatables/datatables.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -108,14 +110,15 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">BILL OF MATERIAL</h6>
+            <h6 class="mb-0">BILL OF MATERIAL - <?php echo($product['kode'].'<br>'.$product['nama'].'<br>modul:'.$modul['name']);
+            ?></h6>
             <div>
           
             </div>
             
         </div>
         <div class="table-responsive">
-                   <h1>Bill of Materials (BOM) Data</h1>
+                
     <div id="table-container">
         <div class="loading">Memuat data...</div>
     </div>

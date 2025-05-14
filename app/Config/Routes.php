@@ -11,6 +11,8 @@ $routes->get('/col/(:any)', 'Home::col/$1');
 $routes->get('/', 'Homepage::index');
 $routes->get('/inputbom/(:any)/(:any)', 'ProductController::inputbom/$1/$2',['filter' => 'accessControl:2']);
 $routes->get('/databom/(:any)/(:any)', 'ProductController::databom/$1/$2',['filter' => 'accessControl:2']);
+$routes->post('/deleteBom/(:any)', 'ProductController::deleteBom/$1',['filter' => 'accessControl:2']);
+$routes->post('/addbom', 'ProductController::addbom',['filter' => 'accessControl:2']);
 
 $routes->get('/dashboard', 'Home::index',['filter' => 'accessControl:2']);
 $routes->get('/dashboard/fetchAndSaveRates', 'DashboardController::fetchAndSaveRates',['filter' => 'accessControl:2']);

@@ -1,6 +1,15 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
-
+function getSegment2() {
+    var pathname = window.location.pathname; // Mendapatkan path dari URL
+    var segments = pathname.split('/').filter(function(segment) { return segment.length > 0; });
+    return segments[segments.length - 1]; // Mengambil segment terakhir
+  }
+  function getSegment1() {
+    var pathname = window.location.pathname; // Mendapatkan path dari URL
+    var segments = pathname.split('/').filter(function(segment) { return segment.length > 0; });
+    return segments[segments.length - 2]; // Mengambil segment terakhir
+  }
 
 $(document).ready(function() {
   var dataTable = $('#tabel_serverside').DataTable( {
@@ -77,7 +86,7 @@ $(document).ready(function() {
 })
 loadBOMData()
      function loadBOMData() {
-            const endpoint = base_url+'databom/24/33';
+            const endpoint = base_url+`databom/${getSegment1()}/ ${getSegment2()}`;
             const $tableContainer = $('#table-container');
             
             $.ajax({
@@ -126,7 +135,7 @@ loadBOMData()
                     $('<td>').text(item.name || '-'),
                     $('<td>').text(item.kode || '-'),
                     $('<td>').text(item.penggunaan || '0'),
-                    $('<td>').text(item.nama || '-'),
+                    $('<td>').text(item.satuan || '-'),
                     $('<td>').text(item.kite || '-'),
                     $('<td>').addClass('action-cell').append(
                         $('<button>')
@@ -156,11 +165,11 @@ loadBOMData()
             }
 
             // Endpoint untuk hapus data (sesuaikan dengan endpoint Anda)
-            const deleteEndpoint = `databom/delete/${id}`;
+            const deleteEndpoint = base_url+`deleteBom/${id}`;
             
             $.ajax({
                 url: deleteEndpoint,
-                type: 'DELETE',
+                type: 'POST',
                 dataType: 'json',
                 beforeSend: function() {
                     $row.css('opacity', '0.5');
@@ -175,6 +184,7 @@ loadBOMData()
                         $row.css('opacity', '1');
                         showAlert('Gagal menghapus data: ' + (response.message || ''), 'error');
                     }
+                    loadBOMData();
                 },
                 error: function(xhr, status, error) {
                     $row.css('opacity', '1');
@@ -222,6 +232,7 @@ function showAddPopup(id, nama, code) {
         <p><strong>ID:</strong> ${id}</p>
         <p><strong>Nama:</strong> ${nama}</p>
         <p><strong>Kode:</strong> ${code}</p>
+        <p><strong>segment: ${getSegment1()} - ${getSegment2()}</strong></p>
         <hr>
         <div class="form-group">
           <label for="swal-input2">Jumlah:</label>
@@ -256,7 +267,7 @@ function showAddPopup(id, nama, code) {
       Swal.fire({
         title: 'Konfirmasi',
         html: `Anda akan menambahkan:<br>
-               <strong>Material:</strong> ${material}<br>
+               <strong>Material:</strong> ${nama}<br>
                <strong>Jumlah:</strong> ${data.jumlah}<br>
      `,
         icon: 'question',
@@ -267,16 +278,15 @@ function showAddPopup(id, nama, code) {
         if (confirmResult.isConfirmed) {
           // AJAX call to save data
           $.ajax({
-            url: base_url + 'material/addMaterial', // Replace with your endpoint
+            url: base_url + 'addbom', // Replace with your endpoint
             type: 'POST',
             dataType: 'json',
             data: {
-              id: id,
-              nama: nama,
-              material: material,
-              ukuran: data.ukuran,
-              jumlah: data.jumlah,
-              keterangan: data.keterangan
+                //'id_modul','id_product', 'id_material','penggunaan',
+              id_product: getSegment1(),
+              id_modul: getSegment2(),
+              id_material: id,
+              penggunaan: data.jumlah,
             },
             success: function(response) {
               if (response.success) {
@@ -286,6 +296,7 @@ function showAddPopup(id, nama, code) {
               } else {
                 Swal.fire('Error', response.message || 'Gagal menambahkan data', 'error');
               }
+              loadBOMData()
             },
             error: function(xhr, status, error) {
               Swal.fire('Error', 'Terjadi kesalahan: ' + error, 'error');

@@ -765,13 +765,18 @@ function deleteLabour($id)
 }
 public function inputbom($id, $id_modul)
 {
-    $data['content'] = view('admin/content/input_bom', ['id_product' => $id, 'id_modul' => $id_modul]);
+    $mdl = new \App\Models\MdlProduct();
+    $mdl2 = new \App\Models\MdlModul();
+
+
+    $data['content'] = view('admin/content/input_bom', ['product' => $mdl->find($id), 'modul' => $mdl2->find($id_modul)]);
         return view('admin/index', $data);
 }
 public function databom($id, $id_modul)
 {
     $model = new \App\Models\MdlBillOfMaterial();
-    $data = $model->join('materials', 'materials.id = billofmaterial.id_material')
+    $data = $model->select('billofmaterial.*, materials.name as name, materials.kode as kode, materials_detail.kite as kite, satuan.nama as satuan')
+                  ->join('materials', 'materials.id = billofmaterial.id_material')
                   ->join('materials_detail', 'materials_detail.material_id = billofmaterial.id_material')
                   ->join('satuan', 'satuan.id = materials_detail.satuan_id')
                   ->where(array('billofmaterial.id_product'=>$id, 'billofmaterial.id_modul'=>$id_modul))
@@ -782,5 +787,30 @@ public function databom($id, $id_modul)
         return $this->response->setJSON(['message' => 'Data not found'], 404);
 
     }
+}
+public function deleteBom($id)
+{
+    $model = new \App\Models\MdlBillOfMaterial();
+    $item = $model->find($id);
+
+    if ($item) {
+        $model->delete($id);
+
+        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully','success' => true,]);
+    }
+
+    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
+public function addbom()
+{
+    $model = new \App\Models\MdlBillOfMaterial();
+    $data = $this->request->getPost();
+    $model->insert($data);
+
+    return $this->response->setJSON([
+        'status' => true,
+        'success' => true,
+        'message' => 'Item added successfully',
+    ]);
 }
 }
