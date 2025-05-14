@@ -108,13 +108,9 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Detail Master Payroll</h6>
+            <h6 class="mb-0">BILL OF MATERIAL</h6>
             <div>
-            <button id="downloadBatch" class="btn btn-warning">Download Batch Gaji</button>
-            <button id="printRekapGaji" class="btn btn-primary">Print Rekap Gaji</button>
-<a id="exportExcelLink" href="#" class="btn btn-success">
-    <i class="fa fa-file-excel"></i> Unduh Rekap Gaji (Excel)
-</a>
+          
             </div>
             
         </div>
