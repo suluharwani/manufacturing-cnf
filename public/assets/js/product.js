@@ -1,9 +1,7 @@
 var loc = window.location;
 var base_url = loc.protocol + "//" + loc.hostname + (loc.port? ":"+loc.port : "") + "/";
 
-
-tabel();
-function tabel(){
+$(document).ready(function() {
   var dataTable = $('#tabel_serverside').DataTable( {
     "processing" : true,
     "oLanguage": {
@@ -63,8 +61,8 @@ function tabel(){
     }},
 
     {mRender: function (data, type, row) {
-     return `<a href="javascript:void(0);" class="btn btn-warning btn-sm deleteProduct" id="'+row[1]+'" >Edit</a>
-             <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteProduct" id="'+row[1]+'" >Delete</a>`; 
+     return `
+             <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteProduct" id="${row[1]}" >Delete</a>`; 
     }},
    
   ],
@@ -81,7 +79,14 @@ function tabel(){
   }
 
 });
-};
+
+})
+
+// tabel();
+// function tabel(){
+  
+
+// };
 
 function showImagePopup(src, alt) {
     Swal.fire({
@@ -262,7 +267,7 @@ function simpan(){
       $('.uploadBtn').removeClass("btn-success");
 
       $('#form').trigger("reset");
-      $('#tabelProduct').DataTable().ajax.reload();
+      $('#tabel_serverside').DataTable().ajax.reload();
       Swal.fire(
         'Berhasil!',
         ''+data['nama']+' telah ditambahkan.',
@@ -648,4 +653,46 @@ $(document).on('click', '.viewOrderDetail', function () {
     
     // Redirect ke URL di tab baru
     window.open(url, '_blank');
+});
+$(document).on('click', '.deleteProduct', function() {
+    const productId = $(this).attr('id');
+    
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Anda akan menghapus produk ini secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: base_url + "product/deleteProduct",
+                data: { id: productId },
+                success: function(response) {
+                    // Reload DataTable
+                    
+                 $('#tabel_serverside').DataTable().ajax.reload();
+                    
+                    Swal.fire(
+                        'Terhapus!',
+                        'Produk telah dihapus.',
+                        'success'
+                    );
+                },
+                error: function(xhr) {
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${d.message}`,
+                        footer: '<a href="">Why do I have this issue?</a>'
+                    });
+                }
+            });
+        }
+    });
 });

@@ -66,7 +66,7 @@ $(document).ready(function() {
     }},
 
     {mRender: function (data, type, row) {
-      return ` <a href="javascript:void(0);" class="btn btn-success btn-sm add" id="${row[1]}" nama="${row[2]}" code= "${row[3]}">Add</a>`; 
+      return ` <a href="javascript:void(0);" class="btn btn-success btn-sm add" id="${row[1]}" nama="${row[2]}" code= "${row[3]}" satuan = "(${row[6]}) ${row[7]}">Add</a>`; 
     }
   }
   ],
@@ -218,13 +218,14 @@ loadBOMData()
     const id = $(this).attr('id');
     const nama = $(this).attr('nama');
     const code = $(this).attr('code');
+    const satuan = $(this).attr('satuan');
     
-    showAddPopup(id, nama, code);
+    showAddPopup(id, nama, code, satuan);
   });
 
 
 // Function to show SweetAlert popup for adding material
-function showAddPopup(id, nama, code) {
+function showAddPopup(id, nama, code, satuan) {
   Swal.fire({
     title: `Tambah Material`,
     html: `
@@ -233,6 +234,7 @@ function showAddPopup(id, nama, code) {
         <p><strong>Nama:</strong> ${nama}</p>
         <p><strong>Kode:</strong> ${code}</p>
         <p><strong>segment: ${getSegment1()} - ${getSegment2()}</strong></p>
+        <p><strong>Satuan: ${satuan}</strong></p>
         <hr>
         <div class="form-group">
           <label for="swal-input2">Jumlah:</label>

@@ -10,7 +10,7 @@ class MdlProduct extends Model
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = ['id','kode','nama','hs_code','id_product_cat','picture','text','updated_at','length','width','height','cbm','deleted_at','created_at'];
 

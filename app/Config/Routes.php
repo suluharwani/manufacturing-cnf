@@ -202,6 +202,8 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
 });
 
 $routes->group('product', function ($routes) {
+$routes->post('deleteProduct', 'ProductController::deleteProduct',['filter' => 'accessControl:2']);
+
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
     $routes->post('addcat', 'ProductController::addcat',['filter' => 'accessControl:2']); 
     // $routes->post('add', 'ProductController::add',['filter' => 'accessControl:2']); 

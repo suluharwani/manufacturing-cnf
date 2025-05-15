@@ -18,9 +18,6 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="container mt-5">
                 <h2>Purchase Request Form</h2>
-                <?php
-
-                ?>
                 <form>
                     <div class="row mb-3">
                         <label for="invoice" class="col-md-3 col-form-label">Kode</label>

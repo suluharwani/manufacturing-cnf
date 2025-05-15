@@ -813,4 +813,18 @@ public function addbom()
         'message' => 'Item added successfully',
     ]);
 }
+function deleteProduct()
+{
+    $id = $this->request->getPost('id');
+    $model = new \App\Models\MdlProduct();
+    $item = $model->find($id);
+
+    if ($item) {
+        $model->delete($id);
+
+        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+    }
+
+    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
 }

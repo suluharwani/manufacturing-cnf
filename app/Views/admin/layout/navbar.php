@@ -32,8 +32,8 @@
                         <div class="dropdown-menu bg-transparent border-0">
                             <a href="<?= base_url('supplier') ?>" class="dropdown-item"> Supplier</a>
                             <a href="<?= base_url('customer') ?>" class="dropdown-item"> Customer</a>
-                            <a href="<?= base_url('material') ?>" class="dropdown-item"> Materials</a>
-                            <a href="<?= base_url('finishing') ?>" class="dropdown-item"> Finishing</a>
+                            <a href="<?= base_url('material') ?>" class="dropdown-item"> Material</a>
+                            <!-- <a href="<?= base_url('finishing') ?>" class="dropdown-item"> Finishing</a> -->
 
                             <a href="<?= base_url('product') ?>" class="dropdown-item">BoM Finished goods</a>
                             <!-- <a href="<?= base_url('track_material') ?>" class="dropdown-item">Track Material Inventory</a> -->
