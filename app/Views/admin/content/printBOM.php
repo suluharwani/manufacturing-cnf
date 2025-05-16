@@ -127,21 +127,26 @@
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $noModul = 1;
-                foreach ($modul['materials'] as $row):
-                    $penggunaan = rtrim(rtrim(number_format(floatval($row['penggunaan']), 4), '0'), '.');
-                    $total_penggunaan = rtrim(rtrim(number_format(floatval($row['total_penggunaan']), 4), '0'), '.');
-                ?>
-                    <tr>
-                        <td><?= $noModul++ ?></td>
-                        <td><?= $row['material_name'] ?></td>
-                        <td><?= $row['material_code'] ?></td>
-                        <td><?= $row['kite'] ?></td>
-                        <td><?= $penggunaan . ' ' . $row['satuan'] ?></td>
+<?php
+$noModul = 1;
+// Sort materials by material_name (ascending)
+usort($modul['materials'], function($a, $b) {
+    return strcmp($a['material_name'], $b['material_name']);
+});
 
-                    </tr>
-                <?php endforeach; ?>
+foreach ($modul['materials'] as $row):
+    // Fix: Remove named argument and simplify rtrim()
+    $penggunaan = rtrim(rtrim(number_format(floatval($row['penggunaan']), 4), '0'), '.');
+    $total_penggunaan = rtrim(rtrim(number_format(floatval($row['total_penggunaan']), 4), '0'), '.');
+?>
+    <tr>
+        <td><?= $noModul++ ?></td>
+        <td><?= $row['material_name'] ?></td>
+        <td><?= $row['material_code'] ?></td>
+        <td><?= $row['kite'] ?></td>
+        <td><?= $penggunaan . ' ' . $row['satuan'] ?></td>
+    </tr>
+<?php endforeach; ?>
             </tbody>
         </table>
     <?php endforeach; ?>

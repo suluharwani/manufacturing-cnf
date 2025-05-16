@@ -633,6 +633,7 @@ public function printBom($productId, $finishingId)   {
         ->join('finishing', 'product.id = finishing.id_product', 'left')
         ->where('product.id', $productId)
         ->where('finishing.id', $finishingId)
+        ->orderBy('product.nama')
         ->findAll();
         // $query1 = $proformaInvoiceDetailsModel
         //     ->select('product.nama,product.kode as kode, proforma_invoice_details.quantity')
@@ -668,7 +669,7 @@ public function printBom($productId, $finishingId)   {
         ->where('p.id', $productId)
         ->where('finishing.id', $finishingId)
         ->groupBy('m.id, m.name, m.kode, p.id, finishing.id,p.id, satuan.nama, type.nama, finishing.name, materials_detail.kite')
-        ->orderBy('finishing.id, p.id')
+        ->orderBy('finishing.id, p.nama')
         ->findAll();
 
         // Query 3: Ambil data material dan penggunaan dari billofmaterial
