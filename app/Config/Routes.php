@@ -223,6 +223,7 @@ $routes->post('deleteProduct', 'ProductController::deleteProduct',['filter' => '
     $routes->post('modul/(:any)', 'ProductController::modul/$1',['filter' => 'accessControl:2']);
     $routes->post('updateDimension/(:any)', 'ProductController::updateDimension/$1',['filter' => 'accessControl:2']);
     $routes->get('printBom/(:any)/(:any)', 'ProductController::printBom/$1/$2',['filter' => 'accessControl:2']); 
+    $routes->get('printCost/(:any)/(:any)', 'ProductController::printCost/$1/$2',['filter' => 'accessControl:2']); 
     $routes->get('labourCost/(:any)', 'ProductController::labourCost/$1',['filter' => 'accessControl:2']); 
     $routes->post('labourCreate/(:any)', 'ProductController::labourCreate/$1',['filter' => 'accessControl:2']); 
     $routes->post('getLabour/(:any)', 'ProductController::getLabour/$1',['filter' => 'accessControl:2']); 

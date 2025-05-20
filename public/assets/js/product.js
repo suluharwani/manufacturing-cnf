@@ -52,7 +52,6 @@ $(document).ready(function() {
        return `
                <a href="${base_url}breakdownBoM/${row[1]}" target="_blank" class="btn btn-secondary btn-sm breakdownBom" id="${row[1]}" title = "Bill of Material"><i class="fa fa-list-ol" aria-hidden="true" ></i></a>
                <a href="${base_url}product/labourCost/${row[1]}" target="_blank" class="btn btn-primary btn-sm labourCost" id="${row[1]}" title = "Labour Cost">$</a>
-               <a href="${base_url}product/materialCost/${row[1]}" target="_blank" class="btn btn-secondary btn-sm materialCost" id="${row[1]}" title = "Material Cost"><i class="fas fa-receipt"></i></a>
                <a href="${base_url}product/productDesign/${row[1]}" target="_blank" class="btn btn-warning btn-sm createDesign" id="${row[1]}" title = "Design" ><i class="fas fa-drafting-compass"></i></a>
                <a href="javascript:void(0);" class="btn btn-primary btn-sm createFile" id="${row[1]}" title = "File"><i class="fas fa-file"></i></a>
                 `; 

@@ -38,6 +38,7 @@ const table = $('#finishingTable').DataTable({
             render: (data) =>
                 `
                     <button class="btn btn-warning print" data-id="${data.id}" data-id_product="${getLastSegment()}">Print Bill of material</button>
+                    <button class="btn btn-warning printCost" data-id="${data.id}" data-id_product="${getLastSegment()}">Print Cost</button>
                     <button class="btn btn-warning bomFinishing" data-id="${data.id}">Bill of material</button>
                     <button class="btn btn-warning edit" data-id="${data.id}">Edit Data</button>
                     <button class="btn btn-info edit-picture" data-id="${data.id}">Edit Picture</button>
@@ -303,7 +304,11 @@ $(document).on('click', '.print', function () {
   const idProduct = getLastSegment();
   window.location.href = `${base_url}product/printBom/${idProduct}/${idFinishing}`;
 })
-
+$(document).on('click', '.printCost', function () {
+  const idFinishing = $(this).data('id'); // Mengambil ID order dari atribut id
+  const idProduct = getLastSegment();
+  window.location.href = `${base_url}product/printCost/${idProduct}/${idFinishing}`;
+})
 $(document).on('click', '.bomFinishing', function () {
     const idModul = $(this).data('id'); // Mengambil ID order dari atribut id
     const idProduct = getLastSegment();
