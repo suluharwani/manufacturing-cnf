@@ -97,6 +97,7 @@ function convertcm($mm) {
         .signature-section td {
             height: 50px;
         }
+        
     </style>
 </head>
 <body>
@@ -178,88 +179,88 @@ function convertcm($mm) {
 
 
         <!-- Tabel Produk -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Picture</th>
-                    <th>Description</th>
-                    <th>Finishing</th>
-                    <th>Finishing Picture</th>
-                    <th>HS Code</th>
-                    <th>Qty</th>
-                    <th>Size (cm)</th>
-                    <th>CBM</th>
-                    <th>Price/Unit</th>
-                    <th>Disc %</th>
-                    <th>Final Price</th>
-                    <th style="width: 50px">Total Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Baris produk (diulang untuk setiap item) -->
-                 <?php 
-                 $tot_qty = 0;
-                 $tot_price = 0;
-                 $tot_cbm = 0;
-                 foreach ($piDet as $item) {
-                    $finalPrice =  hargaDisc($item['unit_price'], $item['disc']);
+<!-- Tabel Produk -->
+<table>
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Product Name</th>
+            <th>Picture</th>
+            <th>Description</th>
+            <th>Finishing</th>
+            <th>Finishing Picture</th>
+            <th>HS Code</th>
+            <th>Qty</th>
+            <th>Size (cm)</th>
+            <th>CBM</th>
+            <th>Total CBM</th> <!-- New column -->
+            <th>Price/Unit</th>
+            <th>Disc %</th>
+            <th>Final Price</th>
+            <th style="width: 50px">Total Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+        $tot_qty = 0;
+        $tot_price = 0;
+        $tot_cbm = 0;
+        $tot_qty_cbm = 0; // New total variable
+        foreach ($piDet as $item) {
+            $finalPrice = hargaDisc($item['unit_price'], $item['disc']);
+            $qty_cbm = $item['quantity'] * $item['p_cbm']; // Calculate Qty x CBM
 
-                    $tot_qty += $item['quantity'];
-                    $tot_price += $item['quantity']*$finalPrice;
-                    $tot_cbm += $item['p_cbm'];
-                    ?>
-                <tr>
-
-                    <td><?=$item['p_code']?></td>
-                    <td><?=$item['p_name']?></td>
-                    <td><img src="<?=base_url('assets/upload/thumb/').$item['p_picture']?>" height="40"></img></td>
-                    <td><?=$item['remarks']?></td>
-                    <td><?=$item['f_name']?></td>
-                    <td><img src="<?=base_url('uploads/finishing/').$item['f_picture']?>" height="40"></img></td>
-                    <td><?=$item['p_hs_code']?></td>
-                    <td><?=formatCurrency($item['quantity'])?></td>
-                    <td><?=convertcm($item['p_length'])."x".convertcm($item['p_width'])."x".convertcm($item['p_height'])?></td>
-                    <td><?=$item['p_cbm']?></td>
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($item['unit_price'])?></td>
-                    <td><?=$item['disc']?></td>
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency( $finalPrice)?></td>
-                    
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($finalPrice*$item['quantity'])?></td>
-
-                </tr>
-                <?php } ?>
-                <!-- Tambahkan baris lain sesuai kebutuhan -->
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="7">TOTAL</td>
-                    <td><?=$tot_qty?></td>
-                    <td></td>
-                    <td><?=$tot_cbm?></td>
-                    <td colspan="3"></td>
-
-  
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
-                </tr>
-                <tr>
-                    <td colspan = "12" style="border: none; !important;"></td>
-                    <td>CHARGE</td>
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
-                </tr>
-                <tr>
-                    <td colspan = "12" style="border: none; !important;"></td>
-                    <td>DEPOSIT</td>
-                    <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
-                </tr>
-                <tr>
-                    <td colspan = "12" style="border: none; !important;"></td>
-                    <td>GRAND TOTAL</td>
-                    <td><?=$item['currency_code']." ".formatCurrency($tot_price+$pi['charge']-$pi['deposit'])?></td>
-                </tr>
-            </tfoot>
-        </table>
+            $tot_qty += $item['quantity'];
+            $tot_price += $item['quantity'] * $finalPrice;
+            $tot_cbm += $item['p_cbm'];
+            $tot_qty_cbm += $qty_cbm; // Add to total
+        ?>
+        <tr>
+            <td><?=$item['p_code']?></td>
+            <td><?=$item['p_name']?></td>
+            <td><img src="<?=base_url('assets/upload/thumb/').$item['p_picture']?>" height="40"></img></td>
+            <td><?=$item['remarks']?></td>
+            <td><?=$item['f_name']?></td>
+            <td><img src="<?=base_url('uploads/finishing/').$item['f_picture']?>" height="40"></img></td>
+            <td><?=$item['p_hs_code']?></td>
+            <td><?=formatCurrency($item['quantity'])?></td>
+            <td><?=convertcm($item['p_length'])."x".convertcm($item['p_width'])."x".convertcm($item['p_height'])?></td>
+            <td><?=number_format($item['p_cbm'], 2)?></td> <!-- Changed to 2 decimal places -->
+            <td><?=number_format($qty_cbm, 2)?></td> <!-- Changed to 2 decimal places -->
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($item['unit_price'])?></td>
+            <td><?=$item['disc']?></td>
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($finalPrice)?></td>
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($finalPrice*$item['quantity'])?></td>
+        </tr>
+        <?php } ?>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="7">TOTAL</td>
+            <td><?=$tot_qty?></td>
+            <td></td>
+            <td><?=number_format($tot_cbm, 2)?></td> <!-- Changed to 2 decimal places -->
+            <td><?=number_format($tot_qty_cbm, 2)?></td> <!-- Changed to 2 decimal places -->
+            <td colspan="3"></td>
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>
+        </tr>
+        <tr>
+            <td colspan="13" style="border: none; !important;"></td>
+            <td>CHARGE</td>
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['charge'])?></td>
+        </tr>
+        <tr>
+            <td colspan="13" style="border: none; !important;"></td>
+            <td>DEPOSIT</td>
+            <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($pi['deposit'])?></td>
+        </tr>
+        <tr>
+            <td colspan="13" style="border: none; !important;"></td>
+            <td>GRAND TOTAL</td>
+            <td><?=$item['currency_code']." ".formatCurrency($tot_price+$pi['charge']-$pi['deposit'])?></td>
+        </tr>
+    </tfoot>
+</table>
 
         <!-- Bank Details -->
         <table>
