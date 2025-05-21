@@ -238,8 +238,7 @@ function convertcm($mm) {
         <tr>
             <td colspan="7">TOTAL</td>
             <td><?=$tot_qty?></td>
-            <td></td>
-            <td><?=number_format($tot_cbm, 2)?></td> <!-- Changed to 2 decimal places -->
+            <td colspan="2"></td>
             <td><?=number_format($tot_qty_cbm, 2)?></td> <!-- Changed to 2 decimal places -->
             <td colspan="3"></td>
             <td style="white-space: nowrap;"><?=$item['currency_code']." ".formatCurrency($tot_price)?></td>

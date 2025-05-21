@@ -228,7 +228,11 @@ $routes->post('deleteProduct', 'ProductController::deleteProduct',['filter' => '
     $routes->post('labourCreate/(:any)', 'ProductController::labourCreate/$1',['filter' => 'accessControl:2']); 
     $routes->post('getLabour/(:any)', 'ProductController::getLabour/$1',['filter' => 'accessControl:2']); 
     $routes->post('deleteLabour/(:any)', 'ProductController::deleteLabour/$1',['filter' => 'accessControl:2']); 
-    
+    $routes->get('file/(:num)', 'ProductController::file/$1',['filter' => 'accessControl:2']);
+    $routes->get('design/(:num)', 'ProductController::design/$1',['filter' => 'accessControl:2']);
+    $routes->post('uploadFile', 'ProductController::uploadFile',['filter' => 'accessControl:2']);
+    $routes->post('getFile/(:num)/(:num)', 'ProductController::getFile/$1/$2',['filter' => 'accessControl:2']);
+    $routes->delete('deleteFile/(:num)', 'ProductController::deleteFile/$1',['filter' => 'accessControl:2']);
 });
 $routes->group('supplier', ['namespace' => 'App\Controllers'], function ($routes) {
     $routes->get('list', 'SupplierController::listdataSupplierJoin',['filter' => 'accessControl:2']); // Route untuk menampilkan data supplier
@@ -328,6 +332,7 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->get('printInvoiceNeed/(:num)', 'ProformaInvoiceController::printInvoiceNeed/$1',['filter' => 'accessControl:2']);
     $routes->get('printPi/(:num)', 'ProformaInvoiceController::printPi/$1',['filter' => 'accessControl:2']);
     $routes->post('update/(:num)', 'ProformaInvoiceController::update/$1',['filter' => 'accessControl:2']);
+   
     
 
 });

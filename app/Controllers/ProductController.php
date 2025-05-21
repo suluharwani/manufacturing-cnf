@@ -954,4 +954,238 @@ function deleteProduct()
 
     return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
 }
+    public function file($id)
+    {
+        $mdl = new \App\Models\MdlProduct();
+        $data['product'] = $mdl->find($id);
+        $data['content'] = view('admin/content/form_file_product', $data);
+        return view('admin/index', $data);
+    }
+        public function design($id)
+    {
+        $mdl = new \App\Models\MdlProduct();
+       $data['product'] = $mdl->find($id);
+        // var_dump($data['pi']);
+        // die();
+        $data['content'] = view('admin/content/form_design_product', $data);
+        return view('admin/index', $data);
+    }
+    public function uploadFile()
+    {
+        $validation = \Config\Services::validation();
+
+        $validation->setRules([
+            'file' => [
+                'label' => 'File',
+                'rules' => 'uploaded[file]|max_size[file,102400]',
+                'errors' => [
+                    'uploaded' => 'Please select a file to upload.',
+                    'max_size' => 'File size must be less than 100MB.',
+                    'mime_in' => 'Only PDF, JPG, JPEG, and PNG files are allowed.'
+                ]
+            ],
+            'name' => [
+                'label' => 'Document Name',
+                'rules' => 'required',
+            ],
+            'desc' => [
+                'label' => 'Document Description',
+                'rules' => 'required',
+            ],
+             'category' => [
+                'label' => 'Document Category',
+                'rules' => 'required',
+            ]
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            // Get the validation errors
+            $errors = $validation->getErrors();
+
+            // Format the errors into a string
+            $errorMessage = implode(", ", $errors);
+
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => $errorMessage
+            ]);
+        }
+
+        $file = $this->request->getFile('file');
+
+        if ($file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            $file->move(ROOTPATH . 'public/uploads/file/', $newName);
+
+            $model = new \App\Models\MdlFile();
+            $data = [
+                'product_id' => $this->request->getPost('product_id'),  // Assuming you have an id_pi field in your form
+                // 'document' => $file->getName(),
+                'file' =>  $newName,
+                'name' => $this->request->getPost('name'),
+                'category' => $this->request->getPost('category'),
+                'desc' => $this->request->getPost('desc')
+            ];
+
+            if ($model->insert($data)) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'File uploaded successfully.'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Failed to save file information to the database.',
+                    'data' => $model->errors()
+                ]);
+            }
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'File upload failed.'
+            ]);
+        }
+    }
+    public function getFile($cat,$id)
+       {
+           
+           $serverside_model = new \App\Models\MdlDatatableJoin();
+           $request = \Config\Services::request();
+          
+           // Define the columns to select
+           $select_columns = 'file.*, product.nama as product_name, product.kode as product_code';
+            $joins = [
+               ['product', 'file.product_id = product.id', 'left'],
+           ];
+           // Define the joins (you can add more joins as needed)
+   
+           $where = ['file.id !=' => 0, 'file.deleted_at' => NULL, 'file.product_id' => $id, 'file.category' => $cat];
+   
+           // Column Order Must Match Header Columns in View
+           $column_order = array(
+               NULL, 
+               'file.id', 
+               'file.updated_at', 
+               'file.name',
+               'file.desc',
+               'file.file',
+
+           );
+           $column_search = array(
+               'file.name', 
+               'file.desc',
+          
+           );
+           $order = array('file.id' => 'desc');
+   
+           // Call the method to get data with dynamic joins and select fields
+           $list = $serverside_model->get_datatables('file', $select_columns, $joins, $column_order, $column_search, $order, $where);
+           
+           $data = array();
+           $no = $request->getPost("start");
+           foreach ($list as $lists) {
+               $no++;
+               $row = array();
+               $row[] = $no;
+               $row[] = $lists->id;
+               $row[] = $lists->updated_at;
+               $row[] = $lists->name;
+               $row[] = $lists->desc;
+               $row[] = $lists->file;
+
+ // From joined suppliers table
+               $data[] = $row;
+           }
+   
+           $output = array(
+               "draw" => $request->getPost("draw"),
+               "recordsTotal" => $serverside_model->count_all('file', $where),
+               "recordsFiltered" => $serverside_model->count_filtered('file', $select_columns, $joins, $column_order, $column_search, $order, $where),
+               "data" => $data,
+           );
+          
+
+           return $this->response->setJSON($output);
+       }
+        public function listdataProdukJoinasd()
+       {
+           
+           $serverside_model = new \App\Models\MdlDatatableJoin();
+           $request = \Config\Services::request();
+           
+           // Define the columns to select
+           $select_columns = 'product.*,product_category.nama as category';
+           
+           // Define the joins (you can add more joins as needed)
+           $joins = [
+                 ['product_category', 'product_category.id = product.id_product_cat', 'left'],
+           ];
+   
+           $where = ['product.id !=' => 0, 'product.deleted_at' => NULL];
+   
+           // Column Order Must Match Header Columns in View
+           $column_order = array(
+               NULL, 
+               'product.name', 
+               'product.kode', 
+               'product.id',
+               'product.id',
+               'product.id',
+               'product.id',
+               'product.id',
+           );
+           $column_search = array(
+               'product.nama', 
+               'product.kode', 
+          
+           );
+           $order = array('product.id' => 'desc');
+   
+           // Call the method to get data with dynamic joins and select fields
+           $list = $serverside_model->get_datatables('product', $select_columns, $joins, $column_order, $column_search, $order, $where);
+           
+           $data = array();
+           $no = $request->getPost("start");
+           foreach ($list as $lists) {
+               $no++;
+               $row = array();
+               $row[] = $no;
+               $row[] = $lists->id;
+               $row[] = $lists->nama;
+               $row[] = $lists->kode;
+               $row[] = $lists->picture;
+               $row[] = $lists->text;
+               $row[] = $lists->category;
+
+ // From joined suppliers table
+               $data[] = $row;
+           }
+   
+           $output = array(
+               "draw" => $request->getPost("draw"),
+               "recordsTotal" => $serverside_model->count_all('product', $where),
+               "recordsFiltered" => $serverside_model->count_filtered('product', $select_columns, $joins, $column_order, $column_search, $order, $where),
+               "data" => $data,
+           );
+          
+
+           return $this->response->setJSON($output);
+       }
+       public function deleteFile($id)
+{
+    $model = new \App\Models\MdlFile();
+    $item = $model->find($id);
+
+    if ($item) {
+        if ($item['file']) {
+            unlink('uploads/file/' . $item['file']);
+        }
+
+        $model->delete($id);
+
+        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+    }
+
+    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+}
 }
