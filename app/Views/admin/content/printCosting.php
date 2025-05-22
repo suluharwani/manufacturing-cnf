@@ -123,8 +123,8 @@
                         <td><?= $row['material_code'] ?></td>
                         <td><?= $row['kite'] ?></td>
                         <td><?= $penggunaan . ' ' . $row['satuan'] ?></td>
-                        <td><?= $row['last_price'].' '. $row['currency_symbol']?></td>
-                        <td><?= $row['last_price']*$penggunaan.' '. $row['currency_symbol']?></td>
+                        <td><?= $row['currency_symbol'].' '.number_format($row['last_price']) ?></td>
+                        <td><?= $row['currency_symbol'].' '.number_format($row['last_price']*$penggunaan)?></td>
                         <td>Rp <?= $row['rate'] != 0 ? number_format(($row['last_price'] * $penggunaan) / $row['rate'], 0, ',', '.') : 0 ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -181,8 +181,8 @@
                         <td><?= $row['material_code'] ?></td>
                         <td><?= $row['kite'] ?></td>
                         <td><?= $penggunaan . ' ' . $row['satuan'] ?></td>
-                        <td><?= $row['last_price'].' '. $row['currency_symbol']?></td>
-                        <td><?= $row['last_price']*$penggunaan.' '. $row['currency_symbol']?></td>
+                        <td><?= $row['currency_symbol'].' '.number_format($row['last_price']) ?></td>
+                        <td><?= $row['currency_symbol'].' '.number_format($row['last_price']*$penggunaan)?></td>
                         <td>Rp <?= $row['rate'] != 0 ? number_format(($row['last_price'] * $penggunaan) / $row['rate'], 0, ',', '.') : 0 ?></td>
                     </tr>
                 <?php endforeach; ?>

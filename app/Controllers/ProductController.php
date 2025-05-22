@@ -622,132 +622,119 @@ function updateDimension($id){
         die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
     }
 }
-public function printCost($productId, $finishingId)   {
-        // Load models
+public function printCost($productId, $finishingId) {
+    // Load models
+    $productModel = new MdlProduct();
 
-        $productModel = new MdlProduct();
-
-        // Query 1: Ambil data produk dan quantity
-        $query1 = $productModel
+    // Query 1: Ambil data produk dan quantity
+    $query1 = $productModel
         ->select('* , finishing.name AS finishing')
         ->join('finishing', 'product.id = finishing.id_product', 'left')
-        
         ->where('product.id', $productId)
         ->where('finishing.id', $finishingId)
         ->orderBy('product.nama')
         ->findAll();
-        // $query1 = $proformaInvoiceDetailsModel
-        //     ->select('product.nama,product.kode as kode, proforma_invoice_details.quantity')
-        //     ->join('product', 'product.id = proforma_invoice_details.id_product')
-        //     ->where('proforma_invoice_details.invoice_id', $invoice_id)
-        //     ->findAll();
 
-        // Query 2: Ambil data material dan penggunaan dari billofmaterialfinishing
-       $query2 = $productModel
-    ->select('
-        m.id AS material_id, 
-        m.name AS material_name, 
-        m.kode AS material_code, 
-        FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
-        p.id, 
-        p.nama AS product, 
-        FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)) , 3) AS total_penggunaan,
-        satuan.nama as satuan, 
-        type.nama as type, 
-        finishing.name AS finishing_name,
-        finishing.id AS finishing_id, 
-        finishing.id as modul_id, 
-        materials_detail.kite as kite,
-        pembelian_detail.harga as last_price,
-        currency.kode as currency_symbol,
-        currency.rate as rate
-    ')
-    ->from('product p')
-    ->join('billofmaterialfinishing bom', 'p.id = bom.id_product', 'left')
-    ->join('materials m', 'bom.id_material = m.id')
-    ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
-    ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
-    ->join('type', 'type.id = materials_detail.type_id', 'left')
-    ->join('finishing', 'bom.id_modul = finishing.id', 'left')
-    ->join("(SELECT pd.* FROM pembelian_detail pd 
-             INNER JOIN (
-                 SELECT id_material, MAX(pembelian.created_at) as max_date 
-                 FROM pembelian_detail 
-                 JOIN pembelian ON pembelian_detail.id_pembelian = pembelian.id
-                 GROUP BY id_material
-             ) last ON pd.id_material = last.id_material 
-             JOIN pembelian p ON pd.id_pembelian = p.id AND p.created_at = last.max_date
-            ) pembelian_detail", 'm.id = pembelian_detail.id_material', 'left')
-    ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian", 'left')
-    ->join('supplier', 'supplier.id = pembelian.id_supplier', 'left')
-    ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
-    ->where('p.id', $productId)
-    ->where('finishing.id', $finishingId)
-    ->groupBy('m.id, m.name, m.kode, p.id, finishing.id,p.id, satuan.nama, type.nama, finishing.name, materials_detail.kite, pembelian_detail.harga, currency.kode')
-    ->orderBy('finishing.id, p.nama')
-    ->findAll();
+    // Query 2: Ambil data material dan penggunaan dari billofmaterialfinishing (with stock.price)
+    $query2 = $productModel
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+            p.id, 
+            p.nama AS product, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS total_penggunaan,
+            satuan.nama as satuan, 
+            type.nama as type, 
+            finishing.name AS finishing_name,
+            finishing.id AS finishing_id, 
+            finishing.id as modul_id, 
+            materials_detail.kite as kite,
+            stock.price as last_price,
+            currency.kode as currency_symbol,
+            currency.rate as rate
+        ')
+        ->from('product p')
+        ->join('billofmaterialfinishing bom', 'p.id = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->join('finishing', 'bom.id_modul = finishing.id', 'left')
+        ->join("(SELECT s.* FROM stock s 
+                INNER JOIN (
+                    SELECT id_material, MAX(created_at) as max_date 
+                    FROM stock 
+                    GROUP BY id_material
+                ) latest ON s.id_material = latest.id_material AND s.created_at = latest.max_date
+               ) stock", 'm.id = stock.id_material', 'left')
+        ->join("currency", "stock.id_currency = currency.id", 'left')
+        ->where('p.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->groupBy('m.id, m.name, m.kode, p.id, finishing.id,p.id, satuan.nama, type.nama, finishing.name, materials_detail.kite, stock.price, currency.kode')
+        ->orderBy('finishing.id, p.nama')
+        ->findAll();
 
-        // Query 3: Ambil data material dan penggunaan dari billofmaterial
-        $query3 = $productModel
-    ->select('
-        m.id AS material_id, 
-        m.name AS material_name, 
-        m.kode AS material_code, 
-        FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
-        p.id, 
-        p.nama AS product, 
-        FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS total_penggunaan,
-        satuan.nama as satuan, 
-        type.nama as type, 
-        modul.name AS modul_name,
-        modul.code AS modul_code, 
-        modul.id as modul_id,
-        materials_detail.kite as kite,
-        pembelian_detail.harga as last_price,
-        currency.kode as currency_symbol,
-        currency.rate as rate
-    ')
-    ->from('product p', true)
-    ->join('billofmaterial bom', 'p.id = bom.id_product', 'left')
-    ->join('materials m', 'bom.id_material = m.id')
-    ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
-    ->join("(SELECT pd.* FROM pembelian_detail pd 
-             INNER JOIN (
-                 SELECT id_material, MAX(id) as max_id 
-                 FROM pembelian_detail 
-                 GROUP BY id_material
-             ) last ON pd.id_material = last.id_material AND pd.id = last.max_id
-            ) pembelian_detail", 'm.id = pembelian_detail.id_material', 'left')
-    ->join("pembelian","pembelian.id = pembelian_detail.id_pembelian", 'left')
-    ->join('supplier', 'supplier.id = pembelian.id_supplier', 'left')
-    ->join("currency","pembelian_detail.id_currency = currency.id", 'left')
-    ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
-    ->join('type', 'type.id = materials_detail.type_id', 'left')
-    ->join('modul', 'bom.id_modul = modul.id', 'left')
-    ->where('p.id', $productId)
-    ->groupBy('m.id, m.name, m.kode, p.id, modul.id, satuan.nama, type.nama, modul.name, modul.code, materials_detail.kite, pembelian_detail.harga, currency.kode')
-    ->orderBy('modul.id,p.id')
-    ->findAll();
+    // Query 3: Ambil data material dan penggunaan dari billofmaterial (with stock.price)
+    $query3 = $productModel
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+            p.id, 
+            p.nama AS product, 
+            FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS total_penggunaan,
+            satuan.nama as satuan, 
+            type.nama as type, 
+            modul.name AS modul_name,
+            modul.code AS modul_code, 
+            modul.id as modul_id,
+            materials_detail.kite as kite,
+            stock.price as last_price,
+            currency.kode as currency_symbol,
+            currency.rate as rate
+        ')
+        ->from('product p', true)
+        ->join('billofmaterial bom', 'p.id = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join("(SELECT s.* FROM stock s 
+                INNER JOIN (
+                    SELECT id_material, MAX(created_at) as max_date 
+                    FROM stock 
+                    GROUP BY id_material
+                ) latest ON s.id_material = latest.id_material AND s.created_at = latest.max_date
+               ) stock", 'm.id = stock.id_material', 'left')
+        ->join("currency", "stock.id_currency = currency.id", 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->join('modul', 'bom.id_modul = modul.id', 'left')
+        ->where('p.id', $productId)
+        ->groupBy('m.id, m.name, m.kode, p.id, modul.id, satuan.nama, type.nama, modul.name, modul.code, materials_detail.kite, stock.price, currency.kode')
+        ->orderBy('modul.id,p.id')
+        ->findAll();
 
-        // Data untuk dikirim ke view
-        $data = [
-            'query1' => $query1,
-            'query2' => $query2,
-            'query3' => $query3,
-        ];
+    // Data untuk dikirim ke view
+    $data = [
+        'query1' => $query1,
+        'query2' => $query2,
+        'query3' => $query3,
+    ];
 
-        // Load view dengan data
-        $html = view('admin/content/printCosting', $data);
+    // Load view dengan data
+    $html = view('admin/content/printCosting', $data);
 
-        // Setup Dompdf
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+    // Setup Dompdf
+    $dompdf = new Dompdf();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
 
-        // Output PDF
-        $dompdf->stream("BOM_{$productId}.pdf", ["Attachment" => false]);
-    }
+    // Output PDF
+    $dompdf->stream("BOM_{$productId}.pdf", ["Attachment" => false]);
+}
 public function printBom($productId, $finishingId)   {
         // Load models
 
