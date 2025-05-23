@@ -934,6 +934,7 @@ $results = $penggajianDetailModel->select('
             $result['total_overtime3_Hours'] = $workData['totalOvertime3Hours'];
             $result['sunday_work_Hours'] = $workData['sundayWorkHours'];
             $result['saturday_work_Hours'] = $workData['saturdayWorkHours'];
+            $result['all_work_hours'] = $workData['totalWorkHours']+$workData['totalOvertime1Hours']+$workData['totalOvertime2Hours']+$workData['totalOvertime3Hours'];
         }
         return $results;
 }
@@ -991,12 +992,13 @@ private function getTunjangan()
         $sheet1->setCellValue('K1', 'Overtime 1');
         $sheet1->setCellValue('L1', 'Overtime 2');
         $sheet1->setCellValue('M1', 'Overtime 3');
-        $sheet1->setCellValue('N1', 'Jam Sabtu');
-        $sheet1->setCellValue('O1', 'Jam Minggu');
-        $sheet1->setCellValue('P1', 'Overtime');
-        $sheet1->setCellValue('Q1', 'Potongan');
-        $sheet1->setCellValue('R1', 'Tunjangan');
-        $sheet1->setCellValue('S1', 'Gaji Kotor');
+        $sheet1->setCellValue('N1', 'Jam Kerja+Overtime');
+        $sheet1->setCellValue('O1', 'Jam Sabtu');
+        $sheet1->setCellValue('P1', 'Jam Minggu');
+        $sheet1->setCellValue('Q1', 'Overtime');
+        $sheet1->setCellValue('R1', 'Potongan');
+        $sheet1->setCellValue('S1', 'Tunjangan');
+        $sheet1->setCellValue('T1', 'Gaji Kotor');
 
     $rekapGaji = $this->getRekapGaji(); // Mengambil data rekap gaji dari database
     $row = 2;
@@ -1016,12 +1018,13 @@ private function getTunjangan()
             $sheet1->setCellValue('K' . $row, $data['total_overtime1_Hours']);
             $sheet1->setCellValue('L' . $row, $data['total_overtime2_Hours']);
             $sheet1->setCellValue('M' . $row, $data['total_overtime3_Hours']);
-            $sheet1->setCellValue('N' . $row, $data['saturday_work_Hours']);
-            $sheet1->setCellValue('O' . $row, $data['sunday_work_Hours']);
-            $sheet1->setCellValue('P' . $row, $data['OVT_salary']);
-            $sheet1->setCellValue('Q' . $row, $data['totalDeduction']);
-            $sheet1->setCellValue('R' . $row, $data['totalAllowance']);
-            $sheet1->setCellValue('S' . $row, $data['grossSalary']);
+            $sheet1->setCellValue('N' . $row, $data['all_work_hours']);
+            $sheet1->setCellValue('O' . $row, $data['saturday_work_Hours']);
+            $sheet1->setCellValue('P' . $row, $data['sunday_work_Hours']);
+            $sheet1->setCellValue('Q' . $row, $data['OVT_salary']);
+            $sheet1->setCellValue('R' . $row, $data['totalDeduction']);
+            $sheet1->setCellValue('S' . $row, $data['totalAllowance']);
+            $sheet1->setCellValue('T' . $row, $data['grossSalary']);
         $row++;
     }
 
