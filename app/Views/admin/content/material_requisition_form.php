@@ -71,6 +71,46 @@
         </div>
     </div>
 </div>
+<?php
+if ($mreq['wo'] == null || $mreq['wo'] == '' || $mreq['wo'] == '0') { ?>
+
+<div class="container-fluid pt-4 px-4">
+                <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Persediaan Material</h6>
+                        <div>
+
+                        </div>
+                        
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
+              <thead>
+                <tr  class="text-center">
+                  <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Code</th>
+                  <th style=" text-align: center;">Name</th>
+                  <th style=" text-align: center;">Balance</th>
+                  <th style=" text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr class="text-center">
+                <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">Code</th>
+                  <th style=" text-align: center;">Name</th>
+                  <th style=" text-align: center;">Balance</th>
+                  <th style=" text-align: center;">Action</th>
+              </tr>
+            </tfoot>
+          </table>
+                    </div>
+                </div>
+            </div>
+
+<?php
+}else{
+?>
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -104,7 +144,7 @@
         </div>
     </div>
 </div>
-
+<?php }?>
 
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
@@ -185,6 +225,6 @@
         </div>
     </div>
 </div>
+<script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/material_requisition_form.js"></script>
-<script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

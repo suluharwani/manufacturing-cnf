@@ -9,9 +9,12 @@ function getLastSegment() {
 }
 masterId = getLastSegment();
 $(document).ready(function () {
-  
+  initializeSupplierTable();
+
   tableWO();
   tabel_requisition();
+
+});
   function tabel_requisition(){
     $.ajax({
       url: base_url+'/requisition/dataRequestList/'+getLastSegment(),
@@ -129,8 +132,6 @@ $(document).ready(function () {
       return null;
     }
   }
-});
-
 // Fungsi untuk menampilkan popup dengan input menggunakan SweetAlert2
 $(document).on('click', '.request', function(e) {
   maxRequest = $(this).attr('max');
@@ -172,7 +173,8 @@ $(document).on('click', '.request', function(e) {
           jumlah: quantityRequested,
         },
         success: function (response) {
-          tableWO();
+          // tableWO();
+          //  $('#tabel_serverside').DataTable().ajax.reload();
           tabel_requisition();
           Swal.fire({
             title: 'Success',
@@ -356,3 +358,71 @@ $(document).on('click', '.edit-request', function(e) {
     }
   });
 });
+
+function formatNumber(number, decimals = 0) {
+    // Memastikan angka adalah tipe Number
+    if (isNaN(number)) {
+        return 'Invalid number';
+    }
+
+    // Menentukan format desimal
+    let options = { 
+        minimumFractionDigits: decimals, 
+        maximumFractionDigits: decimals 
+    };
+
+    // Menggunakan toLocaleString untuk format angka dengan titik ribuan
+    return number.toLocaleString('id-ID', options);
+}
+function initializeSupplierTable() {
+  console.log('Initializing DataTable for server-side processing');
+   $('#tabel_serverside').DataTable({
+        "processing": true,
+        "oLanguage": {
+            "sLengthMenu": "Tampilkan _MENU_ data per halaman",
+            "sSearch": "Pencarian: ",
+            "sZeroRecords": "Maaf, tidak ada data yang ditemukan",
+            "sInfo": "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+            "sInfoEmpty": "Menampilkan 0 s/d 0 dari 0 data",
+            "sInfoFiltered": "(di filter dari _MAX_ total data)",
+            "oPaginate": {
+                "sFirst": "<<",
+                "sLast": ">>",
+                "sPrevious": "<",
+                "sNext": ">"
+            }
+        },
+        "dom": 'Bfrtip',
+        "buttons": ['csv'],
+        "order": [],
+        "ordering": true,
+        "info": true,
+        "serverSide": true,
+        "stateSave": true,
+        "scrollX": true,
+        "ajax": {
+            "url": base_url + "stock/stockdata",
+            "type": "POST",
+            "data": {}
+        },
+        columns: [
+
+            { mRender: function (data, type, row) { return row[0]; } }, // No
+            { mRender: function (data, type, row) { return row[3]; } }, // Code
+            { mRender: function (data, type, row) { return row[2]; } }, // Nama Sup
+          
+            { mRender: function (data, type, row) { return `${row[14] === null ? 0 : row[14] } ${row[8]}`; } }, // 
+            { mRender: function (data, type, row) { return `<button class="btn btn-primary request" max="${row[14]}" material_id="${row[9]}" name="${row[2]}">Request</button>`; } }, // 
+
+        ],
+        "columnDefs": [{
+            "targets": [0],
+            "orderable": false
+        }],
+        error: function () {
+            $(".tabel_serverside-error").html("");
+            $("#tabel_serverside").append('<tbody class="tabel_serverside-error"><tr><th colspan="3">Data Tidak Ditemukan di Server</th></tr></tbody>');
+            $("#tabel_serverside_processing").css("display", "none");
+        }
+    });
+}

@@ -45,6 +45,7 @@ $routes->post('/login', 'Login');
 $routes->get('/logout', 'Login::logout');
 $routes->get('/material', 'Home::material',['filter' => 'accessControl:2']);
 $routes->get('/stock', 'Home::stock',['filter' => 'accessControl:2']);
+$routes->get('/logistic', 'Home::logistic',['filter' => 'accessControl:2']);
 $routes->get('/production', 'Home::production',['filter' => 'accessControl:2']);
 $routes->get('/product', 'Home::product',['filter' => 'accessControl:1']);
 $routes->get('/design', 'Home::design',['filter' => 'accessControl:2']);

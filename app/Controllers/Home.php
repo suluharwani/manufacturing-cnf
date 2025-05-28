@@ -76,6 +76,13 @@ class Home extends BaseController
         $data['content'] = view('admin/content/warehouse_stock');
         return view('admin/index', $data);
     }
+        public function logistic()
+    {
+        $data['group'] = 'Warehouse';
+        $data['title'] = 'Warehouse Logistic';
+        $data['content'] = view('admin/content/warehouse_stock_logistic');
+        return view('admin/index', $data);
+    }
     public function production()
     {
         $data['group'] = 'Production';

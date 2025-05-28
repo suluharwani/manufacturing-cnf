@@ -146,6 +146,7 @@ $('.tambah').click(function() {
         id_dept: dept,
         id_wo: wo,
         remarks: remarks,
+        requestor: requestor,
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material

@@ -511,6 +511,7 @@ public function deleteList($id)
                         ->join('materials_detail', 'materials.id = materials_detail.material_id', 'left')
                         ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
                         ->where('id_material_requisition', $id)->findAll();
+
         
         $options = new Options();
 $options->set('isHtml5ParserEnabled', true);
@@ -538,5 +539,21 @@ $dompdf = new Dompdf($options);
         $dompdf->stream("REQ_{$data['mreq']['code']}.pdf", ["Attachment" => false]);
 
     }
-    
+    public function directRequisition($id)
+{
+    $mdl = new \App\Models\MdlProduct();
+
+
+    $data['content'] = view('admin/content/direct_requisition', ['product' => $mdl->find($id)]);
+        return view('admin/index', $data);
+}
+    public function directRequisitionList()
+{
+    $mdl = new \App\Models\MdlProduct();
+
+
+
+    $data['content'] = view('admin/content/input_bom', ['product' => $mdl->find($id), 'modul' => $mdl2->find($id_modul)]);
+        return view('admin/index', $data);
+}
 }

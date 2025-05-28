@@ -86,7 +86,7 @@
           </div>
           <div class="mb-3">
             <label for="work_order" class="form-label">WORK ORDER</label>
-           <select class="form-control" id="work_order" required>
+           <select class="form-control" id="work_order">
               <option value="">Selct WO</option>
               <!-- Material options will be added here -->
             </select>
