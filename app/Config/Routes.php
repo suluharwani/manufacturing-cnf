@@ -255,6 +255,9 @@ $routes->group('customer', ['namespace' => 'App\Controllers'], function ($routes
 });
 
 $routes->group('stock', function ($routes) {
+    $routes->get('exportExcel', 'Stock::exportExcel');
+$routes->get('importExcel', 'Stock::import');
+$routes->post('importExcel', 'Stock::importExcel');
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
     $routes->get('addStock/(:any)', 'Stock::addStock/(:any)',['filter' => 'accessControl:2']); 
     $routes->post('stockdata', 'Stock::stockdata',['filter' => 'accessControl:2']); 

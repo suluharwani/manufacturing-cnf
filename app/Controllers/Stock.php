@@ -4,6 +4,8 @@ use AllowDynamicProperties;
 use CodeIgniter\Controller;
 use Bcrypt\Bcrypt;
 use google\apiclient;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class Stock extends BaseController
 {
   protected $bcrypt;
@@ -51,46 +53,45 @@ class Stock extends BaseController
     $this->access('operator');
     return view('admin/content/inputStock');
   }
-  public function stockdata()
-  {
-
+public function stockdata()
+{
     $serverside_model = new \App\Models\MdlDatatableJoin();
     $request = \Config\Services::request();
 
     // Define the columns to select
-    $select_columns = 'stock.*, materials.name as name, materials.kode as kode, satuan.nama as satuan,  satuan.kode as kode_satuan, currency.rate as rate, currency.kode as kode_currency';
+    $select_columns = 'stock.*, materials.name as name, materials.kode as kode, satuan.nama as satuan, satuan.kode as kode_satuan, currency.rate as rate, currency.kode as kode_currency';
 
-    // Define the joins (you can add more joins as needed)
+    // Define the joins with additional condition for non-empty material names
     $joins = [
-      ['materials', 'stock.id_material = materials.id', 'left'],
-      ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
-      ['type', 'type.id = materials_detail.type_id', 'left'],
-      ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
-      ['currency', 'currency.id = stock.id_currency', 'left'],
-
+        ['materials', 'stock.id_material = materials.id AND materials.name IS NOT NULL AND materials.name != ""', 'inner'],
+        ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
+        ['type', 'type.id = materials_detail.type_id', 'left'],
+        ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
+        ['currency', 'currency.id = stock.id_currency', 'left'],
     ];
 
     $where = ['stock.deleted_at' => NULL];
 
     // Column Order Must Match Header Columns in View
     $column_order = array(
-      NULL,
-      'materials.kode',
-      'materials.name',
-      'type.id',
-      'materials.id',
-      'materials.id',
-      'materials.id',
-      'materials.id',
-      'materials.id',
-      'materials.id',
-      'materials.id'
+        NULL,
+        'materials.kode',
+        'materials.name',
+        'type.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id'
     );
+    
     $column_search = array(
-      'materials.name',
-      'materials.kode',
-
+        'materials.name',
+        'materials.kode',
     );
+    
     $order = array('stock.id' => 'desc');
 
     // Call the method to get data with dynamic joins and select fields
@@ -99,37 +100,40 @@ class Stock extends BaseController
     $data = array();
     $no = $request->getPost("start");
     foreach ($list as $lists) {
-      $no++;
-      $row = array();
-      $row[] = $no;
-      $row[] = $lists->id;
-      $row[] = $lists->name;
-      $row[] = $lists->kode;
-      $row[] = $lists->stock_awal;
-      $row[] = $this->get_stock_in_out($lists->id_material)['total_in']; //in
-      $row[] = $this->get_stock_in_out($lists->id_material)['total_out']; //out
-      $row[] = $lists->satuan;
-      $row[] = $lists->kode_satuan;
-      $row[] = $lists->id_material;
-      $row[] = $lists->price;
-      $row[] = $lists->rate;
-      $row[] = $lists->kode_currency;
-      $row[] = $this->get_stock_in_out($lists->id_material)['so']; //stock opname
-      $row[] = $lists->stock_awal + $this->get_stock_in_out($lists->id_material)['total']; //stock
-      $data[] = $row;
+        // Skip if material name is empty (though the join condition should already handle this)
+        if (empty($lists->name)) {
+            continue;
+        }
+
+        $no++;
+        $row = array();
+        $row[] = $no;
+        $row[] = $lists->id;
+        $row[] = $lists->name;
+        $row[] = $lists->kode;
+        $row[] = $lists->stock_awal;
+        $row[] = $this->get_stock_in_out($lists->id_material)['total_in']; //in
+        $row[] = $this->get_stock_in_out($lists->id_material)['total_out']; //out
+        $row[] = $lists->satuan;
+        $row[] = $lists->kode_satuan;
+        $row[] = $lists->id_material;
+        $row[] = $lists->price;
+        $row[] = $lists->rate;
+        $row[] = $lists->kode_currency;
+        $row[] = $this->get_stock_in_out($lists->id_material)['so']; //stock opname
+        $row[] = $lists->stock_awal + $this->get_stock_in_out($lists->id_material)['total']; //stock
+        $data[] = $row;
     }
 
     $output = array(
-      "draw" => $request->getPost("draw"),
-      "recordsTotal" => $serverside_model->count_all('stock', $where),
-      "recordsFiltered" => $serverside_model->count_filtered('stock', $select_columns, $joins, $column_order, $column_search, $order, $where),
-      "data" => $data,
+        "draw" => $request->getPost("draw"),
+        "recordsTotal" => $serverside_model->count_all('stock', $where),
+        "recordsFiltered" => $serverside_model->count_filtered('stock', $select_columns, $joins, $column_order, $column_search, $order, $where),
+        "data" => $data,
     );
 
-    //   return $this->response->setJSON($output);
-
     return json_encode($output);
-  }
+}
 
   function get_stock_in_out($id)
   {
@@ -312,5 +316,188 @@ class Stock extends BaseController
     // Return the 'jumlah' value
     return $data[0]['jumlah'];
   }
+ public function exportExcel()
+{
+    // Load model
+    $stockModel = new \App\Models\MdlStock();
+    
+    // Define columns and joins
+    $selectColumns = 'stock.*, 
+        materials.name as name, 
+        materials.kode as kode, 
+        satuan.nama as satuan, 
+        satuan.kode as kode_satuan, 
+        currency.rate as rate, 
+        currency.kode as kode_currency';
+    
+    $joins = [
+        ['materials', 'stock.id_material = materials.id', 'left'],
+        ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
+        ['type', 'type.id = materials_detail.type_id', 'left'],
+        ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
+        ['currency', 'currency.id = stock.id_currency', 'left'],
+    ];
+    
+    // Get data with joins
+    $builder = $stockModel->builder();
+    $builder->select($selectColumns);
+    foreach ($joins as $join) {
+        $builder->join($join[0], $join[1], $join[2]);
+    }
+    
+    // Filter data yang memiliki material name
+    $builder->where('materials.name IS NOT NULL');
+    $builder->where('materials.name !=', '');
+    
+    $data = $builder->get()->getResultArray();
 
+    // Create spreadsheet
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Set headers
+    $headers = [
+        'ID', 'Material ID', 'Stock Awal', 'Stock Masuk', 'Stock Keluar', 'Price', 'Currency ID',
+        'Material Name', 'Material Code', 'Unit', 'Unit Code',
+        'Rate', 'Currency Code'
+    ];
+    
+    $sheet->fromArray($headers, null, 'A1');
+    
+    // Add data
+    $row = 2;
+    foreach ($data as $item) {
+        $sheet->setCellValue('A' . $row, $item['id']);
+        $sheet->setCellValue('B' . $row, $item['id_material']);
+        $sheet->setCellValue('C' . $row, $item['stock_awal']);
+        $sheet->setCellValue('D' . $row, $item['stock_masuk'] ?? 0);
+        $sheet->setCellValue('E' . $row, $item['stock_keluar'] ?? 0);
+        $sheet->setCellValue('F' . $row, $item['price']);
+        $sheet->setCellValue('G' . $row, $item['id_currency']);
+        $sheet->setCellValue('H' . $row, $item['name']);
+        $sheet->setCellValue('I' . $row, $item['kode']);
+        $sheet->setCellValue('J' . $row, $item['satuan']);
+        $sheet->setCellValue('K' . $row, $item['kode_satuan']);
+        $sheet->setCellValue('L' . $row, $item['rate']);
+        $sheet->setCellValue('M' . $row, $item['kode_currency']);
+        $row++;
+    }
+    
+    // Auto size columns
+    foreach (range('A', 'M') as $column) {
+        $sheet->getColumnDimension($column)->setAutoSize(true);
+    }
+    
+    // Output file
+    $filename = 'stock_data_' . date('YmdHis') . '.xlsx';
+    
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
+public function importExcel()
+{
+    // Validation rules
+    $validationRules = [
+        'excel_file' => [
+            'rules' => 'uploaded[excel_file]|ext_in[excel_file,xlsx,xls]',
+            'errors' => [
+                'uploaded' => 'Harap upload file Excel',
+                'ext_in' => 'Hanya file Excel yang diperbolehkan'
+            ]
+        ]
+    ];
+    
+    if (!$this->validate($validationRules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+    
+    $file = $this->request->getFile('excel_file');
+    
+    // Load spreadsheet
+    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+    $spreadsheet = $reader->load($file->getPathname());
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Get data
+    $rows = $sheet->toArray();
+    array_shift($rows); // Remove header
+    
+    // Load models
+    $stockModel = new \App\Models\MdlStock();
+    $materialModel = new \App\Models\MdlMaterial();
+    $currencyModel = new \App\Models\MdlCurrency();
+    $unitModel = new \App\Models\MdlSatuan();
+    
+    $successCount = 0;
+    $errorCount = 0;
+    $errors = [];
+    
+    foreach ($rows as $index => $row) {
+        try {
+            // Skip if no material code
+            if (empty($row[8])) { // Column I (Material Code)
+                continue;
+            }
+            
+            // Material
+            $material = $materialModel->where('kode', $row[8])->first();
+            if (!$material) {
+                $materialId = $materialModel->insert([
+                    'name' => $row[7] ?? '', // Column H (Name)
+                    'kode' => $row[8]       // Column I (Code)
+                ]);
+            } else {
+                $materialId = $material['id'];
+            }
+            
+            // Currency
+            $currency = $currencyModel->where('kode', $row[12])->first(); // Column M
+            $currencyId = $currency ? $currency['id'] : null;
+            
+            // Unit
+            $unit = $unitModel->where('kode', $row[10])->first(); // Column K
+            $unitId = $unit ? $unit['id'] : null;
+            
+            // Prepare stock data
+            $stockData = [
+                'id_material' => $materialId,
+                'stock_awal' => $row[2] ?? 0,    // Column C
+                'stock_masuk' => $row[3] ?? 0,   // Column D
+                'stock_keluar' => $row[4] ?? 0,  // Column E
+                'price' => $row[5] ?? 0,         // Column F
+                'id_currency' => $currencyId
+            ];
+            
+            // Update or insert
+            if (!empty($row[0])) { // Column A (ID)
+                $stock = $stockModel->find($row[0]);
+                if ($stock) {
+                    $stockModel->update($row[0], $stockData);
+                } else {
+                    $stockModel->insert($stockData);
+                }
+            } else {
+                $stockModel->insert($stockData);
+            }
+            
+            $successCount++;
+        } catch (\Exception $e) {
+            $errorCount++;
+            $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+        }
+    }
+    
+    $message = "Import selesai. Berhasil: {$successCount}, Gagal: {$errorCount}";
+    if ($errorCount > 0) {
+        return redirect()->back()->with('message', $message)->with('import_errors', $errors);
+    }
+    
+    return redirect()->back()->with('success', $message);
+}
 }
