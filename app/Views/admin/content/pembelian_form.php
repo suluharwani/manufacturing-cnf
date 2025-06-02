@@ -25,13 +25,13 @@
     <div class="row mb-3">
       <label for="invoice" class="col-md-3 col-form-label">Invoice</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" value="<?=$pembelian[0]['invoice']?>" id="invoice" placeholder="Invoice">
+        <input type="text" class="form-control" value="<?= $pembelian[0]['invoice'] ?? '' ?>" id="invoice" placeholder="Invoice">
       </div>
     </div>
     <div class="row mb-3">
       <label for="po" class="col-md-3 col-form-label">PO</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" value="<?=$pembelian[0]['po']?>" id="po" placeholder="PO" disabled>
+        <input type="text" class="form-control" value="<?=$pembelian[0]['po']?? '' ?>" id="po" placeholder="PO" disabled>
       </div>
     </div>
         <div class="row mb-3">
@@ -60,22 +60,20 @@
     <div class="row mb-3">
       <label for="pajak" class="col-md-3 col-form-label">Pajak</label>
       <div class="col-md-9">
-        <input type="tel" class="form-control" value="<?=$pembelian[0]['pajak']?>" id="pajak" placeholder="...%"> 
+        <input type="tel" class="form-control" value="<?=$pembelian[0]['pajak'] ?? '' ?> " id="pajak" placeholder="...%"> 
       </div>
     </div>
 
     <!-- Tombol Kirim -->
     <button type="button" class="btn btn-primary saveSupplier">Update Supplier</button>
     <button type="button" class="btn btn-warning importPO">Import PO</button>
-    <?php
-    if ($pembelian[0]['posting'] == 0||$pembelian[0]['posting'] == "0") {?>
-    <button type="button" class="btn btn-success postingPembelian">Posting Pembelian</button>
-    <?php
-    }else{?>
-    <button type="button" class="btn btn-danger batalPostingPembelian">Batal Posting Pembelian</button>
-    <?php
-    }
-    ?>
+<?php if (isset($pembelian[0]['posting'])) { 
+    if ($pembelian[0]['posting'] == 0 || $pembelian[0]['posting'] == "0") { ?>
+        <button type="button" class="btn btn-success postingPembelian">Posting Pembelian</button>
+    <?php } else { ?>
+        <button type="button" class="btn btn-danger batalPostingPembelian">Batal Posting Pembelian</button>
+    <?php } 
+} ?>
 
   </form>
   <button class="btn btn-secondary" onclick="window.location.href='<?= base_url('pembelian/printGRN')?>/<?=$pembelian[0]['id'] ?>'">
