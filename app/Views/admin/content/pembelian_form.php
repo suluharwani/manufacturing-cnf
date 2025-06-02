@@ -76,7 +76,7 @@
 } ?>
 
   </form>
-  <button class="btn btn-secondary" onclick="window.location.href='<?= base_url('pembelian/printGRN')?>/<?=$pembelian[0]['id'] ?>'">
+  <button class="btn btn-secondary" onclick="window.location.href='<?= base_url('pembelian/printGRN')?>/<?=$pembelian[0]['id']  ?? '' ?>'">
     Print GRN
 </button>
 </div>
@@ -165,8 +165,8 @@
           </div>
           <div class="mb-3">
             <label for="harga" class="form-label">Harga</label>
-            <input type="number" class="form-control" id="harga" required> <span> Cuurency: <?=$pembelian[0]['curr_code'].'-'.$pembelian[0]['curr_name']?></span>
-            <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']?>" hidden>
+            <input type="number" class="form-control" id="harga" required> <span> Cuurency: <?=$pembelian[0]['curr_code']  ?? '' .'-'.$pembelian[0]['curr_name']  ?? '' ?></span>
+            <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']  ?? '' ?>" hidden>
             
           </div>
           <!-- <div class="mb-3">
