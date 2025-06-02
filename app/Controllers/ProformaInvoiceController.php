@@ -817,5 +817,5 @@ $dompdf = new Dompdf($options);
             die(json_encode(['message' => 'Tidak ada perubahan pada data', 'code' => 1]));
         }
     }
-    
+   
 }

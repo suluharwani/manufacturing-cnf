@@ -68,7 +68,7 @@
                     <a href="<?= base_url('material_requisition_progress') ?>" class="dropdown-item">Progress Material Requisition</a>
                     <a href="<?= base_url('pemusnahan') ?>" class="dropdown-item"> Inventory reduction</a>
                     <a href="<?= base_url('materialreturn') ?>" class="dropdown-item">Material Return</a>
-                    <a href="<?= base_url('stock') ?>" class="dropdown-item">Stock Opname</a>
+                    <a href="<?= base_url('stock-opname') ?>" class="dropdown-item">Stock Opname</a>
                 </div>
             </div>
             <div class="nav-item dropdown">

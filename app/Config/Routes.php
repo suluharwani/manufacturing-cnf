@@ -501,3 +501,19 @@ $routes->group('modul', function ($routes) {
 
 
 });
+
+$routes->group('stock-opname', function($routes) {
+    $routes->get('/', 'StockOpnameController::index',['filter' => 'accessControl:2']);
+    $routes->get('create', 'StockOpnameController::create',['filter' => 'accessControl:2']);
+    $routes->post('save', 'StockOpnameController::save',['filter' => 'accessControl:2']);
+    $routes->get('detail/(:num)', 'StockOpnameController::detail/$1',['filter' => 'accessControl:2']);
+    $routes->post('add-item', 'StockOpnameController::addItem',['filter' => 'accessControl:2']);
+    $routes->get('complete/(:num)', 'StockOpnameController::complete/$1',['filter' => 'accessControl:2']);
+    $routes->get('export/(:num)', 'StockOpnameController::exportExcel/$1',['filter' => 'accessControl:2']);
+    $routes->post('import/(:num)', 'StockOpnameController::importExcel/$1',['filter' => 'accessControl:2']);
+    $routes->get('download-template', 'StockOpnameController::downloadTemplate',['filter' => 'accessControl:2']);
+    $routes->delete('delete-item/(:num)', 'StockOpnameController::deleteItem/$1',['filter' => 'accessControl:2']);
+    $routes->get('export-template/(:num)', 'StockOpnameController::exportTemplateWithData/$1');
+    $routes->delete('delete-item/(:num)', 'StockOpnameController::deleteItem/$1');
+    $routes->delete('delete-all-items/(:num)', 'StockOpnameController::deleteAllItems/$1');
+});

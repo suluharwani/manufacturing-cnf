@@ -447,14 +447,14 @@ public function importExcel()
             
             // Material
             $material = $materialModel->where('kode', $row[8])->first();
-            if (!$material) {
-                $materialId = $materialModel->insert([
-                    'name' => $row[7] ?? '', // Column H (Name)
-                    'kode' => $row[8]       // Column I (Code)
-                ]);
-            } else {
+            // if (!$material) {
+            //     $materialId = $materialModel->insert([
+            //         'name' => $row[7] ?? '', // Column H (Name)
+            //         'kode' => $row[8]       // Column I (Code)
+            //     ]);
+            // } else {
                 $materialId = $material['id'];
-            }
+            // }
             
             // Currency
             $currency = $currencyModel->where('kode', $row[12])->first(); // Column M
