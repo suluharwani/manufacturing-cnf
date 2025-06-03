@@ -135,14 +135,20 @@ http://www.chakranaga.com<br>
 
         <!-- Informasi Header -->
         <table >
+            <tr><td width="50%">PI: <?=$pr['pi']?>  </td>
+                <td>DEPARTMENT: <?=$pr['department']?></td>
+            </tr>
             <tr>
-                <td width="50%">PI NUMBER: <?=$pr['pi']?></td>
+                
+                <td>WO: <?=$pr['wo']?>  </td>
                 <td>PR DATE: <?=formatDate($pr['created_at'])?></td>
             </tr>
             <tr>
                 <td>PR: <?=$pr['kode']?></td>
-                <td>DEPARTMENT: <?=$pr['department']?></td>
+                
+                <td></td>
             </tr>
+
         </table>
 
         <!-- Informasi Customer -->
@@ -206,12 +212,12 @@ http://www.chakranaga.com<br>
         <!-- Bank Details -->
         <!-- Confirm Order -->
         <table class="signature-section">
-            <tr><th colspan="4">CONFIRM PURCHASE REQUEST</th></tr>
+            <tr><th colspan="3">CONFIRM PURCHASE REQUEST</th></tr>
             <tr>
-                <td width="25%">Pemohon:<br><br><br><br>___________</td>
-                <td width="25%">SPV:<br><br><br><br>___________</td>
-                <td width="25%">Disetujui:<br><br><br><br>___________</td>
-                <td width="25%">Dikeluarkan:<br><br><br><br>___________</td>
+                <td width="50%">Pemohon:<br><br><br><br>___________</td>
+                <td width="50%">SPV:<br><br><br><br>___________</td>
+                <td width="50%">Disetujui:<br><br><br><br>___________</td>
+                <!-- <td width="25%">Dikeluarkan:<br><br><br><br>___________</td> -->
             </tr>
         </table>
 

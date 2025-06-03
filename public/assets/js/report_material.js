@@ -392,7 +392,10 @@ window.jsPDF = window.jspdf.jsPDF
         
                     // Add title
                     pdf.setFontSize(18);
-                    pdf.text('MATERIAL ACTIVITY REPORT', 10, 10);
+const pageWidth = pdf.internal.pageSize.getWidth(); // Get page width
+const textWidth = pdf.getStringUnitWidth('MATERIAL ACTIVITY REPORT') * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+const centerX = (pageWidth - textWidth) / 2; // Calculate center position
+pdf.text('MATERIAL ACTIVITY REPORT', centerX, 10);
         
                     // Add a table for Item Codes with specific values
                     pdf.setFontSize(12);

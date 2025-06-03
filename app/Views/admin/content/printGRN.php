@@ -173,7 +173,7 @@ http://www.chakranaga.com<br>
         <!-- Informasi Header -->
         <table >
             <tr>
-                <td width="50%">INVOICE: <?=$grn['invoice']?></td>
+                <td width="50%">GRN: <?=$grn['invoice']?></td>
                 <td>DATE: <?=formatDateJam($grn['tanggal_nota'])?></td>
             </tr>
             <tr>
@@ -299,7 +299,8 @@ http://www.chakranaga.com<br>
         <table class="signature-section">
             <tr><th colspan="2">CONFIRM GOODS RECEIPT NOTE</th></tr>
             <tr>
-                <td width="50%">Prepared By,<br><br><br><br>___________<br>Logistic Dept</td>
+                <td width="25%">Received By,<br><br><br><br>___________<br>Logistic Dept</td>
+                <td width="25%">Approved By,<br><br><br><br>___________<br>Logistic Dept</td>
                 <td width="50%">Approved By,<br><br><br><br>___________<br>Purchasing Manager</td>
             </tr>
 

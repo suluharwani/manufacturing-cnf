@@ -239,8 +239,9 @@ class MaterialRequestController extends BaseController
     public function printPR($id){
         // Konfigurasi opsi Dompdf
         $mdl = new \App\Models\MdlMaterialRequest();
-        $data['pr'] = $mdl->select('department.name as department, material_request.*,proforma_invoice.invoice_number as pi')
+        $data['pr'] = $mdl->select('department.name as department, material_request.*,proforma_invoice.invoice_number as pi, work_order.kode as wo')
                     ->join('proforma_invoice', 'proforma_invoice.id = material_request.id_pi', 'left')
+                    ->join('work_order', 'work_order.id = material_request.id_wo', 'left')
                     ->join('department', 'material_request.dept_id = department.id', 'left')
                         ->where('material_request.id', $id)->first();
         $data['prDet'] = $this->datamr($id);

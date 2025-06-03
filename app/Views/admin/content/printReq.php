@@ -130,7 +130,7 @@ function convertcm($mm) {
 
         </td>
         <td width="70%" align="left" style="border: none; !important;">
-            <h2 align = "right">MATERIAL REQUISITION</h2>
+            <h2 align = "right">MATERIAL REQUISITION NOTE</h2>
         </td>
     </tr>
 </table>
@@ -206,6 +206,7 @@ function convertcm($mm) {
             <tr><th colspan="3">CONFIRM REQUISITION</th></tr>
             <tr>
                 <td width="50%">Requestor Stamp & Sign:<br><br><br><br></td>
+                <td width="50%">Approved:<br><br><br><br></td>
                 <td width="50%">Logistic Stamp & Sign:<br><br><br><br></td>
                 <td width="50%">PPIC Stamp & Sign:<br><br><br><br></td>
             </tr>

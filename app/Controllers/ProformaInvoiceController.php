@@ -591,57 +591,91 @@ public function batalFinish($id)
     }
 }
 
-public function print($id)
-{
-    $invoiceModel = new ProformaInvoice();
-    $data = $invoiceModel->getInvoiceData($id);
+// public function print($id)
+// {
+//     $invoiceModel = new ProformaInvoice();
+//     $data['inv'] = $invoiceModel->getInvoiceData($id);
+//     $mdlPi = new ProformaInvoice();
+//         $mdlPiDet = new ProformaInvoiceDetail();
+//     $data['pi'] = $mdlPi->select('*')->join('customer', 'customer.id = proforma_invoice.customer_id')->where('proforma_invoice.id', $id)->first();
+//           $data['piDet'] = $mdlPiDet->select('product.kode as p_code,
+//             product.nama as p_name,
+//             product.hs_code as p_hs_code,
+//             product.picture as p_picture,
+//             product.length as p_length,
+//             product.width as p_width,
+//             product.height as p_height,
+//             product.cbm as p_cbm,
+//             finishing.name as f_name,
+//             finishing.description as f_desc,
+//             finishing.picture as f_picture,
+//             product_details.dept as pd_dept,
+//             product_details.length_mm as length_mm,
+//             product_details.height_mm as height_mm,
+//             product_details.width_mm as width_mm,
+//             product_details.nw_kg as nw_kg,
+//             product_details.gw_kg as gw_kg,
+//             product_details.cbm as cbm,
+//             proforma_invoice_details.disc as disc,
+//             proforma_invoice_details.quantity as quantity,
+//             proforma_invoice_details.unit_price as unit_price,
+//             proforma_invoice_details.remarks as remarks,
+//             currency.kode as currency_code,
+//             currency.nama as currency_name
+//             ')
+//                                   ->join('product',
+//                                    'proforma_invoice_details.id_product = product.id', 'left')
+//                                   ->join('product_details','product.id = product_details.id_product', 'left')
+//                                   ->join('finishing', 'finishing.id = proforma_invoice_details.finishing_id', 'left')
+//                                   ->join('currency', 'currency.id = proforma_invoice_details.id_currency', 'left')
+//                                   ->where('invoice_id', $id)
+//                                   ->findAll();
+//     // Load the view and pass the data
+//     $html = view('admin/content/report/invoice', $data);
 
-    // Load the view and pass the data
-    $html = view('admin/content/report/invoice', $data);
+//     // Initialize Dompdf
+//     $options = new Options();
+//     $options->set('defaultFont', 'Arial');
+//     $dompdf = new Dompdf($options);
 
-    // Initialize Dompdf
-    $options = new Options();
-    $options->set('defaultFont', 'Arial');
-    $dompdf = new Dompdf($options);
+//     // Load HTML content
+//     $dompdf->loadHtml($html);
 
-    // Load HTML content
-    $dompdf->loadHtml($html);
+//     // (Optional) Setup the paper size and orientation
+//     $dompdf->setPaper('A4', 'portrait');
 
-    // (Optional) Setup the paper size and orientation
-    $dompdf->setPaper('A4', 'portrait');
+//     // Render the HTML as PDF
+//     $dompdf->render();
 
-    // Render the HTML as PDF
-    $dompdf->render();
+//     // Output the generated PDF to Browser
+//     $dompdf->stream("invoice_{$data['inv']['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
+// }
+// public function printDeliveryNote($id)
+//     {
+//         $deliveryNoteModel = new ProformaInvoice();
+//         $data = $deliveryNoteModel->getDeliveryNoteData($id);
 
-    // Output the generated PDF to Browser
-    $dompdf->stream("invoice_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
-}
-public function printDeliveryNote($id)
-    {
-        $deliveryNoteModel = new ProformaInvoice();
-        $data = $deliveryNoteModel->getDeliveryNoteData($id);
-
-        // Load the view and pass the data
-        $html = view('admin/content/report/deliveryNote', $data);
+//         // Load the view and pass the data
+//         $html = view('admin/content/report/deliveryNote', $data);
 
 
-        // Initialize Dompdf
-        $options = new Options();
-        $options->set('defaultFont', 'Arial');
-        $dompdf = new Dompdf($options);
+//         // Initialize Dompdf
+//         $options = new Options();
+//         $options->set('defaultFont', 'Arial');
+//         $dompdf = new Dompdf($options);
 
-        // Load HTML content
-        $dompdf->loadHtml($html);
+//         // Load HTML content
+//         $dompdf->loadHtml($html);
 
-        // (Optional) Setup the paper size and orientation
-        $dompdf->setPaper('A4', 'portrait');
+//         // (Optional) Setup the paper size and orientation
+//         $dompdf->setPaper('A4', 'portrait');
 
-        // Render the HTML as PDF
-        $dompdf->render();
+//         // Render the HTML as PDF
+//         $dompdf->render();
 
-        // Output the generated PDF to Browser
-        $dompdf->stream("surat_jalan_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
-    }
+//         // Output the generated PDF to Browser
+//         $dompdf->stream("surat_jalan_{$data['invoice']['invoice_number']}.pdf", ["Attachment" => false]);
+//     }
 
 
 public function printInvoiceNeed($invoice_id)
@@ -739,7 +773,134 @@ public function printInvoiceNeed($invoice_id)
         $dompdf->stream("PR_{$invoice_id}.pdf", ["Attachment" => false]);
     }
 
+
+    public function printDeliveryNote($id){
+        // Konfigurasi opsi Dompdf
+        $mdlPi = new ProformaInvoice();
+        $mdlPiDet = new ProformaInvoiceDetail();
+        $data['pi'] = $mdlPi->select('*')->join('customer', 'customer.id = proforma_invoice.customer_id')->where('proforma_invoice.id', $id)->first();
+        $data['piDet'] = $mdlPiDet->select('product.kode as p_code,
+            product.nama as p_name,
+            product.hs_code as p_hs_code,
+            product.picture as p_picture,
+            product.length as p_length,
+            product.width as p_width,
+            product.height as p_height,
+            product.cbm as p_cbm,
+            finishing.name as f_name,
+            finishing.description as f_desc,
+            finishing.picture as f_picture,
+            product_details.dept as pd_dept,
+            product_details.length_mm as length_mm,
+            product_details.height_mm as height_mm,
+            product_details.width_mm as width_mm,
+            product_details.nw_kg as nw_kg,
+            product_details.gw_kg as gw_kg,
+            product_details.cbm as cbm,
+            proforma_invoice_details.disc as disc,
+            proforma_invoice_details.quantity as quantity,
+            proforma_invoice_details.unit_price as unit_price,
+            proforma_invoice_details.remarks as remarks,
+            currency.kode as currency_code,
+            currency.nama as currency_name
+            ')
+                                  ->join('product',
+                                   'proforma_invoice_details.id_product = product.id', 'left')
+                                  ->join('product_details','product.id = product_details.id_product', 'left')
+                                  ->join('finishing', 'finishing.id = proforma_invoice_details.finishing_id', 'left')
+                                  ->join('currency', 'currency.id = proforma_invoice_details.id_currency', 'left')
+                                  ->where('invoice_id', $id)
+                                  ->findAll();
+        $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+// var_dump($data['piDet']);
+// die();
     
+        // Data untuk tampilan
+        $data['title'] = 'Proforma Invoice';
+        // $html = view('admin/content/printPi', $data);
+    $html = view('admin/content/report/deliveryNote', $data);
+        // Load HTML ke Dompdf
+        $dompdf->loadHtml($html);
+    
+        // Atur ukuran kertas A4 dan orientasi landscape
+        $dompdf->setPaper('A4', 'landscape');
+    
+        // Render PDF
+        $dompdf->render();
+    
+        // Output PDF ke browser tanpa mengunduh otomatis
+        $dompdf->stream("pi_{$id}.pdf", ["Attachment" => false]);
+    }
+    public function print($id){
+        // Konfigurasi opsi Dompdf
+        $mdlPi = new ProformaInvoice();
+        $mdlPiDet = new ProformaInvoiceDetail();
+        $data['pi'] = $mdlPi->select('*')->join('customer', 'customer.id = proforma_invoice.customer_id')->where('proforma_invoice.id', $id)->first();
+        $data['piDet'] = $mdlPiDet->select('product.kode as p_code,
+            product.nama as p_name,
+            product.hs_code as p_hs_code,
+            product.picture as p_picture,
+            product.length as p_length,
+            product.width as p_width,
+            product.height as p_height,
+            product.cbm as p_cbm,
+            finishing.name as f_name,
+            finishing.description as f_desc,
+            finishing.picture as f_picture,
+            product_details.dept as pd_dept,
+            product_details.length_mm as length_mm,
+            product_details.height_mm as height_mm,
+            product_details.width_mm as width_mm,
+            product_details.nw_kg as nw_kg,
+            product_details.gw_kg as gw_kg,
+            product_details.cbm as cbm,
+            proforma_invoice_details.disc as disc,
+            proforma_invoice_details.quantity as quantity,
+            proforma_invoice_details.unit_price as unit_price,
+            proforma_invoice_details.remarks as remarks,
+            currency.kode as currency_code,
+            currency.nama as currency_name
+            ')
+                                  ->join('product',
+                                   'proforma_invoice_details.id_product = product.id', 'left')
+                                  ->join('product_details','product.id = product_details.id_product', 'left')
+                                  ->join('finishing', 'finishing.id = proforma_invoice_details.finishing_id', 'left')
+                                  ->join('currency', 'currency.id = proforma_invoice_details.id_currency', 'left')
+                                  ->where('invoice_id', $id)
+                                  ->findAll();
+        $options = new Options();
+$options->set('isHtml5ParserEnabled', true);
+$options->set('isPhpEnabled', true);
+$options->set('defaultFont', 'Helvetica');
+$options->set('isRemoteEnabled', true); 
+$dompdf = new Dompdf($options);
+
+// var_dump($data['piDet']);
+// die();
+    
+        // Data untuk tampilan
+        $data['title'] = 'Proforma Invoice';
+        // $html = view('admin/content/printPi', $data);
+    $html = view('admin/content/report/invoice', $data);
+        // Load HTML ke Dompdf
+        $dompdf->loadHtml($html);
+    
+        // Atur ukuran kertas A4 dan orientasi landscape
+        $dompdf->setPaper('A4', 'landscape');
+    
+        // Render PDF
+        $dompdf->render();
+    
+        // Output PDF ke browser tanpa mengunduh otomatis
+        $dompdf->stream("pi_{$id}.pdf", ["Attachment" => false]);
+    }
+
     public function printPi($id){
         // Konfigurasi opsi Dompdf
         $mdlPi = new ProformaInvoice();
