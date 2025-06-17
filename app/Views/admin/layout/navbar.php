@@ -128,6 +128,7 @@
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('report/material') ?>" class="dropdown-item">Material</a>
                     <a href="<?= base_url('report/finished_good') ?>" class="dropdown-item">Finished Good</a>
+                    <a href="<?= base_url('report/bea_cukai') ?>" class="dropdown-item">Bea Cukai</a>
                     
                 </div>
             </div>

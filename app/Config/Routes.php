@@ -377,6 +377,7 @@ $routes->group('purchase', function ($routes) {
 $routes->group('report', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
 
+    $routes->get('bea_cukai', 'ReportController::beacukai',['filter' => 'accessControl:2']); 
     $routes->get('activity', 'ReportController::activity',['filter' => 'accessControl:2']); 
     $routes->get('customer_order', 'ReportController::customer_order',['filter' => 'accessControl:2']); 
     $routes->get('finished_good', 'ReportController::finished_good',['filter' => 'accessControl:2']); 
@@ -516,4 +517,13 @@ $routes->group('stock-opname', function($routes) {
     $routes->get('export-template/(:num)', 'StockOpnameController::exportTemplateWithData/$1');
     $routes->delete('delete-item/(:num)', 'StockOpnameController::deleteItem/$1');
     $routes->delete('delete-all-items/(:num)', 'StockOpnameController::deleteAllItems/$1');
+});
+$routes->post('api/laporan', 'Laporan::getLaporan');
+$routes->post('laporan/generate-all', 'GenerateLaporanController::generateAll');
+
+$routes->group('productstock', function($routes) {
+    $routes->get('/', 'StockController::index',['filter' => 'accessControl:2']);
+    $routes->get('view/(:num)', 'StockController::view/$1',['filter' => 'accessControl:2']);
+    $routes->post('set-initial/(:num)', 'StockController::setInitialStock/$1',['filter' => 'accessControl:2']);
+    $routes->post('adjust/(:num)', 'StockController::adjustStock/$1',['filter' => 'accessControl:2']);
 });

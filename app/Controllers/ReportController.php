@@ -748,4 +748,11 @@ class ReportController extends BaseController
             $dompdf->stream("product_{$productId}_{$role}.pdf", ["Attachment" => false]);
         // return json_encode( $this->db->getLastQuery()->getQuery());
     }
+    public function beacukai(){
+        $data['group'] = 'Beacukai';
+        $data['title'] = 'Beacukai Report';
+
+        $data['content'] = view('admin/content/report/beacukai');
+        return view('admin/index', $data);
+    }
 }
