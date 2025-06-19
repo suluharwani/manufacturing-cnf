@@ -20,6 +20,8 @@
         <div class="navbar-nav w-100">
             <a href="<?= base_url('dashboard') ?>" class="nav-item nav-link"><i
                     class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+            <a href="<?= base_url('productstock') ?>" class="nav-item nav-link"><i
+                    class="fa fa-cubes me-2"></i>Product Stock</a>
             <?php
             if (session()->has('auth')) {
                 if (session()->get('auth')['level'] == 1) {

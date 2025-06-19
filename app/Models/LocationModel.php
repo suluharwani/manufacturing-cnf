@@ -268,4 +268,5 @@ class LocationModel extends Model
                    ->set(['is_active' => 0])
                    ->update();
     }
+
 }

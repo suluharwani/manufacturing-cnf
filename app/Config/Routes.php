@@ -526,4 +526,20 @@ $routes->group('productstock', function($routes) {
     $routes->get('view/(:num)', 'StockController::view/$1',['filter' => 'accessControl:2']);
     $routes->post('set-initial/(:num)', 'StockController::setInitialStock/$1',['filter' => 'accessControl:2']);
     $routes->post('adjust/(:num)', 'StockController::adjustStock/$1',['filter' => 'accessControl:2']);
+    $routes->get('book/(:num)', 'StockController::bookStock/$1',['filter' => 'accessControl:2']);
+    $routes->post('process-booking/(:num)', 'StockController::processBooking/$1',['filter' => 'accessControl:2']);
+    $routes->get('release/(:num)', 'StockController::releaseBooking/$1',['filter' => 'accessControl:2']);
+    $routes->get('transfer/(:num)', 'StockController::transferStock/$1',['filter' => 'accessControl:2']);
+    $routes->post('process-transfer/(:num)', 'StockController::processTransfer/$1',['filter' => 'accessControl:2']);
+});
+$routes->group('location', function($routes) {
+    $routes->get('/', 'Location::index');
+    $routes->get('create', 'Location::create');
+    $routes->post('store', 'Location::store');
+    $routes->get('edit/(:num)', 'Location::edit/$1');
+    $routes->post('update/(:num)', 'Location::update/$1');
+    $routes->get('delete/(:num)', 'Location::delete/$1');
+    $routes->get('restore/(:num)', 'Location::restore/$1');
+    $routes->get('toggle-status/(:num)', 'Location::toggleStatus/$1');
+    $routes->get('stock/(:num)', 'Location::viewStock/$1');
 });

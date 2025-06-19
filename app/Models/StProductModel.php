@@ -16,17 +16,46 @@ class StProductModel extends Model
 
     public function getAvailableStock($productId)
     {
-        return $this->where('product_id', $productId)
-                   ->where('status', 'available')
-                   ->selectSum('quantity')
-                   ->get()
-                   ->getRow()->quantity ?? 0;
+        $initial = $this->db->table('st_initial')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->get()
+        ->getRow()->quantity;
+
+    // Get total stock in (initial stock + stock in adjustments)
+    $stockIn = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'in')
+        ->get()
+        ->getRow()->quantity;
+
+    // Get total stock out (stock out adjustments)
+    $stockOut = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'out')
+        ->get()
+        ->getRow()->quantity;
+
+    // Get total booked stock
+    $bookedStock = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('status', 'booked')
+        ->get()
+        ->getRow()->quantity;
+
+    // Calculate available stock
+    $availableStock =($initial ?? 0)+ ($stockIn ?? 0) - ($stockOut ?? 0) - ($bookedStock ?? 0);
+
+    return max(0, $availableStock);
     }
     
     public function getBookedStock($productId)
     {
-        return $this->where('product_id', $productId)
-                   ->where('status', 'booked')
+        return $this->db->table('st_movement')->where('product_id', $productId)
+                   ->where('movement_type', 'booked')
                    ->selectSum('quantity')
                    ->get()
                    ->getRow()->quantity ?? 0;
@@ -44,7 +73,7 @@ class StProductModel extends Model
 
     public function getStockDetails($productId)
     {
-        return $this->select('st_product.*, locations.name as location_name, proforma_invoice.pi_number')
+        return $this->select('st_product.*, locations.name as location_name, proforma_invoice.invoice_number')
                    ->join('locations', 'locations.id = st_product.location_id', 'left')
                    ->join('proforma_invoice', 'proforma_invoice.id = st_product.pi_id', 'left')
                    ->where('product_id', $productId)

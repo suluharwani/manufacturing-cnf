@@ -5,6 +5,7 @@ use App\Models\StMovementModel;
 use App\Models\StInitialModel;
 use App\Models\MdlProduct;
 use App\Models\LocationModel;
+use App\Models\ProformaInvoice;
 
 class StockController extends BaseController
 {
@@ -13,6 +14,7 @@ class StockController extends BaseController
     protected $stInitialModel;
     protected $productModel;
     protected $locationModel;
+    protected $PiModel;
 
     public function __construct()
     {
@@ -21,15 +23,40 @@ class StockController extends BaseController
         $this->stInitialModel = new StInitialModel();
         $this->productModel = new MdlProduct();
         $this->locationModel = new LocationModel();
+        $this->PiModel = new ProformaInvoice();
     }
 
-    public function index()
-    {
-        $data['title'] = 'Stock Management';
-        $data['products'] = $this->productModel->findAll();
-        $data['content'] = view('admin/content/product_stock',$data);
-        return view('admin/index', $data);
+    public function index() {
+    $products = $this->productModel->findAll();
+    
+    // Prepare stock data for each product
+    $productsWithStock = [];
+    foreach ($products as $product) {
+        $productsWithStock[] = [
+            'id' => $product['id'],
+            'code' => $product['kode'],
+            'name' => $product['nama'],
+            'available' => $this->stProductModel->getAvailableStock($product['id']),
+            'booked' => $this->stProductModel->getBookedStock($product['id']),
+            'total' => $this->stProductModel->getAvailableStock($product['id']) + $this->stProductModel->getBookedStock($product['id'])
+        ];
     }
+
+    $data = [
+        'title' => 'Stock Management',
+        'products' => $productsWithStock
+    ];
+
+   $data['content'] = view('admin/content/product_stock',$data);
+        return view('admin/index', $data);
+}
+    // public function index()
+    // {
+    //     $data['title'] = 'Stock Management';
+    //     $data['products'] = $this->productModel->findAll();
+    //     $data['content'] = view('admin/content/product_stock',$data);
+    //     return view('admin/index', $data);
+    // }
 
     public function view($productId)
     {
@@ -43,18 +70,20 @@ class StockController extends BaseController
         $booked = $this->stProductModel->getBookedStock($productId);
 
         $data = [
-            'title' => 'Stock Detail - ' . $product['name'],
+            'title' => 'Stock Detail - ' . $product['nama'],
             'product' => $product,
             'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
             'available' => $available,
             'booked' => $booked,
-            'total' => $available + $booked,
+            'total' =>  $available + $booked,
             'stock_details' => $this->stProductModel->getStockDetails($productId),
             'movement_history' => $this->stMovementModel->getProductHistory($productId),
+            'stockData' => $this->stMovementModel->getStockByProduct($productId),
             'locations' => $this->locationModel->findAll()
         ];
 
-        return view('stock/view', $data);
+        $data['content'] = view('admin/content/product_stock_view',$data);
+        return view('admin/index', $data);
     }
 
     public function setInitialStock($productId)
@@ -78,36 +107,15 @@ class StockController extends BaseController
         $existing = $this->stInitialModel->where('product_id', $productId)->first();
         
         if ($existing) {
-            $this->stInitialModel->update($existing['id'], $data);
+            $this->stInitialModel->where('id',$existing['id'])->set( $data)->update();
         } else {
             $this->stInitialModel->insert($data);
         }
 
         // Add to current stock
-        $stockData = [
-            'product_id' => $productId,
-            'quantity' => $data['quantity'],
-            'location_id' => $data['location_id'],
-            'label_code' => 'INITIAL',
-            'status' => 'available'
-        ];
-        
-        $this->stProductModel->insert($stockData);
-        
-        // Log movement
-        $movementData = [
-            'product_id' => $productId,
-            'quantity' => $data['quantity'],
-            'movement_type' => 'in',
-            'reference_type' => 'initial_stock',
-            'to_location' => $data['location_id'],
-            'notes' => 'Initial stock setup',
-            'created_by' => user_id()
-        ];
-        
-        $this->stMovementModel->logMovement($movementData);
 
-        return redirect()->to("/stock/view/$productId")->with('message', 'Initial stock set successfully');
+
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Initial stock set successfully');
     }
 
     public function adjustStock($productId)
@@ -180,11 +188,119 @@ class StockController extends BaseController
             'to_location' => $adjustmentType === 'in' ? $locationId : null,
             'from_location' => $adjustmentType === 'out' ? $locationId : null,
             'notes' => $notes ?? 'Manual adjustment',
-            'created_by' => user_id()
+            'created_by' => $_SESSION['auth']['id']
         ];
         
         $this->stMovementModel->logMovement($movementData);
 
-        return redirect()->to("/stock/view/$productId")->with('message', 'Stock adjusted successfully');
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
     }
+      public function bookStock($productId)
+    {
+        $data = [
+            'title' => 'Book Stock',
+            'product' => $this->productModel->find($productId),
+            // 'available' => $this->stMovementModel->getAvailableStock($productId),
+            'proformaInvoices' => $this->PiModel->findAll(), 
+            'validation' => \Config\Services::validation(),
+            'locations' => $this->locationModel->findAll(),
+            'stockData' => $this->stMovementModel->getStockByProduct($productId),
+        ];
+        $data['content'] = view('admin/content/product_stock_book',$data);
+        return view('admin/index', $data);
+    }
+
+    // Process Booking
+public function processBooking($productId)
+{
+    $rules = [
+        'quantity' => 'required|numeric|greater_than[0]',
+        'pi_id' => 'required|numeric',
+        'location_id' => 'required|numeric', // Added location validation
+        'notes' => 'permit_empty|string|max_length[500]'
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    $quantity = $this->request->getPost('quantity');
+    $piId = $this->request->getPost('pi_id');
+    $locationId = $this->request->getPost('location_id'); // Get location ID
+    $notes = $this->request->getPost('notes');
+
+    // Check available stock at SPECIFIC location
+    $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $locationId);
+    
+    if ($available < $quantity) {
+        return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
+    }
+
+    // Pass location ID to bookStock
+    $this->stMovementModel->bookStock($productId, $quantity, $piId, $locationId, $notes);
+
+    return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
+}
+    // Release Booked Stock
+    public function releaseBooking($bookingId)
+    {
+        $booking = $this->stMovementModel->find($bookingId);
+        
+        if (!$booking || $booking['status'] != 'booked') {
+            return redirect()->back()->with('error', 'Invalid booking');
+        }
+
+        $this->stMovementModel->releaseBookedStock([$bookingId]);
+
+        return redirect()->back()->with('message', 'Booking released successfully');
+    }
+
+    // Transfer Stock Form
+    public function transferStock($productId)
+    {
+        $data = [
+            'title' => 'Transfer Stock',
+            'product' => $this->productModel->find($productId),
+            'locations' => $this->locationModel->findAll(),
+            'available' => $this->stMovementModel->getAvailableStock($productId),
+            'validation' => \Config\Services::validation()
+        ];
+
+        $data['content'] = view('admin/content/product_stock_transfer',$data);
+        return view('admin/index', $data);
+    }
+
+    // Process Transfer
+public function processTransfer($productId)
+{
+    $rules = [
+        'from_location_id' => 'required|numeric',
+        'to_location_id' => 'required|numeric',
+        'quantity' => 'required|numeric|greater_than[0]',
+        'notes' => 'permit_empty|string|max_length[500]'
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    // Correct way to access POST data in CodeIgniter 4:
+    $fromLocationId = $this->request->getPost('from_location_id');
+    $toLocationId = $this->request->getPost('to_location_id');
+    $quantity = $this->request->getPost('quantity');
+    $notes = $this->request->getPost('notes');
+
+    $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $fromLocationId);
+    
+    if ($available < $quantity) {
+        return redirect()->back()->withInput()->with('error', 'Not enough available stock at source location');
+    }
+
+    try {
+        $transferIds = $this->stMovementModel->transferStock($productId, $fromLocationId, $toLocationId, $quantity, $notes);
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock transferred successfully');
+    } catch (\Exception $e) {
+        return redirect()->back()->withInput()->with('error', 'Transfer failed: ' . $e->getMessage());
+    }
+}
 }
