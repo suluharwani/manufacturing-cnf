@@ -184,24 +184,88 @@ public function bookStock($productId, $quantity, $piId, $locationId, $notes = ''
  */
 protected function getAvailableStockRecords($productId, $locationId)
 {
-    // Get initial stock
-    $initial = $this->db->table('st_initial')
+    // 1. Get initial stock
+    $initialStock = $this->db->table('st_initial')
+        ->select('id, quantity, location_id')
         ->where('product_id', $productId)
         ->where('location_id', $locationId)
         ->where('quantity >', 0)
         ->get()
         ->getResultArray();
 
-    // Get available movement records
-    $movements = $this->where([
-            'product_id' => $productId,
-            'to_location' => $locationId,
-            'status' => 'available',
-            'quantity >' => 0
+    // 2. Calculate net available movements (in - out - booked)
+    $movementSummary = $this->db->table('st_movement')
+        ->select([
+            'id',
+            'quantity',
+            'movement_type',
+            'from_location',
+            'to_location',
+            'status'
         ])
-        ->findAll();
+        ->where('product_id', $productId)
+        ->where('to_location', $locationId)
+        ->groupStart()
+            ->where('movement_type', 'in')
+            ->orWhere('movement_type', 'out')
+            ->orWhere('movement_type', 'booked')
+        ->groupEnd()
+        ->get()
+        ->getResultArray();
 
-    return array_merge($initial, $movements);
+    // 3. Process movements to calculate available quantities
+    $availableRecords = [];
+
+    // Add initial stock if exists
+    foreach ($initialStock as $stock) {
+        $availableRecords[] = [
+            'type' => 'initial',
+            'id' => $stock['id'],
+            'quantity' => $stock['quantity'],
+            'location_id' => $stock['location_id']
+        ];
+    }
+
+    // Process movement records
+    foreach ($movementSummary as $movement) {
+        if ($movement['movement_type'] === 'in' && $movement['to_location'] == $locationId) {
+            // Add in movements
+            $availableRecords[] = [
+                'type' => 'movement',
+                'id' => $movement['id'],
+                'quantity' => $movement['quantity'],
+                'location_id' => $movement['to_location']
+            ];
+        } elseif ($movement['movement_type'] === 'out' && $movement['from_location'] == $locationId) {
+            // Subtract out movements
+            $this->subtractFromAvailable($availableRecords, $movement['quantity']);
+        } elseif ($movement['movement_type'] === 'booked' && 
+                 $movement['from_location'] == $locationId && 
+                 $movement['status'] == 'booked') {
+            // Subtract booked quantities
+            $this->subtractFromAvailable($availableRecords, $movement['quantity']);
+        }
+    }
+
+    return $availableRecords;
+}
+
+/**
+ * Helper method to subtract quantity from available records
+ */
+protected function subtractFromAvailable(&$availableRecords, $quantityToSubtract)
+{
+    $remaining = $quantityToSubtract;
+    
+    foreach ($availableRecords as &$record) {
+        if ($remaining <= 0) break;
+        
+        if ($record['quantity'] > 0) {
+            $deduct = min($record['quantity'], $remaining);
+            $record['quantity'] -= $deduct;
+            $remaining -= $deduct;
+        }
+    }
 }
 
 /**
