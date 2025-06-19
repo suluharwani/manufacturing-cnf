@@ -531,6 +531,11 @@ $routes->group('productstock', function($routes) {
     $routes->get('release/(:num)', 'StockController::releaseBooking/$1',['filter' => 'accessControl:2']);
     $routes->get('transfer/(:num)', 'StockController::transferStock/$1',['filter' => 'accessControl:2']);
     $routes->post('process-transfer/(:num)', 'StockController::processTransfer/$1',['filter' => 'accessControl:2']);
+    // Route for completing a booking (POST request)
+    $routes->post('complete-booking', 'StockController::completeBooking');
+    
+    // Route for deleting a movement record (GET request)
+    $routes->post('delete-movement/(:num)', 'StockController::deleteMovement/$1');
 });
 $routes->group('location', function($routes) {
     $routes->get('/', 'Location::index');

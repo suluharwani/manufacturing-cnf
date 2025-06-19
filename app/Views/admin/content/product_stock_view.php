@@ -168,41 +168,124 @@
                     </div>
                     <div class="card-body">
                         <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Quantity</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Notes</th>
-                                    <th>User</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($movement_history as $movement): ?>
-                                    <tr>
-                                        <td><?= date('d M Y H:i', strtotime($movement['created_at'])) ?></td>
-                                        <td>
-                                            <span class="badge bg-<?=
-                                                $movement['movement_type'] == 'in' ? 'success' :
-                                                ($movement['movement_type'] == 'out' ? 'danger' : 'info')
-                                                ?>">
-                                                <?= ucfirst($movement['movement_type']) ?>
-                                            </span>
-                                        </td>
-                                        <td><?= $movement['quantity'] ?></td>
-                                        <td><?= $movement['from_location_name'] ?? '-' ?></td>
-                                        <td><?= $movement['to_location_name'] ?? '-' ?></td>
-                                        <td><?= $movement['notes'] ?></td>
-                                        <td><?= $movement['username'] ?? 'System' ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Notes</th>
+            <th>User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($movement_history as $movement): ?>
+            <tr>
+                <td><?= date('d M Y H:i', strtotime($movement['created_at'])) ?></td>
+                <td>
+                    <span class="badge bg-<?=
+                        $movement['movement_type'] == 'in' ? 'success' :
+                        ($movement['movement_type'] == 'out' ? 'danger' : 
+                        ($movement['movement_type'] == 'booked' ? 'warning' : 'info'))
+                        ?>">
+                        <?= ucfirst($movement['movement_type']) ?>
+                        <?= $movement['status'] == 'completed' ? ' (Completed)' : '' ?>
+                    </span>
+                </td>
+                <td><?= $movement['quantity'] ?></td>
+                <td><?= $movement['from_location_name'] ?? '-' ?></td>
+                <td><?= $movement['to_location_name'] ?? '-' ?></td>
+                <td><?= $movement['notes'] ?></td>
+                <td><?= $movement['username'] ?? 'System' ?></td>
+                <td>
+                    <?php if ($movement['movement_type'] == 'booked'): ?>
+                        <button class="btn btn-sm btn-success complete-booking" 
+                                data-id="<?= $movement['id'] ?>"
+                                data-product="<?= $productId ?>">
+                            <i class="fas fa-check"></i> Complete
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-movement" 
+                                data-id="<?= $movement['id'] ?>"
+                                data-product="<?= $productId ?>">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    <?php endif; ?>
+                    
+                    <?php if ($movement['movement_type'] !== 'booked'): ?>
+                        <button class="btn btn-sm btn-danger delete-movement" 
+                                data-id="<?= $movement['id'] ?>"
+                                data-product="<?= $productId ?>">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="completeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complete Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to mark this booking as completed?</p>
+                <form id="completeForm" method="post">
+                    <input type="hidden" name="movement_id" id="movement_id">
+                    <input type="hidden" name="product_id" id="product_id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmComplete">Complete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Complete booking button
+    $('.complete-booking').click(function() {
+        $('#movement_id').val($(this).data('id'));
+        $('#product_id').val($(this).data('product'));
+        $('#completeModal').modal('show');
+    });
+
+    // Confirm complete
+    $('#confirmComplete').click(function() {
+        $('#completeForm').attr('action', '/productstock/complete-booking').submit();
+    });
+
+    // Delete movement
+    // Replace the delete button handler with:
+$('.delete-movement').click(function() {
+    // alert( `/productstock/delete-movement/`+$(this).data('id'))
+    if (confirm('Are you sure you want to delete this record?')) {
+        $('<form>', {
+            'action': `/productstock/delete-movement/`+$(this).data('id'),
+            'method': 'post',
+            'html': $('<input>', {
+                'type': 'hidden',
+                'name': 'movement_id',
+                'value': $(this).data('id')
+            }).add($('<input>', {
+                'type': 'hidden',
+                'name': 'product_id',
+                'value': $(this).data('product')
+            }))
+        }).appendTo('body').submit();
+    }
+});
+});
+</script>

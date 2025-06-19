@@ -72,6 +72,7 @@ class StockController extends BaseController
         $data = [
             'title' => 'Stock Detail - ' . $product['nama'],
             'product' => $product,
+            'productId' => $productId,
             'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
             'available' => $available,
             'booked' => $booked,
@@ -301,6 +302,43 @@ public function processTransfer($productId)
         return redirect()->to("/productstock/view/$productId")->with('message', 'Stock transferred successfully');
     } catch (\Exception $e) {
         return redirect()->back()->withInput()->with('error', 'Transfer failed: ' . $e->getMessage());
+    }
+}
+// Complete a booking
+public function completeBooking()
+{
+    $movementId = $this->request->getPost('movement_id');
+    $productId = $this->request->getPost('product_id');
+    
+    try {
+        $this->stMovementModel->update($movementId, [
+            'status' => 'completed',
+            'movement_type' => 'out', // Change type to out when completed
+            'updated_at' => date('Y-m-d H:i:s'),
+            'to_location' => null, // Use the location from the form
+        ]);
+        
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Booking marked as completed');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to complete booking: ' . $e->getMessage());
+    }
+}
+
+// Delete a movement record
+public function deleteMovement($id)
+{
+
+    $productId = $this->request->getGet('product_id');
+    
+    try {
+        
+        // Only allow deletion of certain types
+        
+        $this->stMovementModel->delete($id);
+        
+        return redirect()->to("/productstock/view/$id")->with('message', 'Record deleted successfully');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to delete record: ' . $e->getMessage());
     }
 }
 }
