@@ -404,37 +404,66 @@ public function generateWasteScrapWithCheck($startDate, $endDate)
     }
 
     // Model untuk laporan mutasi hasil produksi
-    public function generateMutasiHasilProduksi($periode)
-    {
-        // Pertama, hapus data lama untuk periode yang sama
-        $this->db->table('laporan_mutasi_hasil_produksi')->where('periode', $periode)->delete();
-        
-        // Ambil semua produk
-        $products = $this->db->table('proforma_invoice_details')
-        ->select('proforma_invoice_details.id_product, p.kode, p.nama')
-            ->join('product p', 'p.id = proforma_invoice_details.id_product', 'left')
-            ->where('proforma_invoice_details.deleted_at', null)
+public function generateMutasiHasilProduksi($periode)
+{
+    // Pertama, hapus data lama untuk periode yang sama
+    $this->db->table('laporan_mutasi_hasil_produksi')->where('periode', $periode)->delete();
+    
+    // Ambil semua gudang yang aktif
+    $warehouses = $this->db->table('locations')
+        ->select('id, code, name')
+        ->where('is_active', 1)
+        ->where('type', 'warehouse')
+        ->get()
+        ->getResultArray();
+    
+    // Ambil semua produk yang memiliki data awal atau pergerakan stok
+    $products = $this->db->table('st_initial')
+        ->select('st_initial.product_id, p.kode, p.nama')
+        ->join('product p', 'p.id = st_initial.product_id', 'left')
+        ->groupBy('st_initial.product_id')
+        ->get()
+        ->getResultArray();
+    
+    // Jika tidak ada data awal, ambil dari produk yang memiliki pergerakan
+    if (empty($products)) {
+        $products = $this->db->table('st_movement')
+            ->select('st_movement.product_id, p.kode, p.nama')
+            ->join('product p', 'p.id = st_movement.product_id', 'left')
+            ->groupBy('st_movement.product_id')
             ->get()
             ->getResultArray();
-        
-        $records = [];
-        $startDate = date('Y-m-01', strtotime($periode));
-        $endDate = date('Y-m-t', strtotime($periode));
-        
+    }
+    
+    $records = [];
+    $startDate = date('Y-m-01', strtotime($periode));
+    $endDate = date('Y-m-t', strtotime($periode));
+    
+    foreach ($warehouses as $warehouse) {
         foreach ($products as $product) {
-
-            // Hitung saldo awal (dari bulan sebelumnya)
-            $saldoAwal = $this->getSaldoAwalHasilProduksi($product['id_product'], $startDate);
+            // Hitung saldo awal dari tabel st_initial
+            $saldoAwal = $this->getSaldoAwalHasilProduksi($product['product_id'], $warehouse['id']);
             
-            // Hitung total pemasukan
-            $pemasukan = $this->getTotalPemasukanHasilProduksi($product['id_product'], $startDate, $endDate);
+            // Hitung total pemasukan untuk gudang ini
+            $pemasukanData = $this->getTotalPemasukanHasilProduksi($product['product_id'], $warehouse['id'], $startDate, $endDate);
+            $pemasukan = $pemasukanData['total'];
+            $tanggalMasuk = $pemasukanData['tanggal'];
             
-            // Hitung total pengeluaran
-            $pengeluaran = $this->getTotalPengeluaranHasilProduksi($product['id_product'], $startDate, $endDate)['total'];
-            $tanggal = $this->getTotalPengeluaranHasilProduksi($product['id_product'], $startDate, $endDate)['tanggal'];
+            // Hitung total pengeluaran untuk gudang ini
+            $pengeluaranData = $this->getTotalPengeluaranHasilProduksi($product['product_id'], $warehouse['id'], $startDate, $endDate);
+            $pengeluaran = $pengeluaranData['total'];
+            $tanggalKeluar = $pengeluaranData['tanggal'];
             
             // Hitung saldo akhir
             $saldoAkhir = $saldoAwal + $pemasukan - $pengeluaran;
+            
+            // Skip jika semua nilai 0 (tidak ada pergerakan)
+            if ($saldoAwal == 0 && $pemasukan == 0 && $pengeluaran == 0) {
+                continue;
+            }
+            
+            // Ambil tanggal terbaru antara masuk dan keluar
+            $tanggal = max($tanggalMasuk, $tanggalKeluar);
             
             $records[] = [
                 'kode_barang' => $product['kode'],
@@ -444,20 +473,21 @@ public function generateWasteScrapWithCheck($startDate, $endDate)
                 'pemasukan' => $pemasukan,
                 'pengeluaran' => $pengeluaran,
                 'saldo_akhir' => $saldoAkhir,
-                'gudang' => 'Gudang Produk',
+                'gudang' => $warehouse['name'],
+                'gudang_kode' => $warehouse['code'],
                 'periode' => $periode,
                 'tanggal' => $tanggal
             ];
         }
-
-        if (!empty($records)) {
-
-            $this->db->table('laporan_mutasi_hasil_produksi')->insertBatch($records);
-            return count($records);
-        }
-        
-        return 0;
     }
+
+    if (!empty($records)) {
+        $this->db->table('laporan_mutasi_hasil_produksi')->insertBatch($records);
+        return count($records);
+    }
+    
+    return 0;
+}
 
     // Model untuk laporan waste/scrap
     public function generateWasteScrap($startDate, $endDate)
@@ -543,54 +573,175 @@ public function generateWasteScrapWithCheck($startDate, $endDate)
     }
 
     // Fungsi pembantu untuk menghitung saldo awal hasil produksi
-    private function getSaldoAwalHasilProduksi($productId, $startDate)
-    {
-        $previousMonth = date('Y-m', strtotime('-1 month', strtotime($startDate)));
-        
-        $saldo = $this->db->table('laporan_mutasi_hasil_produksi')
-            ->select('saldo_akhir')
-            ->where('kode_barang', function($builder) use ($productId) {
-                $builder->select('kode')
-                    ->from('product')
-                    ->where('id', $productId);
-            })
-            ->where('periode', $previousMonth)
-            ->get()
-            ->getRowArray();
-            
-        return $saldo ? $saldo['saldo_akhir'] : 0;
-    }
+private function getSaldoAwalHasilProduksi($productId, $locationId)
+{
+    // Ambil saldo awal dari tabel st_initial
+    $initialStock = $this->db->table('st_initial')
+        ->select('quantity')
+        ->where('product_id', $productId)
+        ->where('location_id', $locationId)
+        ->where('deleted_at', null)
+        ->get()
+        ->getRow();
+    
+    return $initialStock ? $initialStock->quantity : 0;
+}
 
-    // Fungsi pembantu untuk menghitung total pemasukan hasil produksi
-    private function getTotalPemasukanHasilProduksi($productId, $startDate, $endDate)
-    {
-        $result = $this->db->table('production_progress pp')
-            ->select('COALESCE(SUM(pp.quantity), 0) as total')
-            ->where('pp.product_id', $productId)
-            ->where('pp.created_at >=', $startDate)
-            ->where('pp.created_at <=', $endDate)
-            ->where('pp.deleted_at', null)
-            ->get()
-            ->getRowArray();
-            
-        return $result['total'] ?? 0;
-    }
+// private function getTotalPemasukanHasilProduksi($productId, $locationId, $startDate, $endDate)
+// {
+    
+//     // Debug: Check if we're getting the expected parameters
+//     // You can log these values to verify
+//     // log_message('debug', 'Params: productId='.$productId.', locationId='.$locationId.', startDate='.$startDate.', endDate='.$endDate);
 
-    // Fungsi pembantu untuk menghitung total pengeluaran hasil produksi
-    private function getTotalPengeluaranHasilProduksi($productId, $startDate, $endDate)
-    {
-        $startDate_ = date('Y-m-d H:i:s', strtotime($startDate));
-        $endDate_ = date('Y-m-d H:i:s', strtotime($endDate));
-        $result = $this->db->table('proforma_invoice_details pid')
-            ->select('pid.quantity as total,pid.created_at as tanggal')
-            // ->join('proforma_invoice pi', 'pi.id = pid.invoice_id')
-            ->where('pid.id_product', $productId)
-            ->where('pid.created_at >=', $startDate_)
-            ->where('pid.created_at <=', $endDate_)
-            // ->where('pi.deleted_at', null)
-            // ->where('pi.peb IS NOT NULL')
-            ->get()
-            ->getRowArray();
-        return $result;
-    }
+//     // Get all 'in' movements to this location during the period
+//     $inQuery = $this->db->table('st_movement')
+//         ->select('quantity, created_at, reference_type')
+//         ->where('product_id', $productId)
+//         ->where('movement_type', 'in')
+//         ->where('to_location', $locationId)
+//         ->where('created_at >=', $startDate)
+//         ->where('created_at <=', $endDate)
+//         ->get();
+
+//     $totalIn = 0;
+//     foreach ($inQuery->getResult() as $row) {
+//         $totalIn += $row->quantity;
+//     }
+
+//     // Get all transfers in to this location during the period
+//     $transferQuery = $this->db->table('st_movement')
+//         ->select('quantity, created_at, reference_type')
+//         ->where('product_id', $productId)
+//         ->where('movement_type', 'transfer')
+//         ->where('to_location', $locationId)
+//         ->where('created_at >=', $startDate)
+//         ->where('created_at <=', $endDate)
+//         ->get();
+    
+//     $transfersIn = 0;
+//     foreach ($transferQuery->getResult() as $row) {
+//         $transfersIn += $row->quantity;
+//     }
+
+//     // Debug: Log the queries being executed
+//     // log_message('debug', 'In movements query: '.$this->db->getLastQuery());
+//     // log_message('debug', 'Transfer movements query: '.$this->db->getLastQuery());
+//     // log_message('debug', 'Total in: '.$totalIn.', Transfers in: '.$transfersIn);
+
+//     return $totalIn + $transfersIn;
+// }
+
+// private function getTotalPengeluaranHasilProduksi($productId, $locationId, $startDate, $endDate)
+// {
+//     // Get all 'out' movements from this location during the period
+//     $outQuery = $this->db->table('st_movement')
+//         ->select('SUM(quantity) as total, MAX(created_at) as tanggal')
+//         ->where('product_id', $productId)
+//         ->where('movement_type', 'out')
+//         ->where('from_location', $locationId)
+//         ->where('created_at >=', $startDate)
+//         ->where('created_at <=', $endDate)
+//         ->get()
+//         ->getRow();
+    
+//     $totalOut = $outQuery->total ?? 0;
+//     $tanggal = $outQuery->tanggal ?? null;
+    
+//     // Get all transfers out from this location during the period
+//     $transfersOut = $this->db->table('st_movement')
+//         ->selectSum('quantity')
+//         ->where('product_id', $productId)
+//         ->where('movement_type', 'transfer')
+//         ->where('from_location', $locationId)
+//         ->where('created_at >=', $startDate)
+//         ->where('created_at <=', $endDate)
+//         ->get()
+//         ->getRow()
+//         ->quantity ?? 0;
+    
+//     return [
+//         'total' => $totalOut + $transfersOut,
+//         'tanggal' => $tanggal
+//     ];
+// }
+private function getTotalPemasukanHasilProduksi($productId, $locationId, $startDate, $endDate)
+{
+    // Get all 'in' movements to this location during the period
+    $inQuery = $this->db->table('st_movement')
+        ->select('SUM(quantity) as total, MAX(created_at) as tanggal')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'in')
+        ->where('to_location', $locationId)
+        ->where('created_at >=', $startDate)
+        ->where('created_at <=', $endDate)
+        ->get()
+        ->getRow();
+    
+    $totalIn = $inQuery->total ?? 0;
+    $tanggalIn = $inQuery->tanggal ?? null;
+    
+    // Get all transfers in to this location during the period
+    $transferQuery = $this->db->table('st_movement')
+        ->select('SUM(quantity) as total, MAX(created_at) as tanggal')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'transfer')
+        ->where('to_location', $locationId)
+        ->where('created_at >=', $startDate)
+        ->where('created_at <=', $endDate)
+        ->get()
+        ->getRow();
+    
+    $transfersIn = $transferQuery->total ?? 0;
+    $tanggalTransferIn = $transferQuery->tanggal ?? null;
+    
+    // Combine results
+    $total = $totalIn + $transfersIn;
+    $tanggal = max($tanggalIn, $tanggalTransferIn);
+    
+    return [
+        'total' => $total,
+        'tanggal' => $tanggal
+    ];
+}
+
+private function getTotalPengeluaranHasilProduksi($productId, $locationId, $startDate, $endDate)
+{
+    // Get all 'out' movements from this location during the period
+    $outQuery = $this->db->table('st_movement')
+        ->select('SUM(quantity) as total, MAX(created_at) as tanggal')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'out')
+        ->where('from_location', $locationId)
+        ->where('created_at >=', $startDate)
+        ->where('created_at <=', $endDate)
+        ->get()
+        ->getRow();
+    
+    $totalOut = $outQuery->total ?? 0;
+    $tanggalOut = $outQuery->tanggal ?? null;
+    
+    // Get all transfers out from this location during the period
+    $transferQuery = $this->db->table('st_movement')
+        ->select('SUM(quantity) as total, MAX(created_at) as tanggal')
+        ->where('product_id', $productId)
+        ->where('movement_type', 'transfer')
+        ->where('from_location', $locationId)
+        ->where('created_at >=', $startDate)
+        ->where('created_at <=', $endDate)
+        ->get()
+        ->getRow();
+    
+    $transfersOut = $transferQuery->total ?? 0;
+    $tanggalTransferOut = $transferQuery->tanggal ?? null;
+    
+    // Combine results
+    $total = $totalOut + $transfersOut;
+    $tanggal = max($tanggalOut, $tanggalTransferOut);
+    
+    return [
+        'total' => $total,
+        'tanggal' => $tanggal
+    ];
+}
 }

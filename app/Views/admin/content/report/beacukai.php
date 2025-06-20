@@ -491,86 +491,128 @@ function generateTable(reportType, data) {
 }
 
 // Fungsi untuk export ke PDF
-function exportToPdf(reportType, startDate, endDate, columns, data) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('l', 'mm', 'a4');
-    
-    const reportTitles = {
-        1: 'LAPORAN PEMASUKAN BAHAN BAKU',
-        2: 'LAPORAN PEMAKAIAN BAHAN BAKU',
-        3: 'LAPORAN PEMASUKAN HASIL PRODUKSI',
-        4: 'LAPORAN PENGELUARAN HASIL PRODUKSI',
-        5: 'LAPORAN MUTASI BAHAN BAKU',
-        6: 'LAPORAN MUTASI HASIL PRODUKSI',
-        7: 'LAPORAN WASTE/SCRAP'
+function exportToPdf(reportType, startDate, endDate,column, data) {
+    try {
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) throw new Error("jsPDF library not loaded");
+        
+        // Define columns for each report type
+        const columns = {
+            1: ['No', 'Jenis Bukti', 'No. Dokumen', 'Tanggal', 'No. BC 2.0', 'No. BC 2.4', 'Kode Barang', 'Nama Barang', 'Negara', 'Satuan', 'Jumlah', 'Nilai', 'Penerima'],
+            2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
+            3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+            4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+            5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+            6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+            7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai']
+        };
+        
+        const reportTitles = {
+            1: 'LAPORAN PEMASUKAN BAHAN BAKU',
+            2: 'LAPORAN PEMAKAIAN BAHAN BAKU',
+            3: 'LAPORAN PEMASUKAN HASIL PRODUKSI',
+            4: 'LAPORAN PENGELUARAN HASIL PRODUKSI',
+            5: 'LAPORAN MUTASI BAHAN BAKU',
+            6: 'LAPORAN MUTASI HASIL PRODUKSI',
+            7: 'LAPORAN WASTE/SCRAP'
+        };
+        
+        const title = reportTitles[reportType];
+        const reportColumns = columns[reportType];
+        
+        if (!reportColumns) throw new Error("Invalid report type");
+        
+        // Format dates for display
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        const startDateFormatted = new Date(startDate).toLocaleDateString('id-ID', options);
+        const endDateFormatted = new Date(endDate).toLocaleDateString('id-ID', options);
+        
+        // Initialize PDF document
+        const doc = new jsPDF('l', 'mm', 'a4');
+        
+        // Header
+        doc.setFontSize(12);
+        doc.text('PT.CHAKRA NAGA FURNITURE', 145, 10, { align: 'center' });
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text( title, 145, 22, { align: 'center' }) ;
+        doc.setFontSize(10);
+        doc.text(`Periode: ${startDateFormatted} s/d ${endDateFormatted}`, 145, 28, { align: 'center' });
+        doc.setFontSize(8);
+        doc.text('Berdasarkan PER-5/BC/2023 tentang Tata Laksana Monitoring dan Evaluasi', 145, 34, { align: 'center' });
+        doc.setDrawColor(0);
+        doc.setLineWidth(0.5);
+        doc.line(10, 36, 280, 36);
+        
+        // Prepare table data
+        const pdfData = [];
+        
+        // Add data rows with proper numbering
+        if (data && data.length > 0) {
+            data.forEach((row, index) => {
+                const rowData = [index + 1]; // Add row number
+                Object.values(row).forEach(val => rowData.push(val || '-'));
+                pdfData.push(rowData);
+            });
+        } else {
+            // Add empty data message if no data
+            pdfData.push(['Tidak ada data']);
+        }
+        
+        // Create table
+        doc.autoTable({
+            startY: 45,
+            head: [reportColumns],
+            body: pdfData,
+            margin: { left: 5, right: 5 },
+            styles: { 
+                fontSize: 12,
+                cellPadding: 1,
+                overflow: 'linebreak',
+                valign: 'middle'
+            },
+            headStyles: { 
+                fillColor: [13, 110, 253], 
+                textColor: 255, 
+                fontStyle: 'bold',
+                fontSize: 12,
+                valign: 'middle'
+            },
+            alternateRowStyles: { fillColor: [248, 249, 250] },
+            columnStyles: { 0: { cellWidth: 'auto' } },
+            tableWidth: 'wrap',
+            pageBreak: 'auto',
+            showHead: 'everyPage'
+        });
+        
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for(let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.text(`Halaman ${i} dari ${pageCount}`, 145, doc.internal.pageSize.height - 10, { align: 'center' });
+        }
+        
+        doc.save(`${title.replace(/ /g, '_')}_${startDate}_to_${endDate}.pdf`);
+    } catch (error) {
+        console.error("Error generating PDF:", error);
+        Swal.fire('Error', `Gagal membuat PDF: ${error.message}`, 'error');
+    }
+}
+// Fungsi untuk export ke Excel
+// Fungsi untuk export ke Excel
+function exportToExcel(reportType, startDate, endDate,column, data) {
+    // Define columns for each report type
+    const columns = {
+        1: ['No', 'Jenis Bukti', 'No. Dokumen', 'Tanggal', 'No. BC 2.0', 'No. BC 2.4', 'Kode Barang', 'Nama Barang', 'Negara', 'Satuan', 'Jumlah', 'Nilai', 'Penerima'],
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
+        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+        4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+        6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai']
     };
     
-    const title = reportTitles[reportType];
-    const options = { day: '2-digit', month: 'long', year: 'numeric' };
-    const startDateFormatted = new Date(startDate).toLocaleDateString('id-ID', options);
-    const endDateFormatted = new Date(endDate).toLocaleDateString('id-ID', options);
-    
-    // Header
-    doc.setFontSize(12);
-    doc.text('KEMENTERIAN KEUANGAN REPUBLIK INDONESIA', 145, 10, { align: 'center' });
-    doc.text('DIREKTORAT JENDERAL BEA DAN CUKAI', 145, 15, { align: 'center' });
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(title, 145, 22, { align: 'center' });
-    doc.setFontSize(10);
-    doc.text(`Periode: ${startDateFormatted} s/d ${endDateFormatted}`, 145, 28, { align: 'center' });
-    doc.setFontSize(8);
-    doc.text('Berdasarkan PER-5/BC/2023 tentang Tata Laksana Monitoring dan Evaluasi', 145, 34, { align: 'center' });
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(10, 36, 280, 36);
-    
-    // Data tabel
-    const pdfData = data.map((row, index) => {
-        const rowData = [index + 1];
-        Object.values(row).forEach(val => rowData.push(val || '-'));
-        return rowData;
-    });
-    
-    // Buat tabel
-    doc.autoTable({
-        startY: 45,
-        head: [columns],
-        body: pdfData,
-        margin: { left: 5, right: 5 },
-        styles: { 
-            fontSize: 6,
-            cellPadding: 1,
-            overflow: 'linebreak',
-            valign: 'middle'
-        },
-        headStyles: { 
-            fillColor: [13, 110, 253], 
-            textColor: 255, 
-            fontStyle: 'bold',
-            fontSize: 6,
-            valign: 'middle'
-        },
-        alternateRowStyles: { fillColor: [248, 249, 250] },
-        columnStyles: { 0: { cellWidth: 'auto' } },
-        tableWidth: 'wrap',
-        pageBreak: 'auto',
-        showHead: 'everyPage'
-    });
-    
-    // Footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.text(`Halaman ${i} dari ${pageCount}`, 145, doc.internal.pageSize.height - 10, { align: 'center' });
-    }
-    
-    doc.save(`${title.replace(/ /g, '_')}_${startDate}_to_${endDate}.pdf`);
-}
-
-// Fungsi untuk export ke Excel
-function exportToExcel(reportType, startDate, endDate, columns, data) {
     const reportTitles = {
         1: 'LAPORAN_PEMASUKAN_BAHAN_BAKU',
         2: 'LAPORAN_PEMAKAIAN_BAHAN_BAKU',
@@ -583,33 +625,54 @@ function exportToExcel(reportType, startDate, endDate, columns, data) {
     
     const title = reportTitles[reportType];
     const fileName = `${title}_${startDate}_to_${endDate}.xlsx`;
+    const reportColumns = columns[reportType];
     
     // Siapkan data
     const excelData = [
         ['KEMENTERIAN KEUANGAN REPUBLIK INDONESIA'],
         ['DIREKTORAT JENDERAL BEA DAN CUKAI'],
-        [title],
+        [title.replace(/_/g, ' ')],
         [`Periode: ${startDate} s/d ${endDate}`],
         ['Berdasarkan PER-5/BC/2023 tentang Tata Laksana Monitoring dan Evaluasi'],
         [''],
-        columns
+        reportColumns // Use the columns we defined
     ];
     
-    data.forEach((row, index) => {
-        const rowData = [index + 1];
-        Object.values(row).forEach(val => rowData.push(val || '-'));
-        excelData.push(rowData);
-    });
+    // Add data rows
+    if (data && data.length > 0) {
+        data.forEach((row, index) => {
+            const rowData = [index + 1];
+            Object.values(row).forEach(val => rowData.push(val || '-'));
+            excelData.push(rowData);
+        });
+    }
     
     // Buat worksheet
     const ws = XLSX.utils.aoa_to_sheet(excelData);
+    
+    // Set column widths
+    const colWidths = reportColumns.map(() => ({ wch: 15 }));
+    ws['!cols'] = colWidths;
+    
+    // Merge header cells
     ws['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: columns.length - 1 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: columns.length - 1 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: columns.length - 1 } },
-        { s: { r: 3, c: 0 }, e: { r: 3, c: columns.length - 1 } },
-        { s: { r: 4, c: 0 }, e: { r: 4, c: columns.length - 1 } }
+        { s: { r: 0, c: 0 }, e: { r: 0, c: reportColumns.length - 1 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: reportColumns.length - 1 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: reportColumns.length - 1 } },
+        { s: { r: 3, c: 0 }, e: { r: 3, c: reportColumns.length - 1 } },
+        { s: { r: 4, c: 0 }, e: { r: 4, c: reportColumns.length - 1 } }
     ];
+    
+    // Style header row
+    for (let i = 0; i < reportColumns.length; i++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 6, c: i });
+        if (!ws[cellAddress]) continue;
+        ws[cellAddress].s = {
+            font: { bold: true },
+            fill: { fgColor: { rgb: "FFD9D9D9" } },
+            alignment: { horizontal: 'center' }
+        };
+    }
     
     // Buat workbook
     const wb = XLSX.utils.book_new();
