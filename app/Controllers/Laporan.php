@@ -193,8 +193,9 @@ class Laporan extends BaseController
             gudang
         ");
         
-        $builder->where('tanggal >=', $startDate);
-        $builder->where('tanggal <=', $endDate);
+        $builder->where('periode >=', $startDate);
+        $builder->where('periode <=', $endDate);
+        $builder->where('saldo_akhir !=', 0);
         
         return $builder->get()->getResultArray();
     }

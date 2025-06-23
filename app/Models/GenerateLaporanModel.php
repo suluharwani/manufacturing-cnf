@@ -353,7 +353,9 @@ public function generateWasteScrapWithCheck($startDate, $endDate)
         
         // Ambil semua material
         $materials = $this->db->table('materials')
-            ->where('deleted_at', null)
+            ->join('materials_detail md', 'md.material_id = materials.id', 'left')
+            ->where('materials.deleted_at', null)
+            ->where('md.kite', 'KITE')
             ->get()
             ->getResultArray();
         
@@ -363,13 +365,13 @@ public function generateWasteScrapWithCheck($startDate, $endDate)
         
         foreach ($materials as $material) {
             // Hitung saldo awal (dari bulan sebelumnya)
-            $saldoAwal = $this->getSaldoAwalBahanBaku($material['id'], $startDate);
+            $saldoAwal = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_awal'] ?? 0;
             
             // Hitung total pemasukan
-            $pemasukan = $this->getTotalPemasukanBahanBaku($material['id'], $startDate, $endDate);
+            $pemasukan = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_masuk'] ?? 0;
             
             // Hitung total pengeluaran
-            $pengeluaran = $this->getTotalPengeluaranBahanBaku($material['id'], $startDate, $endDate);
+            $pengeluaran = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_keluar'] ?? 0;
             
             // Hitung saldo akhir
             $saldoAkhir = $saldoAwal + $pemasukan - $pengeluaran;
@@ -522,54 +524,16 @@ public function generateMutasiHasilProduksi($periode)
     }
 
     // Fungsi pembantu untuk menghitung saldo awal bahan baku
-    private function getSaldoAwalBahanBaku($materialId, $startDate)
+    private function getSaldoBahanBaku($materialId, $startDate)
     {
-        $previousMonth = date('Y-m', strtotime('-1 month', strtotime($startDate)));
         
-        $saldo = $this->db->table('laporan_mutasi_bahan_baku')
-            ->select('saldo_akhir')
-            ->where('kode_barang', function($builder) use ($materialId) {
-                $builder->select('kode')
-                    ->from('materials')
-                    ->where('id', $materialId);
-            })
-            ->where('periode', $previousMonth)
+        $saldo = $this->db->table('stock')
+            ->select('stock_awal, stock_masuk, stock_keluar')
+            ->where('id_material', $materialId )
             ->get()
             ->getRowArray();
             
-        return $saldo ? $saldo['saldo_akhir'] : 0;
-    }
-
-    // Fungsi pembantu untuk menghitung total pemasukan bahan baku
-    private function getTotalPemasukanBahanBaku($materialId, $startDate, $endDate)
-    {
-        $result = $this->db->table('pembelian_detail pd')
-            ->select('COALESCE(SUM(pd.jumlah), 0) as total')
-            ->join('pembelian p', 'p.id = pd.id_pembelian')
-            ->where('pd.id_material', $materialId)
-            ->where('p.tanggal_nota >=', $startDate)
-            ->where('p.tanggal_nota <=', $endDate)
-            ->where('p.deleted_at', null)
-            ->get()
-            ->getRowArray();
-            
-        return $result['total'] ?? 0;
-    }
-
-    // Fungsi pembantu untuk menghitung total pengeluaran bahan baku
-    private function getTotalPengeluaranBahanBaku($materialId, $startDate, $endDate)
-    {
-        $result = $this->db->table('material_requisition_list mrl')
-            ->select('COALESCE(SUM(mrl.jumlah), 0) as total')
-            ->join('material_requisition mr', 'mr.id = mrl.id_material_requisition')
-            ->where('mrl.id_material', $materialId)
-            ->where('mr.created_at >=', $startDate)
-            ->where('mr.created_at <=', $endDate)
-            ->where('mr.deleted_at', null)
-            ->get()
-            ->getRowArray();
-            
-        return $result['total'] ?? 0;
+        return $saldo;
     }
 
     // Fungsi pembantu untuk menghitung saldo awal hasil produksi
