@@ -112,6 +112,7 @@ $('.tambahPembelian').click(function() {
     var invoice = $('#invoice').val();
     var tanggal_nota = $('#tanggal_nota').val();
     var pajak = $('#pajak').val();
+    var document = $('#document').val();
 
 
     // Kirim data melalui AJAX ke server
@@ -122,7 +123,8 @@ $('.tambahPembelian').click(function() {
         supplier: supplier,
         invoice: invoice,
         tanggal_nota: tanggal_nota,
-        pajak: pajak
+        pajak: pajak,
+        document: document
       },
       success: function(response) {
         // Tampilkan pesan sukses jika berhasil menambahkan material

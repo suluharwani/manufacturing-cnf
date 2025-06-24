@@ -62,19 +62,13 @@
       <div class="modal-body">
         <form id="addPembelianForm">
           <div class="mb-3">
-            <label for="supplier" class="form-label">Material</label>
+            <label for="supplier" class="form-label">Supplier</label>
            <select class="form-control" id="supplier" required>
               <option value="">Select Supplier</option>
               <!-- Material options will be added here -->
             </select>
           </div>
-          <div class="mb-3">
-            <label for="po" class="form-label">Material</label>
-           <select class="form-control" id="po" required>
-              <option value="">Select Purchase Order</option>
-              <!-- Material options will be added here -->
-            </select>
-          </div>
+
           <div class="mb-3">
             <label for="materialQty" class="form-label">Invoice</label>
             <input type="text" class="form-control" id="invoice" required>
@@ -82,6 +76,10 @@
           <div class="mb-3">
             <label for="tanggal_nota" class="form-label">Tanggal Nota</label>
             <input type="date" class="form-control" id="tanggal_nota" required>
+          </div>
+          <div class="mb-3">
+            <label for="document" class="form-label">Dokumen(BC 2.0/BC 2.4/BC 2.5/BC 2.8)</label>
+            <input type="text" class="form-control" id="document">
           </div>
           <div class="mb-3">
             <label for="pajak" class="form-label">Pajak (%)</label>

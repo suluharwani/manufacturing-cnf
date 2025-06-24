@@ -13,7 +13,6 @@ class Laporan extends BaseController
 
     public function getLaporan()
     {
-
         // Validasi input
         if (!$this->validate([
             'report_type' => 'required|numeric',
@@ -79,28 +78,11 @@ class Laporan extends BaseController
         $builder = $this->laporanModel->builder('laporan_pemasukan_bahan_baku');
         
         $builder->select("
-            jenis_bukti_penerimaan,
-            no_dokumen,
-            tanggal_dokumen,
-            no_bc20,
-            no_bc24,
-            no_bc25,
-            no_bc28,
-            kode_barang,
-            seri_barang,
-            nama_barang,
-            negara_asal,
-            satuan,
-            jumlah,
-            mata_uang,
-            nilai,
-            penerima,
-            gudang,
-            subkontrak
+             tgl_rekam, jenis_dokumen, pabean_nomor, pabean_tanggal, kode_hs, nomor_seri_barang, bukti_penerimaan_nomor, bukti_penerimaan_tanggal, kode_bb, nama_barang, satuan, jumlah, mata_uang, nilai_barang, gudang, penerima_subkontrak, negara_asal_bb
         ");
         
-        $builder->where('tanggal_dokumen >=', $startDate);
-        $builder->where('tanggal_dokumen <=', $endDate);
+        $builder->where('bukti_penerimaan_tanggal >=', $startDate);
+        $builder->where('bukti_penerimaan_tanggal <=', $endDate);
         
         return $builder->get()->getResultArray();
     }

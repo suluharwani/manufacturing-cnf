@@ -313,6 +313,7 @@ return view('admin/index', $data);
     public function addInvoice(){
     $data['id_supplier'] = $_POST['supplier'];
     $data['invoice'] = $_POST['invoice'];
+    $data['document'] = $_POST['document'];
     $data['tanggal_nota'] = $_POST['tanggal_nota'];
     $data['pajak'] = $_POST['pajak'];
     $data['status_pembayaran'] = 0;

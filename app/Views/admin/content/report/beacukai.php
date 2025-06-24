@@ -455,7 +455,7 @@ function generateReport(reportType) {
 // Fungsi untuk generate tabel
 function generateTable(reportType, data) {
     const columns = {
-        1: ['No', 'Jenis Bukti', 'No. Dokumen', 'Tanggal', 'No. BC 2.0', 'No. BC 2.4', 'Kode Barang', 'Nama Barang', 'Negara', 'Satuan', 'Jumlah', 'Nilai', 'Penerima'],
+        1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
         2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
         3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
         4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
@@ -498,7 +498,7 @@ function exportToPdf(reportType, startDate, endDate,column, data) {
         
         // Define columns for each report type
         const columns = {
-            1: ['No', 'Jenis Bukti', 'No. Dokumen', 'Tanggal', 'No. BC 2.0', 'No. BC 2.4', 'Kode Barang', 'Nama Barang', 'Negara', 'Satuan', 'Jumlah', 'Nilai', 'Penerima'],
+            1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
             2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
             3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
             4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
@@ -604,7 +604,7 @@ function exportToPdf(reportType, startDate, endDate,column, data) {
 function exportToExcel(reportType, startDate, endDate,column, data) {
     // Define columns for each report type
     const columns = {
-        1: ['No', 'Jenis Bukti', 'No. Dokumen', 'Tanggal', 'No. BC 2.0', 'No. BC 2.4', 'Kode Barang', 'Nama Barang', 'Negara', 'Satuan', 'Jumlah', 'Nilai', 'Penerima'],
+        1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
         2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
         3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
         4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],

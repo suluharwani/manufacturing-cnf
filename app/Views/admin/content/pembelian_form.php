@@ -63,7 +63,12 @@
         <input type="tel" class="form-control" value="<?=$pembelian[0]['pajak'] ?? '' ?> " id="pajak" placeholder="...%"> 
       </div>
     </div>
-
+<div class="row mb-3">
+      <label for="document" class="col-md-3 col-form-label">Dokumen</label>
+      <div class="col-md-9">
+        <input type="tel" class="form-control" value="<?=$pembelian[0]['document'] ?? '' ?> " id="document" placeholder="...%"> 
+      </div>
+    </div>
     <!-- Tombol Kirim -->
     <button type="button" class="btn btn-primary saveSupplier">Update Supplier</button>
     <button type="button" class="btn btn-warning importPO">Import PO</button>
@@ -185,6 +190,7 @@
             <label for="potongan" class="form-label">potongan</label>
             <input type="number" class="form-control" id="potongan">
           </div> -->
+         
           <div class="mb-3">
             <label for="pajak_barang" class="form-label">Pajak (%)</label>
             <input type="number" class="form-control" value="<?=$pembelian[0]['pajak']?>" id="pajak_barang" >
