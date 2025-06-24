@@ -228,6 +228,7 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
     $builder->join('country_data country', 's.id_country = country.id_country', 'left');
 
     $builder->where('p.deleted_at', null);
+    $builder->where('p.posting', 1);
     $builder->orderBy('p.invoice');
 
     $results = $builder->get()->getResultArray();
