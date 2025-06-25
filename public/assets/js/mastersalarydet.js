@@ -358,8 +358,8 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate, 
             <td>${overtime3Display}</td>
             <td>
             <a href="javascript:void(0);" class="btn btn-success btn-sm addAttendance" 
-            id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
-            Tambah Data
+            id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}"><i class="fas fa-plus"></i>
+            Tambah
             </a>
             <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteAttendance" 
                    id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
