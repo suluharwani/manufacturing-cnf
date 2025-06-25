@@ -143,6 +143,8 @@ $routes->post('/user/deleteWorkDay', 'User::deleteWorkDay',['filter' => 'accessC
 $routes->post('/user/getSalaryCat', 'User::getSalaryCat',['filter' => 'accessControl:2']);
 $routes->post('/user/deleteSalaryCat', 'User::deleteSalaryCat',['filter' => 'accessControl:2']);
 $routes->post('/user/addSalaryCat', 'User::addSalaryCat',['filter' => 'accessControl:2']);
+$routes->post('/user/addAttendance', 'User::addAttendance',['filter' => 'accessControl:2']);
+$routes->post('/user/deleteAttendance', 'User::deleteAttendance',['filter' => 'accessControl:2']);
 
 $routes->get('/user/getAllowanceData', 'User::getAllowanceData',['filter' => 'accessControl:2']); 
 $routes->post('/user/deleteAllowance', 'User::deleteAllowance',['filter' => 'accessControl:2']);  
@@ -520,6 +522,7 @@ $routes->group('stock-opname', function($routes) {
 });
 $routes->post('api/laporan', 'Laporan::getLaporan');
 $routes->post('laporan/generate-all', 'GenerateLaporanController::generateAll');
+$routes->post('laporan/delete-all', 'GenerateLaporanController::deleteAll');
 
 $routes->group('productstock', function($routes) {
     $routes->get('/', 'StockController::index',['filter' => 'accessControl:2']);

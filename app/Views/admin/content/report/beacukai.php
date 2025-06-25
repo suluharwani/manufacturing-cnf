@@ -75,9 +75,11 @@
                                     <span id="loadingAll" class="spinner-border spinner-border-sm d-none"></span>
                                     GENERATE LAPORAN
                                 </button>
+                                
                                 <small class="form-text text-muted d-block mt-2">
                                     Sistem akan mengecek dan hanya menggenerate laporan yang belum ada datanya
                                 </small>
+                                
                             </div>
                         </div>
                     </div>
@@ -230,6 +232,10 @@
                             </div>
                         </div>
                     </div>
+                    <button class="btn btn-generate-all btn-lg w-100" onclick="deleteAllReports()">
+                                    <span id="loadingAll" class="spinner-border spinner-border-sm d-none"></span>
+                                    HAPUS SEMUA LAPORAN
+                                </button>
                 </div>
             </div>
         </div>
@@ -491,7 +497,7 @@ function generateTable(reportType, data) {
 }
 
 // Fungsi untuk export ke PDF
-function exportToPdf(reportType, startDate, endDate,column, data) {
+function exportToPdf(reportType, startDate, endDate, column, data) {
     try {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) throw new Error("jsPDF library not loaded");
@@ -535,7 +541,7 @@ function exportToPdf(reportType, startDate, endDate,column, data) {
         doc.text('PT.CHAKRA NAGA FURNITURE', 145, 10, { align: 'center' });
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text( title, 145, 22, { align: 'center' }) ;
+        doc.text(title, 145, 22, { align: 'center' });
         doc.setFontSize(10);
         doc.text(`Periode: ${startDateFormatted} s/d ${endDateFormatted}`, 145, 28, { align: 'center' });
         doc.setFontSize(8);
@@ -559,30 +565,76 @@ function exportToPdf(reportType, startDate, endDate,column, data) {
             pdfData.push(['Tidak ada data']);
         }
         
-        // Create table
+        // Calculate column widths based on content
+        const calculateColumnWidths = (columns, data) => {
+            const pageWidth = doc.internal.pageSize.width - 20; // 10mm margin on each side
+            const columnCount = columns.length;
+            
+            // For reports with many columns (like reportType 1), use auto width
+            if (columnCount > 10) {
+                return 'auto';
+            }
+            
+            // For other reports, calculate proportional widths
+            const baseWidth = pageWidth / columnCount;
+            const columnWidths = {};
+            
+            columns.forEach((col, i) => {
+                // Adjust width for certain columns
+                if (col.includes('Nama Barang')) {
+                    columnWidths[i] = baseWidth * 1.5;
+                } else if (col.includes('Tanggal') || col.includes('Tgl')) {
+                    columnWidths[i] = baseWidth * 0.8;
+                } else if (col === 'No') {
+                    columnWidths[i] = baseWidth * 0.5;
+                } else {
+                    columnWidths[i] = baseWidth;
+                }
+            });
+            
+            return columnWidths;
+        };
+        
+        const columnStyles = calculateColumnWidths(reportColumns, pdfData);
+        
+        // Create table with improved styling
         doc.autoTable({
             startY: 45,
             head: [reportColumns],
             body: pdfData,
-            margin: { left: 5, right: 5 },
+            margin: { left: 10, right: 10 },
             styles: { 
-                fontSize: 12,
-                cellPadding: 1,
+                fontSize: 8,
+                cellPadding: 2,
                 overflow: 'linebreak',
-                valign: 'middle'
+                valign: 'middle',
+                lineColor: [0, 0, 0], // Black borders
+                lineWidth: 0.1,
+                textColor: [0, 0, 0], // Black text
+                fillColor: false // No background
             },
             headStyles: { 
                 fillColor: [13, 110, 253], 
-                textColor: 255, 
+                textColor: [255, 255, 255], 
                 fontStyle: 'bold',
-                fontSize: 12,
-                valign: 'middle'
+                fontSize: 8,
+                valign: 'middle',
+                lineWidth: 0.1,
+                lineColor: [0, 0, 0]
             },
-            alternateRowStyles: { fillColor: [248, 249, 250] },
-            columnStyles: { 0: { cellWidth: 'auto' } },
-            tableWidth: 'wrap',
+            bodyStyles: {
+                lineWidth: 0.1,
+                lineColor: [0, 0, 0]
+            },
+            alternateRowStyles: { 
+                fillColor: [240, 240, 240] // Light gray for alternate rows
+            },
+            columnStyles: columnStyles === 'auto' ? undefined : columnStyles,
+            tableWidth: columnStyles === 'auto' ? 'wrap' : 'auto',
             pageBreak: 'auto',
-            showHead: 'everyPage'
+            showHead: 'everyPage',
+            horizontalPageBreak: true,
+            horizontalPageBreakRepeat: 0 // Repeat header row on horizontal page breaks
         });
         
         // Footer
@@ -600,7 +652,7 @@ function exportToPdf(reportType, startDate, endDate,column, data) {
     }
 }
 // Fungsi untuk export ke Excel
-// Fungsi untuk export ke Excel
+
 function exportToExcel(reportType, startDate, endDate,column, data) {
     // Define columns for each report type
     const columns = {
@@ -678,5 +730,68 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Laporan");
     XLSX.writeFile(wb, fileName);
+}
+// Fungsi untuk menghapus semua laporan
+function deleteAllReports() {
+    Swal.fire({
+        title: 'Konfirmasi Hapus Semua Laporan',
+        text: "Anda yakin ingin menghapus semua laporan? Tindakan ini tidak dapat dibatalkan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus Semua!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Tampilkan loading
+            const loadingBtn = $('#loadingAll').removeClass('d-none');
+            $('.btn-generate-all').prop('disabled', true);
+            
+            // AJAX Request untuk menghapus semua laporan
+            $.ajax({
+                type: "POST",
+                url: '<?= base_url('laporan/delete-all') ?>', // Sesuaikan dengan endpoint Anda
+                dataType: 'json',
+                success: function(response) {
+                    // Sembunyikan loading
+                    loadingBtn.addClass('d-none');
+                    $('.btn-generate-all').prop('disabled', false);
+                    
+                    if (response.status === 'success') {
+                        Swal.fire(
+                            'Berhasil!',
+                            response.message || 'Semua laporan telah dihapus',
+                            'success'
+                        );
+                        
+                        // Kosongkan tampilan laporan jika ada
+                        $('#reportContent').hide();
+                        $('#reportData').empty();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message || 'Gagal menghapus laporan',
+                            'error'
+                        );
+                    }
+                },
+                error: function(xhr) {
+                    loadingBtn.addClass('d-none');
+                    $('.btn-generate-all').prop('disabled', false);
+                    
+                    let errorMsg = 'Terjadi kesalahan saat menghapus laporan';
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        errorMsg = errorResponse.message || errorMsg;
+                    } catch (e) {
+                        console.error('Error parsing response:', e);
+                    }
+                    
+                    Swal.fire('Error', errorMsg, 'error');
+                }
+            });
+        }
+    });
 }
 </script>

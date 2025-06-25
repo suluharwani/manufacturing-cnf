@@ -44,6 +44,7 @@ public function getAttendanceData($pin, $id, $startDate, $endDate)
     return $this->where('pin', $pin)
                 ->where('scan_date >=', $startDate)
                 ->where('scan_date <=', $endDate)
+                ->orderBy('scan_date', 'ASC')
                 ->findAll();
 }
 public function getAttendance($pin, $id, $startDate, $endDate)
@@ -55,4 +56,22 @@ public function getAttendance($pin, $id, $startDate, $endDate)
                 ->where('scan_date <=', $endDate)
                 ->findAll();
 }
+public function getByDateRange(string $pin, string $startDate, string $endDate)
+    {
+        return $this->where('pin', $pin)
+            ->where('scan_date >=', $startDate)
+            ->where('scan_date <=', $endDate)
+            ->orderBy('scan_date', 'ASC')
+            ->findAll();
+    }
+
+    /**
+     * Check if attendance exists for PIN on date
+     */
+    public function existsForDate(string $pin, string $date)
+    {
+        return $this->where('pin', $pin)
+            ->where('DATE(scan_date)', $date)
+            ->countAllResults() > 0;
+    }
 }

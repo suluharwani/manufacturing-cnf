@@ -234,7 +234,7 @@ function formatDate(datetime) {
         success: function(workDays) {
           const groupedData = groupAttendanceData(data);
 
-          let html = generateAttendanceTable(groupedData, workDays, id, startDate, endDate);
+          let html = generateAttendanceTable(groupedData, workDays, id, startDate, endDate, pin);
 
           $('#popupContent').html(html);
           $('#popupModal').modal('show');
@@ -264,8 +264,18 @@ function groupAttendanceData(data) {
 }
 
 
-function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) {
+
+// Function to show add attendance form
+
+
+function generateAttendanceTable(groupedData, workDays, id, startDate, endDate, pin) {
     let html = `
+     <div class="mb-2">
+         <a href="javascript:void(0);" class="btn btn-primary btn-sm addAttendanceTop" 
+         id="${id}" pin="${pin}" startDate="${startDate}" endDate="${endDate}">
+         <i class="fas fa-plus"></i> Tambah Presensi PIN: ${pin}
+         </a>
+     </div>
     <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
     <table class="table table-striped table-bordered">
     <thead>
@@ -351,6 +361,10 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
             id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
             Tambah Data
             </a>
+            <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteAttendance" 
+                   id="${id}" startDate="${startDate}" endDate="${endDate}" pin="${entries[0].pin}" date="${date}">
+                    <i class="fas fa-trash"></i> Hapus
+                     </a>
             </td>
             </tr>`;
         }
@@ -403,6 +417,117 @@ function generateAttendanceTable(groupedData, workDays, id, startDate, endDate) 
 
     return html;
 }
+
+  $(document).on('click', '.addAttendanceTop', function () {
+    let id = $(this).attr('id');
+  let pin = $(this).attr('pin');
+let startDate = $(this).attr('startDate');
+  let endDate = $(this).attr('endDate');
+    Swal.fire({
+        title: 'Tambah Data Presensi',
+        html: `
+            <div class="form-group">
+                <label for="attendanceDate">Tanggal</label>
+                <input type="date" class="form-control" id="attendanceDate" value="" required>
+            </div>
+            <div class="form-group">
+                <label for="clockIn">Jam Masuk</label>
+                <input type="time" class="form-control" id="clockIn" required>
+            </div>
+            <div class="form-group">
+                <label for="clockOut">Jam Keluar</label>
+                <input type="time" class="form-control" id="clockOut" required>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Simpan',
+        cancelButtonText: 'Batal',
+        focusConfirm: false,
+        preConfirm: () => {
+            const attendanceDate = Swal.getPopup().querySelector('#attendanceDate').value;
+            const clockIn = Swal.getPopup().querySelector('#clockIn').value;
+            const clockOut = Swal.getPopup().querySelector('#clockOut').value;
+            
+            if (!attendanceDate || !clockIn || !clockOut) {
+                Swal.showValidationMessage('Harap isi semua field');
+                return false;
+            }
+            
+            return { 
+                id: id,
+                pin: pin,
+                date: attendanceDate,
+                clockIn: clockIn,
+                clockOut: clockOut,
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Call your API to save the attendance data here
+            const data = result.value;
+            console.log('Data to save:', data);
+            
+            // Example AJAX call (replace with your actual API call)
+            $.ajax({
+                url: base_url+'/user/addAttendance',
+                method: 'POST',
+                data: data,
+                success: function(response) {
+                    Swal.fire('Sukses!', 'Data presensi berhasil ditambahkan', 'success')
+                        .then(() => {
+                            // Reload or refresh the attendance table
+                            refreshPopupContent(pin, id, startDate, endDate);
+                        });
+                },
+                error: function(error) {
+                    Swal.fire('Error!', 'Gagal menambahkan data presensi', 'error');
+                }
+            });
+        }
+    });
+});
+// Function to confirm attendance deletion
+  $('#popupContent').on('click','.deleteAttendance',function(){
+  let id = $(this).attr('id');
+  let pin = $(this).attr('pin');
+  let date = $(this).attr('date');
+  let startDate = $(this).attr('startDate');
+  let endDate = $(this).attr('endDate');
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: `Anda akan menghapus data presensi untuk PIN ${pin} pada tanggal ${date}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Call your API to delete the attendance record here
+            console.log('Deleting attendance for PIN:', pin, 'Date:', date);
+            
+            // Example AJAX call (replace with your actual API call)
+            $.ajax({
+                url: base_url+'/user/deleteAttendance',
+                method: 'POST',
+                data: { pin: pin, date: date },
+                success: function(response) {
+                    Swal.fire('Terhapus!', 'Data presensi telah dihapus.', 'success')
+                        .then(() => {
+                            // Reload or refresh the attendance table
+                            // You might need to pass the appropriate parameters here
+                            refreshPopupContent(pin, id, startDate, endDate);
+                        });
+                },
+                error: function(error) {
+                    Swal.fire('Error!', 'Gagal menghapus data presensi', 'error');
+                }
+            });
+        }
+    });
+})
 
 
 function getInOutTimes(entries) {

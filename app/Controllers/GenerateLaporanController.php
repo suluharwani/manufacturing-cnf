@@ -12,6 +12,65 @@ class GenerateLaporanController extends BaseController
         $this->generateLaporanModel = new GenerateLaporanModel();
     }
 
+     public function deleteAll()
+    {
+        // Daftar tabel yang akan dihapus
+        $tables = [
+            'laporan_mutasi_bahan_baku',
+            'laporan_mutasi_hasil_produksi',
+            'laporan_pemakaian_bahan_baku',
+            'laporan_pemasukan_bahan_baku',
+            'laporan_pemasukan_hasil_produksi',
+            'laporan_pengeluaran_hasil_produksi',
+            'laporan_waste_scrap'
+        ];
+
+        $db = \Config\Database::connect();
+        $db->transStart(); // Mulai transaction
+
+        try {
+            $success = true;
+            $deletedRows = 0;
+
+            foreach ($tables as $table) {
+                // Skip jika tabel tidak ada
+                if (!$db->tableExists($table)) {
+                    continue;
+                }
+
+                // Hapus semua data dari tabel
+                $result = $db->table($table)->emptyTable();
+                $deletedRows += $db->affectedRows();
+                
+                if (!$result) {
+                    $success = false;
+                    break;
+                }
+            }
+
+            $db->transComplete();
+
+            if ($success) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => "Berhasil menghapus semua laporan ($deletedRows data dihapus)",
+                    'deleted_rows' => $deletedRows
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Gagal menghapus beberapa laporan'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
 
 public function generateAll()
 {

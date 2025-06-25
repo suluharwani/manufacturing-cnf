@@ -3,9 +3,11 @@ namespace App\Controllers;
 use AllowDynamicProperties; 
 use CodeIgniter\Controller;
 use Bcrypt\Bcrypt;
-
+use App\Models\AttendanceModel;
+use CodeIgniter\API\ResponseTrait;
 class User extends BaseController
 {
+  use ResponseTrait;
   protected $bcrypt;
   protected $userValidation;
   protected $bcrypt_version;
@@ -14,9 +16,10 @@ class User extends BaseController
   protected $uri;
   protected $form_validation;
   protected $changelog;
-
+  protected $attendanceModel;
   public function __construct()
   {
+    $this->attendanceModel = new AttendanceModel();
     //   parent::__construct();
     $this->db      = \Config\Database::connect();
     $this->session = session();
@@ -882,8 +885,99 @@ public function getDeductionOptions()
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete the allowance.'], 400);
         }
     }
+ public function addAttendance()
+    {
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'pin' => 'required|max_length[32]',
+            'date' => 'required|valid_date',
+            'clockIn' => 'required',
+            'clockOut' => 'required'
+        ];
 
-    
+        if (!$this->validate($rules)) {
+            return $this->failValidationErrors($validation->getErrors());
+        }
 
+        $pin = $this->request->getPost('pin');
+        $date = $this->request->getPost('date');
+        $clockIn = $this->request->getPost('clockIn');
+        $clockOut = $this->request->getPost('clockOut');
+
+        // Prepare data for clock in
+        $clockInData = [
+            'sn' => 'manual',
+            'scan_date' => "$date $clockIn",
+            'pin' => $pin,
+            'verifymode' => 0,
+            'inoutmode' => 0,
+            'att_id' => 0
+        ];
+
+        // Prepare data for clock out
+        $clockOutData = [
+            'sn' => 'manual',
+            'scan_date' => "$date $clockOut",
+            'pin' => $pin,
+            'verifymode' => 0,
+            'inoutmode' => 1,
+            'att_id' => 0
+        ];
+
+        try {
+            $this->attendanceModel->insert($clockInData);
+            $this->attendanceModel->insert($clockOutData);
+
+            return $this->respondCreated([
+                'status' => 'success',
+                'message' => 'Attendance records added successfully'
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Error adding attendance: ' . $e->getMessage());
+            return $this->failServerError('Failed to add attendance records');
+        }
+    }
+
+    /**
+     * Delete attendance record from att_log table
+     */
+    public function deleteAttendance()
+    {
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'pin' => 'required|max_length[32]',
+            'date' => 'required|valid_date'
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->failValidationErrors($validation->getErrors());
+        }
+
+        $pin = $this->request->getPost('pin');
+        $date = $this->request->getPost('date');
+
+        try {
+            $result = $this->attendanceModel
+                ->where('pin', $pin)
+                ->where('DATE(scan_date)', $date)
+                ->delete();
+
+            if ($result) {
+                return $this->respondDeleted([
+                    'status' => 'success',
+                    'message' => 'Attendance records deleted successfully',
+                    'deleted_rows' => $result
+                ]);
+            }
+
+            return $this->failNotFound('No manual attendance records found for this date');
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Error deleting attendance: ' . $e->getMessage());
+            return $this->failServerError('Failed to delete attendance records');
+        }
+    }
 
 }
