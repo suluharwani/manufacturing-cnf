@@ -134,30 +134,33 @@ class Laporan extends BaseController
     }
 
     // 4. Laporan Pengeluaran Hasil Produksi
-    protected function getPengeluaranHasilProduksi($startDate, $endDate)
-    {
-        $builder = $this->laporanModel->builder('laporan_pengeluaran_hasil_produksi');
-        
-        $builder->select("
-            no_peb,
-            tanggal_peb,
-            no_bukti_pengeluaran,
-            tanggal_bukti,
-            pembeli_penerima,
-            negara_tujuan,
-            kode_barang,
-            nama_barang,
-            satuan,
-            jumlah,
-            mata_uang,
-            nilai_barang
-        ");
-        
-        $builder->where('tanggal_peb >=', $startDate);
-        $builder->where('tanggal_peb <=', $endDate);
-        
-        return $builder->get()->getResultArray();
-    }
+ protected function getPengeluaranHasilProduksi($startDate, $endDate)
+{
+    $builder = $this->laporanModel->builder('laporan_pengeluaran_hasil_produksi');
+    
+    $builder->select("
+        no_peb,
+        tanggal_peb,
+        pembeli_penerima,
+        negara_tujuan,
+        kode_barang,
+        nama_barang,
+        'PCS' as satuan,
+        jumlah,
+        CONCAT(mata_uang, ' ', FORMAT(nilai_barang, 2)) AS nilai_uang
+    ");
+    
+    // Format start date (pastikan sudah dalam format Y-m-d)
+    $startDateFormatted = date('Y-m-d 00:00:00', strtotime($startDate));
+    
+    // Format end date dengan waktu 23:59:59
+    $endDateFormatted = date('Y-m-d 23:59:59', strtotime($endDate));
+    
+    $builder->where('created_at >=', $startDateFormatted);
+    $builder->where('created_at <=', $endDateFormatted);
+    
+    return $builder->get()->getResultArray();
+}
 
     // 5. Laporan Mutasi Bahan Baku
     protected function getMutasiBahanBaku($startDate, $endDate)

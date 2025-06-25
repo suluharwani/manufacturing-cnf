@@ -279,9 +279,9 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
             m.name as nama_barang,
             sat.nama as satuan,
             mrl.jumlah as jumlah,
-            'Ya' as digunakan,
+            mr.remarks as digunakan,
             'Tidak' as disubkontrakkan,
-            NULL as penerima_subkontrak
+            mr.requestor as penerima_subkontrak
         ");
         $builder->join('material_requisition mr', 'mr.id = mrl.id_material_requisition');
         $builder->join('materials m', 'm.id = mrl.id_material');
@@ -290,6 +290,7 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
         $builder->where('mr.created_at >=', $startDate);
         $builder->where('mr.created_at <=', $endDate);
         $builder->where('mr.deleted_at', null);
+        $builder->where('md.kite', 'KITE');
 
         $results = $builder->get()->getResultArray();
 
@@ -334,41 +335,64 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
     }
 
     // Model untuk laporan pengeluaran hasil produksi
-    public function generatePengeluaranHasilProduksi($startDate, $endDate)
-    {
-        $builder = $this->db->table('proforma_invoice_details pid');
-        $builder->select("
-            pi.peb as no_peb,
-            pi.tgl_peb as tanggal_peb,
-            CONCAT('DO-', pi.invoice_number) as no_bukti_pengeluaran,
-            pi.loading_date as tanggal_bukti,
-            c.customer_name as pembeli_penerima,
-            c.id_country as negara_tujuan,
-            p.kode as kode_barang,
-            p.nama as nama_barang,
-            pid.unit as satuan,
-            pid.quantity as jumlah,
-            cur.kode as mata_uang,
-            pid.total_price as nilai_barang
-        ");
-        $builder->join('proforma_invoice pi', 'pi.id = pid.invoice_id');
-        $builder->join('product p', 'p.id = pid.id_product');
-        $builder->join('customer c', 'c.id = pi.customer_id');
-        $builder->join('currency cur', 'cur.id = pi.id_currency');
-        $builder->where('pi.tgl_peb >=', $startDate);
-        $builder->where('pi.tgl_peb <=', $endDate);
-        $builder->where('pi.deleted_at', null);
-        $builder->where('pi.peb IS NOT NULL');
+public function generatePengeluaranHasilProduksi($startDate, $endDate)
+{
+    $builder = $this->db->table('st_movement sm');
+    
+    $builder->select("
+        sm.id AS id_movement,
+        pi.peb AS no_peb,
+        pi.tgl_peb AS tanggal_peb,
+        pi.invoice_number AS no_bukti_pengeluaran,
+        pi.invoice_date AS tanggal_bukti,
+        c.customer_name AS pembeli_penerima,
+        pi.port_discharge AS negara_tujuan,
+        p.kode AS kode_barang,
+        p.nama AS nama_barang,
+        sm.quantity AS jumlah,
+        (SELECT nama FROM currency WHERE id = pi.id_currency) AS mata_uang,
+        (SELECT unit_price FROM proforma_invoice_details 
+         WHERE invoice_id = pi.id AND id_product = sm.product_id LIMIT 1) * sm.quantity AS nilai_barang,
+        NOW() AS created_at
+    ");
+    
+    $builder->join('product p', 'sm.product_id = p.id', 'inner');
+    $builder->join('proforma_invoice pi', 'sm.reference_id = pi.id', 'inner');
+    $builder->join('customer c', 'pi.customer_id = c.id', 'left');
+    
+    $builder->where('sm.movement_type', 'out');
+    $builder->where('sm.reference_type', 'proforma_invoice');
+    $builder->where('sm.status', 'completed');
+    
+    // Tambahkan filter tanggal jika diperlukan
 
-        $results = $builder->get()->getResultArray();
-
-        if (!empty($results)) {
-            $this->db->table('laporan_pengeluaran_hasil_produksi')->insertBatch($results);
-            return count($results);
+    
+    $results = $builder->get()->getResultArray();
+    
+    if (!empty($results)) {
+        $insertedCount = 0;
+        
+        foreach ($results as $row) {
+            // Cek apakah data sudah ada
+            $exists = $this->db->table('laporan_pengeluaran_hasil_produksi')
+                ->where('no_peb', $row['no_peb'])
+                ->where('no_bukti_pengeluaran', $row['no_bukti_pengeluaran'])
+                ->where('kode_barang', $row['kode_barang'])
+                ->where('jumlah', $row['jumlah'])
+                ->where('id_movement', $row['id_movement'])
+                ->countAllResults();
+            
+            if ($exists == 0) {
+                $this->db->table('laporan_pengeluaran_hasil_produksi')->insert($row);
+                $insertedCount++;
+            }
         }
-
-        return 0;
+        
+        return $insertedCount;
     }
+
+    return 0;
+}
 
     // Model untuk laporan mutasi bahan baku
     public function generateMutasiBahanBaku($periode)
