@@ -8,7 +8,7 @@
                     <a href="<?=base_url()?>productstock/stockExport" class="btn btn-success">
     <i class="fas fa-file-excel"></i> Export Excel Stock
 </a>
-                    <button id="exportPdf" class="btn btn-danger"><i class="fas fa-file-pdf me-2"></i>Export PDF</button>
+                   
                 </div>
                 
                 <div class="card">

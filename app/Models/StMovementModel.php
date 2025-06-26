@@ -193,7 +193,7 @@ protected function getAvailableStockRecords($productId, $locationId)
         ->get()
         ->getResultArray();
 
-    // 2. Calculate net available movements (in - out - booked)
+    // 2. Calculate net available movements (in - out - booked - transfer)
     $movementSummary = $this->db->table('st_movement')
         ->select([
             'id',
@@ -204,11 +204,15 @@ protected function getAvailableStockRecords($productId, $locationId)
             'status'
         ])
         ->where('product_id', $productId)
-        ->where('to_location', $locationId)
+        ->groupStart()
+            ->where('to_location', $locationId)
+            ->orWhere('from_location', $locationId)
+        ->groupEnd()
         ->groupStart()
             ->where('movement_type', 'in')
             ->orWhere('movement_type', 'out')
             ->orWhere('movement_type', 'booked')
+            ->orWhere('movement_type', 'transfer')
         ->groupEnd()
         ->get()
         ->getResultArray();
@@ -228,10 +232,12 @@ protected function getAvailableStockRecords($productId, $locationId)
 
     // Process movement records
     foreach ($movementSummary as $movement) {
-        if ($movement['movement_type'] === 'in' && $movement['to_location'] == $locationId) {
-            // Add in movements
+        if (($movement['movement_type'] === 'in' || $movement['movement_type'] === 'transfer') 
+            && $movement['to_location'] == $locationId) {
+            // Add in/transfer movements (as positive quantity)
             $availableRecords[] = [
                 'type' => 'movement',
+                'subtype' => $movement['movement_type'],
                 'id' => $movement['id'],
                 'quantity' => $movement['quantity'],
                 'location_id' => $movement['to_location']
@@ -249,6 +255,10 @@ protected function getAvailableStockRecords($productId, $locationId)
 
     return $availableRecords;
 }
+
+/**
+ * Helper method to subtract quantity from available records
+ */
 
 /**
  * Helper method to subtract quantity from available records
