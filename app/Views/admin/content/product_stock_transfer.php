@@ -2,6 +2,32 @@
     <div class="row g-4">
         <div class="col-12">
             <div class="bg-light rounded h-100 p-4">
+                            <div class="card-body">
+                        <table class="table table-striped" border="1" cellpadding="8" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Location ID</th>
+                                    <th>Location Code</th>
+                                    <th>Location Name</th>
+                                    <th>Current Stock</th>
+                                    <th>Booked Quantity</th>
+                                    <th>Available Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($stockData as $item): ?>
+                                    <tr>
+                                        <td><?= $item['location_id'] ?></td>
+                                        <td><?= $item['location_code'] ?></td>
+                                        <td><?= $item['location_name'] ?></td>
+                                        <td><?= $item['current_stock'] ?></td>
+                                        <td><?= $item['booked_stock'] ?></td>
+                                        <td><?= $item['current_stock'] - $item['booked_stock'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <h1 class="mb-4"><?= $title ?></h1>
                 
                 <?php if (session('error')): ?>

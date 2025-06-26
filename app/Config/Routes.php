@@ -525,6 +525,7 @@ $routes->post('laporan/generate-all', 'GenerateLaporanController::generateAll');
 $routes->post('laporan/delete-all', 'GenerateLaporanController::deleteAll');
 
 $routes->group('productstock', function($routes) {
+    $routes->get('stockExport', 'StockController::exportExcel',['filter' => 'accessControl:2']);
     $routes->get('/', 'StockController::index',['filter' => 'accessControl:2']);
     $routes->get('view/(:num)', 'StockController::view/$1',['filter' => 'accessControl:2']);
     $routes->post('set-initial/(:num)', 'StockController::setInitialStock/$1',['filter' => 'accessControl:2']);

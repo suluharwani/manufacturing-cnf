@@ -5,6 +5,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1><?= $title ?></h1>
                     <a href="location" class="btn btn-warning"><i class="fas fa-file-pdf me-2"></i>Location Data</></a>
+                    <a href="<?=base_url()?>productstock/stockExport" class="btn btn-success">
+    <i class="fas fa-file-excel"></i> Export Excel Stock
+</a>
                     <button id="exportPdf" class="btn btn-danger"><i class="fas fa-file-pdf me-2"></i>Export PDF</button>
                 </div>
                 

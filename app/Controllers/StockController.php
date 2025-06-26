@@ -6,7 +6,8 @@ use App\Models\StInitialModel;
 use App\Models\MdlProduct;
 use App\Models\LocationModel;
 use App\Models\ProformaInvoice;
-
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class StockController extends BaseController
 {
     protected $stProductModel;
@@ -15,9 +16,10 @@ class StockController extends BaseController
     protected $productModel;
     protected $locationModel;
     protected $PiModel;
-
+    protected $db;
     public function __construct()
     {
+        $this->db = \Config\Database::connect();
         $this->stProductModel = new StProductModel();
         $this->stMovementModel = new StMovementModel();
         $this->stInitialModel = new StInitialModel();
@@ -25,7 +27,139 @@ class StockController extends BaseController
         $this->locationModel = new LocationModel();
         $this->PiModel = new ProformaInvoice();
     }
-
+public function exportExcel()
+    {
+        // Ambil data stock opname
+        $stockData = $this->getStockOpnameData();
+        
+        // Buat spreadsheet baru
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set judul dokumen
+        $spreadsheet->getProperties()
+            ->setCreator("Your System")
+            ->setTitle("Laporan Stock Opname")
+            ->setSubject("Data Stock Gudang");
+            
+        // Set header tabel
+        $sheet->setCellValue('A1', 'LAPORAN STOCK');
+        $sheet->mergeCells('A1:H1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
+        
+        // Set tanggal generate
+        $sheet->setCellValue('A2', 'Tanggal: ' . date('d/m/Y H:i:s'));
+        $sheet->mergeCells('A2:H2');
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal('right');
+        
+        // Header kolom
+        $headers = [
+            'No',
+            'Kode Produk',
+            'Nama Produk', 
+            'Kode Gudang',
+            'Nama Gudang',
+            'Stok Awal',
+            'Pemasukan',
+            'Pengeluaran',
+            'Stok Akhir'
+        ];
+        
+        $sheet->fromArray($headers, NULL, 'A4');
+        
+        // Isi data
+        $row = 5;
+        $no = 1;
+        
+        foreach ($stockData as $item) {
+            $sheet->setCellValue('A'.$row, $no++);
+            $sheet->setCellValue('B'.$row, $item['kode_produk']);
+            $sheet->setCellValue('C'.$row, $item['nama_produk']);
+            $sheet->setCellValue('D'.$row, $item['kode_gudang']);
+            $sheet->setCellValue('E'.$row, $item['nama_gudang']);
+            $sheet->setCellValue('F'.$row, $item['stok_awal']);
+            $sheet->setCellValue('G'.$row, $item['total_pemasukan']);
+            $sheet->setCellValue('H'.$row, $item['total_pengeluaran']);
+            $sheet->setCellValue('I'.$row, $item['stok_akhir']);
+            $row++;
+        }
+        
+        // Style untuk header kolom
+        $sheet->getStyle('A4:I4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:I4')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFDDDDDD');
+        
+        // Auto size kolom
+        foreach(range('A','I') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        
+        // Border untuk data
+        $sheet->getStyle('A4:I'.($row-1))->getBorders()
+            ->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        
+        // Format angka
+        $sheet->getStyle('F5:I'.($row-1))->getNumberFormat()
+            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+        
+        // Download file
+        $filename = 'Stock_'.date('Ymd_His').'.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    
+    protected function getStockOpnameData()
+    {
+        $builder = $this->db->table('product p');
+        $builder->select("
+            p.id AS product_id,
+            p.kode AS kode_produk,
+            p.nama AS nama_produk,
+            l.id AS location_id,
+            l.code AS kode_gudang,
+            l.name AS nama_gudang,
+            (SELECT COALESCE(SUM(si.quantity), 0) 
+                FROM st_initial si 
+                WHERE si.product_id = p.id AND si.location_id = l.id) AS stok_awal,
+            (SELECT COALESCE(SUM(sm.quantity), 0) 
+                FROM st_movement sm 
+                WHERE sm.product_id = p.id AND sm.to_location = l.id 
+                AND sm.movement_type IN ('in', 'transfer')) AS total_pemasukan,
+            (SELECT COALESCE(SUM(sm.quantity), 0) 
+                FROM st_movement sm 
+                WHERE sm.product_id = p.id AND sm.from_location = l.id 
+                AND sm.movement_type IN ('out', 'transfer')) AS total_pengeluaran,
+            ((SELECT COALESCE(SUM(si.quantity), 0) 
+                FROM st_initial si 
+                WHERE si.product_id = p.id AND si.location_id = l.id) +
+            (SELECT COALESCE(SUM(sm.quantity), 0) 
+                FROM st_movement sm 
+                WHERE sm.product_id = p.id AND sm.to_location = l.id 
+                AND sm.movement_type IN ('in', 'transfer')) -
+            (SELECT COALESCE(SUM(sm.quantity), 0) 
+                FROM st_movement sm 
+                WHERE sm.product_id = p.id AND sm.from_location = l.id 
+                AND sm.movement_type IN ('out', 'transfer'))) AS stok_akhir
+        ");
+        
+        $builder->join('locations l', 'l.type = "warehouse" AND l.deleted_at IS NULL AND l.is_active = 1', 'CROSS');
+        $builder->where('p.deleted_at IS NULL');
+        $builder->groupStart()
+            ->where('EXISTS (SELECT 1 FROM st_initial si WHERE si.product_id = p.id AND si.location_id = l.id)')
+            ->orWhere('EXISTS (SELECT 1 FROM st_movement sm WHERE sm.product_id = p.id AND (sm.from_location = l.id OR sm.to_location = l.id))')
+        ->groupEnd();
+        $builder->orderBy('p.kode, l.code');
+        
+        return $builder->get()->getResultArray();
+    }
     public function index() {
     $products = $this->productModel->findAll();
     
@@ -268,7 +402,8 @@ public function processBooking($productId)
             'product' => $this->productModel->find($productId),
             'locations' => $this->locationModel->findAll(),
             'available' => $this->stMovementModel->getAvailableStock($productId),
-            'validation' => \Config\Services::validation()
+            'validation' => \Config\Services::validation(),
+            'stockData' => $this->stMovementModel->getStockByProduct($productId)
         ];
 
         $data['content'] = view('admin/content/product_stock_transfer',$data);
