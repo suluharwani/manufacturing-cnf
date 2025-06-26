@@ -176,6 +176,7 @@
         <tr>
             <th>Date</th>
             <th>Document</th>
+            <th>Proforma Invoice</th>
             <th>Type</th>
             <th>Quantity</th>
             <th>From</th>
@@ -186,10 +187,12 @@
         </tr>
     </thead>
     <tbody>
+
         <?php foreach ($movement_history as $movement): ?>
             <tr>
                 <td><?= date('d M Y H:i', strtotime($movement['created_at'])) ?></td>
                 <td><?= $movement['code'] ?></td>
+                <td><?= $movement['pi'] ?></td>
                 <td>
                     <span class="badge bg-<?=
                         $movement['movement_type'] == 'in' ? 'success' :

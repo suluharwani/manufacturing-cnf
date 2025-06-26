@@ -126,10 +126,11 @@ public function getStockByProduct(int $product_id): array
     }
     public function getProductHistory($productId, $limit = 100)
     {
-        return $this->select('st_movement.*, from_loc.name as from_location_name, to_loc.name as to_location_name, users.nama_depan as user_name')
+        return $this->select('proforma_invoice.invoice_number as pi, st_movement.*, from_loc.name as from_location_name, to_loc.name as to_location_name, users.nama_depan as user_name')
                    ->join('locations as from_loc', 'from_loc.id = st_movement.from_location', 'left')
                    ->join('locations as to_loc', 'to_loc.id = st_movement.to_location', 'left')
                    ->join('users', 'users.id = st_movement.created_by', 'left')
+                   ->join('proforma_invoice', 'proforma_invoice.id = st_movement.reference_id', 'left')
                    ->where('product_id', $productId)
                    ->orderBy('created_at', 'DESC')
                    ->limit($limit)
