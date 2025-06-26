@@ -75,6 +75,10 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
+                                        <label class="form-label">Document Code</label>
+                                        <input type="text" class="form-control" name="code">
+                                    </div>
+                                    <div class="mb-3">
                                         <label class="form-label">Quantity</label>
                                         <input type="number" step="0.01" class="form-control" name="quantity" required>
                                     </div>
@@ -171,6 +175,7 @@
     <thead>
         <tr>
             <th>Date</th>
+            <th>Document</th>
             <th>Type</th>
             <th>Quantity</th>
             <th>From</th>
@@ -184,6 +189,7 @@
         <?php foreach ($movement_history as $movement): ?>
             <tr>
                 <td><?= date('d M Y H:i', strtotime($movement['created_at'])) ?></td>
+                <td><?= $movement['code'] ?></td>
                 <td>
                     <span class="badge bg-<?=
                         $movement['movement_type'] == 'in' ? 'success' :

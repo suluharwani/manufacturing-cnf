@@ -186,26 +186,32 @@ class Laporan extends BaseController
     }
 
     // 6. Laporan Mutasi Hasil Produksi
-    protected function getMutasiHasilProduksi($startDate, $endDate)
-    {
-        $builder = $this->laporanModel->builder('laporan_mutasi_hasil_produksi');
-        
-        $builder->select("
-            kode_barang,
-            nama_barang,
-            satuan,
-            saldo_awal,
-            pemasukan,
-            pengeluaran,
-            saldo_akhir,
-            gudang
-        ");
-        
-        $builder->where('tanggal >=', $startDate);
-        $builder->where('tanggal <=', $endDate);
-        
-        return $builder->get()->getResultArray();
-    }
+protected function getMutasiHasilProduksi($startDate, $endDate)
+{
+    $builder = $this->laporanModel->builder('laporan_mutasi_hasil_produksi');
+    
+    $builder->select("
+        kode_barang,
+        nama_barang,
+        satuan,
+        saldo_awal,
+        pemasukan,
+        pengeluaran,
+        saldo_akhir,
+        gudang
+    ");
+    
+    // Format start date to include time (00:00:00)
+    $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
+    
+    // Format end date to include time (23:59:59)
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
+    
+    $builder->where('tanggal >=', $startDate);
+    $builder->where('tanggal <=', $endDate);
+    
+    return $builder->get()->getResultArray();
+}
 
     // 7. Laporan Waste/Scrap
     protected function getWasteScrap($startDate, $endDate)

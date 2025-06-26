@@ -125,7 +125,8 @@ class StockController extends BaseController
             'adjustment_type' => 'required|in_list[in,out]',
             'quantity' => 'required|numeric|greater_than[0]',
             'location_id' => 'permit_empty|numeric',
-            'notes' => 'permit_empty|string'
+            'notes' => 'permit_empty|string',
+            'code' => 'permit_empty|string'
         ];
 
         if (!$this->validate($rules)) {
@@ -136,6 +137,7 @@ class StockController extends BaseController
         $quantity = $this->request->getPost('quantity');
         $locationId = $this->request->getPost('location_id');
         $notes = $this->request->getPost('notes');
+        $code = $this->request->getPost('code');
 
         if ($adjustmentType === 'in') {
             $stockData = [
@@ -143,7 +145,8 @@ class StockController extends BaseController
                 'quantity' => $quantity,
                 'location_id' => $locationId,
                 'label_code' => 'ADJ-' . date('YmdHis'),
-                'status' => 'available'
+                'status' => 'available',
+                
             ];
             
             $this->stProductModel->insert($stockData);
@@ -189,6 +192,7 @@ class StockController extends BaseController
             'to_location' => $adjustmentType === 'in' ? $locationId : null,
             'from_location' => $adjustmentType === 'out' ? $locationId : null,
             'notes' => $notes ?? 'Manual adjustment',
+            'code' => $code,
             'created_by' => $_SESSION['auth']['id']
         ];
         

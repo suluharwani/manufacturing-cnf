@@ -305,33 +305,53 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
     // Model untuk laporan pemasukan hasil produksi
     public function generatePemasukanHasilProduksi($startDate, $endDate)
     {
-        $builder = $this->db->table('production_progress pp');
-        $builder->select("
-            CONCAT('PROD-', wo.kode) as no_dokumen,
-            pp.created_at as tanggal,
-            p.kode as kode_barang,
-            p.nama as nama_barang,
-            'PCS' as satuan,
-            pp.quantity as jumlah,
-            pp.quantity as dari_produksi,
-            0 as dari_subkontrak,
-            w.name as gudang
-        ");
-        $builder->join('work_order wo', 'wo.id = pp.wo_id');
-        $builder->join('product p', 'p.id = pp.product_id');
-        $builder->join('warehouses w', 'w.id = pp.warehouse_id');
-        $builder->where('pp.created_at >=', $startDate);
-        $builder->where('pp.created_at <=', $endDate);
-        $builder->where('pp.deleted_at', null);
+         $builder = $this->db->table('st_movement sm');
+    
+    $builder->select("
+        sm.code as no_dokumen,
+        sm.created_at as tanggal,
+        p.kode as kode_barang,
+        p.nama as nama_barang,
+        'PCS' as satuan,
+        sm.quantity as jumlah,
+        'Produksi' as dari_produksi,
+        'Tidak' as dari_subkontrak,
+        'Gudang Utama' as gudang,
+    ");
+    
+    $builder->join('product p', 'sm.product_id = p.id', 'inner');
+    
+    $builder->where('sm.movement_type', 'in');
+    
+    // Tambahkan filter tanggal jika diperlukan
 
-        $results = $builder->get()->getResultArray();
-
-        if (!empty($results)) {
-            $this->db->table('laporan_pemasukan_hasil_produksi')->insertBatch($results);
-            return count($results);
+    
+    $results = $builder->get()->getResultArray();
+    
+    if (!empty($results)) {
+        $insertedCount = 0;
+        // $datacheck = [];
+        foreach ($results as $row) {
+            // Cek apakah data sudah ada
+            $exists = $this->db->table('laporan_pemasukan_hasil_produksi')
+                ->where('no_dokumen', $row['no_dokumen'])
+                ->where('nama_barang', $row['nama_barang'])
+                ->where('jumlah', $row['jumlah'])
+                ->countAllResults();
+                
+            //  array_push($datacheck, $exists);
+      
+            if ($exists == 0) {
+                $this->db->table('laporan_pemasukan_hasil_produksi')->insert($row);
+                $insertedCount++;
+            }
         }
+        // var_dump($datacheck);
+        //     die();
+        return $insertedCount;
+    }
 
-        return 0;
+    return 0;
     }
 
     // Model untuk laporan pengeluaran hasil produksi
@@ -455,90 +475,125 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
     }
 
     // Model untuk laporan mutasi hasil produksi
-    public function generateMutasiHasilProduksi($periode)
-    {
-        // Pertama, hapus data lama untuk periode yang sama
-        $this->db->table('laporan_mutasi_hasil_produksi')->where('periode', $periode)->delete();
-
-        // Ambil semua gudang yang aktif
-        $warehouses = $this->db->table('locations')
-            ->select('id, code, name')
-            ->where('is_active', 1)
-            ->where('type', 'warehouse')
-            ->get()
-            ->getResultArray();
-
-        // Ambil semua produk yang memiliki data awal atau pergerakan stok
-        $products = $this->db->table('st_initial')
-            ->select('st_initial.product_id, p.kode, p.nama')
-            ->join('product p', 'p.id = st_initial.product_id', 'left')
-            ->groupBy('st_initial.product_id')
-            ->get()
-            ->getResultArray();
-
-        // Jika tidak ada data awal, ambil dari produk yang memiliki pergerakan
-        if (empty($products)) {
-            $products = $this->db->table('st_movement')
-                ->select('st_movement.product_id, p.kode, p.nama')
-                ->join('product p', 'p.id = st_movement.product_id', 'left')
-                ->groupBy('st_movement.product_id')
-                ->get()
-                ->getResultArray();
-        }
-
-        $records = [];
-        $startDate = date('Y-m-01', strtotime($periode));
-        $endDate = date('Y-m-t', strtotime($periode));
-
-        foreach ($warehouses as $warehouse) {
-            foreach ($products as $product) {
-                // Hitung saldo awal dari tabel st_initial
-                $saldoAwal = $this->getSaldoAwalHasilProduksi($product['product_id'], $warehouse['id']);
-
-                // Hitung total pemasukan untuk gudang ini
-                $pemasukanData = $this->getTotalPemasukanHasilProduksi($product['product_id'], $warehouse['id'], $startDate, $endDate);
-                $pemasukan = $pemasukanData['total'];
-                $tanggalMasuk = $pemasukanData['tanggal'];
-
-                // Hitung total pengeluaran untuk gudang ini
-                $pengeluaranData = $this->getTotalPengeluaranHasilProduksi($product['product_id'], $warehouse['id'], $startDate, $endDate);
-                $pengeluaran = $pengeluaranData['total'];
-                $tanggalKeluar = $pengeluaranData['tanggal'];
-
-                // Hitung saldo akhir
-                $saldoAkhir = $saldoAwal + $pemasukan - $pengeluaran;
-
-                // Skip jika semua nilai 0 (tidak ada pergerakan)
-                if ($saldoAwal == 0 && $pemasukan == 0 && $pengeluaran == 0) {
-                    continue;
-                }
-
-                // Ambil tanggal terbaru antara masuk dan keluar
-                $tanggal = max($tanggalMasuk, $tanggalKeluar);
-
-                $records[] = [
-                    'kode_barang' => $product['kode'],
-                    'nama_barang' => $product['nama'],
-                    'satuan' => 'PCS',
-                    'saldo_awal' => $saldoAwal,
-                    'pemasukan' => $pemasukan,
-                    'pengeluaran' => $pengeluaran,
-                    'saldo_akhir' => $saldoAkhir,
-                    'gudang' => $warehouse['name'],
-                    'gudang_kode' => $warehouse['code'],
-                    'periode' => $periode,
-                    'tanggal' => $tanggal
-                ];
-            }
-        }
-
-        if (!empty($records)) {
-            $this->db->table('laporan_mutasi_hasil_produksi')->insertBatch($records);
-            return count($records);
-        }
-
-        return 0;
+public function generateMutasiHasilProduksi($periode)
+{
+    // Check if data already exists for this period
+    $existingData = $this->db->table('laporan_mutasi_hasil_produksi')
+        ->where('periode', $periode)
+        ->countAllResults();
+    
+    if ($existingData > 0) {
+        return 0; // Skip generation as data already exists
     }
+
+    // Build the complete query
+    $query = "
+      INSERT INTO laporan_mutasi_hasil_produksi (
+    kode_barang, 
+    nama_barang, 
+    satuan, 
+    saldo_awal, 
+    pemasukan, 
+    pengeluaran, 
+    saldo_akhir, 
+    gudang, 
+    gudang_kode, 
+    periode, 
+    tanggal
+)
+SELECT 
+    p.kode COLLATE utf8mb4_uca1400_ai_ci AS kode_barang,
+    p.nama COLLATE utf8mb4_uca1400_ai_ci AS nama_barang,
+    'pcs' AS satuan,
+    COALESCE((
+        SELECT si.quantity 
+        FROM st_initial si 
+        WHERE si.product_id = p.id 
+        AND si.location_id = l.id
+    ), 0) AS saldo_awal,
+
+    COALESCE((
+        SELECT SUM(sm.quantity) 
+        FROM st_movement sm 
+        WHERE sm.product_id = p.id 
+        AND sm.to_location = l.id 
+        AND (sm.movement_type = 'in' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) = CURRENT_DATE()
+    ), 0) AS pemasukan,
+    
+    COALESCE((
+        SELECT SUM(sm.quantity) 
+        FROM st_movement sm 
+        WHERE sm.product_id = p.id 
+        AND sm.from_location = l.id 
+        AND (sm.movement_type = 'out' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) = CURRENT_DATE()
+    ), 0) AS pengeluaran,
+    
+    (COALESCE((
+        SELECT si.quantity 
+        FROM st_initial si 
+        WHERE si.product_id = p.id 
+        AND si.location_id = l.id
+    ), 0) +
+    COALESCE((
+        SELECT SUM(sm.quantity) 
+        FROM st_movement sm 
+        WHERE sm.product_id = p.id 
+        AND sm.to_location = l.id 
+        AND (sm.movement_type = 'in' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) = CURRENT_DATE()
+    ), 0) -
+    COALESCE((
+        SELECT SUM(sm.quantity) 
+        FROM st_movement sm 
+        WHERE sm.product_id = p.id 
+        AND sm.from_location = l.id 
+        AND (sm.movement_type = 'out' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) = CURRENT_DATE()
+    ), 0)) AS saldo_akhir,
+    l.name AS gudang,
+    l.code COLLATE utf8mb4_uca1400_ai_ci AS gudang_kode,
+    CURRENT_DATE() AS periode,
+    NOW() AS tanggal
+FROM 
+    product p
+CROSS JOIN 
+    locations l
+LEFT JOIN 
+    laporan_mutasi_hasil_produksi existing 
+    ON existing.kode_barang = p.kode COLLATE utf8mb4_uca1400_ai_ci
+    AND existing.gudang_kode = l.code COLLATE utf8mb4_uca1400_ai_ci
+    AND existing.periode = CURRENT_DATE()
+WHERE 
+    l.type = 'warehouse' 
+    AND l.deleted_at IS NULL
+    AND p.deleted_at IS NULL
+    AND existing.id IS NULL -- Skip if already exists
+    AND (
+        EXISTS (
+            SELECT 1 FROM st_initial si 
+            WHERE si.product_id = p.id 
+            AND si.location_id = l.id
+        )
+        OR EXISTS (
+            SELECT 1 FROM st_movement sm 
+            WHERE sm.product_id = p.id 
+            AND (sm.from_location = l.id OR sm.to_location = l.id)
+            AND DATE(sm.created_at) = CURRENT_DATE()
+        )
+    );";
+
+    // Calculate date range for the period
+    $startDate = date('Y-m-01', strtotime($periode));
+    $endDate = date('Y-m-t', strtotime($periode));
+
+    // Execute the query with parameters
+    $result = $this->db->query($query);
+
+    // Return number of affected rows
+    return $this->db->affectedRows();
+}
 
     // Model untuk laporan waste/scrap
     public function generateWasteScrap($startDate, $endDate)

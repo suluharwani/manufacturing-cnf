@@ -9,7 +9,7 @@ class StMovementModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
     protected $allowedFields = ['id','product_id', 'quantity', 'movement_type', 'reference_id', 
-                              'reference_type', 'from_location', 'to_location', 'notes', 'created_by','status', 'user_id'];
+                              'reference_type', 'from_location', 'to_location', 'notes','code', 'created_by','status', 'user_id'];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
