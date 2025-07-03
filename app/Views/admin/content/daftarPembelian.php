@@ -30,7 +30,7 @@
                   <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Tanggal</th>
                   <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
+                  <th style=" text-align: center;">Document Number</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -40,7 +40,7 @@
                   <th style=" text-align: center;">#</th>
                   <th style=" text-align: center;">Tanggal</th>
                   <th style=" text-align: center;">Supplier</th>
-                  <th style=" text-align: center;">Invoice</th>
+                  <th style=" text-align: center;">Document Number</th>
                   <th style=" text-align: center;">Status</th>
                   <th style=" text-align: center;">Action</th>
                 </tr>
@@ -70,7 +70,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="materialQty" class="form-label">Invoice</label>
+            <label for="materialQty" class="form-label">Document Number</label>
             <input type="text" class="form-control" id="invoice" required>
           </div>
           <div class="mb-3">

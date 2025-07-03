@@ -31,17 +31,20 @@ class MasterPenggajianDetailController extends BaseController
         // $patternMdl = new MdlFsalaryPatternEmployee();
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
         $results = $penggajianDetailModel
-            ->select('employeesallarycat.Gaji_Per_Jam  ,informasi_pegawai.bank_account as bank_account,informasi_pegawai.pemilik_rekening as pemilik_rekening, salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
-            ->distinct() 
-            ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
-            ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
-            ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
-            ->join('informasi_pegawai', ' pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
-            ->join('employeesallarycat', ' salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
-            ->where('master_penggajian_detail.penggajian_id', $penggajianId)
-            ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
-            ->get()
-            ->getResultArray();
+    ->select('employeesallarycat.Gaji_Per_Jam, informasi_pegawai.bank_account, informasi_pegawai.pemilik_rekening, 
+             salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, 
+             pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, 
+             master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+    ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
+    ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+    ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
+    ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
+    ->join('employeesallarycat', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
+    ->where('master_penggajian_detail.penggajian_id', $penggajianId)
+    ->groupBy('master_penggajian_detail.karyawan_id') // Group by karyawan_id
+    ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
+    ->get()
+    ->getResultArray();
 
         foreach ($results as &$result) {
             $employeeId = $result['karyawan_id'];
@@ -731,18 +734,22 @@ public function getSalaryRate($employeeId)
         $salaryCatModel = new MdlSalaryCat();
         // $patternMdl = new MdlFsalaryPatternEmployee();
         // Dapatkan data penggajian dengan join tabel pegawai dan master_penggajian
-         $results = $penggajianDetailModel
-            ->select('employeesallarycat.Gaji_Per_Jam  ,informasi_pegawai.bank_account as bank_account,informasi_pegawai.pemilik_rekening as pemilik_rekening, salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
-            ->distinct()
-            ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
-            ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
-            ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
-            ->join('informasi_pegawai', ' pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
-            ->join('employeesallarycat', ' salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
-            ->where('master_penggajian_detail.penggajian_id', $masterId)
-            ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
-            ->get()
-            ->getResultArray();
+        $results = $penggajianDetailModel
+    ->select('employeesallarycat.Gaji_Per_Jam, informasi_pegawai.bank_account, informasi_pegawai.pemilik_rekening, 
+             salary_pattern_employee.id_salary_pattern as pattern_id, master_penggajian_detail.karyawan_id, 
+             pegawai.pegawai_nama, pegawai.pegawai_pin, master_penggajian.kode_penggajian, 
+             master_penggajian.tanggal_awal_penggajian, master_penggajian.tanggal_akhir_penggajian')
+    ->join('master_penggajian', 'master_penggajian_detail.penggajian_id = master_penggajian.id', 'left')
+    ->join('pegawai', 'master_penggajian_detail.karyawan_id = pegawai.pegawai_id', 'left')
+    ->join('salary_pattern_employee', 'salary_pattern_employee.id_employee = pegawai.pegawai_id', 'left')
+    ->join('informasi_pegawai', 'pegawai.pegawai_id = informasi_pegawai.id_pegawai', 'left')
+    ->join('employeesallarycat', 'salary_pattern_employee.id_salary_pattern = employeesallarycat.id', 'left')
+    ->where('master_penggajian_detail.penggajian_id', $masterId)
+    ->groupBy('master_penggajian_detail.karyawan_id') // Group by karyawan_id
+    ->orderBy('master_penggajian_detail.karyawan_id', 'ASC')
+    ->get()
+    ->getResultArray();
+
 
 
         foreach ($results as &$result) {
