@@ -178,7 +178,10 @@ $routes->get('user/getEmployeeDeductions/(:any)', 'User::getEmployeeDeductions/$
 $routes->post('user/deleteDeductionList/(:any)', 'User::deleteDeductionList/$1',['filter' => 'accessControl:2']);
 $routes->post('user/addDeductionList', 'User::addDeductionList',['filter' => 'accessControl:2']);
 
+$routes->get('user/getEmployeeData/(:num)/(:num)', 'User::getEmployeeData/$1/$2',['filter' => 'accessControl:2']);
+$routes->post('user/saveEmployeeData', 'User::saveEmployeeData',['filter' => 'accessControl:2']);
 //master salary
+
 $routes->get('/master_salary', 'Home::masterSalary',['filter' => 'accessControl:2']);
 $routes->get('/detail_salary/(:any)', 'Home::detailSalary/$1',['filter' => 'accessControl:2']);
 $routes->group('master_penggajian', function ($routes) {

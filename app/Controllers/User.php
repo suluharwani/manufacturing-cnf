@@ -979,5 +979,81 @@ public function getDeductionOptions()
             return $this->failServerError('Failed to delete attendance records');
         }
     }
+public function getEmployeeData($pin = null, $id = null){
 
+    $mdl = new \App\Models\MdlInformasiPegawai();
+    $employee = $mdl->where('pin', $pin)
+                                       ->where('id_pegawai', $id)
+                                       ->first();
+
+        if ($employee) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data' => $employee
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Data tidak ditemukan'
+        ]);
+}
+public  function saveEmployeeData(){
+  $mdl = new \App\Models\MdlInformasiPegawai();
+  $rules = [
+            'pin' => 'required',
+            'id' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Validasi gagal'
+            ]);
+        }
+
+        $data = [
+            'pin' => $this->request->getPost('pin'),
+            'id_pegawai' => $this->request->getPost('id'),
+            'bank' => $this->request->getPost('bank'),
+            'bank_account' => $this->request->getPost('bank_account'),
+            'masuk_kerja' => $this->request->getPost('masuk_kerja'),
+            'keluar_kerja' => $this->request->getPost('keluar_kerja'),
+            'nik' => $this->request->getPost('nik'),
+            'tgl_lahir' => $this->request->getPost('tgl_lahir'),
+            'jumlah_tanggungan' => $this->request->getPost('jumlah_tanggungan'),
+            'status' => $this->request->getPost('status'),
+            'no_bpjs' => $this->request->getPost('no_bpjs'),
+            'no_bpjstk' => $this->request->getPost('no_bpjstk'),
+            'pemilik_rekening' => $this->request->getPost('pemilik_rekening'),
+            'alamat' => $this->request->getPost('alamat'),
+            'posisi' => $this->request->getPost('posisi')
+        ];
+
+        // Handle file upload
+        $foto = $this->request->getFile('foto');
+
+        if ($foto && $foto->isValid()) {
+            $newName = $foto->getRandomName();
+            $foto->move(ROOTPATH . 'public/uploads/employees', $newName);
+            $data['foto'] = $newName;
+        }
+
+        // Check if exists
+        $existing =  $mdl
+            ->where('pin', $data['pin'])
+            ->where('id_pegawai', $data['id_pegawai'])
+            ->first();
+
+        if ($existing) {
+             $mdl->update($existing['id'], $data);
+        } else {
+             $mdl->insert($data);
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Data berhasil disimpan'
+        ]);
+}
 }

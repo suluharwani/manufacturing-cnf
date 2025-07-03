@@ -828,6 +828,7 @@ function formatDateIndonesian(dateString) {
 
 
   });
+  
   $(document).on('click', '.varPotongan', function() {
     var pin = $(this).attr('pin');
     var id = $(this).attr('id');
@@ -845,17 +846,205 @@ function formatDateIndonesian(dateString) {
   $(document).on('click', '.varData', function() {
     var pin = $(this).attr('pin');
     var id = $(this).attr('id');
-    var name = $(this).attr('name');
-          $('#dataEmployeeName').val(name); 
-          $('#dataEmployeeId').val(id); 
-          $('#dataEmployeePin').val(pin); 
+    var name = $(this).attr('nama');
+          $('#d_dataEmployeeName').val(name); 
+          $('#d_dataEmployeeId').val(id); 
+          $('#d_dataEmployeePin').val(pin); 
+    getEmployeeData(pin, id)
 
-    fetchDeductionOptions();
-    fetchDeductionsUser(id);
     $('#dataModal').modal('show');
 
 
   });
+function getEmployeeData(pin, id) {
+    // Reset form first
+    resetEmployeeForm();
+    
+    $.ajax({
+        url: base_url + `/user/getEmployeeData/${pin}/${id}`, // Updated to CI4 route
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // Set basic information
+                $('#d_employeeName').val(response.data.nama || '');  // Changed from 'name' to 'nama' to match your table
+                $('#d_employeeId').val(response.data.id_pegawai || '');
+                $('#d_pin').val(response.data.pin || '');
+                
+                // Set additional information
+                $('#bank').val(response.data.bank || '');
+                $('#bank_account').val(response.data.bank_account || '');
+                $('#masuk_kerja').val(response.data.masuk_kerja ? response.data.masuk_kerja.split(' ')[0] : ''); // Format date if needed
+                $('#keluar_kerja').val(response.data.keluar_kerja ? response.data.keluar_kerja.split(' ')[0] : '');
+                $('#nik').val(response.data.nik || '');
+                $('#tgl_lahir').val(response.data.tgl_lahir ? response.data.tgl_lahir.split(' ')[0] : '');
+                $('#jumlah_tanggungan').val(response.data.jumlah_tanggungan || '');
+                $('#status').val(response.data.status || '1');
+                $('#no_bpjs').val(response.data.no_bpjs || '');
+                $('#no_bpjstk').val(response.data.no_bpjstk || '');
+                $('#pemilik_rekening').val(response.data.pemilik_rekening || '');
+                $('#alamat').val(response.data.alamat || '');
+                $('#posisi').val(response.data.posisi || '');
+                
+                // Photo handling
+                $('#photoPreview').html(''); // Clear previous preview
+                if (response.data.foto) {
+                    $('#photoPreview').html(`<img src="${base_url}uploads/employees/${response.data.foto}" class="img-thumbnail" width="500">`);
+                }
+                
+                $('#dataModal').modal('show');
+            } else {
+
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan saat memuat data: ' + error
+            });
+        }
+    });
+}
+
+// Function to reset form
+function resetEmployeeForm() {
+    // Reset basic info
+    $('#d_employeeName').val('');
+    $('#d_employeeId').val('');
+    $('#d_pin').val('');
+    
+    // Reset all other fields
+    $('#bank').val('');
+    $('#bank_account').val('');
+    $('#masuk_kerja').val('');
+    $('#keluar_kerja').val('');
+    $('#nik').val('');
+    $('#tgl_lahir').val('');
+    $('#jumlah_tanggungan').val('');
+    $('#status').val('1');
+    $('#no_bpjs').val('');
+    $('#no_bpjstk').val('');
+    $('#pemilik_rekening').val('');
+    $('#alamat').val('');
+    $('#posisi').val('');
+    
+    // Reset photo
+    $('#photoPreview').html('');
+    $('#foto').val(''); // Clear file input
+    
+    // Remove validation errors if any
+    $('.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').remove();
+}
+$('#saveEData').on('click', function() {
+    var employeeId = $('#d_dataEmployeeId').val();
+    
+    if (!employeeId) {
+        Swal.fire('Error', 'ID Pegawai tidak valid', 'error');
+        return;
+    }
+
+    // Basic form validation
+    if (!$('#d_dataEmployeePin').val()) {
+        Swal.fire('Error', 'PIN harus diisi', 'error');
+        return;
+    }
+
+    // Prepare form data (including file if exists)
+    var formData = new FormData();
+    var photoFile = $('#foto')[0].files[0];
+
+    // Append all fields
+    formData.append('id', employeeId);
+    formData.append('pin', $('#d_dataEmployeePin').val());
+    formData.append('bank', $('#bank').val());
+    formData.append('bank_account', $('#bank_account').val());
+    formData.append('masuk_kerja', $('#masuk_kerja').val());
+    formData.append('keluar_kerja', $('#keluar_kerja').val());
+    formData.append('nik', $('#nik').val());
+    formData.append('tgl_lahir', $('#tgl_lahir').val());
+    formData.append('jumlah_tanggungan', $('#jumlah_tanggungan').val());
+    formData.append('status', $('#status').val());
+    formData.append('no_bpjs', $('#no_bpjs').val());
+    formData.append('no_bpjstk', $('#no_bpjstk').val());
+    formData.append('pemilik_rekening', $('#pemilik_rekening').val());
+    formData.append('alamat', $('#alamat').val());
+    formData.append('posisi', $('#posisi').val());
+    
+    // Append photo if selected
+    if (photoFile) {
+        formData.append('foto', photoFile);
+    }
+
+    // Determine if this is an update or create
+    var isUpdate = employeeId !== '';
+
+    $.ajax({
+        url: base_url + '/user/saveEmployeeData',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                $('#dataModal').modal('hide');
+                
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Data karyawan berhasil ' + (isUpdate ? 'diperbarui' : 'ditambahkan'),
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then(() => {
+                    // Refresh employee table or perform other actions
+                    if (typeof refreshEmployeeTable === 'function') {
+                        refreshEmployeeTable();
+                    }
+                });
+                
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: response.message || 'Operasi gagal'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan: ' + error
+            });
+        }
+    });
+});
+
+// Function to handle photo preview
+$('#foto').on('change', function(e) {
+    var file = e.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#photoPreview').html(
+                `<img src="${e.target.result}" class="img-thumbnail mt-2" style="max-width: 200px;">
+                 <button type="button" class="btn btn-sm btn-danger mt-2" id="removePhoto">
+                     <i class="fas fa-trash"></i> Hapus Foto
+                 </button>`
+            );
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Function to remove selected photo
+$(document).on('click', '#removePhoto', function() {
+    $('#foto').val('');
+    $('#photoPreview').html('');
+});
+
 
 //allowance
 
@@ -1147,3 +1336,46 @@ function formatRupiah(amount) {
             }
         });
     });
+
+      $('#saveEmployeeData').on('click', function() {
+    var selectedCategoryId = $('#salaryCategorySelect').val();
+
+    if (!selectedCategoryId) {
+      alert("Silakan pilih kategori gaji.");
+      return;
+    }
+
+    var formData = {
+      pin: $('#pin').val(),  
+      id: $('#id').val(),    
+      salaryCategoryId: selectedCategoryId,
+    };
+
+
+    $.ajax({
+      url: base_url + '/user/saveSalaryCategory',  
+      type: 'POST',
+      data: formData,
+      dataType: 'json',
+      success: function(response) {
+        if (response.status === 'success') {
+          $('#salaryCategoryModal').modal('hide');  
+
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: `Kategori gaji berhasil disimpan.`,
+            showConfirmButton: false,
+            timer: 2500
+          })
+
+
+        } else {
+          alert("Gagal menyimpan kategori gaji.");
+        }
+      },
+      error: function() {
+        alert("Terjadi kesalahan saat menyimpan kategori gaji.");
+      }
+    });
+  });

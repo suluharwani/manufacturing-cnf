@@ -290,53 +290,118 @@
             </div>
             <div class="modal-body">
                 <form id="potonganForm">
-                    <!-- Form for adding new potongan -->
-                        <div class="mb-3">
-                        <label for="namaTunjangan" class="form-label">Nama</label>
-                        <input type="text" class="form-control" id="dataEmployeeName" disabled>
+                    <!-- Basic Employee Info -->
+                    <div class="mb-3">
+                        <label for="dataEmployeeName" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="d_dataEmployeeName" disabled>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dataEmployeeId" class="form-label">ID Pegawai</label>
+                            <input type="number" class="form-control" id="d_dataEmployeeId" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dataEmployeePin" class="form-label">PIN</label>
+                            <input type="text" class="form-control" id="d_dataEmployeePin" disabled>
+                        </div>
+                    </div>
+
+                    <!-- Bank Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="bank" class="form-label">Bank</label>
+                            <input type="text" class="form-control" id="bank">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bank_account" class="form-label">Nomor Rekening</label>
+                            <input type="text" class="form-control" id="bank_account">
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="namaTunjangan" class="form-label">ID/PIN</label>
-                        <input type="number" class="form-control" id="dataEmployeeId" disabled>
-                        <input type="number" class="form-control" id="dataEmployeePin" disabled>
+                        <label for="pemilik_rekening" class="form-label">Pemilik Rekening</label>
+                        <input type="text" class="form-control" id="pemilik_rekening">
                     </div>
+
+                    <!-- Employment Dates -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="masuk_kerja" class="form-label">Tanggal Masuk Kerja</label>
+                            <input type="date" class="form-control" id="masuk_kerja">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="keluar_kerja" class="form-label">Tanggal Keluar Kerja</label>
+                            <input type="date" class="form-control" id="keluar_kerja">
+                        </div>
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nik" class="form-label">NIK</label>
+                            <input type="text" class="form-control" id="nik">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tgl_lahir" class="form-label">Tanggal Lahir</label>
+                            <input type="date" class="form-control" id="tgl_lahir">
+                        </div>
+                    </div>
+
+                    <!-- Insurance Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="no_bpjs" class="form-label">Nomor BPJS</label>
+                            <input type="text" class="form-control" id="no_bpjs">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="no_bpjstk" class="form-label">Nomor BPJS TK</label>
+                            <input type="text" class="form-control" id="no_bpjstk">
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="jumlah_tanggungan" class="form-label">Jumlah Tanggungan</label>
+                            <input type="number" class="form-control" id="jumlah_tanggungan">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-control" id="status">
+                                <option value="1">Aktif</option>
+                                <option value="0">Tidak Aktif</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
-                        <label for="namaPotongan" class="form-label">Nama Potongan</label>
-                        <select class="form-select" id="dataSelect" required>
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <textarea class="form-control" id="alamat" rows="2"></textarea>
                     </div>
+
                     <div class="mb-3">
-                        <label for="jumlahPotongan" class="form-label">Jumlah Potongan</label>
-                        <input type="number" class="form-control" id="jumlahPotongan" placeholder="Enter data Amount" required>
+                        <label for="posisi" class="form-label">Posisi</label>
+                        <input type="text" class="form-control" id="posisi">
                     </div>
-                    <button type="button" class="btn btn-primary" id="addPotonganBtn">Add Potongan</button>
+
+                     <div class="mb-3">
+            <label class="form-label">Foto</label>
+            <input type="file" class="form-control" id="foto">
+            <div id="photoPreview" class="mt-2"></div>
+          </div>
                 </form>
 
                 <hr>
 
                 <!-- Table to display and manage potongan -->
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="potonganTable">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nama Potongan</th>
-                                <th>Jumlah</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be dynamically populated here by AJAX -->
-                        </tbody>
-                    </table>
-                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEData">Save Changes</button>
             </div>
         </div>
     </div>
 </div>
-
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/employee.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
