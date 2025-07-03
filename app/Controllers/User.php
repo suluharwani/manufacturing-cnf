@@ -422,7 +422,7 @@ public function getPresensi()
       "att_id"=>0,
 
     ];
-    if ($Mdl->insert($data)==0) {
+    if ($Mdl->insert($data)) {
       $riwayat = "User ".$userInfo['nama_depan']." ".$userInfo['nama_belakang']." menambahkan presensi untuk pin: ".$pin."untuk waktu $dateTime";
       header('HTTP/1.1 200 OK');
     }else{

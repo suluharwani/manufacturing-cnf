@@ -23,7 +23,7 @@
   <h2>Form GRN</h2>
   <form>
     <div class="row mb-3">
-      <label for="invoice" class="col-md-3 col-form-label">Invoice</label>
+      <label for="invoice" class="col-md-3 col-form-label">Document Number</label>
       <div class="col-md-9">
         <input type="text" class="form-control" value="<?= $pembelian[0]['invoice'] ?? '' ?>" id="invoice" placeholder="Invoice">
       </div>
