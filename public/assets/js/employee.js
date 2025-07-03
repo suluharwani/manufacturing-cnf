@@ -889,7 +889,7 @@ function getEmployeeData(pin, id) {
                 // Photo handling
                 $('#photoPreview').html(''); // Clear previous preview
                 if (response.data.foto) {
-                    $('#photoPreview').html(`<img src="${base_url}uploads/employees/${response.data.foto}" class="img-thumbnail" width="500">`);
+                  $('#photoPreview').html(`<img src="${base_url}uploads/employees/${response.data.foto}" class="img-thumbnail" style="width: 100%; max-width: 500px;">`);
                 }
                 
                 $('#dataModal').modal('show');
