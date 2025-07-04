@@ -51,71 +51,54 @@ $(document).ready(function () {
 
 
 
-  async function tableWO() {
-    try {
-      const data = await $.ajax({
-        url: base_url + "requisition/WoAvailablelistdata/" + getLastSegment(),
-        type: "GET",
-        dataType: "json",
-      });
-
+function tableWO() {
+  $.ajax({
+    url: base_url + "requisition/getwoav/" + getLastSegment(),
+    type: "GET",
+    dataType: "json",
+    success: function(response) {
       var tableBody = $("#materialTable tbody");
       tableBody.empty(); // Clear existing rows
       let no = 1;
 
-      for (const item of data) {
-        const totalStock = await getTotalStock(item.material_id);
-        const max_request = Math.min(totalStock, item.remaining_quantity);
-        if(statusDoc == 'Posted'){
-          button = `Document Posted`
-        }else{
-           button = (max_request <= 0) 
-          ? 'Not available' 
-          : `<button class="btn btn-primary request" max = "${max_request}" material_id = "${item.material_id}" name= "${item.material_name}">Request</button>`;
-        }
+      $.each(response, function(index, item) {
+        // Calculate max_request based on total_stock (now included in the response)
+        const totalStock = item.total_stock || 0;
+        availableStock = item.remaining_quantity - item.terpenuhi - item.total_requisition_unposting ;
+        availableStock = availableStock < 0 ? 0 : availableStock;
+        const max_request = Math.ceil(Math.min(totalStock, availableStock));
         
+        let button;
+        if (statusDoc === 'Posted') {
+          button = 'Document Posted';
+        } else {
+          button = (max_request <= 0) 
+            ? 'Not available' 
+            : `<button class="btn btn-primary request" max="${max_request}" material_id="${item.material_id}" name="${item.material_name}">Request</button>`;
+        }
 
         var row = `<tr>
-                    <td>${no++}</td>
-                    <td>${item.material_name}</td>
-                    <td>${item.satuan} (${item.c_satuan})</td>
-                    <td>${item.total_usage}</td>
-                    <td>${item.terpenuhi}</td>
-                    <td>${item.remaining_quantity}</td>
-                    <td>${item.total_requisition}</td>
-                    <td>${item.total_requisition_unposting}</td>
-                    <td>${totalStock}</td>
-                    <td>${max_request}</td>
-                    <td>${button}</td>
-                    <td></td>
-                </tr>`;
+                      <td>${no++}</td>
+                      <td>${item.material_name}</td>
+                      <td>${item.satuan} (${item.c_satuan})</td>
+                      <td>${(item.quantity * item.penggunaan).toFixed(2)}</td>
+                      <td>${item.terpenuhi}</td>
+                      <td>${item.remaining_quantity}</td>
+                      <td>${item.total_requisition}</td>
+                      <td>${item.total_requisition_unposting}</td>
+                      <td>${totalStock}</td>
+                      <td>${max_request}</td>
+                      <td>${button}</td>
+                      <td></td>
+                  </tr>`;
         tableBody.append(row);
-      }
-    } catch (error) {
+      });
+    },
+    error: function(xhr, status, error) {
       console.error("AJAX Error: ", error);
     }
-  }
-
-  async function getTotalStock(id) {
-    const endpoint = base_url + 'stock/get_stock_in_out/' + id;
-
-    try {
-      const response = await $.ajax({
-        url: endpoint,
-        type: 'GET',
-        dataType: 'json',
-      });
-
-      if (response && typeof response.total !== 'undefined') {
-        return response.total;
-      } else {
-        throw new Error('Data total tidak ditemukan');
-      }
-    } catch (error) {
-      console.error('Terjadi kesalahan pada request:', error);
-      return null;
-    }
-  }
+  });
+}
 });
 
 // Fungsi untuk menampilkan popup dengan input menggunakan SweetAlert2
