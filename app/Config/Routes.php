@@ -468,6 +468,7 @@ $routes->group('requisition', function ($routes) {
     $routes->post('submitRequest', 'MaterialRequisition::submitRequest',['filter' => 'accessControl:2']); 
     $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 
     $routes->get('print/(:any)', 'MaterialRequisition::print/$1',['filter' => 'accessControl:2']); 
+    $routes->get('getwoav/(:any)', 'MaterialRequisition::getWorkOrderMaterialData/$1',['filter' => 'accessControl:2']); 
     
 });
 

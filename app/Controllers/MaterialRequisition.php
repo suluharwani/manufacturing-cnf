@@ -134,6 +134,11 @@ class MaterialRequisition extends BaseController
 
         return $this->response->setJSON($output);
     }
+    function getWorkOrderMaterialData($idMR) {
+    $mdl = new \App\Models\MdlWorkOrderDetail();
+    $data = $mdl->getMaterialRequisitionData($idMR);
+    return $this->response->setJSON($data);
+}  
     function WoAvailablelistdata($idMR)  
     {  
         $db = \Config\Database::connect();  
@@ -547,13 +552,13 @@ $dompdf = new Dompdf($options);
     $data['content'] = view('admin/content/direct_requisition', ['product' => $mdl->find($id)]);
         return view('admin/index', $data);
 }
-    public function directRequisitionList()
-{
-    $mdl = new \App\Models\MdlProduct();
+//     public function directRequisitionList()
+// {
+//     $mdl = new \App\Models\MdlProduct();
 
 
 
-    $data['content'] = view('admin/content/input_bom', ['product' => $mdl->find($id), 'modul' => $mdl2->find($id_modul)]);
-        return view('admin/index', $data);
-}
+//     $data['content'] = view('admin/content/input_bom', ['product' => $mdl->find($id), 'modul' => $mdl2->find($id_modul)]);
+//         return view('admin/index', $data);
+// }
 }
