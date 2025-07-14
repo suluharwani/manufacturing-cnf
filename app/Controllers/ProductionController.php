@@ -192,38 +192,29 @@ function getProductByWO($id_production)
 {
     $mdl = new \App\Models\MdlProductionWO();
     
-    // Selecting required fields and calculating the remaining quantity
     $data = $mdl->select('
-                            work_order.kode as wo,
-                            proforma_invoice.invoice_number,
-                            product.kode,
-                            product.nama,
-                            work_order_detail.quantity as qty_wo,
-                            SUM(DISTINCT production_progress.quantity) as qty_prod,
-                            work_order_detail.quantity - COALESCE(SUM(DISTINCT production_progress.quantity), 0) as quantity, 
-                            product.id as id_product,
-                            production_wo.production_id as production_id,
-                            production_wo.wo_id as wo_id,
-                            proforma_invoice.id as pi_id
-                        ')
-                ->join('work_order', 'work_order.id = production_wo.wo_id')
-                ->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id')
-                ->join('work_order_detail', 'work_order_detail.wo_id = work_order.id')
-                ->join('product', 'work_order_detail.product_id = product.id')
-                ->join('production_progress', 'work_order_detail.wo_id = production_progress.wo_id', 'left') // Join with production_progress to get quantity data
-                ->where('production_wo.production_id', $id_production)
-                ->groupBy([
-                    'work_order.kode',
-                    'proforma_invoice.invoice_number',
-                    'product.kode',
-                    'product.nama',
-                    'product.id',
-                    'production_wo.production_id',
-                    'production_wo.wo_id',
-                    'proforma_invoice.id'
-                ])  // Grouping to avoid duplicates
-                ->get()
-                ->getResultArray();
+                work_order.kode as wo,
+                proforma_invoice.invoice_number,
+                product.kode,
+                product.nama,
+                work_order_detail.quantity as qty_wo,
+                COALESCE(SUM(production_progress.quantity), 0) as qty_prod,
+                work_order_detail.quantity - COALESCE(SUM(production_progress.quantity), 0) as quantity, 
+                product.id as id_product,
+                production_wo.production_id as production_id,
+                production_wo.wo_id as wo_id,
+                proforma_invoice.id as pi_id,
+                work_order_detail.id as wod_id
+            ')
+            ->join('work_order', 'work_order.id = production_wo.wo_id')
+            ->join('proforma_invoice', 'work_order.invoice_id = proforma_invoice.id')
+            ->join('work_order_detail', 'work_order_detail.wo_id = work_order.id')
+            ->join('product', 'work_order_detail.product_id = product.id')
+            ->join('production_progress', 'production_progress.wo_id = work_order_detail.wo_id AND production_progress.product_id = work_order_detail.product_id', 'left')
+            ->where('production_wo.production_id', $id_production)
+            ->groupBy('work_order.kode, proforma_invoice.invoice_number, product.kode, product.nama, work_order_detail.quantity, product.id, production_wo.production_id, production_wo.wo_id, proforma_invoice.id, work_order_detail.id')
+            ->get()
+            ->getResultArray();
 
     return json_encode($data);
 }

@@ -50,8 +50,8 @@ $(document).ready(function() {
     }},
     {mRender: function (data, type, row) {
      return `
-     <a href="${base_url}proformainvoice/piDoc/${row[1]}" target="_blank" class="btn btn-warning btn-sm showDocumentShipment" id="${row[1]}" >Document&Shipment</a>
-     <a href="${base_url}proformainvoice/pi/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[1]}" >Detail</a>
+     <a href="${base_url}proformainvoice/piDoc/${row[1]}"  class="btn btn-warning btn-sm showDocumentShipment" id="${row[1]}" >Document&Shipment</a>
+     <a href="${base_url}proformainvoice/pi/${row[1]}"  class="btn btn-success btn-sm showPurchaseOrder" id="${row[1]}" >Detail</a>
      <a href="javascript:void(0);" class="btn btn-danger btn-sm deletePi" id="${row[1]}" invoice = "${row[2]}" >Delete</a>
      `; 
    

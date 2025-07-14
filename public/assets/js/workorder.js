@@ -53,7 +53,7 @@ $(document).ready(function() {
     }},
 
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}wo/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+     return `<a href="${base_url}wo/${row[1]}"  class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
     }}
   ],
   "columnDefs": [{

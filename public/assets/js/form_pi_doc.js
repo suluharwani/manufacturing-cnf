@@ -145,7 +145,7 @@ $(document).ready(function() {
           return row[2]
       }},
       {mRender: function (data, type, row) {
-          return `<a href="${base_url}${row[3]}" target="_blank">View File</a>`
+          return `<a href="${base_url}${row[3]}">View File</a>`
       }},
       {mRender: function (data, type, row) {
           return`

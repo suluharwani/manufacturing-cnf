@@ -50,15 +50,13 @@ $(document).ready(function() {
     }},
     {mRender: function (data, type, row) {
        return `
-               <a href="${base_url}breakdownBoM/${row[1]}" target="_blank" class="btn btn-secondary btn-sm breakdownBom" id="${row[1]}" title = "Bill of Material"><i class="fa fa-list-ol" aria-hidden="true" ></i></a>
-               <a href="${base_url}product/labourCost/${row[1]}" target="_blank" class="btn btn-primary btn-sm labourCost" id="${row[1]}" title = "Labour Cost">$</a>
-               <a href="${base_url}product/design/${row[1]}" target="_blank" class="btn btn-warning btn-sm Design" id="${row[1]}" title = "Design" ><i class="fas fa-drafting-compass"></i></a>
-               <a href="${base_url}product/file/${row[1]}" target="_blank" class="btn btn-warning btn-sm File" id="${row[1]}" title = "File" ><i class="fas fa-file"></i></a>
+               <a href="${base_url}breakdownBoM/${row[1]}" class="btn btn-secondary btn-sm breakdownBom" id="${row[1]}" title = "Bill of Material"><i class="fa fa-list-ol" aria-hidden="true" ></i></a>
+               <a href="${base_url}product/labourCost/${row[1]}" class="btn btn-primary btn-sm labourCost" id="${row[1]}" title = "Labour Cost">$</a>
+               <a href="${base_url}product/design/${row[1]}" class="btn btn-warning btn-sm Design" id="${row[1]}" title = "Design" ><i class="fas fa-drafting-compass"></i></a>
+               <a href="${base_url}product/file/${row[1]}" class="btn btn-warning btn-sm File" id="${row[1]}" title = "File" ><i class="fas fa-file"></i></a>
                 `; 
      }},
-    {mRender: function (data, type, row) {
-     return `<a href="javascript:void(0);" class="btn btn-success btn-sm trackProduct" id="'+row[1]+'" >Track</a>`; 
-    }},
+
 
     {mRender: function (data, type, row) {
      return `
@@ -369,7 +367,7 @@ function tableCat(data){
     table+=     `<tr>`;
     table+=   `<td>${no++}</td>`;
     table+=   `<td>${d[k].nama}</td>`;
-    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" >Edit</a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" >Delete</a>`;
+    table+=   `<td><a href="javascript:void(0);" class="btn btn-warning btn-sm edit"  id="${d[k].id}" nama = "${d[k].nama}" titel ="Edit" ><i class="fas fa-pen"></i></a> <a href="javascript:void(0);" class="btn btn-danger btn-sm delete"  id="${d[k].id}" nama = "${d[k].nama}" title ="Delete"><i class="fas fa-trash"></i></a>`;
     table+=   `</tr>`
 
   })
@@ -427,7 +425,7 @@ function getOrderMaterial(materialOptions, idProduct) {
                 <input type="number" class="form-control material-penggunaan" name="penggunaan[]" value="${item.penggunaan}" placeholder="Masukkan ukuran">
               </td>
               <td>
-                <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></a></button>
               </td>
             </tr>
           `;
@@ -461,7 +459,7 @@ function getOrderMaterial(materialOptions, idProduct) {
                     <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
                   </td>
                   <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+                    <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></a></button>
                   </td>
                 </tr>
               </tbody>
@@ -503,7 +501,7 @@ $(document).on('click', '#addProduct', async function() {
           <input type="number" class="form-control material-penggunaan" name="penggunaan[]" placeholder="Masukkan ukuran">
         </td>
         <td>
-          <button type="button" class="btn btn-danger btn-sm remove-material">Hapus</button>
+          <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></a></button>
         </td>
       </tr>
     `;

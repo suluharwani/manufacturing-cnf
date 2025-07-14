@@ -74,7 +74,7 @@ $(document).ready(function() {
         return stat
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}requisition/form/${row[7]}" target="_blank" class="btn btn-success btn-sm ">Edit</a>
+     return `<a href="${base_url}requisition/form/${row[7]}" class="btn btn-success btn-sm ">Edit</a>
              <a href="javascript:void(0);" class="btn btn-danger btn-sm delete" code = "${row[1]}" id="${row[7]}" >Delete</a>
              `; 
     }}

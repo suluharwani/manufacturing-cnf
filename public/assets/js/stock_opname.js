@@ -58,7 +58,7 @@ $(document).ready(function() {
         return status
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}pembelian/form/${row[1]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder">Edit</a>
+     return `<a href="${base_url}pembelian/form/${row[1]}"  class="btn btn-success btn-sm showPurchaseOrder">Edit</a>
              <a href="javascript:void(0);" class="btn btn-danger btn-sm deleteInvoice" invoice = "${row[3]}" id="${row[1]}" >Delete</a>
              `; 
     }}

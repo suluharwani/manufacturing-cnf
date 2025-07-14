@@ -69,7 +69,7 @@ $(document).ready(function() {
         return stat
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}requisitionprogress/form/${row[7]}" target="_blank" class="btn btn-success btn-sm ">Progress</a>
+     return `<a href="${base_url}requisitionprogress/form/${row[7]}" class="btn btn-success btn-sm ">Progress</a>
              `; 
     }}
   ], 

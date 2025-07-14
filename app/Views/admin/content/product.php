@@ -49,7 +49,6 @@
                   <th style=" text-align: center;">Picture</th>
                   <th style=" text-align: center;">Category</th>
                   <th style=" text-align: center;">Variable</th>
-                  <th style=" text-align: center;">Track Stock</th>
                   <th style=" text-align: center;">Aktif</th>
                 </tr>
               </thead>
@@ -61,7 +60,6 @@
                   <th style=" text-align: center;">Picture</th>
                   <th style=" text-align: center;">Category</th>
                   <th style=" text-align: center;">Variable</th>
-                  <th style=" text-align: center;">Track Stock</th>
                   <th style=" text-align: center;">Aktif</th>
                 </tr>
               </tr>
@@ -142,7 +140,7 @@
 <!-- Widgets Start -->
 
 <!-- Widgets End -->
-
+ 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/product.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script> 
 <script type="text/javascript" src="<?=base_url()?>/assets/summernote/summernote-lite.min.js"></script>

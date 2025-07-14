@@ -75,11 +75,11 @@ $(document).ready(function () {
       {
         mRender: function (data, type, row) {
           if(row[6] == 0){
-            return `<a href="${base_url}scrap/form/${row[1]}" target="_blank" class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>
-                  <a href="javascript:void(0);" target="_blank" class="btn btn-danger btn-sm delete" id="'+row[1]+'" >Delete</a>`;
+            return `<a href="${base_url}scrap/form/${row[1]}"  class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>
+                  <a href="javascript:void(0);"  class="btn btn-danger btn-sm delete" id="'+row[1]+'" >Delete</a>`;
 
           }else{
-            return `<a href="${base_url}scrap/form/${row[1]}" target="_blank" class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>`
+            return `<a href="${base_url}scrap/form/${row[1]}"  class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>`
           }
       },
       },

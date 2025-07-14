@@ -59,7 +59,7 @@ $(document).ready(function() {
       return status
     }},
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}purchase/po/${row[4]}" target="_blank" class="btn btn-success btn-sm showPurchaseOrder" id="${row[4]}" >Detail</a>`; 
+     return `<a href="${base_url}purchase/po/${row[4]}"  class="btn btn-success btn-sm showPurchaseOrder" id="${row[4]}" >Detail</a>`; 
     }}
   ],
   "columnDefs": [{
