@@ -54,7 +54,6 @@
                         class="fa fa-industry  me-2"></i>Production</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('production') ?>" class="dropdown-item">All Productions</a>
-                    <a href="<?= base_url('design') ?>" class="dropdown-item">Production Design</a>
                     <a href="<?= base_url('scrap') ?>" class="dropdown-item">Scrap</a>
                     <a href="<?= base_url('materialrequisition') ?>" class="dropdown-item">Material Requisition</a>
 

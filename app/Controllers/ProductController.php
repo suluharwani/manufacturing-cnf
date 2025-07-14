@@ -185,7 +185,7 @@ class ProductController extends BaseController
           header('Content-Type: application/json; charset=UTF-8');
           die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
-      }
+      } 
     }else{
       $response = [
         'success' => false,

@@ -50,6 +50,10 @@ $(document).ready(function() {
     }},
     {mRender: function (data, type, row) {
        return `
+       <button class="btn btn-sm btn-warning edit-picture" data-id="${row[1]}" data-picture="${row[4]}" 
+              title="Edit Picture">
+        <i class="fas fa-edit"></i>
+      </button>
                <a href="${base_url}breakdownBoM/${row[1]}" class="btn btn-secondary btn-sm breakdownBom" id="${row[1]}" title = "Bill of Material"><i class="fa fa-list-ol" aria-hidden="true" ></i></a>
                <a href="${base_url}product/labourCost/${row[1]}" class="btn btn-primary btn-sm labourCost" id="${row[1]}" title = "Labour Cost">$</a>
                <a href="${base_url}product/design/${row[1]}" class="btn btn-warning btn-sm Design" id="${row[1]}" title = "Design" ><i class="fas fa-drafting-compass"></i></a>
@@ -693,4 +697,57 @@ $(document).on('click', '.deleteProduct', function() {
             });
         }
     });
+});
+// Add this to your product.js file
+
+// Handle edit picture button click
+$(document).on('click', '.edit-picture', function() {
+  const productId = $(this).data('id');
+  const currentPicture = $(this).data('picture');
+  
+  $('#editPictureId').val(productId);
+  $('#editPreview').attr('src', base_url + 'assets/upload/image/' + currentPicture);
+  $('#editPictureModal').modal('show');
+});
+
+// Preview image when file is selected
+$('#editFile').change(function() {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      $('#editPreview').attr('src', e.target.result);
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+// Save edited picture
+$('#saveEditPicture').click(function() {
+  const formData = new FormData($('#editPictureForm')[0]);
+  
+  if (!$('#editFile').val()) {
+    Swal.fire('Error', 'Please select a new picture', 'error');
+    return;
+  }
+  
+  $.ajax({
+    url: base_url + 'product/upload',
+    type: 'POST',
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function(response) {
+      if (response.success) {
+        Swal.fire('Success', response.msg, 'success');
+        $('#editPictureModal').modal('hide');
+        $('#tabel_serverside').DataTable().ajax.reload();
+      } else {
+        Swal.fire('Error', response.msg, 'error');
+      }
+    },
+    error: function(xhr) {
+      Swal.fire('Error', 'An error occurred while uploading the picture', 'error');
+    }
+  });
 });

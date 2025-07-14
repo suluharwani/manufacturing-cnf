@@ -136,9 +136,35 @@
 </div>
 </div>
 <!-- modal -->
-
+<!-- Add this modal after your existing modals -->
+<div class="modal fade" id="editPictureModal" tabindex="-1" aria-labelledby="editPictureModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPictureModalLabel">Edit Product Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editPictureForm" enctype="multipart/form-data">
+          <input type="hidden" name="id" id="editPictureId">
+          <div class="mb-3">
+            <label for="editFile" class="form-label">New Picture</label>
+            <input type="file" class="form-control" id="editFile" name="file" accept="image/*">
+          </div>
+          <div class="mb-3 text-center">
+            <img id="editPreview" src="" alt="Preview" style="max-width: 100%; max-height: 200px;">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveEditPicture">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Widgets Start -->
-
+ 
 <!-- Widgets End -->
  
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/product.js"></script>
