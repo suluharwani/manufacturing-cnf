@@ -23,7 +23,7 @@
                         <h6 class="mb-0">Data</h6>
                     </div>
                     <div class="table-responsive">
-                    <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
+                    <table id="tabel_serverside_all" class="table table-bordered display text-left" cellspacing="0" width="100%">
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>

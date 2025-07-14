@@ -319,6 +319,12 @@ class Home extends BaseController
         $data['content'] = view('admin/content/material_requisition_progress');
         return view('admin/index', $data);
     }
+        public function material_requisition_progress_completed(){
+        $data['group'] = 'Material Requisition Progress Completed';
+        $data['title'] = 'Material Requisition Progress Completed';
+        $data['content'] = view('admin/content/material_requisition_progress_completed');
+        return view('admin/index', $data);
+    }
     public function check_hs_code() {
         $term = $_GET['term'];
 

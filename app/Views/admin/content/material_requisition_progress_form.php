@@ -111,7 +111,7 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Product WO</h6>
             <?php if ($mreq['completion'] == 1) { ?>
-                <button class="btn btn-success print">Print</button>
+                <button class="btn btn-secondary alokasiPI" onclick="window.location.href='<?= base_url('requisition/print') ?>/<?= $mreq['id'] ?>'">Print</button>
             <?php } else { ?>
                 <button class="btn btn-primary posting">Completion</button>
 

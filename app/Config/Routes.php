@@ -65,6 +65,7 @@ $routes->get('/warehouse_report', 'Home::warehouse_report',['filter' => 'accessC
 $routes->post('/material/tambah_tipe', 'MaterialController::tambah_tipe',['filter' => 'accessControl:2']);
 $routes->post('/material/tambah_satuan', 'MaterialController::tambah_satuan',['filter' => 'accessControl:2']);
 $routes->get('/material_requisition_progress',  'Home::material_requisition_progress',['filter' => 'accessControl:2']);
+$routes->get('/material_requisition_progress_completed',  'Home::material_requisition_progress_completed',['filter' => 'accessControl:2']);
 
 //product
 
@@ -478,6 +479,7 @@ $routes->group('requisition', function ($routes) {
 $routes->group('requisitionprogress', function ($routes) {
   
     $routes->post('listdata', 'MaterialRequisitionProgress::listdata',['filter' => 'accessControl:2']); 
+    $routes->post('listdata_completed', 'MaterialRequisitionProgress::listdata_completed',['filter' => 'accessControl:2']); 
     $routes->get('form/(:any)', 'MaterialRequisitionProgress::mr/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'MaterialRequisitionProgress::posting/$1',['filter' => 'accessControl:2']); 
     
