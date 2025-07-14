@@ -463,6 +463,7 @@ $routes->group('requisition', function ($routes) {
     $routes->post('addMD', 'MaterialRequisition::addMD',['filter' => 'accessControl:2']); 
     $routes->post('listdata', 'MaterialRequisition::listdata',['filter' => 'accessControl:2']); 
     $routes->post('delete', 'MaterialRequisition::delete',['filter' => 'accessControl:2']); 
+    $routes->post('deletemr/(:any)', 'MaterialRequisition::deletemr/$1',['filter' => 'accessControl:2']); 
     $routes->post('deleteList/(:any)', 'MaterialRequisition::deleteList/$1',['filter' => 'accessControl:2']); 
     $routes->post('datamd/(:any)', 'MaterialRequisition::datamd/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'MaterialRequisition::posting/$1',['filter' => 'accessControl:2']); 

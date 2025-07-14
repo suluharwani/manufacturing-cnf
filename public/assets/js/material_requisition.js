@@ -224,8 +224,8 @@ $('.tambah').click(function() {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: base_url + '/pemusnahan/delete', 
-                            type: 'post',
+                            url: base_url + '/requisition/deletemr/'+id, 
+                            type: 'post', 
                             data: { id: id },
                             success: function(response) {
                                 Swal.fire('Dihapus!', response.message, 'success');

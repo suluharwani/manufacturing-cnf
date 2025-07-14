@@ -288,7 +288,34 @@ class MaterialRequisition extends BaseController
     }  
     
     
+public function deletemr($id)
+{
+    $userInfo = $_SESSION['auth'];
 
+    $mdl = new \App\Models\MdlMaterialRequisition();
+    // $id = $this->request->getPost('id');
+
+    // Ambil data sebelum dihapus untuk riwayat
+    $dataBeforeDelete = $mdl->where('id', $id)->first();
+
+    if ($dataBeforeDelete) {
+        $mdl->where('id', $id)->delete();
+
+        if ($mdl->affectedRows() != 0) {
+            $riwayat = "{$userInfo['nama_depan']} {$userInfo['nama_belakang']} menghapus MR id: {$id} dengan data: " . json_encode($dataBeforeDelete);
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 500)));
+        }
+    } else {
+        header('HTTP/1.1 404 Not Found');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(array('message' => 'Data tidak ditemukan', 'code' => 404)));
+    }
+}
 public function deleteList($id)
 {
     $userInfo = $_SESSION['auth'];
