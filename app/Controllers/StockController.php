@@ -8,6 +8,9 @@ use App\Models\LocationModel;
 use App\Models\ProformaInvoice;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\MdlMaterial;
+use App\Models\MdlStock;
+use App\Models\MdlCurrency;
 class StockController extends BaseController
 {
     protected $stProductModel;
@@ -17,6 +20,10 @@ class StockController extends BaseController
     protected $locationModel;
     protected $PiModel;
     protected $db;
+
+    protected $materialModel;
+    protected $stockModel;
+    protected $currencyModel;
     public function __construct()
     {
         $this->db = \Config\Database::connect();
@@ -26,6 +33,10 @@ class StockController extends BaseController
         $this->productModel = new MdlProduct();
         $this->locationModel = new LocationModel();
         $this->PiModel = new ProformaInvoice();
+
+         $this->materialModel = new MdlMaterial();
+        $this->stockModel = new MdlStock();
+        $this->currencyModel = new MdlCurrency();
     }
 public function exportExcel()
     {
@@ -479,5 +490,220 @@ public function deleteMovement($id)
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Failed to delete record: ' . $e->getMessage());
     }
+}
+
+ public function initExportExcel()
+    {
+            // Ambil data stock awal dengan join material dan currency
+    $stocks = $this->stockModel->select('stock.*, materials.name as material_name, materials.kode as material_kode, currency.id as currency_id')
+        ->join('materials', 'materials.id = stock.id_material')
+        ->join('currency', 'currency.id = stock.id_currency', 'left')
+        ->where('stock.deleted_at', null)
+        ->findAll();
+
+    // Ambil semua currency untuk sheet 2
+    $currencies = $this->currencyModel->findAll();
+
+    $spreadsheet = new Spreadsheet();
+
+    // Sheet 1: Data Stock
+    $sheet1 = $spreadsheet->getActiveSheet();
+    $sheet1->setTitle('Data Stock');
+
+    // Header Sheet 1
+    $sheet1->setCellValue('A1', 'No');
+    $sheet1->setCellValue('B1', 'Kode Material');
+    $sheet1->setCellValue('C1', 'Nama Material');
+    $sheet1->setCellValue('D1', 'Stock Awal');
+    $sheet1->setCellValue('E1', 'Harga');
+    $sheet1->setCellValue('F1', 'ID Currency');
+    $sheet1->setCellValue('G1', 'Kode Currency');
+    $sheet1->setCellValue('H1', 'Nama Currency');
+    $sheet1->setCellValue('I1', 'Rate Currency');
+
+    // Data Sheet 1
+    $row = 2;
+    foreach ($stocks as $index => $stock) {
+        $sheet1->setCellValue('A' . $row, $index + 1);
+        $sheet1->setCellValue('B' . $row, $stock['material_kode']);
+        $sheet1->setCellValue('C' . $row, $stock['material_name']);
+        $sheet1->setCellValue('D' . $row, $stock['stock_awal']);
+        $sheet1->setCellValue('E' . $row, $stock['price']);
+        $sheet1->setCellValue('F' . $row, $stock['currency_id']);
+        
+        // Tambahkan rumus VLOOKUP untuk mengambil data dari Sheet 2
+        if (!empty($stock['currency_id'])) {
+            $sheet1->setCellValue('G' . $row, '=VLOOKUP(F'.$row.',List_Currency!A:D,2,FALSE)');
+            $sheet1->setCellValue('H' . $row, '=VLOOKUP(F'.$row.',List_Currency!A:D,3,FALSE)');
+            $sheet1->setCellValue('I' . $row, '=VLOOKUP(F'.$row.',List_Currency!A:D,4,FALSE)');
+        } else {
+            $sheet1->setCellValue('G' . $row, '');
+            $sheet1->setCellValue('H' . $row, '');
+            $sheet1->setCellValue('I' . $row, '');
+        }
+        $row++;
+    }
+
+    // Sheet 2: List Currency (dengan nama yang diformat tanpa spasi)
+    $sheet2 = $spreadsheet->createSheet();
+    $sheet2->setTitle('List_Currency'); // Nama sheet tanpa spasi untuk memudahkan rumus
+    
+    // Header Sheet 2
+    $sheet2->setCellValue('A1', 'ID');
+    $sheet2->setCellValue('B1', 'Kode');
+    $sheet2->setCellValue('C1', 'Nama');
+    $sheet2->setCellValue('D1', 'Rate');
+
+    // Data Sheet 2
+    $row = 2;
+    foreach ($currencies as $currency) {
+        $sheet2->setCellValue('A' . $row, $currency['id']);
+        $sheet2->setCellValue('B' . $row, $currency['kode']);
+        $sheet2->setCellValue('C' . $row, $currency['nama']);
+        $sheet2->setCellValue('D' . $row, $currency['rate']);
+        $row++;
+    }
+
+    // Kembali ke Sheet 1 sebagai aktif
+    $spreadsheet->setActiveSheetIndex(0);
+
+    // Format file
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'stock_awal_material_' . date('YmdHis') . '.xlsx';
+
+    // Header untuk download
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+
+    $writer->save('php://output');
+    exit;
+    }
+
+    public function initImportExcel()
+   {
+    $file = $this->request->getFile('excel_file');
+    
+    if (!$file->isValid()) {
+        return redirect()->back()->with('error', 'File tidak valid');
+    }
+
+    $extension = $file->getClientExtension();
+    if (!in_array($extension, ['xlsx', 'xls'])) {
+        return redirect()->back()->with('error', 'Format file harus Excel (.xlsx atau .xls)');
+    }
+
+    try {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getSheetByName('Data Stock');
+        
+        if (!$sheet) {
+            return redirect()->back()->with('error', 'Sheet "Data Stock" tidak ditemukan dalam file Excel');
+        }
+
+        $rows = $sheet->toArray();
+
+        // Skip header
+        array_shift($rows);
+
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        foreach ($rows as $index => $row) {
+            $materialKode = $row[1] ?? null; // Kolom B: Kode Material
+            $stockAwal = $row[3] ?? 0;      // Kolom D: Stock Awal
+            $price = $row[4] ?? 0;          // Kolom E: Harga
+            $currencyId = $row[5] ?? null;  // Kolom F: ID Currency
+
+            // Validasi data kosong
+            if (empty($materialKode)) {
+                $errors[] = "Baris " . ($index + 2) . ": Kode Material kosong";
+                $errorCount++;
+                continue;
+            }
+
+            // Cari material
+            $material = $this->materialModel->where('kode', $materialKode)->first();
+            if (!$material) {
+                $errors[] = "Baris " . ($index + 2) . ": Material dengan kode '$materialKode' tidak ditemukan";
+                $errorCount++;
+                continue;
+            }
+
+            // Handle ID Currency
+            $currencyId = $this->parseCurrencyId($row[5] ?? null);
+            
+            // Validasi currency jika diisi
+            if ($currencyId !== null && !is_numeric($currencyId)) {
+                $errors[] = "Baris " . ($index + 2) . ": ID Currency harus angka";
+                $errorCount++;
+                continue;
+            }
+
+            if ($currencyId !== null) {
+                $currency = $this->currencyModel->find($currencyId);
+                if (!$currency) {
+                    $errors[] = "Baris " . ($index + 2) . ": Currency dengan ID '$currencyId' tidak ditemukan";
+                    $errorCount++;
+                    continue;
+                }
+            }
+
+            // Cek stock existing
+            $existingStock = $this->stockModel
+                ->where('id_material', $material['id'])
+                ->first();
+
+            $stockData = [
+                'id_material' => $material['id'],
+                'stock_awal' => $stockAwal,
+                'price' => $price,
+                'stock_masuk' => 0,
+                'stock_keluar' => 0,
+                'selisih_stock_opname' => 0,
+                'id_currency' => $currencyId,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            if ($existingStock) {
+                // Update existing
+                $this->stockModel->update($existingStock['id'], $stockData);
+            } else {
+                // Insert new
+                $stockData['created_at'] = date('Y-m-d H:i:s');
+                $this->stockModel->insert($stockData);
+            }
+
+            $successCount++;
+        }
+
+        $message = "Import selesai. Berhasil: $successCount, Gagal: $errorCount";
+        if ($errorCount > 0) {
+            $message .= "<br>Error detail:<br>" . implode("<br>", $errors);
+        }
+
+        return redirect()->to('/stock')->with('success', $message);
+
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
+}
+
+// Fungsi helper untuk parse ID Currency
+private function parseCurrencyId($value)
+{
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    // Jika nilai adalah rumus Excel yang menghasilkan error
+    if (is_string($value) && strpos($value, '#') === 0) {
+        return null;
+    }
+
+    // Coba konversi ke integer
+    $intVal = (int)$value;
+    return ($intVal > 0) ? $intVal : null;
 }
 }

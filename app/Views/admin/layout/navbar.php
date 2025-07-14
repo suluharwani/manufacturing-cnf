@@ -117,6 +117,13 @@
                             <a href="<?= base_url('activitylog') ?>" class="dropdown-item">User Activity logs</a>
                         <?php }
                     } ?>
+                   
+                </div>
+            </div>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        class="fa fa-users me-2"></i>Employee</a>
+                <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('employee') ?>" class="dropdown-item">Employee</a>
                     <a href="<?= base_url('salary') ?>" class="dropdown-item">Salary Setting</a>
                     <a href="<?= base_url('master_salary') ?>" class="dropdown-item">Master Salary</a>

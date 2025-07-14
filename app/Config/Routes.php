@@ -267,7 +267,10 @@ $routes->post('importExcel', 'Stock::importExcel');
     $routes->get('addStock/(:any)', 'Stock::addStock/(:any)',['filter' => 'accessControl:2']); 
     $routes->post('stockdata', 'Stock::stockdata',['filter' => 'accessControl:2']); 
     $routes->get('get_stock_in_out/(:any)', 'Stock::get_stock/$1',['filter' => 'accessControl:2']); 
-    
+
+    $routes->get('initexport', 'StockController::initExportExcel');
+    $routes->post('initimport', 'StockController::initImportExcel');
+
 });
  
     $routes->get('breakdownBoM/(:any)', 'ProductController::breakdownBom/$1',['filter' => 'accessControl:2']);

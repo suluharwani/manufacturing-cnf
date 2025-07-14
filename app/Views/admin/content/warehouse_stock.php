@@ -12,7 +12,25 @@
 
 
 
+  <?php if (session()->getFlashdata('success')) : ?>
+                        <script>
+                            Swal.fire({
+                                title: 'Sukses',
+                                html: '<?= session()->getFlashdata('success'); ?>',
+                                icon: 'success'
+                            });
+                        </script>
+                    <?php endif; ?>
 
+                    <?php if (session()->getFlashdata('error')) : ?>
+                        <script>
+                            Swal.fire({
+                                title: 'Error',
+                                text: '<?= session()->getFlashdata('error'); ?>',
+                                icon: 'error'
+                            });
+                        </script>
+                    <?php endif; ?>
 
 
 
@@ -23,13 +41,16 @@
                         <h6 class="mb-0">Persediaan Material</h6>
                         <div>
                             
-                            <button class= "btn btn-primary">Stock Opname</button>
-                        <button class= "btn btn-primary">Pemakaian</button>
-                        <button class= "btn btn-primary">Pemusnahan</button>
-                        <button class= "btn btn-primary">Saldo Awal</button>
+                          <button type="button" class="btn btn-success btn-sm" onclick="exportExcel()">
+                            <i class="fas fa-file-excel"></i> Export Excel
+                        </button>
+                         <button type="button" class="btn btn-primary btn-sm ml-1" id="importButton">
+                            <i class="fas fa-file-import"></i> Import Excel
+                        </button>
                         </div>
                         
                     </div>
+                    
                     <div class="table-responsive">
                     <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
               <thead>
@@ -66,12 +87,64 @@
                     </div>
                 </div>
             </div>
-<!-- Recent Sales End -->
+<!-- modal -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Stock dari Excel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="<?= base_url('/stock/initimport'); ?>" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="excel_file">File Excel</label>
+                        <input type="file" class="form-control-file" id="excel_file" name="excel_file" accept=".xlsx,.xls" required>
+                        <small class="form-text text-muted">
+                            Format file harus Excel (.xlsx atau .xls). 
+                            <a href="<?= base_url('/stock/initexport'); ?>" download>Download template</a><br>
+                            <strong>Format Import:</strong><br>
+                            - Sheet "Data Stock" untuk data stock<br>
+                            - Kolom F harus berisi ID Currency (bisa dilihat di Sheet "List Currency")
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+   $(document).ready(function() {
+        $('#stockTable').DataTable();
+        
+        // Handle tombol import
+        $('#importButton').click(function() {
+            $('#importModal').modal('show');
+        });
+    });
 
-
-<!-- Widgets Start -->
-
-<!-- Widgets End -->
-
+    function exportExcel() {
+        Swal.fire({
+            title: 'Export Data Stock',
+            text: 'Anda akan mengekspor data stock ke file Excel?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Export!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '<?= base_url('/stock/initexport'); ?>';
+            }
+        });
+    }
+</script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/stock.js"></script>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>

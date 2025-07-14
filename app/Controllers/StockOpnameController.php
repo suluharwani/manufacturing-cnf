@@ -247,7 +247,10 @@ public function importExcel($opnameId)
             $materialName = trim($row[3] ?? '');
             
             // Validate material exists
-            $material = $this->materialModel->find($idMaterial);
+            
+            $material = $this->materialModel->where('id',3)->get();
+            var_dump($material);
+            die();
             if (!$material) {
                 $errorCount++;
                 $errorMessages[] = "Row " . ($rowIndex + 8) . ": Material with ID {$idMaterial} not found";
