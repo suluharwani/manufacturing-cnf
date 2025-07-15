@@ -83,8 +83,9 @@ public function generateAll()
     }
     
     $periode = $this->request->getPost('periode');
+    $end = $this->request->getPost('end');
     
-    $results = $this->generateLaporanModel->generateAllLaporan($periode);
+    $results = $this->generateLaporanModel->generateAllLaporan($periode,$end);
     
     // Format hasil untuk ditampilkan
     $messages = [];

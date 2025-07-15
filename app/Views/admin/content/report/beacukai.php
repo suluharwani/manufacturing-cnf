@@ -312,7 +312,8 @@ function generateAllReports() {
         type: "POST",
         url: '<?= base_url('laporan/generate-all') ?>',
         data: {
-            periode: startDate
+            periode: startDate,
+            end:endDate
         },
         success: function(response) {
             // Sembunyikan loading
