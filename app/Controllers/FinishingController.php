@@ -144,23 +144,64 @@ public function updatePicture()
 }
 
 
-    public function delete($id)
-    {
-        $model = new FinishingModel();
+public function delete($id)
+{
+    // Validate input
+    if (!is_numeric($id) || $id <= 0) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Invalid ID provided'
+        ]);
+    }
+
+    $model = new FinishingModel();
+    $bomf = new \App\Models\MdlBillOfMaterialFinishing();
+    
+    try {
+        // Start transaction
+        db_connect()->transBegin();
+
         $item = $model->find($id);
-
-        if ($item) {
-            if ($item['picture']) {
-                unlink('uploads/finishing/' . $item['picture']);
-            }
-
-            $model->delete($id);
-
-            return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+        if (!$item) {
+            throw new \RuntimeException('Item not found');
         }
 
-        return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+        // Delete associated file if exists
+        if (!empty($item['picture'])) {
+            $filePath = 'uploads/finishing/' . $item['picture'];
+            if (file_exists($filePath)) {
+                if (!unlink($filePath)) {
+                    throw new \RuntimeException('Failed to delete associated file');
+                }
+            };
+        }
+
+        // Delete from bill of material first (child records)
+        $bomf->where('id_modul', $id)->delete();
+        
+        // Then delete the main record
+        if (!$model->delete($id)) {
+            throw new \RuntimeException('Failed to delete main record');
+        }
+
+        // Commit transaction if all operations succeeded
+        db_connect()->transCommit();
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Item and associated data deleted successfully'
+        ]);
+
+    } catch (\Exception $e) {
+        // Rollback transaction on error
+        db_connect()->transRollback();
+
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Delete failed: ' . $e->getMessage()
+        ]);
     }
+}
     public function get()
 {
     $id = $this->request->getPost('id'); // Mengambil ID dari request POST

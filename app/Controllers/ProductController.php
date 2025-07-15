@@ -594,20 +594,86 @@ public function updateData()
 
 public function deleteModul($id)
 {
-    $model = new \App\Models\MdlModul();
-    $item = $model->find($id);
-
-    if ($item) {
-        if ($item['picture']) {
-            unlink('uploads/modul/' . $item['picture']);
-        }
-
-        $model->delete($id);
-
-        return $this->response->setJSON(['status' => true, 'message' => 'Item deleted successfully']);
+    // Validate input
+    if (!is_numeric($id) || $id <= 0) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Invalid ID provided',
+            'error' => 'INVALID_INPUT'
+        ]);
     }
 
-    return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
+    $model = new \App\Models\MdlModul();
+    $bom = new \App\Models\MdlBillOfMaterial();
+    
+    try {
+        // Start database transaction
+        db_connect()->transBegin();
+
+        // Find the item with proper error handling
+        $item = $model->find($id);
+        if (!$item) {
+            throw new \RuntimeException('Modul not found', 404);
+        }
+
+        // Handle file deletion if picture exists
+        if (!empty($item['picture'])) {
+            $filePath = 'uploads/modul/' . $item['picture'];
+            
+            if (file_exists($filePath)) {
+                if (!unlink($filePath)) {
+                    throw new \RuntimeException('Failed to delete modul image', 500);
+                }
+                
+                // Optional: Delete thumbnail if exists
+                $thumbPath = 'uploads/modul/thumbs/' . $item['picture'];
+                if (file_exists($thumbPath)) {
+                    unlink($thumbPath);
+                }
+            }
+        }
+
+        // Delete related BOM records first (foreign key constraint)
+        $bomDeleted = $bom->where('id_modul', $id)->delete();
+        if ($bomDeleted === false) {
+            throw new \RuntimeException('Failed to delete related BOM records', 500);
+        }
+
+        // Delete the main modul record
+        if (!$model->delete($id)) {
+            throw new \RuntimeException('Failed to delete modul record', 500);
+        }
+
+        // Commit transaction if all operations succeeded
+        db_connect()->transCommit();
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Modul and all related data deleted successfully',
+            'data' => [
+                'modul_id' => $id,
+                'bom_records_deleted' => $bomDeleted
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        // Rollback transaction on error
+        db_connect()->transRollback();
+
+        $statusCode = $e->getCode() ?: 500;
+        $this->response->setStatusCode($statusCode);
+
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Delete failed: ' . $e->getMessage(),
+            'error' => 'DELETE_FAILED',
+            'error_details' => [
+                'modul_id' => $id,
+                'exception' => get_class($e),
+                'code' => $e->getCode()
+            ]
+        ]);
+    }
 }
 function updateDimension($id){
     $model = new MdlProduct();
