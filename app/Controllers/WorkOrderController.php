@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\MdlWorkOrder;
+use App\Models\MdlWorkOrderDetail;
 use CodeIgniter\HTTP\ResponseInterface;
 use AllowDynamicProperties; 
 use Dompdf\Dompdf;
@@ -364,5 +365,34 @@ public function updateDate($id){
       die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
     }
 }
-   
+   public function deleteWO($id)
+{
+    $mdlWorkOrder = new MdlWorkOrder();
+    $mdlWorkOrderDetail = new MdlWorkOrderDetail();
+    
+    // Start transaction to ensure both operations succeed or fail together
+    $this->db->transStart();
+    
+    // Delete the Work Order (soft delete)
+    $resultWO = $mdlWorkOrder->delete($id);
+    
+    // Delete related Work Order Details (soft delete)
+    $resultDetails = $mdlWorkOrderDetail->where('wo_id', $id)->delete();
+    
+    $this->db->transComplete();
+    
+    if ($this->db->transStatus() === false) {
+        $response = [
+            'success' => false,
+            'message' => 'Gagal menghapus Work Order dan detailnya'
+        ];
+    } else {
+        $response = [
+            'success' => true,
+            'message' => 'Work Order dan detailnya berhasil dihapus'
+        ];
+    }
+    
+    return $this->response->setJSON($response);
+}
 }

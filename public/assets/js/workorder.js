@@ -53,7 +53,8 @@ $(document).ready(function() {
     }},
 
     {mRender: function (data, type, row) {
-     return `<a href="${base_url}wo/${row[1]}"  class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>`; 
+     return `<a href="${base_url}wo/${row[1]}"  class="btn btn-success btn-sm showPurchaseOrder" id="'+row[1]+'" >Detail</a>
+                <button class="btn btn-danger btn-sm deleteWo" data-id="${row[1]}">Delete</button>`; 
     }}
   ],
   "columnDefs": [{
@@ -201,3 +202,49 @@ function generateWoCode(invoiceId) {
         }
     });
 }
+// Add this after your document.ready function:
+$(document).on('click', '.deleteWo', function() {
+    const woId = $(this).data('id');
+    
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Data akan dihapus secara soft delete!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: base_url + 'wo/delete/' + woId,
+                type: 'DELETE',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire(
+                            'Deleted!',
+                            'Work Order telah dihapus.',
+                            'success'
+                        );
+                        $('#tabel_serverside').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message || 'Gagal menghapus data',
+                            'error'
+                        );
+                    }
+                }, 
+                error: function(xhr) {
+                    Swal.fire(
+                        'Error!',
+                        'Terjadi kesalahan saat menghapus data',
+                        'error'
+                    );
+                }
+            });
+        }
+    });
+});

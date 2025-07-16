@@ -356,6 +356,7 @@ $routes->group('wo', function ($routes) {
     $routes->post('listdata', 'WorkOrderController::listdataWorkOrder',['filter' => 'accessControl:2']); 
     $routes->post('add', 'WorkOrderController::add',['filter' => 'accessControl:2']); 
     $routes->get('(:any)', 'WorkOrderController::wo/$1',['filter' => 'accessControl:2']); 
+    $routes->delete('delete/(:any)', 'WorkOrderController::deleteWO/$1',['filter' => 'accessControl:2']); 
    
 
 });
