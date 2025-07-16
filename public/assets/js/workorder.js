@@ -71,59 +71,42 @@ $(document).ready(function() {
 });
 });
 
-   $('.tambahInvoice').on('click', function() {
+  $('.tambahInvoice').on('click', function() {
     $.when(
-        $.ajax({
-            url: base_url + '/material/type_list',
-            method: 'POST',
-            dataType: 'json' // Expecting JSON response
-        }),
-        $.ajax({
-            url: base_url + '/material/satuan_list',
-            method: 'POST',
-            dataType: 'json' // Expecting JSON response
-        }),
         $.ajax({
             url: base_url + '/proformainvoice/get_list',
             method: 'POST',
-            dataType: 'json' // Expecting JSON response
+            dataType: 'json'
         })
-    ).done(function(typesResponse, satuanUkuranResponse,piResponse) {
-        // Debugging: Log the responses to check their structure
-             // Extract data
-        const typesData = typesResponse[0]; // Array of types
-        const satuanUkuranData = satuanUkuranResponse[0]; // Array of satuan ukuran
-        const piData = piResponse[0]; // Array of satuan ukuran
-
-        if (Array.isArray(typesData) && Array.isArray(satuanUkuranData) && Array.isArray(piData)) {
-            let typeOptions = typesData.map(type => `<option value="${type.id}">${type.nama}</option>`).join('');
+    ).done(function(piResponse) {
+        const piData = piResponse;
+        
+        if (Array.isArray(piData)) {
             let piOptions = piData.map(pi => `<option value="${pi.id}">${pi.invoice_number}</option>`).join('');
-            let satuanUkuranOptions = satuanUkuranData.map(satuan => `<option value="${satuan.id}">${satuan.nama}</option>`).join('');
 
             Swal.fire({
                 title: 'Tambah WO',
                 html: `
                     <form id="form_add_data">
-                    	<div class="form-group">
+                        <div class="form-group">
                             <label for="invoice_id">Proforma Invoice</label>
                             <select class="form-control" id="invoice_id">
+                            <option value="" selected disabled>Pilih Proforma Invoice</option>
                                 ${piOptions}
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="kode">Kode</label>
-                            <input type="text" class="form-control" id="kode" placeholder="Kode">
-
+                            <input type="text" class="form-control" id="kode" placeholder="Kode" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="namaMaterial">Start</label>
-                            <input type="date" class="form-control" id="start" >
+                            <label for="start">Start</label>
+                            <input type="date" class="form-control" id="start">
                         </div>
                         <div class="form-group">
-                            <label for="namaMaterial">End</label>
-                            <input type="date" class="form-control" id="end" >
+                            <label for="end">End</label>
+                            <input type="date" class="form-control" id="end">
                         </div>
-                       
                     </form>
                 `,
                 confirmButtonText: 'Confirm',
@@ -144,7 +127,7 @@ $(document).ready(function() {
                     $.ajax({
                         type: "POST",
                         url: base_url + 'wo/add',
-                        async : false,
+                        async: false,
                         data: {
                             invoice_id: result.value.invoice_id,
                             kode: result.value.kode,
@@ -152,7 +135,6 @@ $(document).ready(function() {
                             end: result.value.end
                         },
                         success: function(data) {
-                          
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',
@@ -161,8 +143,6 @@ $(document).ready(function() {
                                 timer: 1500
                             });
                             $('#tabel_serverside').DataTable().ajax.reload();
-                            // tabel()
-                            // $('#tabel_serverside').dataTable( ).api().ajax.reload();
                         },
                         error: function(xhr) {
                             let d = JSON.parse(xhr.responseText);
@@ -174,6 +154,16 @@ $(document).ready(function() {
                             });
                         }
                     });
+                }
+            });
+
+            // Auto-generate WO code when PI is selected
+            $('#invoice_id').on('change', function() {
+                const invoiceId = $(this).val();
+                if (invoiceId) {
+                    generateWoCode(invoiceId);
+                } else {
+                    $('#kode').val('');
                 }
             });
         } else {
@@ -193,3 +183,21 @@ $(document).ready(function() {
         });
     });
 });
+
+function generateWoCode(invoiceId) {
+    $.ajax({
+        url: base_url + '/generate/generateWoCode/' + invoiceId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.error) {
+                Swal.fire('Error', response.error, 'error');
+            } else {
+                $('#kode').val(response.code);
+            }
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Gagal generate kode WO', 'error');
+        }
+    });
+}

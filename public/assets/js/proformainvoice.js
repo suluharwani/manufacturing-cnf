@@ -88,22 +88,23 @@ function getCurrentDate() {
 }
 
 $('.tambahProformaInvoice').on('click', function () {
-    const currentDate =getCurrentDate();
+    const currentDate = getCurrentDate();
+    
     // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
     Swal.fire({
         title: `Tambah Proforma Invoice`,
         html: `
         <form id="form_add_data">
-            <div class="form-group">
-                <label for="kode">Kode</label>
-                <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-                <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
-            </div>
+            
             <div class="form-group">
                 <label for="customer">Customer</label>
                 <select id="customer" class="form-control">
                     <option value="">Pilih Customer</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="kode">Kode</label>
+                <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode" readonly>
             </div>
         </form>`,
         confirmButtonText: 'Confirm',
@@ -117,37 +118,47 @@ $('.tambahProformaInvoice').on('click', function () {
             return { kode: kode, customerId: customerId };
         }
     }).then((result) => {
-        $.ajax({
-            type: "POST",
-            url: base_url + '/proformainvoice/add',
-            async: false,
-            data: { invoice_number: result.value.kode, customer_id: result.value.customerId , invoice_date :currentDate},
-            success: function (data) {
-                 $('#tabel_serverside').DataTable().ajax.reload();
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: `Jenis barang berhasil ditambahkan.`,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            },
-            error: function (xhr) {
-                let d = JSON.parse(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: `${d.message}`,
-                    footer: '<a href="">Why do I have this issue?</a>'
-                });
-            }
-        });
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/proformainvoice/add',
+                async: false,
+                data: { 
+                    invoice_number: result.value.kode, 
+                    customer_id: result.value.customerId,
+                    invoice_date: currentDate
+                },
+                success: function (data) {
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: `Proforma Invoice berhasil ditambahkan.`,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function (xhr) {
+                    let d = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `${d.message}`,
+                        footer: '<a href="">Why do I have this issue?</a>'
+                    });
+                }
+            });
+        }
     });
 
-    // Menambahkan event listener pada tombol generate kode
-    $('#generateCode').on('click', function () {
-        const generatedCode = generateCode();
-        $('#kode').val(generatedCode);  // Set value ke input kode
+    // Generate code when customer is selected
+    $('#customer').on('change', function() {
+        const customerId = $(this).val();
+        if (customerId) {
+            generateCode(customerId);
+        } else {
+            $('#kode').val('');
+        }
     });
 
     // Menambahkan opsi customer ke select dropdown
@@ -158,23 +169,18 @@ $('.tambahProformaInvoice').on('click', function () {
     });
 });
 
-function generateCode() {
-    // Mendapatkan tanggal saat ini
-    const today = new Date();
-    
-    // Format tanggal: yymmdd
-    const year = today.getFullYear().toString().slice(-2); // Ambil 2 digit terakhir dari tahun
-    const month = ('0' + (today.getMonth() + 1)).slice(-2); // Bulan dalam format 2 digit
-    const day = ('0' + today.getDate()).slice(-2); // Hari dalam format 2 digit
-    
-    // Menghasilkan dua angka acak
-    const randomNum = Math.floor(Math.random() * 100); // Angka acak antara 0 dan 99
-    const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
-    
-    // Gabungkan semuanya menjadi format PIXXXXXXXX
-    const code = `PI${year}${month}${day}${randomNumStr}`;
-    
-    return code;
+function generateCode(customerId) {
+    $.ajax({
+        url: base_url + 'generate/generateCode/' + customerId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            $('#kode').val(response.code);
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Gagal generate kode', 'error');
+        }
+    });
 }
 
 function getCustomerOption() {

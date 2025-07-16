@@ -562,3 +562,8 @@ $routes->group('location', function($routes) {
     $routes->get('toggle-status/(:num)', 'Location::toggleStatus/$1');
     $routes->get('stock/(:num)', 'Location::viewStock/$1');
 });
+$routes->group('generate', function ($routes) {
+    $routes->get('generateCode/(:any)', 'Generate::generateCode/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
+    $routes->get('generateWoCode/(:any)', 'Generate::generateWoCode/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
+
+});
