@@ -321,7 +321,7 @@ $(document).on('click', '.bomFinishing', function () {
   
         // Buat opsi produk dari data yang diterima
         response.material.forEach(material => {
-          materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan})</option>`;
+          materialOptions += `<option value="${material.id}">${material.name} - ${material.nama_satuan}(${material.kode_satuan}) || kode: ${material.kode} </option>`;
         });
         orderMaterialHtml = getOrderMaterial(materialOptions,idProduct,idModul);
       
