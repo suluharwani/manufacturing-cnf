@@ -423,49 +423,41 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
 
         // Ambil semua material
         $materials = $this->db->table('materials')
+            ->select('materials.id as material_id, materials.kode as kode, materials.name as name')
             ->join('materials_detail md', 'md.material_id = materials.id', 'left')
-            ->where('materials.deleted_at', null)
             ->where('md.kite', 'KITE')
             ->get()
             ->getResultArray();
 
         $records = [];
-
+ 
 
         foreach ($materials as $material) {
             // Hitung saldo awal (dari bulan sebelumnya)
-            $saldoAwal = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_awal'] ?? 0;
-
-            // Hitung total pemasukan
-            $pemasukan = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_masuk'] ?? 0;
-
-            // Hitung total pengeluaran
-            $pengeluaran = $this->getSaldoBahanBaku($material['id'], $startDate)['stock_keluar'] ?? 0;
-
+            $saldo = $this->getSaldoBahanBaku($material['material_id']);
             // Hitung saldo akhir
-            $saldoAkhir = $saldoAwal + $pemasukan - $pengeluaran;
-
-            // Dapatkan satuan
-            $satuan = $this->db->table('materials_detail md')
-                ->select('sat.nama')
-                ->join('satuan sat', 'sat.id = md.satuan_id', 'left')
-                ->where('md.material_id', $material['id'])
-                ->get()
-                ->getRowArray();
+            $saldoawal = $saldo['stock_awal'] ?? 0;
+            $saldomasuk = $saldo['stock_masuk'] ?? 0;
+            $saldokeluar = $saldo['stock_keluar'] ?? 0;
+            
+            $saldoAkhir = $saldoawal + $saldomasuk - $saldokeluar;
+            
 
             $records[] = [
+                'material_id' => $material['material_id'],
                 'kode_barang' => $material['kode'],
                 'nama_barang' => $material['name'],
                 'satuan' => $satuan['nama'] ?? 'PCS',
-                'saldo_awal' => $saldoAwal,
-                'pemasukan' => $pemasukan,
-                'pengeluaran' => $pengeluaran,
+                'saldo_awal' => $saldoawal,
+                'pemasukan' => $saldomasuk,
+                'pengeluaran' => $saldokeluar,
                 'saldo_akhir' => $saldoAkhir,
-                'gudang' => 'Gudang Utama',
+                'gudang' => 'Logistik',
                 'periode' => $periode
             ];
         }
-
+        // var_dump($records);
+        // die();
         if (!empty($records)) {
             $this->db->table('laporan_mutasi_bahan_baku')->insertBatch($records);
             return count($records);
@@ -473,7 +465,20 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
 
         return 0;
     }
+    private function getSaldoBahanBaku($materialId)
+    {
 
+        $saldo = $this->db->table('stock')
+            ->select('stock.stock_awal, stock.stock_masuk, stock.stock_keluar, sat.nama as satuan')
+            ->join('materials_detail md', 'md.material_id = stock.id_material', 'left')
+            ->join('satuan sat', 'sat.id = md.satuan_id', 'left')
+            ->where('id_material', $materialId)
+            ->limit(1)
+            ->get()
+            ->getRowArray();
+
+        return $saldo;
+    }
     // Model untuk laporan mutasi hasil produksi
 public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
 {
@@ -632,17 +637,7 @@ public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
     }
 
     // Fungsi pembantu untuk menghitung saldo awal bahan baku
-    private function getSaldoBahanBaku($materialId, $startDate)
-    {
 
-        $saldo = $this->db->table('stock')
-            ->select('stock_awal, stock_masuk, stock_keluar')
-            ->where('id_material', $materialId)
-            ->get()
-            ->getRowArray();
-
-        return $saldo;
-    }
 
     // Fungsi pembantu untuk menghitung saldo awal hasil produksi
     private function getSaldoAwalHasilProduksi($productId, $locationId)
