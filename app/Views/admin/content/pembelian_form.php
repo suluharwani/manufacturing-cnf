@@ -170,7 +170,7 @@
           </div>
           <div class="mb-3">
             <label for="harga" class="form-label">Harga</label>
-            <input type="number" class="form-control" id="harga" required> <span> Cuurency: <?=$pembelian[0]['curr_code']  ?? '' .'-'.$pembelian[0]['curr_name']  ?? '' ?></span>
+            <input type="number" class="form-control" id="harga" required> <span> Curency: <?=$pembelian[0]['curr_code']  ?? '' .'-'.$pembelian[0]['curr_name']  ?? '' ?></span>
             <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']  ?? '' ?>" hidden>
             
           </div>

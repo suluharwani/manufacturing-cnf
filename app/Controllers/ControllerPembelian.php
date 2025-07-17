@@ -99,8 +99,8 @@ function pembelianForm($idPembelian){
     $MdlPembelianDetail = new MdlPembelianDetail();
 $dataPembelian = $MdlPembelian
                 ->select('purchase_order.code as po,pembelian.*, supplier.supplier_name, currency.id as curr_id, currency.kode as curr_code, currency.nama as curr_name')
-                ->join('supplier', 'supplier.id = pembelian.id_supplier')   
-                ->join('currency', 'currency.id = supplier.id_currency')    
+                ->join('supplier', 'supplier.id = pembelian.id_supplier','left')   
+                ->join('currency', 'currency.id = supplier.id_currency','left')    
                 ->join('purchase_order', 'purchase_order.id = pembelian.id_po', 'left')    
                 ->where('pembelian.id', $idPembelian)->get()->getResultArray();
 // $dataPembelianDetail = $MdlPembelianDetail
