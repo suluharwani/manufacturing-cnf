@@ -312,6 +312,7 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('importpo', 'ControllerPembelian::importpo',['filter' => 'accessControl:2']); 
     $routes->get('printGRN/(:any)', 'ControllerPembelian::printGRN/$1',['filter' => 'accessControl:2']); 
     $routes->post('form/material/update/(:any)', 'ControllerPembelian::updateMaterial/$1',['filter' => 'accessControl:2']); 
+    $routes->get('generateInvoice', 'ControllerPembelian::generateInvoice',['filter' => 'accessControl:2']); 
 
     
     
@@ -381,6 +382,7 @@ $routes->group('purchase', function ($routes) {
     $routes->post('deleteProduct/(:any)', 'PurchaseController::deleteProduct/$1',['filter' => 'accessControl:2']); 
     $routes->post('getMaterial/(:any)', 'PurchaseController::getMaterial/$1',['filter' => 'accessControl:2']); 
     $routes->post('updateMaterial/(:any)', 'PurchaseController::updateMaterial/$1',['filter' => 'accessControl:2']); 
+    $routes->get('generateCode', 'PurchaseController::generateCode',['filter' => 'accessControl:2']); 
     
 });
 
@@ -409,6 +411,7 @@ $routes->get('mr/(:any)', 'MaterialRequestController::mr/$1',['filter' => 'acces
 $routes->group('materialrequest', function ($routes) {
     // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
 
+    $routes->get('generateCode', 'MaterialRequestController::generateCode',['filter' => 'accessControl:2']); 
     $routes->post('materialRequest', 'MaterialRequestController::materialRequest',['filter' => 'accessControl:2']); 
     $routes->post('materialRequestList', 'MaterialRequestController::materialRequestList',['filter' => 'accessControl:2']); 
     $routes->get('material_request', 'MaterialRequestController::index',['filter' => 'accessControl:2']); 
@@ -490,6 +493,7 @@ $routes->group('requisitionprogress', function ($routes) {
 
 $routes->group('scrap', function ($routes) {
   
+    $routes->get('generateCode', 'ScrapController::generateCode',['filter' => 'accessControl:2']); 
     $routes->post('add', 'ScrapController::add',['filter' => 'accessControl:2']); 
     $routes->post('listdataScrap', 'ScrapController::listdataScrap',['filter' => 'accessControl:2']); 
     $routes->post('addScrap', 'ScrapController::addScrap',['filter' => 'accessControl:2']); 
@@ -567,4 +571,10 @@ $routes->group('generate', function ($routes) {
     $routes->get('generateCode/(:any)', 'Generate::generateCode/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
     $routes->get('generateWoCode/(:any)', 'Generate::generateWoCode/$1',['filter' => 'accessControl:2']); // Menghapus data finishing berdasarkan ID
 
+});
+$routes->group('bc-import', function($routes) {
+    $routes->get('/', 'BcImport::index');
+    $routes->get('form', 'BcImport::importForm');
+    $routes->post('process', 'BcImport::processImport');
+    $routes->get('detail/(:num)', 'BcImport::detail/$1');
 });

@@ -43,4 +43,29 @@ class MdlPembelian extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    // In MdlPembelian model
+public function generateInvoice()
+{
+    $prefix = 'GRN' . date('Ymd') . '-';
+    
+    // Get last invoice number for today
+    $lastInvoice = $this->select('invoice')
+                       ->like('invoice', $prefix, 'after')
+                       ->orderBy('invoice', 'DESC')
+                       ->first();
+    
+    if ($lastInvoice) {
+        // Extract and increment the sequential number
+        $lastNumber = (int) substr($lastInvoice['invoice'], strlen($prefix));
+        $sequential = $lastNumber + 1;
+    } else {
+        // First invoice of the day
+        $sequential = 1;
+    }
+    
+    // Format with leading zeros
+    $sequentialNumber = str_pad($sequential, 3, '0', STR_PAD_LEFT);
+    
+    return $prefix . $sequentialNumber;
+}
 }

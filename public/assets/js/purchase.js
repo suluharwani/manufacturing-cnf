@@ -76,100 +76,97 @@ $(document).ready(function() {
 
 });
 })
-$('.addPurchaseOrder').on('click', function () {
-    // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
-  const currentDate = new Date();
-const formattedDate = currentDate.toISOString().split('T')[0];
+$('.addPurchaseOrder').on('click', function() {
+    // Generate code first via AJAX
+    $.ajax({
+        url: base_url + '/purchase/generateCode',
+        type: 'GET',
+        async: false, // Synchronous to ensure we get the code first
+        success: function(response) {
+            showPurchaseOrderPopup(response.code);
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Gagal generate kode PO', 'error');
+        }
+    });
+});
+
+function showPurchaseOrderPopup(generatedCode) {
+    const currentDate = new Date().toISOString().split('T')[0];
+    
     Swal.fire({
         title: `Tambah Purchase Order`,
         html: `
         <form id="form_add_data">
             <div class="form-group">
-                <label for="kode">Kode</label>
-                <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-                <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
+                <label for="kode">Kode PO</label>
+                <input type="text" class="form-control" id="kode" value="${generatedCode}" readonly>
             </div>
             <div class="form-group">
                 <label for="supplier">Supplier</label>
-                <select id="supplier" class="form-control">
-                    <option value="">Pilih supplier</option>
+                <select id="supplier" class="form-control" required>
+                    <option value="">Pilih Supplier</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="date">Tanggal</label>
+                <input type="date" class="form-control" id="date" value="${currentDate}" required>
+            </div>
         </form>`,
-        confirmButtonText: 'Confirm',
+        confirmButtonText: 'Simpan',
         focusConfirm: false,
+        didOpen: () => {
+            // Load supplier options
+            getSupplierOption().then(options => {
+                $('#supplier').html('<option value="">Pilih Supplier</option>' + options);
+            }).catch(error => {
+                Swal.fire('Error', error, 'error');
+            });
+        },
         preConfirm: () => {
-            const kode = Swal.getPopup().querySelector('#kode').value;
-            const supplier = Swal.getPopup().querySelector('#supplier').value;
-            if (!kode || !supplier) {
-                Swal.showValidationMessage('Silakan lengkapi data');
+            const kode = $('#kode').val();
+            const supplier = $('#supplier').val();
+            const date = $('#date').val();
+
+            if (!kode || !supplier || !date) {
+                Swal.showValidationMessage('Harap lengkapi semua field yang wajib diisi');
+                return false;
             }
-            return { kode: kode, supplier: supplier};
+
+            return {
+                code: kode,
+                supplier_id: supplier,
+                date: date,
+                status: 0
+            };
         }
     }).then((result) => {
-        $.ajax({
-            type: "POST",
-            url: base_url + '/purchase/add_po',
-            async: false,
-            data: { code: result.value.kode, supplier_id: result.value.supplier, date:formattedDate, status :0  },
-            success: function (data) {
-                 $('#tabel_serverside').DataTable().ajax.reload();
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: `Jenis barang berhasil ditambahkan.`,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            },
-            error: function (xhr) {
-                let d = JSON.parse(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: `${d.message}`,
-                    footer: '<a href="">Why do I have this issue?</a>'
-                });
-            }
-        });
+        if (result.isConfirmed && result.value) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/purchase/add_po',
+                data: result.value,
+                success: function(response) {
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Purchase Order berhasil ditambahkan',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function(xhr) {
+                    const error = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: error.message || 'Terjadi kesalahan saat menyimpan PO'
+                    });
+                }
+            });
+        }
     });
-
-    // Menambahkan event listener pada tombol generate kode
-    $('#generateCode').on('click', function () {
-        const generatedCode = generateCode();
-        $('#kode').val(generatedCode);  // Set value ke input kode
-    });
-
-    // Menambahkan opsi customer ke select dropdown
-    // getCustomerOption().then(options => {
-    //     $('#customer').html(options); // Isi select dengan opsi customer
-    // }).catch(error => {
-    //     Swal.fire('Error', error, 'error');
-    // });
-        getSupplierOption().then(options => {
-        $('#supplier').html(options); // Isi select dengan opsi customer
-    }).catch(error => {
-        Swal.fire('Error', error, 'error');
-    });
-});
-
-function generateCode() {
-    // Mendapatkan tanggal saat ini
-    const today = new Date();
-    
-    // Format tanggal: yymmdd
-    const year = today.getFullYear().toString().slice(-2); // Ambil 2 digit terakhir dari tahun
-    const month = ('0' + (today.getMonth() + 1)).slice(-2); // Bulan dalam format 2 digit
-    const day = ('0' + today.getDate()).slice(-2); // Hari dalam format 2 digit
-    
-    // Menghasilkan dua angka acak
-    const randomNum = Math.floor(Math.random() * 100); // Angka acak antara 0 dan 99
-    const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
-    
-    // Gabungkan semuanya menjadi format PIXXXXXXXX
-    const code = `PO${year}${month}${day}${randomNumStr}`;
-    
-    return code;
 }
 
 function getSupplierOption() {

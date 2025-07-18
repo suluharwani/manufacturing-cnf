@@ -18,10 +18,17 @@
         <h2>Form Scrap</h2>
         <form>
           <div class="row mb-3">
-            <label for="invoice" class="col-md-3 col-form-label">Invoice</label>
+            <label for="invoice" class="col-md-3 col-form-label">Kode</label>
             <div class="col-md-9">
               <input type="text" class="form-control" value="<?= $scrap_doc[0]['pi'] ?>" id="invoice"
                 placeholder="Invoice" disabled>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="invoice" class="col-md-3 col-form-label">BC 2.4</label>
+            <div class="col-md-9">
+              <input type="text" class="form-control" value="<?= $scrap_doc[0]['document_bc'] ?>" id="document_bc"
+                disabled>
             </div>
           </div>
           <div class="row mb-3">

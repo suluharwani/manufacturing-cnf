@@ -73,19 +73,52 @@ class Laporan extends BaseController
     }
 
     // 1. Laporan Pemasukan Bahan Baku
-    protected function getPemasukanBahanBaku($startDate, $endDate)
-    {
-        $builder = $this->laporanModel->builder('laporan_pemasukan_bahan_baku');
-        
-        $builder->select("
-             tgl_rekam, jenis_dokumen, pabean_nomor, pabean_tanggal, kode_hs, nomor_seri_barang, bukti_penerimaan_nomor, bukti_penerimaan_tanggal, kode_bb, nama_barang, satuan, jumlah, mata_uang, nilai_barang, gudang, penerima_subkontrak, negara_asal_bb
-        ");
-        
-        $builder->where('bukti_penerimaan_tanggal >=', $startDate);
-        $builder->where('bukti_penerimaan_tanggal <=', $endDate);
-        
-        return $builder->get()->getResultArray();
+protected function getPemasukanBahanBaku($startDate, $endDate)
+{
+    $builder = $this->laporanModel->builder('laporan_pemasukan_bahan_baku');
+    
+    $builder->select("
+         tgl_rekam, 
+         jenis_dokumen, 
+         pabean_nomor, 
+         pabean_tanggal, 
+         kode_hs, 
+         nomor_seri_barang, 
+         bukti_penerimaan_nomor, 
+         bukti_penerimaan_tanggal, 
+         kode_bb, 
+         nama_barang, 
+         satuan, 
+         jumlah, 
+         mata_uang, 
+         nilai_barang, 
+         gudang, 
+         penerima_subkontrak, 
+         negara_asal_bb
+    ");
+    
+    $builder->where('bukti_penerimaan_tanggal >=', $startDate);
+    $builder->where('bukti_penerimaan_tanggal <=', $endDate);
+    
+    $results = $builder->get()->getResultArray();
+    
+    // Format the numbers
+    foreach ($results as &$row) {
+        $row['jumlah'] = $this->formatNumber($row['jumlah']);
+        $row['nilai_barang'] = $this->formatNumber($row['nilai_barang']);
     }
+    
+    return $results;
+}
+
+protected function formatNumber($number)
+{
+    // Format with thousand separators and 2 decimal places
+    $formatted = number_format((float)$number, 2, ',', '.');
+    
+    // Remove trailing zeros and decimal point if not needed
+    return preg_replace('/,00$/', '', $formatted);
+}
 
     // 2. Laporan Pemakaian Bahan Baku
     protected function getPemakaianBahanBaku($startDate, $endDate)
@@ -99,9 +132,9 @@ class Laporan extends BaseController
             nama_barang,
             satuan,
             jumlah,
-            digunakan,
-            disubkontrakkan,
-            penerima_subkontrak
+            null,
+            null,
+            '-'
         ");
         
         $builder->where('tanggal >=', $startDate);
@@ -122,8 +155,7 @@ class Laporan extends BaseController
             nama_barang,
             satuan,
             jumlah,
-            dari_produksi,
-            dari_subkontrak,
+            '0' as dari_subkontrak,
             gudang
         ");
         

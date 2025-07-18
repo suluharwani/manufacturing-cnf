@@ -12,7 +12,7 @@ class MdlScrapDoc extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ["id","code","id_dept","id_wo","id_user","remarks","created_at","updated_at","deleted_at","status"];
+    protected $allowedFields    = ["id","code","document_bc","id_dept","id_wo","id_user","remarks","created_at","updated_at","deleted_at","status"];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -43,4 +43,29 @@ class MdlScrapDoc extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public function generateCode()
+{
+    $prefix = 'SC' . date('Ymd') . '-';
+    
+    // Get the last code with today's prefix
+    $lastCode = $this->select('code')
+                     ->like('code', $prefix, 'after')
+                     ->orderBy('code', 'DESC')
+                     ->first();
+    
+    if ($lastCode) {
+        // Extract the sequential number and increment
+        $lastNumber = (int) substr($lastCode['code'], strlen($prefix));
+        $sequential = $lastNumber + 1;
+    } else {
+        // First code of the day
+        $sequential = 1;
+    }
+    
+    // Format the sequential number with leading zeros
+    $sequentialNumber = str_pad($sequential, 2, '0', STR_PAD_LEFT);
+    
+    return $prefix . $sequentialNumber;
+}
 }

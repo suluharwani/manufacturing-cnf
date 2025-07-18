@@ -462,9 +462,9 @@ function generateReport(reportType) {
 // Fungsi untuk generate tabel
 function generateTable(reportType, data) {
     const columns = {
-        1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
-        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
-        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+        1: ['No','Tgl Rekam', 'Jenis Dokumen','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Digunakan', 'Jumlah Subkontrak', 'Penerima Subkontrak'],
+        3: ['No', 'No. Pengeluaran Barang', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Dari Produksi', 'Jumlah Dari Subkontrak', 'Gudang'],
         4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
         5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
         6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],

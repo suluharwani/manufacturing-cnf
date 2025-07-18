@@ -115,114 +115,114 @@ function dateFormater(date) {
 }
 
 
-  $('.tambahMaterialRequest').on('click', function () {
-    // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
+$('.tambahMaterialRequest').on('click', function() {
+    // Generate code first via AJAX
+    $.ajax({
+        url: base_url + '/materialrequest/generateCode',
+        type: 'GET',
+        async: false, // Synchronous to ensure we get the code first
+        success: function(response) {
+            showMaterialRequestPopup(response.code);
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Gagal generate kode', 'error');
+        }
+    });
+});
+
+function showMaterialRequestPopup(generatedCode) {
     Swal.fire({
-        title: `Tambah Material Request Form`,
+        title: `Tambah Material Request`,
         html: `
         <form id="form_add_data">
             <div class="form-group">
                 <label for="kode">Kode</label>
-                <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-                <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
+                <input type="text" class="form-control" id="kode" value="${generatedCode}" readonly>
             </div>
             <div class="form-group">
                 <label for="proforma_invoice">Proforma Invoice</label>
-                <select id="proforma_invoice" class="form-control">
-                    <option value="">Proforma Invoice</option>
+                <select id="proforma_invoice" class="form-control" required>
+                    <option value="">Pilih Proforma Invoice</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="department">Department</label>
-                <select id="department" class="form-control">
+                <select id="department" class="form-control" required>
                     <option value="">Pilih Department</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="kode">Remarks</label>
-                <input type="text" class="form-control" id="remarks" aria-describedby="remarksHelp" placeholder="remarks">
+                <label for="remarks">Remarks</label>
+                <input type="text" class="form-control" id="remarks" required placeholder="Masukkan remarks">
             </div>
         </form>`,
-        confirmButtonText: 'Confirm',
+        confirmButtonText: 'Simpan',
         focusConfirm: false,
+        didOpen: () => {
+            // Load dropdown options
+            getPIOption().then(options => {
+                $('#proforma_invoice').html('<option value="">Pilih Proforma Invoice</option>' + options);
+            }).catch(error => {
+                Swal.fire('Error', error, 'error');
+            });
+
+            getDepartOption().then(options => {
+                $('#department').html('<option value="">Pilih Department</option>' + options);
+            }).catch(error => {
+                Swal.fire('Error', error, 'error');
+            });
+        },
         preConfirm: () => {
-            const kode = Swal.getPopup().querySelector('#kode').value;
-            const proforma_invoice = Swal.getPopup().querySelector('#proforma_invoice').value;
-            const department = Swal.getPopup().querySelector('#department').value;
-            const remarks = Swal.getPopup().querySelector('#remarks').value;
-            if (!kode || !department || !remarks) {
-                Swal.showValidationMessage('Silakan lengkapi data');
+            const kode = $('#kode').val();
+            const proforma_invoice = $('#proforma_invoice').val();
+            const department = $('#department').val();
+            const remarks = $('#remarks').val();
+
+            if (!kode) {
+                Swal.showValidationMessage('Harap lengkapi semua field yang wajib diisi');
+                return false;
             }
-            return {department:department, kode: kode, proforma_invoice: proforma_invoice , remarks:remarks };
+
+            return {
+                kode: kode,
+                dept_id: department,
+                id_pi: proforma_invoice,
+                remarks: remarks
+            };
         }
     }).then((result) => {
-        $.ajax({
-            type: "POST",
-            url: base_url + '/materialrequest/add',
-            async: false,
-            // 'kode','dept_id', 'id_pi', 'status', 'remarks',
-            data: { kode: result.value.kode, dept_id: result.value.department,id_pi:result.value.proforma_invoice,status:0, remarks:result.value.remarks },
-            success: function (data) {
-                 $('#tabel_serverside').DataTable().ajax.reload();
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: `Material request successfully added.`,
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            },
-            error: function (xhr) {
-                let d = JSON.parse(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: `${d.message}`,
-                    footer: '<a href="">Why do I have this issue?</a>'
-                });
-            }
-        });
+        if (result.isConfirmed && result.value) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/materialrequest/add',
+                data: {
+                    kode: result.value.kode,
+                    dept_id: result.value.dept_id,
+                    id_pi: result.value.id_pi,
+                    status: 0,
+                    remarks: result.value.remarks
+                },
+                success: function(response) {
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Material Request berhasil ditambahkan',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function(xhr) {
+                    const error = JSON.parse(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: error.message || 'Terjadi kesalahan saat menyimpan data'
+                    });
+                }
+            });
+        }
     });
-
-    // Menambahkan event listener pada tombol generate kode
-    $('#generateCode').on('click', function () {
-        const generatedCode = generateCode();
-        $('#kode').val(generatedCode);  // Set value ke input kode
-    });
-
-    // Menambahkan opsi customer ke select dropdown
-
-    getPIOption().then(PIoptions => {
-      console.log(PIoptions);
-      $('#proforma_invoice').html(PIoptions); // Isi select dengan opsi customer
-  }).catch(error => {
-      Swal.fire('Error', error, 'error');
-  });
-  getDepartOption().then(Departoptions => {
-    console.log(Departoptions);
-    $('#department').html(Departoptions); // Isi select dengan opsi customer
-}).catch(error => {
-    Swal.fire('Error', error, 'error');
-});
-});
-
-function generateCode() {
-  // Mendapatkan tanggal saat ini
-  const today = new Date();
-  
-  // Format tanggal: yymmdd
-  const year = today.getFullYear().toString().slice(-2); // Ambil 2 digit terakhir dari tahun
-  const month = ('0' + (today.getMonth() + 1)).slice(-2); // Bulan dalam format 2 digit
-  const day = ('0' + today.getDate()).slice(-2); // Hari dalam format 2 digit
-  
-  // Menghasilkan dua angka acak
-  const randomNum = Math.floor(Math.random() * 100); // Angka acak antara 0 dan 99
-  const randomNumStr = randomNum.toString().padStart(2, '0'); // Pastikan dua digit dengan menambahkan 0 di depan jika perlu
-  
-  // Gabungkan semuanya menjadi format PIXXXXXXXX
-  const code = `PR${year}${month}${day}${randomNumStr}`;
-  
-  return code;
 }
 
 function getSupplierOption() {

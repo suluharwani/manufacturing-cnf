@@ -339,6 +339,37 @@ public function updateMaterial($id){
         ]);
     }
 }
+// In Purchase controller
+public function generateCode()
+{
+    $model = new MdlPurchaseOrder();
+    $code = $model->generateCode();
+    
+    return $this->response->setJSON(['code' => $code]);
+}
 
+// public function add_po()
+// {
+//     $model = new MdlPurchaseOrder();
+    
+//     $data = [
+//         'code' => $this->request->getPost('code'),
+//         'supplier_id' => $this->request->getPost('supplier_id'),
+//         'date' => $this->request->getPost('date'),
+//         'status' => 0,
+//         'top' => 0, // Default value
+//         'vat' => 0, // Default value
+//         'remarks' => '' // Default value
+//     ];
+    
+//     if ($model->save($data)) {
+//         return $this->response->setJSON(['success' => true]);
+//     } else {
+//         return $this->response->setJSON([
+//             'success' => false,
+//             'message' => 'Gagal menyimpan Purchase Order'
+//         ]);
+//     }
+// }
 }
 

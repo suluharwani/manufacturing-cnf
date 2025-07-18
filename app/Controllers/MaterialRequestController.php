@@ -271,5 +271,12 @@ $dompdf = new Dompdf($options);
         // Output PDF ke browser tanpa mengunduh otomatis
         $dompdf->stream("PR_{$id}.pdf", ["Attachment" => false]);
     }
-
+// In MaterialRequest controller
+public function generateCode()
+{
+    $model = new \App\Models\MdlMaterialRequest();
+    $code = $model->generateCode();
+    
+    return $this->response->setJSON(['code' => $code]);
+}
 }

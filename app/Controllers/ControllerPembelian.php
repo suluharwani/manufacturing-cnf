@@ -723,4 +723,11 @@ $dompdf = new Dompdf($options);
         $dompdf->stream("GRN_{$id}.pdf", ["Attachment" => false]);
 
     }
+    public function generateInvoice()
+{
+    $model = new MdlPembelian();
+    $invoice = $model->generateInvoice();
+    
+    return $this->response->setJSON(['invoice' => $invoice]);
+}
 }

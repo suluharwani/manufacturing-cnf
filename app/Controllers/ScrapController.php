@@ -306,4 +306,12 @@ $dompdf = new Dompdf($options);
     // Output PDF ke browser tanpa mengunduh otomatis
     $dompdf->stream("scrap_{$id}.pdf", ["Attachment" => false]);
 }
+// In your controller
+public function generateCode()
+{
+    $model = new \App\Models\MdlScrapDoc();
+    $code = $model->generateCode();
+    
+    return $this->response->setJSON(['code' => $code]);
+}
 }

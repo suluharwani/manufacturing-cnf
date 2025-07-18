@@ -43,4 +43,29 @@ class MdlMaterialRequest extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+    // In MdlMaterialRequest model
+public function generateCode()
+{
+    $prefix = 'PR' . date('Y-m-d') . '-';
+    
+    // Cari nomor urut terakhir hari ini
+    $lastCode = $this->select('kode')
+                    ->like('kode', $prefix, 'after')
+                    ->orderBy('kode', 'DESC')
+                    ->first();
+    
+    if ($lastCode) {
+        // Ambil nomor urut dan increment
+        $lastNumber = (int) substr($lastCode['kode'], strlen($prefix));
+        $sequential = $lastNumber + 1;
+    } else {
+        // Jika belum ada kode hari ini
+        $sequential = 1;
+    }
+    
+    // Format nomor urut dengan leading zero
+    $sequentialNumber = str_pad($sequential, 3, '0', STR_PAD_LEFT);
+    
+    return $prefix . $sequentialNumber;
+}
 }

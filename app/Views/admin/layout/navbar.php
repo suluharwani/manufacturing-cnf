@@ -79,6 +79,7 @@
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('proformainvoice') ?>" class="dropdown-item">Proforma Invoice</a>
                     <a href="<?= base_url('work_order') ?>" class="dropdown-item">Work Orders</a>
+                    <a href="<?= base_url('bc-import') ?>" class="dropdown-item">BC Import</a>
 
                 </div>
             </div>

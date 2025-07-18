@@ -104,47 +104,65 @@ $('.tambahPembelian').click(function() {
   });
 
   // Menangani form submit di modal
-  $('#addPembelianForm').submit(function(event) {
+// Show modal with auto-generated invoice number
+$('#tambahPembelianModal').on('show.bs.modal', function() {
+    // Generate invoice number when modal opens
+    $.ajax({
+        url: base_url + '/pembelian/generateInvoice',
+        type: 'GET',
+        success: function(response) {
+            $('#invoice').val(response.invoice);
+        },
+        error: function() {
+            Swal.fire('Error', 'Failed to generate invoice number', 'error');
+        }
+    });
+});
+
+// Form submission
+$('#addPembelianForm').submit(function(event) {
     event.preventDefault();
 
-    // Ambil data dari form
-    var supplier = $('#supplier').val();
-    var invoice = $('#invoice').val();
-    var tanggal_nota = $('#tanggal_nota').val();
-    var pajak = $('#pajak').val();
-    var document = $('#document').val();
+    // Get form data
+    var formData = {
+        supplier: $('#supplier').val(),
+        invoice: $('#invoice').val(),
+        tanggal_nota: $('#tanggal_nota').val(),
+        pajak: $('#pajak').val(),
+        document: $('#document').val(),
+        status_pembayaran: 0, // Default value
+        posting: 0 // Default value
+    };
 
+    // Validate required fields
+    if (!formData.supplier || !formData.tanggal_nota) {
+        Swal.fire('Error', 'Supplier and Tanggal Nota are required', 'error');
+        return;
+    }
 
-    // Kirim data melalui AJAX ke server
+    // Send data to server
     $.ajax({
-      type: "POST",
-      url: base_url + "pembelian/addInvoice", // URL untuk menambahkan material (ganti dengan URL yang sesuai)
-      data: {
-        supplier: supplier,
-        invoice: invoice,
-        tanggal_nota: tanggal_nota,
-        pajak: pajak,
-        document: document
-      },
-      success: function(response) {
-        // Tampilkan pesan sukses jika berhasil menambahkan material
-        if(response.status === 'success') {
-          Swal.fire({
-            title: "success!",
-            text: "invoice Added!",
-            icon: "success"
-          });
-          $('#tambahPembelianModal').modal('hide'); 
-          $('#tabel_serverside').DataTable().ajax.reload();
-        } else {
-          alert('Error adding invoice');
+        type: "POST",
+        url: base_url + "pembelian/addInvoice",
+        data: formData,
+        success: function(response) {
+            if(response.status === 'success') {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Invoice added successfully!",
+                    icon: "success"
+                });
+                $('#tambahPembelianModal').modal('hide'); 
+                $('#tabel_serverside').DataTable().ajax.reload();
+            } else {
+                Swal.fire('Error', response.message || 'Error adding invoice', 'error');
+            }
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Error connecting to server', 'error');
         }
-      },
-      error: function() {
-        alert('Error connecting to server');
-      }
     });
-  });
+});
 
   
   function getSupplierOption() {

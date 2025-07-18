@@ -103,94 +103,124 @@ $(document).ready(function () {
 });
 
 $('.add').on('click', function () {
-  // Menampilkan SweetAlert dan menambahkan dynamic select option untuk customer
-  Swal.fire({
-      title: `Add Scrap Document`,
-      html: `
-      <form id="form_add_data">
-          <div class="form-group">
-              <label for="kode">Kode</label>
-              <input type="text" class="form-control" id="kode" aria-describedby="kodeHelp" placeholder="Kode">
-              <button type="button" id="generateCode" class="btn btn-primary mt-2">Generate Kode</button>
-          </div>
-         <div class="form-group">
-              <label for="department">department</label>
-              <select id="department" class="form-control">
-                  <option value="">Department</option>
-              </select>
-          </div>
-          <div class="form-group">
-              <label for="work_order">work_order</label>
-              <select id="work_order" class="form-control">
-                  <option value="">Work Order</option>
-              </select>
-          </div>
-          <div class="form-group">
-              <label for="kode">Remarks</label>
-              <input type="text" class="form-control" id="remarks" aria-describedby="remarksHelp" placeholder="remarks">
-          </div>
-      </form>`,
-      confirmButtonText: 'Confirm',
-      focusConfirm: false,
-      preConfirm: () => {
-          const kode = Swal.getPopup().querySelector('#kode').value;
-          const work_order = Swal.getPopup().querySelector('#work_order').value;
-          const department = Swal.getPopup().querySelector('#department').value;
-          const remarks = Swal.getPopup().querySelector('#remarks').value;
-          if (!kode || !work_order || !department || !remarks) {
-              Swal.showValidationMessage('Silakan lengkapi data');
-          }
-          return {department:department, kode: kode,  work_order:work_order , remarks:remarks };
-      }
-  }).then((result) => {
-      $.ajax({
-          type: "POST",
-          url: base_url + '/scrap/add',
-          async: false,
-          // 'kode','dept_id', 'id_pi', 'status', 'remarks',
-          data: { code: result.value.kode, id_dept: result.value.department, id_wo:result.value.work_order, status:0, remarks:result.value.remarks },
-          success: function (data) {
-               $('#tabel_serverside').DataTable().ajax.reload();
-              Swal.fire({
-                  position: 'center',
-                  icon: 'success',
-                  title: `Scrap successfully added.`,
-                  showConfirmButton: false,
-                  timer: 1500
-              });
-          },
-          error: function (xhr) {
-              let d = JSON.parse(xhr.responseText);
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: `${d.message}`,
-                  footer: '<a href="">Why do I have this issue?</a>'
-              });
-          }
-      });
-  });
-
-  // Menambahkan event listener pada tombol generate kode
-  $('#generateCode').on('click', function () {
-      const generatedCode = generateCode();
-      $('#kode').val(generatedCode);  // Set value ke input kode
-  });
-
-  // Menambahkan opsi customer ke select dropdown
-  getWOOption().then(options => {
-      $('#work_order').html(options); // Isi select dengan opsi customer
-  }).catch(error => {
-      Swal.fire('Error', error, 'error');
-  });
-  getDepartOption().then(Departoptions => {
-    console.log(Departoptions);
-    $('#department').html(Departoptions); // Isi select dengan opsi customer
-}).catch(error => {
-    Swal.fire('Error', error, 'error');
+    // Generate code first before showing the popup
+    $.ajax({
+        url: base_url + '/scrap/generateCode',
+        type: 'GET',
+        async: false, // Make synchronous to ensure we have the code before showing popup
+        success: function(response) {
+            // After getting the code, show the popup
+            showAddPopup(response.code);
+        },
+        error: function(xhr) {
+            Swal.fire('Error', 'Failed to generate code', 'error');
+        }
+    });
 });
 
-});
+function showAddPopup(generatedCode) {
+    Swal.fire({
+        title: `Add Scrap Document`,
+        html: `
+        <form id="form_add_data">
+            <div class="form-group">
+                <label for="kode">Kode</label>
+                <input type="text" class="form-control" id="kode" value="${generatedCode}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="department" class="form-control" required>
+                    <option value="">Select Department</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="work_order">Work Order</label>
+                <select id="work_order" class="form-control" required>
+                    <option value="">Select Work Order</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="document_bc_2_4">Document BC 2.4</label>
+                <input type="text" class="form-control" id="document_bc_2_4" required placeholder="Enter BC 2.4 Document">
+            </div>
+            <div class="form-group">
+                <label for="remarks">Remarks</label>
+                <input type="text" class="form-control" id="remarks" required placeholder="Enter Remarks">
+            </div>
+        </form>`,
+        confirmButtonText: 'Submit',
+        focusConfirm: false,
+        didOpen: () => {
+            // Load departments using your existing function
+            getDepartOption().then(Departoptions => {
+                $('#department').html(Departoptions);
+            }).catch(error => {
+                Swal.fire('Error', error, 'error');
+            });
+
+            // Load work orders using your existing function
+            getWOOption().then(options => {
+                $('#work_order').html(options);
+            }).catch(error => {
+                Swal.fire('Error', error, 'error');
+            });
+        },
+        preConfirm: () => {
+            const kode = Swal.getPopup().querySelector('#kode').value;
+            const work_order = Swal.getPopup().querySelector('#work_order').value;
+            const department = Swal.getPopup().querySelector('#department').value;
+            const document_bc_2_4 = Swal.getPopup().querySelector('#document_bc_2_4').value;
+            const remarks = Swal.getPopup().querySelector('#remarks').value;
+            
+            if (!kode || !work_order || !department || !document_bc_2_4 || !remarks) {
+                Swal.showValidationMessage('Please complete all fields');
+                return false;
+            }
+            
+            return { 
+                code: kode,
+                id_dept: department,
+                id_wo: work_order,
+                document_bc: document_bc_2_4,
+                remarks: remarks 
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            $.ajax({
+                type: "POST",
+                url: base_url + '/scrap/add',
+                data: result.value,
+                success: function (response) {
+                    $('#tabel_serverside').DataTable().ajax.reload();
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Scrap document added successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function (xhr) {
+                    if (xhr.status === 500) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No changes were made to the data'
+                        });
+                    } else {
+                        let error = JSON.parse(xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || 'An error occurred'
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
 
 function getDepartOption() {
   return new Promise((resolve, reject) => {
