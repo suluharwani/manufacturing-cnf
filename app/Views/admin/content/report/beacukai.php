@@ -232,6 +232,26 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Laporan 8 -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 card-report">
+                            <div class="card-body">
+                                <h5 class="h5">LAPORAN PEMAKAIAN BARANG DALAM PROSES DALAM RANGKA KEGIATAN SUBKONTRAK</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Dari Tanggal</label>
+                                    <input type="date" class="form-control" id="startDate8">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sampai Tanggal</label>
+                                    <input type="date" class="form-control" id="endDate8">
+                                </div>
+                                <button class="btn btn-dark w-100" onclick="generateReport(8)">
+                                    <span id="loading8" class="spinner-border spinner-border-sm d-none"></span>
+                                    Tampilkan Laporan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <button class="btn btn-generate-all btn-lg w-100" onclick="deleteAllReports()">
                                     <span id="loadingAll" class="spinner-border spinner-border-sm d-none"></span>
                                     HAPUS SEMUA LAPORAN
@@ -277,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const formatDate = (date) => date.toISOString().split('T')[0];
     
     // Set untuk semua input tanggal
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 8; i++) {
         $(`#startDate${i}`).val(formatDate(lastMonth));
         $(`#endDate${i}`).val(formatDate(today));
     }
@@ -390,7 +410,8 @@ function generateReport(reportType) {
         4: 'LAPORAN PENGELUARAN HASIL PRODUKSI',
         5: 'LAPORAN MUTASI BAHAN BAKU',
         6: 'LAPORAN MUTASI HASIL PRODUKSI',
-        7: 'LAPORAN WASTE/SCRAP'
+        7: 'LAPORAN WASTE/SCRAP',
+        8: 'LAPORAN PEMAKAIAN BARANG DALAM PROSES DALAM RANGKA KEGIATAN SUBKONTRAK'
     };
     
     $('#reportTitle').text(reportTitles[reportType]);
@@ -462,13 +483,14 @@ function generateReport(reportType) {
 // Fungsi untuk generate tabel
 function generateTable(reportType, data) {
     const columns = {
-        1: ['No','Tgl Rekam', 'Jenis Dokumen','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
-        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Digunakan', 'Jumlah Subkontrak', 'Penerima Subkontrak'],
-        3: ['No', 'No. Pengeluaran Barang', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Dari Produksi', 'Jumlah Dari Subkontrak', 'Gudang'],
-        4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
+        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+        4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
         5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
         6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
-        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai']
+        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        8: ['No', 'No Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Disubkontrakkan', 'Penerima']
     };
 
     let tableHTML = `<div class="table-responsive"><table class="table table-bordered table-striped"><thead><tr>`;
@@ -508,10 +530,11 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
             1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
             2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
             3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
-            4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+            4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
             5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
             6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
-            7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai']
+            7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+            8: ['No', 'No Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Disubkontrakkan', 'Penerima']        
         };
         
         const reportTitles = {
@@ -521,7 +544,8 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
             4: 'LAPORAN PENGELUARAN HASIL PRODUKSI',
             5: 'LAPORAN MUTASI BAHAN BAKU',
             6: 'LAPORAN MUTASI HASIL PRODUKSI',
-            7: 'LAPORAN WASTE/SCRAP'
+            7: 'LAPORAN WASTE/SCRAP',
+            8: 'LAPORAN PEMAKAIAN BARANG DALAM PROSES DALAM RANGKA KEGIATAN SUBKONTRAK'
         };
         
         const title = reportTitles[reportType];
@@ -660,10 +684,11 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
         1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
         2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
         3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
-        4: ['No', 'No. PEB', 'Tanggal', 'Penerima', 'Negara', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
         5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
         6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
-        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai']
+        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        8: ['No', 'No Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Disubkontrakkan', 'Penerima']
     };
     
     const reportTitles = {
@@ -673,7 +698,8 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
         4: 'LAPORAN_PENGELUARAN_HASIL_PRODUKSI',
         5: 'LAPORAN_MUTASI_BAHAN_BAKU',
         6: 'LAPORAN_MUTASI_HASIL_PRODUKSI',
-        7: 'LAPORAN_WASTE_SCRAP'
+        7: 'LAPORAN_WASTE_SCRAP',
+        8: 'LAPORAN_PEMAKAIAN_BARANG_SUBKONTRAK'
     };
     
     const title = reportTitles[reportType];

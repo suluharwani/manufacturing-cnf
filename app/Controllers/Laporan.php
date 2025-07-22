@@ -52,6 +52,9 @@ class Laporan extends BaseController
                 case 7:
                     $data = $this->getWasteScrap($startDate, $endDate);
                     break;
+                case 8:
+                    $data = [];
+                    break;
                 default:
                     return $this->response->setJSON([
                         'status' => 'error',
@@ -173,13 +176,16 @@ protected function formatNumber($number)
     $builder->select("
         no_peb,
         tanggal_peb,
+        no_bukti_pengeluaran,
+        tanggal_bukti,
         pembeli_penerima,
         negara_tujuan,
         kode_barang,
         nama_barang,
         'PCS' as satuan,
         jumlah,
-        CONCAT(mata_uang, ' ', FORMAT(nilai_barang, 2)) AS nilai_uang
+        mata_uang,
+        FORMAT(nilai_barang, 2) AS nilai_uang
     ");
     
     // Format start date (pastikan sudah dalam format Y-m-d)
