@@ -76,6 +76,33 @@ $(document).ready(function() {
   }
 
 });
+$(document).on('click', '.deleteInvoice', function() {
+    const id = $(this).attr('id');
+    const invoice = $(this).attr('invoice');
+    Swal.fire({
+      title: 'Anda yakin ingin menghapus invoice: '+invoice+'?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: base_url + '/pembelian/deleteinvoice', 
+          type: 'post',
+          data: { id: id },
+          success: function(response) {
+            Swal.fire('Dihapus!', response.message, 'success');
+            $('#tabel_serverside').DataTable().ajax.reload();
+          },
+          error: function(xhr) {
+            let d = JSON.parse(xhr.responseText);
+            Swal.fire('Oops...', d.message, 'error');
+          }
+        });
+      }
+    });
+  });
 })
 
 function formatNumber(number) {
@@ -189,31 +216,4 @@ $('#addPembelianForm').submit(function(event) {
     });
   } 
 
-          $('#tabel_serverside').on('click','.deleteInvoice',function(){
-                const id = $(this).attr('id');
-                const invoice = $(this).attr('invoice');
-                Swal.fire({
-                    title: 'Anda yakin ingin menghapus invoice: '+invoice+'?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Hapus',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: base_url + '/pembelian/deleteinvoice', 
-                            type: 'post',
-                            data: { id: id },
-                            success: function(response) {
-                                Swal.fire('Dihapus!', response.message, 'success');
-                                $('#tabel_serverside').DataTable().ajax.reload();
-
-                            },
-                            error: function(xhr) {
-                                let d = JSON.parse(xhr.responseText);
-                                Swal.fire('Oops...', d.message, 'error');
-                            }
-                        });
-                    }
-                });
-            });
+        

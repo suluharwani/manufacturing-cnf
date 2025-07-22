@@ -504,7 +504,9 @@ $routes->group('scrap', function ($routes) {
     $routes->post('deleteList/(:any)', 'ScrapController::deleteList/$1',['filter' => 'accessControl:2']); 
     $routes->post('posting/(:any)', 'ScrapController::posting/$1',['filter' => 'accessControl:2']); 
     $routes->get('printScrap/(:any)', 'ScrapController::printScrap/$1',['filter' => 'accessControl:2']); 
-    
+    // app/Config/Routes.php
+
+    $routes->delete('delete/(:num)', 'ScrapController::delete/$1',['filter' => 'accessControl:2']); 
     
 });
 

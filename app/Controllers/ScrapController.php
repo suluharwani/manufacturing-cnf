@@ -314,4 +314,64 @@ public function generateCode()
     
     return $this->response->setJSON(['code' => $code]);
 }
+// app/Controllers/Scrap.php
+
+public function delete($id)
+{
+    // Only allow AJAX requests
+    if (!$this->request->isAJAX()) {
+        return $this->response->setStatusCode(405)->setJSON([
+            'status' => 'error',
+            'message' => 'Method Not Allowed'
+        ]);
+    }
+
+    // Check if document exists
+    $scrapModel = new \App\Models\MdlScrapDoc();
+    $scrap = $scrapModel->find($id);
+    
+    if (!$scrap) {
+        return $this->response->setStatusCode(404)->setJSON([
+            'status' => 'error',
+            'message' => 'Scrap document not found'
+        ]);
+    }
+
+    // Check if document is already posted (prevent deletion if posted)
+    if ($scrap['status'] == 1) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Cannot delete posted scrap document'
+        ]);
+    }
+
+    // Begin transaction
+    $db = \Config\Database::connect();
+    $db->transBegin();
+
+    try {
+        // First delete related items if any
+        $scrapItemModel = new \App\Models\MdlScrap();
+        $scrapItemModel->where('scrap_doc_id', $id)->delete();
+
+        // Then delete the main document
+        $scrapModel->delete($id);
+
+        // Commit transaction
+        $db->transCommit();
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Scrap document deleted successfully'
+        ]);
+    } catch (\Exception $e) {
+        // Rollback transaction on error
+        $db->transRollback();
+        
+        return $this->response->setStatusCode(500)->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to delete scrap document: ' . $e->getMessage()
+        ]);
+    }
+}
 }

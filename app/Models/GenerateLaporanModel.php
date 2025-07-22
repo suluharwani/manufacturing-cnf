@@ -609,7 +609,7 @@ public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
     {
         $builder = $this->db->table('scrap s');
         $builder->select("
-            sd.code as no_bc24,
+            sd.document_bc as no_bc24,
             s.created_at as tanggal,
             m.kode as kode_barang,
             m.name as nama_barang,
@@ -625,6 +625,7 @@ public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
         $builder->where('s.created_at >=', $startDate);
         $builder->where('s.created_at <=', $endDate);
         $builder->where('s.deleted_at', null);
+        $builder->where('sd.status', 1);
 
         $results = $builder->get()->getResultArray();
 

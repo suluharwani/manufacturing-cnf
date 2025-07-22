@@ -76,7 +76,7 @@ $(document).ready(function () {
         mRender: function (data, type, row) {
           if(row[6] == 0){
             return `<a href="${base_url}scrap/form/${row[1]}"  class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>
-                  <a href="javascript:void(0);"  class="btn btn-danger btn-sm delete" id="'+row[1]+'" >Delete</a>`;
+                  <a href="javascript:void(0);"  class="btn btn-danger btn-sm delete" id="${row[1]}" >Delete</a>`;
 
           }else{
             return `<a href="${base_url}scrap/form/${row[1]}"  class="btn btn-success btn-sm detail" id="'+row[1]+'" >Detail</a>`
@@ -286,3 +286,51 @@ function getWOOption() {
     });
   });
 }
+// Tambahkan event handler untuk tombol delete
+$(document).on('click', '.delete', function() {
+    const id = $(this).attr('id');
+    const row = $(this).closest('tr');
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: base_url + 'scrap/delete/' + id,
+                type: 'DELETE',
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your scrap document has been deleted.',
+                            'success'
+                        );
+                        // Reload datatable
+                        $('#tabel_serverside').DataTable().ajax.reload();
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message || 'Failed to delete scrap document',
+                            'error'
+                        );
+                    }
+                },
+                error: function(xhr) {
+                    let error = JSON.parse(xhr.responseText);
+                    Swal.fire(
+                        'Error!',
+                        error.message || 'Something went wrong',
+                        'error'
+                    );
+                }
+            });
+        }
+    });
+});
