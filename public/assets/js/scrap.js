@@ -1,7 +1,29 @@
 var loc = window.location;
 var base_url =
   loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/";
+function formatIndonesianDateTime(datetimeString) {
+  const date = new Date(datetimeString);
+  
+  // Jika tanggal tidak valid
+  if (isNaN(date.getTime())) {
+    return 'Tanggal tidak valid';
+  }
 
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  const dayName = days[date.getDay()];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  
+
+
+  return `${dayName}, ${day} ${month} ${year}`;
+}
 $(document).ready(function () {
   var dataTable = $("#tabel_serverside").DataTable({
     processing: true,
@@ -42,6 +64,11 @@ $(document).ready(function () {
 
     columns: [
       {},
+      {
+        mRender: function (data, type, row) {
+          return formatIndonesianDateTime(row[7]);
+        },
+      },
       {
         mRender: function (data, type, row) {
           return row[2];

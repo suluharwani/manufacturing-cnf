@@ -64,12 +64,14 @@ $dataScrapDoc = $Mdl
         // Column Order Must Match Header Columns in View
         $column_order = array(
             NULL, 
+            'scrap_doc.created_at',
             'proforma_invoice.invoice_number', 
             'work_order.kode', 
             'scrap_doc.id',
             'scrap_doc.start',
             'scrap_doc.end',
             'scrap_doc.id',
+            
         );
         $column_search = array(
             'scrap_doc.nama', 
@@ -93,6 +95,7 @@ $dataScrapDoc = $Mdl
             $row[] = $lists->code;
             $row[] = $lists->dept_name;
             $row[] = $lists->status;
+            $row[] = $lists->created_at;
 
 // From joined suppliers table
             $data[] = $row;

@@ -28,6 +28,7 @@
               <thead>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">DATE</th>
                   <th style=" text-align: center;">PI</th>
                   <th style=" text-align: center;">WO</th>
                   <th style=" text-align: center;">DEPARTMENT</th>
@@ -39,6 +40,7 @@
               <tfoot>
                 <tr  class="text-center">
                   <th style=" text-align: center;">#</th>
+                  <th style=" text-align: center;">DATE</th>
                   <th style=" text-align: center;">PI</th>
                   <th style=" text-align: center;">WO</th>
                   <th style=" text-align: center;">DEPARTMENT</th>
