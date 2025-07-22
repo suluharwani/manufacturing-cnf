@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'App\\Controllers\\BaseController' => $baseDir . '/app/Controllers/BaseController.php',
+    'App\\Controllers\\BcImport' => $baseDir . '/app/Controllers/BcImport.php',
     'App\\Controllers\\Changelog' => $baseDir . '/app/Controllers/Changelog.php',
     'App\\Controllers\\CheckAccess' => $baseDir . '/app/Controllers/CheckAccess.php',
     'App\\Controllers\\ControllerPembelian' => $baseDir . '/app/Controllers/ControllerPembelian.php',
@@ -14,6 +15,7 @@ return array(
     'App\\Controllers\\DashboardController' => $baseDir . '/app/Controllers/DashboardController.php',
     'App\\Controllers\\DepartmentController' => $baseDir . '/app/Controllers/DepartmentController.php',
     'App\\Controllers\\FinishingController' => $baseDir . '/app/Controllers/FinishingController.php',
+    'App\\Controllers\\Generate' => $baseDir . '/app/Controllers/Generate.php',
     'App\\Controllers\\GenerateLaporanController' => $baseDir . '/app/Controllers/GenerateLaporanController.php',
     'App\\Controllers\\Home' => $baseDir . '/app/Controllers/Home.php',
     'App\\Controllers\\Homepage' => $baseDir . '/app/Controllers/Homepage.php',
@@ -50,6 +52,10 @@ return array(
     'App\\Filters\\AuthFilter' => $baseDir . '/app/Filters/AuthFilter.php',
     'App\\Models\\AllowanceModel' => $baseDir . '/app/Models/AllowanceModel.php',
     'App\\Models\\AttendanceModel' => $baseDir . '/app/Models/AttendanceModel.php',
+    'App\\Models\\BcBarangModel' => $baseDir . '/app/Models/BcBarangModel.php',
+    'App\\Models\\BcDokumenModel' => $baseDir . '/app/Models/BcDokumenModel.php',
+    'App\\Models\\BcEntitasModel' => $baseDir . '/app/Models/BcEntitasModel.php',
+    'App\\Models\\BcHeaderModel' => $baseDir . '/app/Models/BcHeaderModel.php',
     'App\\Models\\DeductionModel' => $baseDir . '/app/Models/DeductionModel.php',
     'App\\Models\\FinishingModel' => $baseDir . '/app/Models/FinishingModel.php',
     'App\\Models\\GenerateLaporanModel' => $baseDir . '/app/Models/GenerateLaporanModel.php',

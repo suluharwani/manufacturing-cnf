@@ -312,7 +312,7 @@ $routes->group('pembelian', ['namespace' => 'App\Controllers'], function ($route
     $routes->post('importpo', 'ControllerPembelian::importpo',['filter' => 'accessControl:2']); 
     $routes->get('printGRN/(:any)', 'ControllerPembelian::printGRN/$1',['filter' => 'accessControl:2']); 
     $routes->post('form/material/update/(:any)', 'ControllerPembelian::updateMaterial/$1',['filter' => 'accessControl:2']); 
-    $routes->get('generateInvoice', 'ControllerPembelian::generateInvoice',['filter' => 'accessControl:2']); 
+    $routes->get('generateGrnNumber/(:any)', 'ControllerPembelian::generateGrnNumber/$1',['filter' => 'accessControl:2']); 
 
     
     

@@ -723,11 +723,16 @@ $dompdf = new Dompdf($options);
         $dompdf->stream("GRN_{$id}.pdf", ["Attachment" => false]);
 
     }
-    public function generateInvoice()
+
+// In your Pembelian controller
+public function generateGrnNumber($supplierId)
 {
-    $model = new MdlPembelian();
-    $invoice = $model->generateInvoice();
+    $pembelianModel = new MdlPembelian();
+    $grnNumber = $pembelianModel->generateInvoice($supplierId);
     
-    return $this->response->setJSON(['invoice' => $invoice]);
+    return $this->response->setJSON([
+        'success' => true,
+        'grnNumber' => $grnNumber
+    ]);
 }
 }

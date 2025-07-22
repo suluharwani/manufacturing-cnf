@@ -179,6 +179,7 @@ class ComposerStaticInit6d1daeb62045cc4cf36738de2dc00d22
 
     public static $classMap = array (
         'App\\Controllers\\BaseController' => __DIR__ . '/../..' . '/app/Controllers/BaseController.php',
+        'App\\Controllers\\BcImport' => __DIR__ . '/../..' . '/app/Controllers/BcImport.php',
         'App\\Controllers\\Changelog' => __DIR__ . '/../..' . '/app/Controllers/Changelog.php',
         'App\\Controllers\\CheckAccess' => __DIR__ . '/../..' . '/app/Controllers/CheckAccess.php',
         'App\\Controllers\\ControllerPembelian' => __DIR__ . '/../..' . '/app/Controllers/ControllerPembelian.php',
@@ -186,6 +187,7 @@ class ComposerStaticInit6d1daeb62045cc4cf36738de2dc00d22
         'App\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Controllers/DashboardController.php',
         'App\\Controllers\\DepartmentController' => __DIR__ . '/../..' . '/app/Controllers/DepartmentController.php',
         'App\\Controllers\\FinishingController' => __DIR__ . '/../..' . '/app/Controllers/FinishingController.php',
+        'App\\Controllers\\Generate' => __DIR__ . '/../..' . '/app/Controllers/Generate.php',
         'App\\Controllers\\GenerateLaporanController' => __DIR__ . '/../..' . '/app/Controllers/GenerateLaporanController.php',
         'App\\Controllers\\Home' => __DIR__ . '/../..' . '/app/Controllers/Home.php',
         'App\\Controllers\\Homepage' => __DIR__ . '/../..' . '/app/Controllers/Homepage.php',
@@ -222,6 +224,10 @@ class ComposerStaticInit6d1daeb62045cc4cf36738de2dc00d22
         'App\\Filters\\AuthFilter' => __DIR__ . '/../..' . '/app/Filters/AuthFilter.php',
         'App\\Models\\AllowanceModel' => __DIR__ . '/../..' . '/app/Models/AllowanceModel.php',
         'App\\Models\\AttendanceModel' => __DIR__ . '/../..' . '/app/Models/AttendanceModel.php',
+        'App\\Models\\BcBarangModel' => __DIR__ . '/../..' . '/app/Models/BcBarangModel.php',
+        'App\\Models\\BcDokumenModel' => __DIR__ . '/../..' . '/app/Models/BcDokumenModel.php',
+        'App\\Models\\BcEntitasModel' => __DIR__ . '/../..' . '/app/Models/BcEntitasModel.php',
+        'App\\Models\\BcHeaderModel' => __DIR__ . '/../..' . '/app/Models/BcHeaderModel.php',
         'App\\Models\\DeductionModel' => __DIR__ . '/../..' . '/app/Models/DeductionModel.php',
         'App\\Models\\FinishingModel' => __DIR__ . '/../..' . '/app/Models/FinishingModel.php',
         'App\\Models\\GenerateLaporanModel' => __DIR__ . '/../..' . '/app/Models/GenerateLaporanModel.php',

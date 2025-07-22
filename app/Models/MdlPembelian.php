@@ -44,12 +44,16 @@ class MdlPembelian extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
     // In MdlPembelian model
-public function generateInvoice()
+
+// In MdlPembelian model
+public function generateInvoice($supplierId)
 {
-    $prefix = 'GRN' . date('Ymd') . '-';
+    $today = date('Ymd');
+    $prefix = "GRN{$supplierId}-{$today}-";
     
-    // Get last invoice number for today
+    // Get last invoice number for this supplier today
     $lastInvoice = $this->select('invoice')
+                       ->where('id_supplier', $supplierId)
                        ->like('invoice', $prefix, 'after')
                        ->orderBy('invoice', 'DESC')
                        ->first();
@@ -59,11 +63,11 @@ public function generateInvoice()
         $lastNumber = (int) substr($lastInvoice['invoice'], strlen($prefix));
         $sequential = $lastNumber + 1;
     } else {
-        // First invoice of the day
+        // First invoice of the day for this supplier
         $sequential = 1;
     }
     
-    // Format with leading zeros
+    // Format with leading zeros (3 digits)
     $sequentialNumber = str_pad($sequential, 3, '0', STR_PAD_LEFT);
     
     return $prefix . $sequentialNumber;

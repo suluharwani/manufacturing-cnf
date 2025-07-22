@@ -70,8 +70,8 @@
           </div>
 
           <div class="mb-3">
-            <label for="materialQty" class="form-label">Document Number</label>
-            <input type="text" class="form-control" id="invoice" required>
+            <label for="materialQty" class="form-label">GRN Number</label>
+            <input type="text" class="form-control" id="invoice" required disabled>
           </div>
           <div class="mb-3">
             <label for="tanggal_nota" class="form-label">Tanggal Nota</label>
@@ -92,7 +92,27 @@
   </div>
 </div>
 <!-- Widgets Start -->
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const supplierSelect = document.getElementById('supplier');
+    const invoiceInput = document.getElementById('invoice');
+    
+    supplierSelect.addEventListener('change', function() {
+        const supplierId = this.value;
+        if (supplierId) {
+            // Call AJAX to generate GRN number
+            fetch(`/pembelian/generateGrnNumber/${supplierId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.grnNumber) {
+                        invoiceInput.value = data.grnNumber;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+});
+</script>
 <!-- Widgets End -->
 
 <script type="text/javascript" src="<?= base_url('assets') ?>/js/pembelian.js"></script>
