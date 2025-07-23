@@ -484,8 +484,8 @@ function generateReport(reportType) {
 function generateTable(reportType, data) {
     const columns = {
         1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
-        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
-        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Digunakan', 'Subkontrak', 'Penerima'],
+        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Produksi', 'Jumlah Subkontrak', 'Gudang'],
         4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
         5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
         6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
@@ -528,13 +528,13 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
         // Define columns for each report type
         const columns = {
             1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
-            2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
-            3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
-            4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
-            5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
-            6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
-            7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
-            8: ['No', 'No Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Disubkontrakkan', 'Penerima']        
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Digunakan', 'Subkontrak', 'Penerima'],
+        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Produksi', 'Jumlah Subkontrak', 'Gudang'],
+        4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
+        5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+        6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
+        7: ['No', 'No. BC 2.4', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Nilai'],
+        8: ['No', 'No Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Disubkontrakkan', 'Penerima']    
         };
         
         const reportTitles = {
@@ -682,8 +682,8 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
     // Define columns for each report type
     const columns = {
         1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
-        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Digunakan', 'Subkontrak', 'Penerima'],
-        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah', 'Produksi', 'Subkontrak', 'Gudang'],
+        2: ['No', 'No. Bukti', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Digunakan', 'Subkontrak', 'Penerima'],
+        3: ['No', 'No. Dokumen', 'Tanggal', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah Produksi', 'Jumlah Subkontrak', 'Gudang'],
         4: ['No', 'No. PEB', 'Tanggal PEB', 'Nomor Pengeluaran Barang','Tanggal Pengeluaran', 'Pembeli (Penerima)', 'Negara Tujuan', 'Kode Barang', 'Nama Barang', 'Satuan', 'Jumlah','Mata Uang', 'Nilai'],
         5: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
         6: ['No', 'Kode Barang', 'Nama Barang', 'Satuan', 'Saldo Awal', 'Masuk', 'Keluar', 'Saldo Akhir', 'Gudang'],
