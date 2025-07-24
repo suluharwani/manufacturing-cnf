@@ -12,7 +12,7 @@ class MdlPembelianDetail extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','jumlah','harga','id_pembelian','id_material','id_currency','diskon1','diskon2','diskon3','pajak','potongan','status_pembayaran','created_at', 'updated_at','deleted_at'];
+    protected $allowedFields    = ['id','jumlah','jenis_doc','harga','id_pembelian','id_material','id_currency','diskon1','diskon2','diskon3','pajak','potongan','status_pembayaran','created_at', 'updated_at','deleted_at'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

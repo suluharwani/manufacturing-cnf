@@ -25,7 +25,7 @@
     <div class="row mb-3">
       <label for="invoice" class="col-md-3 col-form-label">GRN Number</label>
       <div class="col-md-9">
-        <input type="text" class="form-control" value="<?= $pembelian[0]['invoice'] ?? '' ?>" id="invoice" placeholder="Invoice">
+        <input type="text" class="form-control" value="<?= $pembelian[0]['invoice'] ?? '' ?>" disabled id="invoice" placeholder="Invoice">
       </div>
     </div>
     <div class="row mb-3">
@@ -44,9 +44,15 @@
       </div>
     </div>
     <div class="row mb-3">
-      <label for="lastName" class="col-md-3 col-form-label">Country</label>
+      <label for="jenis_doc" class="col-md-3 col-form-label">Jenis Dokumen(BC 2.0/BC 2.4/BC 2.5/BC 2.8)</label>
       <div class="col-md-9">
-       <input type="text" class="form-control" id="country" disabled>
+       <input type="text" class="form-control" id="jenis_doc" disabled value="<?=$pembelian[0]['jenis_doc']  ?? '' ?>">
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label for="lastName" class="col-md-3 col-form-label">Nomor Dokumen Import</label>
+      <div class="col-md-9">
+       <input type="text" class="form-control" id="document" disabled value="<?=$pembelian[0]['document']  ?? '' ?>">
       </div>
     </div>
     <div class="row mb-3">
@@ -63,12 +69,7 @@
         <input type="tel" class="form-control" value="<?=$pembelian[0]['pajak'] ?? '' ?> " id="pajak" placeholder="...%"> 
       </div>
     </div>
-<div class="row mb-3">
-      <label for="document" class="col-md-3 col-form-label">Dokumen</label>
-      <div class="col-md-9">
-        <input type="tel" class="form-control" value="<?=$pembelian[0]['document'] ?? '' ?> " id="document" placeholder="...%"> 
-      </div>
-    </div>
+
     <!-- Tombol Kirim -->
     <button type="button" class="btn btn-primary saveSupplier">Update Supplier</button>
     <button type="button" class="btn btn-warning importPO">Import PO</button>
@@ -174,6 +175,7 @@
             <input type="text" class="form-control" id="id_currency" value="<?=$pembelian[0]['curr_id']  ?? '' ?>" hidden>
             
           </div>
+          
           <!-- <div class="mb-3">
             <label for="disc1" class="form-label">Discount 1</label>
             <input type="number" class="form-control" id="disc1">

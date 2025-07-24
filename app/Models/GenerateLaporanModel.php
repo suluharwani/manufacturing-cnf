@@ -7,10 +7,11 @@ class GenerateLaporanModel extends Model
 {
     protected $DBGroup = 'default';
     // Generate semua laporan sekaligus dengan pengecekan data yang sudah ada
-    public function generateAllLaporan($periode, $end)
+    public function generateAllLaporan($p, $end)
     {
         // Format periode untuk laporan harian dan bulanan
-        $startDate = $periode;
+        $periode = $end;
+        $startDate = $p;
         $endDate = $end;
     
         $results = [];
@@ -195,13 +196,7 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
     $builder->select("
         ROW_NUMBER() OVER (ORDER BY p.tanggal_nota) AS no,
         CURRENT_DATE() AS tgl_rekam,
-        CASE 
-            WHEN p.document LIKE '%BC 2.0%' THEN 'BC 2.0'
-            WHEN p.document LIKE '%BC 2.4%' THEN 'BC 2.4'
-            WHEN p.document LIKE '%BC 2.5%' THEN 'BC 2.5'
-            WHEN p.document LIKE '%BC 2.8%' THEN 'BC 2.8'
-            ELSE 'Document Import'
-        END AS jenis_dokumen,
+        p.jenis_doc AS jenis_dokumen,
         p.document AS pabean_nomor,
         p.tanggal_nota AS pabean_tanggal,
         md.hscode AS kode_hs,

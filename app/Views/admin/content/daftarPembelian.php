@@ -63,9 +63,9 @@
         <form id="addPembelianForm">
           <div class="mb-3">
             <label for="supplier" class="form-label">Supplier</label>
-           <select class="form-control" id="supplier" required>
+            <select class="form-control" id="supplier" required>
               <option value="">Select Supplier</option>
-              <!-- Material options will be added here -->
+              <!-- Supplier options will be added here -->
             </select>
           </div>
 
@@ -78,8 +78,14 @@
             <input type="date" class="form-control" id="tanggal_nota" required>
           </div>
           <div class="mb-3">
-            <label for="document" class="form-label">Dokumen(BC 2.0/BC 2.4/BC 2.5/BC 2.8)</label>
-            <input type="text" class="form-control" id="document">
+            <label for="jenis_doc" class="form-label">Jenis Dokumen (BC 2.0/BC 2.4/BC 2.5/BC 2.8)</label>
+            <input type="text" class="form-control" id="jenis_doc">
+          </div>
+          <div class="mb-3">
+            <label for="document" class="form-label">Nomor Dokumen Import</label>
+            <select class="form-control" id="document">
+              <!-- Document options will be added here -->
+            </select>
           </div>
           <div class="mb-3">
             <label for="pajak" class="form-label">Pajak (%)</label>

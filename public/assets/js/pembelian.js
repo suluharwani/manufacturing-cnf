@@ -120,20 +120,39 @@ $('.tambahPembelian').click(function() {
     // Reset form di modal
     $('#addPembelianForm')[0].reset();
 
-    // Ambil opsi material dan masukkan ke dropdown
-    getSupplierOption().then(function(options) {
-      $('#supplier').html(options); // Masukkan opsi ke dalam elemen select
-      $('#po').html(options); // Masukkan opsi ke dalam elemen select
-      $('#tambahPembelianModal').modal('show'); // Tampilkan modal
+    // Ambil opsi supplier dan dokumen
+    Promise.all([
+        getSupplierOption(),
+        getDocumentOptions()
+    ]).then(function(results) {
+        $('#supplier').html(results[0]); // Masukkan opsi supplier
+        $('#document').html(results[1]); // Masukkan opsi dokumen
+        $('#tambahPembelianModal').modal('show'); // Tampilkan modal
     }).catch(function(error) {
-      alert(error); // Tampilkan error jika gagal mengambil data
+        Swal.fire('Error', error, 'error');
     });
-  });
+});
+// Function to get document options from bc_i_header
+function getDocumentOptions() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: 'GET',
+            url: base_url + 'pembelian/getDocumentList',
+            success: function(response) {
+                var options = '<option value="">Pilih Nomor Aju</option>';
+                response.forEach(function(doc) {
+                    options += `<option value="${doc.nomor_aju}">${doc.nomor_aju}</option>`;
+                });
+                resolve(options);
+            },
+            error: function(xhr) {
+                reject('Terjadi kesalahan saat mengambil daftar dokumen');
+            }
+        });
+    });
+}
 
-  // Menangani form submit di modal
-// Show modal with auto-generated invoice number
 $('#tambahPembelianModal').on('show.bs.modal', function() {
-    // Generate invoice number when modal opens
     $.ajax({
         url: base_url + '/pembelian/generateInvoice',
         type: 'GET',
@@ -157,6 +176,7 @@ $('#addPembelianForm').submit(function(event) {
         tanggal_nota: $('#tanggal_nota').val(),
         pajak: $('#pajak').val(),
         document: $('#document').val(),
+        jenis_doc: $('#jenis_doc').val(),
         status_pembayaran: 0, // Default value
         posting: 0 // Default value
     };

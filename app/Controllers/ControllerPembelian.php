@@ -314,6 +314,7 @@ return view('admin/index', $data);
     $data['id_supplier'] = $_POST['supplier'];
     $data['invoice'] = $_POST['invoice'];
     $data['document'] = $_POST['document'];
+    $data['jenis_doc'] = $_POST['jenis_doc'];
     $data['tanggal_nota'] = $_POST['tanggal_nota'];
     $data['pajak'] = $_POST['pajak'];
     $data['status_pembayaran'] = 0;
@@ -327,7 +328,7 @@ return view('admin/index', $data);
                     ]);
                 } else {
         // Jika gagal
-                    $errorMessage = $mdlCustomer->errors() ? $mdlCustomer->errors() : 'Gagal menambahkan Invoice karena kesalahan internal.';
+                    $errorMessage = $mdl->errors() ? $mdl->errors() : 'Gagal menambahkan Invoice karena kesalahan internal.';
 
                     return $this->response->setJSON([
                         'status' => false,
@@ -585,80 +586,81 @@ public function unposting()
         $code = $_POST['kode'];
         $id = $_POST['id'];
         $curr = $_POST['curr'];
+        $doc = $_POST['doc'];
+        $jdoc = $_POST['jenis_doc'];
         
 
-        return $this->importPOToPembelianDetail($code, $id, $curr);
-
+        return $this->importPOToPembelianDetail($code, $id, $curr, $doc, $jdoc);
     }
-    public function importPOToPembelianDetail($poCode, $idPembelian, $curr)
-    {
-        // Load models
-        $poModel = new MdlPurchaseOrder();
-        $poListModel = new MdlPurchaseOrderList();
-        $pembelianDetailModel = new MdlPembelianDetail();
-
-        $mdlPembelian = new MdlPembelian();
-       
-    
-        // Get PO ID based on PO Code
-        $po = $poModel->where('code', $poCode)->first();
-        if (!$po) {
-            return $this->response->setJSON([
-                "status" => false,
-                "message" => "Purchase Order dengan code $poCode tidak ditemukan."
-            ]);  
-        }
-    
-        $poId = $po['id'];
-
-        //update po
-        $mdlPembelian->set(array('id_po'=>$poId))->where('id',$idPembelian)->update();
-    
-        // Get PO List based on PO ID
-        $poList = $poListModel->where('id_po', $poId)->findAll();
-        if (empty($poList)) {
-            return $this->response->setJSON([
-                "status" => false,
-                "message" => "Tidak ada data di Purchase Order List untuk PO ID $poId."
-            ]);
-        }
-    
-        // Insert or update data into Pembelian Detail
-        foreach ($poList as $item) {
-            // Cek apakah sudah ada data dengan id_pembelian dan id_material yang sama
-            $existingDetail = $pembelianDetailModel
-                ->where('id_pembelian', $idPembelian)
-                ->where('id_material', $item['id_material'])
-                ->first();
-    
-            if ($existingDetail) {
-                // Jika sudah ada, update jumlahnya
-                $newJumlah = $existingDetail['jumlah'] + $item['quantity'];
-                $pembelianDetailModel->update($existingDetail['id'], ['jumlah' => $newJumlah]);
-            } else {
-                // Jika belum ada, insert data baru
-                $data = [
-                    'id_pembelian' => $idPembelian,
-                    'id_material' => $item['id_material'],
-                    'id_currency' => $curr,
-                    'jumlah' => $item['quantity'],
-                    'harga' => $item['price'],
-                    'status_pembayaran' => 0,
-                    'diskon1' => 0,
-                    'diskon2' => 0,
-                    'diskon3' => 0,
-                    'pajak' => $item['vat'],
-                    'potongan' => 0,
-                ];
-                $pembelianDetailModel->insert($data);
-            }
-        }
-    
+    public function importPOToPembelianDetail($poCode, $idPembelian, $curr, $doc, $jdoc)
+{
+    // Load models
+    $poModel = new MdlPurchaseOrder();
+    $poListModel = new MdlPurchaseOrderList();
+    $pembelianDetailModel = new MdlPembelianDetail();
+    $mdlPembelian = new MdlPembelian();
+   
+    // Get PO ID based on PO Code
+    $po = $poModel->where('code', $poCode)->first();
+    if (!$po) {
         return $this->response->setJSON([
-            "status" => true,
-            "message" => "Data berhasil diimpor ke Pembelian Detail."
+            "status" => false,
+            "message" => "Purchase Order dengan code $poCode tidak ditemukan."
+        ]);  
+    }
+
+    $poId = $po['id'];
+
+    // Update MdlPembelian with id_po
+    $mdlPembelian->update($idPembelian, ['id_po' => $poId]);
+
+    // Get PO List based on PO ID
+    $poList = $poListModel->where('id_po', $poId)->findAll();
+    if (empty($poList)) {
+        return $this->response->setJSON([
+            "status" => false,
+            "message" => "Tidak ada data di Purchase Order List untuk PO ID $poId."
         ]);
     }
+
+    // Insert or update data into Pembelian Detail
+    foreach ($poList as $item) {
+        // Cek apakah sudah ada data dengan id_pembelian dan id_material yang sama
+        $existingDetail = $pembelianDetailModel
+            ->where('id_pembelian', $idPembelian)
+            ->where('id_material', $item['id_material'])
+            ->first();
+
+        if ($existingDetail) {
+            // Jika sudah ada, update jumlahnya
+            $newJumlah = $existingDetail['jumlah'] + $item['quantity'];
+            $pembelianDetailModel->update($existingDetail['id'], ['jumlah' => $newJumlah]);
+        } else {
+            // Jika belum ada, insert data baru
+            $data = [
+                'id_pembelian' => $idPembelian,
+                'id_material' => $item['id_material'],
+                'id_currency' => $curr,
+                'jumlah' => $item['quantity'],
+                'harga' => $item['price'],
+                'status_pembayaran' => 0,
+                'diskon1' => 0,
+                'diskon2' => 0,
+                'diskon3' => 0,
+                'pajak' => $item['vat']? $item['vat'] : 0,
+                'potongan' => 0,
+                'document'=> $doc,
+                'jenis_doc'=> $jdoc
+            ];
+            $pembelianDetailModel->insert($data);
+        }
+    }
+
+    return $this->response->setJSON([
+        "status" => true,
+        "message" => "Data berhasil diimpor ke Pembelian Detail."
+    ]);
+}
     
     public function printGRN($id){
         $MdlPembelian = new MdlPembelian();
@@ -734,5 +736,12 @@ public function generateGrnNumber($supplierId)
         'success' => true,
         'grnNumber' => $grnNumber
     ]);
+}
+public function getDocumentList()
+{
+    $bcHeaderModel = new \App\Models\BcHeaderModel;
+    $documents = $bcHeaderModel->select('nomor_aju')->findAll();
+    
+    return $this->response->setJSON($documents);
 }
 }

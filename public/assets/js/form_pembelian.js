@@ -675,6 +675,8 @@ $(document).on('click', '.editMaterial', function(e) {
 
     $('.importPO').on('click',function(){
       let curr = $('#id_currency').val();
+      let doc = $('#document').val();
+      let jenis_doc = $('#jenis_doc').val();
       Swal.fire({
         title: `Import From Purchase Order`,
         // html: `<input type="text" id="password" class="swal2-input" placeholder="Password baru">`,
@@ -697,9 +699,9 @@ $(document).on('click', '.editMaterial', function(e) {
         $.ajax({
           type : "POST",
           url  : base_url+'/pembelian/importpo',
-          async : false,
+          async : false, 
           // dataType : "JSON",
-          data : {kode:result.value.kode,id:getLastSegment(), curr:curr},
+          data : {kode:result.value.kode,id:getLastSegment(), curr:curr, doc:doc, jenis_doc:jenis_doc},
           success: function(data){
             if (data.status == true) {
               $('#tabel_serverside').DataTable().ajax.reload();
