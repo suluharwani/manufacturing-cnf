@@ -96,7 +96,7 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h6 class="mb-0">Material Scrap</h6>
       <button class="btn btn-secondary " onclick="window.location.href='<?= base_url('scrap/printScrap') ?>/<?= $scrap_doc[0]['id'] ?>'">
-    Print PO
+    Print
 </button>
       <?php
     if ($scrap_doc[0]['status'] == 0||$scrap_doc[0]['status'] == "0") {?>
