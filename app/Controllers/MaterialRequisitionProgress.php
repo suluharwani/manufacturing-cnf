@@ -198,6 +198,7 @@ class MaterialRequisitionProgress extends BaseController
     function posting($id)
 {
     $mdl = new \App\Models\MdlMaterialRequisition();
+    $mdlStock = new \App\Models\MdlStock();
     $userInfo = $_SESSION['auth'];
 
     // Set data dengan array asosiatif
@@ -217,6 +218,7 @@ class MaterialRequisitionProgress extends BaseController
             $mdlProgress = new \App\Models\MdlMaterialRequisitionProgress();
 
             foreach ($dataList as $item) {
+                $mdlStock->set('stock_keluar', $item['jumlah'])->where('id_material', $item['id_material'])->update();
                 // Copy data ke material_requisition_progress
                 $mdlProgress->insert([
                     'id_material_requisition_list' => $item['id'],

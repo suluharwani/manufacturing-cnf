@@ -581,3 +581,9 @@ $routes->group('bc-import', function($routes) {
     $routes->post('process', 'BcImport::processImport');
     $routes->get('detail/(:num)', 'BcImport::detail/$1');
 });
+$routes->group('bc-export', function($routes) {
+    $routes->get('/', 'BcExport::index');
+    $routes->get('form', 'BcExport::importForm');
+    $routes->post('process', 'BcExport::processImport');
+    $routes->get('detail/(:num)', 'BcExport::detail/$1');
+});
