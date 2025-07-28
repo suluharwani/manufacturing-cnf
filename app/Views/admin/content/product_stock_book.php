@@ -26,7 +26,7 @@
                                 <td><?= $item['current_stock'] - $item['booked_stock'] ?></td>
                             </tr>
                             <?php foreach ($finishings as $finishing): 
-                                $finishingStock = $this->stMovementModel->getStockByProductAndLocation($product['id'], $item['location_id'], $finishing['id']); ?>
+                                $finishingStock = $stockData ?>
                                 <tr>
                                     <td><?= $item['location_name'] ?></td>
                                     <td><?= $finishing['name'] ?></td>

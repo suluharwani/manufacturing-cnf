@@ -454,20 +454,144 @@ public function index() {
 
 //     return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
 // }
-      public function bookStock($productId)
-    {
-        $data = [
-            'title' => 'Book Stock',
-            'product' => $this->productModel->find($productId),
-            // 'available' => $this->stMovementModel->getAvailableStock($productId),
-            'proformaInvoices' => $this->PiModel->findAll(), 
-            'validation' => \Config\Services::validation(),
-            'locations' => $this->locationModel->findAll(),
-            'stockData' => $this->stMovementModel->getStockByProduct($productId),
-        ];
-        $data['content'] = view('admin/content/product_stock_book',$data);
-        return view('admin/index', $data);
+public function bookStock($productId)
+{
+    // Load models
+    $finishingModel = new \App\Models\FinishingModel();
+    $stMovementModel = new \App\Models\StMovementModel();
+    
+    // Get product data
+    $product = $this->productModel->find($productId);
+    if (!$product) {
+        return redirect()->back()->with('error', 'Product not found');
     }
+
+    // Get all necessary data
+    $finishings = $finishingModel->where('id_product', $productId)->findAll();
+    $locations = $this->locationModel->findAll();
+    $proformaInvoices = $this->PiModel->findAll();
+    
+    // Prepare stock data with proper calculations
+    $stockData = [];
+    foreach ($locations as $location) {
+        $locationId = $location['id'];
+        
+        // Standard variant (no finishing)
+        $standardCurrent = (int)$this->stProductModel
+            ->where('product_id', $productId)
+            ->where('location_id', $locationId)
+            ->where('finishing_id IS NULL')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
+
+        // Subtract outgoing stock movements (out and transfer out)
+        $outgoingStandard = (int)$this->stMovementModel
+            ->where('product_id', $productId)
+            ->where('from_location', $locationId)
+            ->groupStart()
+                ->where('movement_type', 'out')
+                ->orWhere('movement_type', 'transfer')
+            ->groupEnd()
+            ->where('finishing_id IS NULL')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
+
+        $standardBooked = (int)$this->stMovementModel
+            ->where('product_id', $productId)
+            ->where('from_location', $locationId)
+            ->where('movement_type', 'booked')
+            ->where('status IS NULL OR status !=', 'completed')
+            ->where('finishing_id IS NULL')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
+
+        $standardAvailable = max(0, $standardCurrent - $outgoingStandard - $standardBooked);
+
+        if ($standardCurrent > 0 || $standardBooked > 0 || $outgoingStandard > 0) {
+            $stockData[] = [
+                'location_id' => $locationId,
+                'location_name' => $location['name'],
+                'finishing_id' => null,
+                'finishing_name' => 'Standard',
+                'current_stock' => max(0, $standardCurrent - $outgoingStandard),
+                'booked_stock' => $standardBooked,
+                'available_stock' => $standardAvailable
+            ];
+        }
+
+        // Finishing variants
+        foreach ($finishings as $finishing) {
+            $finishingId = $finishing['id'];
+            
+            $finishingCurrent = (int)$this->stProductModel
+                ->where('product_id', $productId)
+                ->where('location_id', $locationId)
+                ->where('finishing_id', $finishingId)
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
+
+            // Subtract outgoing stock movements for finishing
+            $outgoingFinishing = (int)$this->stMovementModel
+                ->where('product_id', $productId)
+                ->where('from_location', $locationId)
+                ->groupStart()
+                    ->where('movement_type', 'out')
+                    ->orWhere('movement_type', 'transfer')
+                ->groupEnd()
+                ->where('finishing_id', $finishingId)
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
+
+            $finishingBooked = (int)$this->stMovementModel
+                ->where('product_id', $productId)
+                ->where('from_location', $locationId)
+                ->where('movement_type', 'booked')
+                ->where('status IS NULL OR status !=', 'completed')
+                ->where('finishing_id', $finishingId)
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
+
+            $finishingAvailable = max(0, $finishingCurrent - $outgoingFinishing - $finishingBooked);
+
+            if ($finishingCurrent > 0 || $finishingBooked > 0 || $outgoingFinishing > 0) {
+                $stockData[] = [
+                    'location_id' => $locationId,
+                    'location_name' => $location['name'],
+                    'finishing_id' => $finishingId,
+                    'finishing_name' => $finishing['name'],
+                    'current_stock' => max(0, $finishingCurrent - $outgoingFinishing),
+                    'booked_stock' => $finishingBooked,
+                    'available_stock' => $finishingAvailable
+                ];
+            }
+        }
+    }
+
+    $data = [
+        'title' => 'Book Stock',
+        'product' => $product,
+        'finishings' => $finishings,
+        'locations' => $locations,
+        'proformaInvoices' => $proformaInvoices,
+        'stockData' => $stockData,
+        'validation' => \Config\Services::validation()
+    ];
+
+    $data['content'] = view('admin/content/product_stock_book', $data);
+    return view('admin/index', $data);
+}
 
     // Process Booking
 // public function processBooking($productId)
@@ -985,26 +1109,40 @@ protected function getStockByLocation($productId)
             ->getRow()
             ->quantity ?? 0;
 
-        $standardBooked = (int)$this->stMovementModel
+        // Subtract outgoing stock movements (out and transfer out)
+        $outgoingStandard = (int)$this->stMovementModel
             ->where('product_id', $productId)
             ->where('from_location', $locationId)
+            ->groupStart()
+                ->where('movement_type', 'out')
+                ->orWhere('movement_type', 'transfer')
+            ->groupEnd()
             ->where('finishing_id IS NULL')
-            ->where('movement_type', 'booked')
-            ->where('status IS NULL OR status !=', 'completed')
             ->selectSum('quantity')
             ->get()
             ->getRow()
             ->quantity ?? 0;
 
-        $standardAvailable = max(0, $standardCurrent - $standardBooked);
+        $standardBooked = (int)$this->stMovementModel
+            ->where('product_id', $productId)
+            ->where('from_location', $locationId)
+            ->where('movement_type', 'booked')
+            ->where('status IS NULL OR status !=', 'completed')
+            ->where('finishing_id IS NULL')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
 
-        if ($standardCurrent > 0 || $standardBooked > 0) {
+        $standardAvailable = max(0, $standardCurrent - $outgoingStandard - $standardBooked);
+
+        if ($standardCurrent > 0 || $standardBooked > 0 || $outgoingStandard > 0) {
             $stockData[] = [
                 'location_id' => $locationId,
                 'location_name' => $location['name'],
                 'finishing_id' => null,
                 'finishing_name' => 'Standard',
-                'current_stock' => $standardCurrent,
+                'current_stock' => max(0, $standardCurrent - $outgoingStandard),
                 'booked_stock' => $standardBooked,
                 'available_stock' => $standardAvailable
             ];
@@ -1023,26 +1161,40 @@ protected function getStockByLocation($productId)
                 ->getRow()
                 ->quantity ?? 0;
 
-            $finishingBooked = (int)$this->stMovementModel
+            // Subtract outgoing stock movements for finishing
+            $outgoingFinishing = (int)$this->stMovementModel
                 ->where('product_id', $productId)
                 ->where('from_location', $locationId)
+                ->groupStart()
+                    ->where('movement_type', 'out')
+                    ->orWhere('movement_type', 'transfer')
+                ->groupEnd()
                 ->where('finishing_id', $finishingId)
-                ->where('movement_type', 'booked')
-                ->where('status IS NULL OR status !=', 'completed')
                 ->selectSum('quantity')
                 ->get()
                 ->getRow()
                 ->quantity ?? 0;
 
-            $finishingAvailable = max(0, $finishingCurrent - $finishingBooked);
+            $finishingBooked = (int)$this->stMovementModel
+                ->where('product_id', $productId)
+                ->where('from_location', $locationId)
+                ->where('movement_type', 'booked')
+                ->where('status IS NULL OR status !=', 'completed')
+                ->where('finishing_id', $finishingId)
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
 
-            if ($finishingCurrent > 0 || $finishingBooked > 0) {
+            $finishingAvailable = max(0, $finishingCurrent - $outgoingFinishing - $finishingBooked);
+
+            if ($finishingCurrent > 0 || $finishingBooked > 0 || $outgoingFinishing > 0) {
                 $stockData[] = [
                     'location_id' => $locationId,
                     'location_name' => $location['name'],
                     'finishing_id' => $finishingId,
                     'finishing_name' => $finishing['name'],
-                    'current_stock' => $finishingCurrent,
+                    'current_stock' => max(0, $finishingCurrent - $outgoingFinishing),
                     'booked_stock' => $finishingBooked,
                     'available_stock' => $finishingAvailable
                 ];

@@ -148,7 +148,7 @@ public function getProductHistory($productId, $limit = 100)
                ->limit($limit)
                ->findAll();
 }
-public function bookStock($productId, $quantity, $piId, $locationId, $notes = '')
+public function bookStock($productId, $quantity, $piId, $locationId, $notes = '', $finishing_id)
 {
     $this->db->transStart();
 
@@ -175,7 +175,7 @@ public function bookStock($productId, $quantity, $piId, $locationId, $notes = ''
             $remaining -= $deduct;
             
             // Create booking record
-            $bookedId = $this->createBookingRecord($productId, $deduct, $piId, $locationId, $notes);
+            $bookedId = $this->createBookingRecord($productId, $deduct, $piId, $locationId, $notes, $finishing_id);
             $bookedIds[] = $bookedId;
             
             // Update source record
@@ -294,7 +294,7 @@ protected function subtractFromAvailable(&$availableRecords, $quantityToSubtract
 /**
  * Create a booking movement record
  */
-protected function createBookingRecord($productId, $quantity, $piId, $locationId, $notes)
+protected function createBookingRecord($productId, $quantity, $piId, $locationId, $notes, $finishing_id)
 {
     return $this->insert([
         'product_id' => $productId,
@@ -306,6 +306,7 @@ protected function createBookingRecord($productId, $quantity, $piId, $locationId
         'reference_id' => $piId,
         'reference_type' => 'proforma_invoice',
         'notes' => $notes,
+        'finishing_id' => $finishing_id,
         'user_id' => session('auth.id'),
         'created_at' => date('Y-m-d H:i:s'),
         'updated_at' => date('Y-m-d H:i:s')
@@ -446,56 +447,60 @@ public function transferStock($productId, $fromLocationId, $toLocationId, $quant
 
     return max(0, $availableStock); // Ensure we don't return negative values
 }
-// public function getAvailableStockAtLocation(int $productId, int $locationId): float
-// {
-//     // Get initial stock at this location
-//     $initialStock = $this->db->table('st_initial')
-//         ->selectSum('quantity')
-//         ->where('product_id', $productId)
-//         ->where('location_id', $locationId)
-//         ->get()
-//         ->getRow()->quantity ?? 0;
+public function getAvailableStockAtLocation(int $productId, int $locationId, ?int $finishingId = null): float
+{
+    // Get initial stock at this location with finishing filter
+    $initialStock = $this->db->table('st_initial')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('location_id', $locationId)
+        ->where($finishingId ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->get()
+        ->getRow()->quantity ?? 0;
 
-//     // Get total incoming stock (in + transfer to this location)
-//     $incoming = $this->db->table('st_movement')
-//         ->selectSum('quantity')
-//         ->where('product_id', $productId)
-//         ->where('to_location', $locationId)
-//         ->groupStart()
-//             ->where('movement_type', 'in')
-//             ->orWhere('movement_type', 'transfer')
-//         ->groupEnd()
-//         ->get()
-//         ->getRow()->quantity ?? 0;
+    // Get total incoming stock (in + transfer to this location)
+    $incoming = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('to_location', $locationId)
+        ->groupStart()
+            ->where('movement_type', 'in')
+            ->orWhere('movement_type', 'transfer')
+        ->groupEnd()
+        ->where($finishingId ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->get()
+        ->getRow()->quantity ?? 0;
 
-//     // Get total outgoing stock (out + transfer from this location)
-//     $outgoing = $this->db->table('st_movement')
-//         ->selectSum('quantity')
-//         ->where('product_id', $productId)
-//         ->where('from_location', $locationId)
-//         ->groupStart()
-//             ->where('movement_type', 'out')
-//             ->orWhere('movement_type', 'transfer')
-//         ->groupEnd()
-//         ->get()
-//         ->getRow()->quantity ?? 0;
+    // Get total outgoing stock (out + transfer from this location)
+    $outgoing = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('from_location', $locationId)
+        ->groupStart()
+            ->where('movement_type', 'out')
+            ->orWhere('movement_type', 'transfer')
+        ->groupEnd()
+        ->where($finishingId ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->get()
+        ->getRow()->quantity ?? 0;
 
-//     // Get booked stock at this location (status = booked and location matches)
-//     $booked = $this->db->table('st_movement')
-//         ->selectSum('quantity')
-//         ->where('product_id', $productId)
-//         ->where('status', 'booked')
-//         ->where('from_location', $locationId)
-//         ->where('to_location', $locationId)
-//         ->get()
-//         ->getRow()->quantity ?? 0;
+    // Get booked stock at this location (status = booked and location matches)
+    $booked = $this->db->table('st_movement')
+        ->selectSum('quantity')
+        ->where('product_id', $productId)
+        ->where('status', 'booked')
+        ->where('from_location', $locationId)
+        ->where('to_location', $locationId)
+        ->where($finishingId ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->get()
+        ->getRow()->quantity ?? 0;
 
-//     // Calculate available stock
-//     $availableStock = $initialStock + $incoming + $outgoing - $booked;
+    // Calculate available stock
+    $availableStock = ($initialStock + $incoming) - $outgoing - $booked;
     
-//     // Ensure we don't return negative values
-//     return max(0, $availableStock);
-// }
+    // Ensure we don't return negative values
+    return max(0, $availableStock);
+}
 public function getMovementHistory($productId, $limit = 100)
 {
     return $this->select('st_movement.*, 
@@ -602,23 +607,23 @@ public function getStockByProduct(int $product_id, int $finishing_id = null): ar
 }
 
 // Update getAvailableStockAtLocation
-public function getAvailableStockAtLocation(int $productId, int $locationId, int $finishingId = null): float
-{
-    $finishingCondition = $finishingId ? "AND finishing_id = $finishingId" : "AND finishing_id IS NULL";
+// public function getAvailableStockAtLocation(int $productId, int $locationId, int $finishingId = null): float
+// {
+//     $finishingCondition = $finishingId ? "AND finishing_id = $finishingId" : "AND finishing_id IS NULL";
     
-    // Get initial stock with finishing filter
-    $initialStock = $this->db->table('st_initial')
-        ->selectSum('quantity')
-        ->where('product_id', $productId)
-        ->where('location_id', $locationId)
-        ->where($finishingCondition)
-        ->get()
-        ->getRow()->quantity ?? 0;
+//     // Get initial stock with finishing filter
+//     $initialStock = $this->db->table('st_initial')
+//         ->selectSum('quantity')
+//         ->where('product_id', $productId)
+//         ->where('location_id', $locationId)
+//         ->where($finishingCondition)
+//         ->get()
+//         ->getRow()->quantity ?? 0;
 
-    // ... update other queries similarly with $finishingCondition ...
+//     // ... update other queries similarly with $finishingCondition ...
     
-    return max(0, $initialStock + $incoming - $outgoing - $booked);
-}
+//     return max(0, $initialStock + $incoming - $outgoing - $booked);
+// }
 /**
  * Get total booked stock quantity for a product
  * 
