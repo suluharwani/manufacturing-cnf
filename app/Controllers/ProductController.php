@@ -1241,4 +1241,6 @@ function deleteProduct()
 
     return $this->response->setJSON(['status' => false, 'message' => 'Item not found']);
 }
+
+
 }

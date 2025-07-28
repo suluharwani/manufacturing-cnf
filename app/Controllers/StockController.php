@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\MdlMaterial;
 use App\Models\MdlStock;
 use App\Models\MdlCurrency;
+use App\Models\FinishingModel;
 class StockController extends BaseController
 {
     protected $stProductModel;
@@ -24,6 +25,7 @@ class StockController extends BaseController
     protected $materialModel;
     protected $stockModel;
     protected $currencyModel;
+    protected $finishingModel;
     public function __construct()
     {
         $this->db = \Config\Database::connect();
@@ -37,95 +39,158 @@ class StockController extends BaseController
          $this->materialModel = new MdlMaterial();
         $this->stockModel = new MdlStock();
         $this->currencyModel = new MdlCurrency();
+        $this->finishingModel = new FinishingModel();
     }
 public function exportExcel()
-    {
-        // Ambil data stock opname
-        $stockData = $this->getStockOpnameData();
+{
+    // Ambil data stock opname dengan informasi finishing
+    $stockData = $this->getStockOpnameDataWithFinishing();
+    
+    // Buat spreadsheet baru
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Set judul dokumen
+    $spreadsheet->getProperties()
+        ->setCreator("Your System")
+        ->setTitle("Laporan Stock Opname")
+        ->setSubject("Data Stock Gudang");
         
-        // Buat spreadsheet baru
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        
-        // Set judul dokumen
-        $spreadsheet->getProperties()
-            ->setCreator("Your System")
-            ->setTitle("Laporan Stock Opname")
-            ->setSubject("Data Stock Gudang");
-            
-        // Set header tabel
-        $sheet->setCellValue('A1', 'LAPORAN STOCK');
-        $sheet->mergeCells('A1:H1');
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
-        
-        // Set tanggal generate
-        $sheet->setCellValue('A2', 'Tanggal: ' . date('d/m/Y H:i:s'));
-        $sheet->mergeCells('A2:H2');
-        $sheet->getStyle('A2')->getAlignment()->setHorizontal('right');
-        
-        // Header kolom
-        $headers = [
-            'No',
-            'Kode Produk',
-            'Nama Produk', 
-            'Kode Gudang',
-            'Nama Gudang',
-            'Stok Awal',
-            'Pemasukan',
-            'Pengeluaran',
-            'Stok Akhir'
-        ];
-        
-        $sheet->fromArray($headers, NULL, 'A4');
-        
-        // Isi data
-        $row = 5;
-        $no = 1;
-        
-        foreach ($stockData as $item) {
-            $sheet->setCellValue('A'.$row, $no++);
-            $sheet->setCellValue('B'.$row, $item['kode_produk']);
-            $sheet->setCellValue('C'.$row, $item['nama_produk']);
-            $sheet->setCellValue('D'.$row, $item['kode_gudang']);
-            $sheet->setCellValue('E'.$row, $item['nama_gudang']);
-            $sheet->setCellValue('F'.$row, $item['stok_awal']);
-            $sheet->setCellValue('G'.$row, $item['total_pemasukan']);
-            $sheet->setCellValue('H'.$row, $item['total_pengeluaran']);
-            $sheet->setCellValue('I'.$row, $item['stok_akhir']);
-            $row++;
-        }
-        
-        // Style untuk header kolom
-        $sheet->getStyle('A4:I4')->getFont()->setBold(true);
-        $sheet->getStyle('A4:I4')->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFDDDDDD');
-        
-        // Auto size kolom
-        foreach(range('A','I') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
-        
-        // Border untuk data
-        $sheet->getStyle('A4:I'.($row-1))->getBorders()
-            ->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-        
-        // Format angka
-        $sheet->getStyle('F5:I'.($row-1))->getNumberFormat()
-            ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
-        
-        // Download file
-        $filename = 'Stock_'.date('Ymd_His').'.xlsx';
-        
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-        
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+    // Set header tabel
+    $sheet->setCellValue('A1', 'LAPORAN STOCK DENGAN FINISHING');
+    $sheet->mergeCells('A1:J1');
+    $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+    $sheet->getStyle('A1')->getAlignment()->setHorizontal('center');
+    
+    // Set tanggal generate
+    $sheet->setCellValue('A2', 'Tanggal: ' . date('d/m/Y H:i:s'));
+    $sheet->mergeCells('A2:J2');
+    $sheet->getStyle('A2')->getAlignment()->setHorizontal('right');
+    
+    // Header kolom dengan tambahan kolom finishing
+    $headers = [
+        'No',
+        'Kode Produk',
+        'Nama Produk', 
+        'Finishing',
+        'Kode Gudang',
+        'Nama Gudang',
+        'Stok Awal',
+        'Pemasukan',
+        'Pengeluaran',
+        'Stok Akhir'
+    ];
+    
+    $sheet->fromArray($headers, NULL, 'A4');
+    
+    // Isi data
+    $row = 5;
+    $no = 1;
+    
+    foreach ($stockData as $item) {
+        $sheet->setCellValue('A'.$row, $no++);
+        $sheet->setCellValue('B'.$row, $item['kode_produk']);
+        $sheet->setCellValue('C'.$row, $item['nama_produk']);
+        $sheet->setCellValue('D'.$row, $item['finishing_name'] ?? 'Standard');
+        $sheet->setCellValue('E'.$row, $item['kode_gudang']);
+        $sheet->setCellValue('F'.$row, $item['nama_gudang']);
+        $sheet->setCellValue('G'.$row, $item['stok_awal']);
+        $sheet->setCellValue('H'.$row, $item['total_pemasukan']);
+        $sheet->setCellValue('I'.$row, $item['total_pengeluaran']);
+        $sheet->setCellValue('J'.$row, $item['stok_akhir']);
+        $row++;
     }
+    
+    // Style untuk header kolom
+    $sheet->getStyle('A4:J4')->getFont()->setBold(true);
+    $sheet->getStyle('A4:J4')->getFill()
+        ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FFDDDDDD');
+    
+    // Auto size kolom
+    foreach(range('A','J') as $columnID) {
+        $sheet->getColumnDimension($columnID)->setAutoSize(true);
+    }
+    
+    // Border untuk data
+    $sheet->getStyle('A4:J'.($row-1))->getBorders()
+        ->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+    
+    // Format angka
+    $sheet->getStyle('G5:J'.($row-1))->getNumberFormat()
+        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+    
+    // Download file
+    $filename = 'Stock_Finishing_'.date('Ymd_His').'.xlsx';
+    
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="'.$filename.'"');
+    header('Cache-Control: max-age=0');
+    
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
+protected function getStockOpnameDataWithFinishing()
+{
+    $builder = $this->db->table('product p');
+    $builder->select("
+        p.id AS product_id,
+        p.kode AS kode_produk,
+        p.nama AS nama_produk,
+        f.id AS finishing_id,
+        f.name AS finishing_name,
+        l.id AS location_id,
+        l.code AS kode_gudang,
+        l.name AS nama_gudang,
+        (SELECT COALESCE(SUM(si.quantity), 0) 
+            FROM st_initial si 
+            WHERE si.product_id = p.id 
+            AND si.location_id = l.id 
+            AND (si.finishing_id = f.id OR (si.finishing_id IS NULL AND f.id IS NULL))) AS stok_awal,
+        (SELECT COALESCE(SUM(sm.quantity), 0) 
+            FROM st_movement sm 
+            WHERE sm.product_id = p.id 
+            AND sm.to_location = l.id 
+            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
+            AND sm.movement_type IN ('in', 'transfer')) AS total_pemasukan,
+        (SELECT COALESCE(SUM(sm.quantity), 0) 
+            FROM st_movement sm 
+            WHERE sm.product_id = p.id 
+            AND sm.from_location = l.id 
+            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
+            AND sm.movement_type IN ('out', 'transfer')) AS total_pengeluaran,
+        ((SELECT COALESCE(SUM(si.quantity), 0) 
+            FROM st_initial si 
+            WHERE si.product_id = p.id 
+            AND si.location_id = l.id
+            AND (si.finishing_id = f.id OR (si.finishing_id IS NULL AND f.id IS NULL))) +
+        (SELECT COALESCE(SUM(sm.quantity), 0) 
+            FROM st_movement sm 
+            WHERE sm.product_id = p.id 
+            AND sm.to_location = l.id
+            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
+            AND sm.movement_type IN ('in', 'transfer')) -
+        (SELECT COALESCE(SUM(sm.quantity), 0) 
+            FROM st_movement sm 
+            WHERE sm.product_id = p.id 
+            AND sm.from_location = l.id
+            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
+            AND sm.movement_type IN ('out', 'transfer'))) AS stok_akhir
+    ");
+    
+    $builder->join('locations l', 'l.type = "warehouse" AND l.deleted_at IS NULL AND l.is_active = 1', 'CROSS');
+    $builder->join('finishing f', 'f.id_product = p.id', 'left');
+    $builder->where('p.deleted_at IS NULL');
+    $builder->groupStart()
+        ->where('EXISTS (SELECT 1 FROM st_initial si WHERE si.product_id = p.id AND si.location_id = l.id)')
+        ->orWhere('EXISTS (SELECT 1 FROM st_movement sm WHERE sm.product_id = p.id AND (sm.from_location = l.id OR sm.to_location = l.id))')
+    ->groupEnd();
+    $builder->orderBy('p.kode, f.name, l.code');
+    
+    return $builder->get()->getResultArray();
+}
     
     protected function getStockOpnameData()
     {
@@ -171,20 +236,43 @@ public function exportExcel()
         
         return $builder->get()->getResultArray();
     }
-    public function index() {
+public function index() {
     $products = $this->productModel->findAll();
+    $finishingModel = new FinishingModel();
     
     // Prepare stock data for each product
     $productsWithStock = [];
     foreach ($products as $product) {
-        $productsWithStock[] = [
-            'id' => $product['id'],
-            'code' => $product['kode'],
-            'name' => $product['nama'],
-            'available' => $this->stProductModel->getAvailableStock($product['id']),
-            'booked' => $this->stProductModel->getBookedStock($product['id']),
-            'total' => $this->stProductModel->getAvailableStock($product['id']) + $this->stProductModel->getBookedStock($product['id'])
-        ];
+        $finishings = $finishingModel->where('id_product', $product['id'])->findAll();
+        
+        if (empty($finishings)) {
+            // Product without finishing variations
+            $productsWithStock[] = [
+                'id' => $product['id'],
+                'code' => $product['kode'],
+                'name' => $product['nama'],
+                'finishing_id' => null,
+                'finishing_name' => 'Standard',
+                'available' => $this->stProductModel->getAvailableStock($product['id']),
+                'booked' => $this->stProductModel->getBookedStock($product['id']),
+                'total' => $this->stProductModel->getAvailableStock($product['id']) + $this->stProductModel->getBookedStock($product['id'])
+            ];
+        } else {
+            // Product with finishing variations
+            foreach ($finishings as $finishing) {
+                $productsWithStock[] = [
+                    'id' => $product['id'],
+                    'code' => $product['kode'],
+                    'name' => $product['nama'],
+                    'finishing_id' => $finishing['id'],
+                    'finishing_name' => $finishing['name'],
+                    'available' => $this->stProductModel->getAvailableStock($product['id'], $finishing['id']),
+                    'booked' => $this->stProductModel->getBookedStock($product['id'], $finishing['id']),
+                    'total' => $this->stProductModel->getAvailableStock($product['id'], $finishing['id']) + 
+                              $this->stProductModel->getBookedStock($product['id'], $finishing['id'])
+                ];
+            }
+        }
     }
 
     $data = [
@@ -192,8 +280,8 @@ public function exportExcel()
         'products' => $productsWithStock
     ];
 
-   $data['content'] = view('admin/content/product_stock',$data);
-        return view('admin/index', $data);
+    $data['content'] = view('admin/content/product_stock',$data);
+    return view('admin/index', $data);
 }
     // public function index()
     // {
@@ -203,148 +291,169 @@ public function exportExcel()
     //     return view('admin/index', $data);
     // }
 
-    public function view($productId)
-    {
-        $product = $this->productModel->find($productId);
-        if (!$product) {
-            return redirect()->back()->with('error', 'Product not found');
-        }
+// public function view($productId)
+// {
+//     $product = $this->productModel->find($productId);
+//     if (!$product) {
+//         return redirect()->back()->with('error', 'Product not found');
+//     }
 
-        $initialStock = $this->stInitialModel->getInitialStock($productId);
-        $available = $this->stProductModel->getAvailableStock($productId);
-        $booked = $this->stProductModel->getBookedStock($productId);
+//     // Get basic stock data
+//     $initialStock = $this->stInitialModel->getInitialStock($productId);
+//     $available = $this->stMovementModel->getAvailableStock($productId);
+//     $booked = $this->stMovementModel->getBookedStock($productId);
 
-        $data = [
-            'title' => 'Stock Detail - ' . $product['nama'],
-            'product' => $product,
-            'productId' => $productId,
-            'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
-            'available' => $available,
-            'booked' => $booked,
-            'total' =>  $available + $booked,
-            'stock_details' => $this->stProductModel->getStockDetails($productId),
-            'movement_history' => $this->stMovementModel->getProductHistory($productId),
-            'stockData' => $this->stMovementModel->getStockByProduct($productId),
-            'locations' => $this->locationModel->findAll()
-        ];
+//     // Get finishing variations
+//     $finishings = $this->finishingModel->where('id_product', $productId)->findAll();
+//     $finishingStocks = [];
+    
+//     foreach ($finishings as $finishing) {
+//         $finishingStocks[$finishing['id']] = [
+//             'initial' => $this->stInitialModel->getInitialStock($productId, $finishing['id'])['quantity'] ?? 0,
+//             'available' => $this->stMovementModel->getAvailableStock($productId, $finishing['id']),
+//             'booked' => $this->stMovementModel->getBookedStock($productId, $finishing['id']),
+//             'locations' => $this->stMovementModel->getStockByProduct($productId, $finishing['id'])
+//         ];
+//     }
 
-        $data['content'] = view('admin/content/product_stock_view',$data);
-        return view('admin/index', $data);
-    }
+//     // Prepare data for view
+//     $data = [
+//         'title' => 'Stock Detail - ' . $product['nama'],
+//         'product' => $product,
+//         'productId' => $productId,
+//         'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
+//         'available' => $available,
+//         'booked' => $booked,
+//         'total' => $available + $booked,
+//         'finishings' => $finishings,
+//         'finishing_stocks' => $finishingStocks,
+//         'stock_data' => $this->stMovementModel->getStockByProduct($productId),
+//         'movement_history' => $this->stMovementModel->getProductHistory($productId),
+//         'locations' => $this->locationModel->findAll()
+//     ];
 
-    public function setInitialStock($productId)
-    {
-        $rules = [
-            'quantity' => 'required|numeric|greater_than[0]',
-            'location_id' => 'permit_empty|numeric'
-        ];
+//     $data['content'] = view('admin/content/product_stock_view',$data);
+//         return view('admin/index', $data);
+// }
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+    // public function setInitialStock($productId)
+    // {
+    //     $rules = [
+    //         'quantity' => 'required|numeric|greater_than[0]',
+    //         'location_id' => 'permit_empty|numeric'
+    //     ];
 
-        $data = [
-            'product_id' => $productId,
-            'quantity' => $this->request->getPost('quantity'),
-            'location_id' => $this->request->getPost('location_id')
-        ];
+    //     if (!$this->validate($rules)) {
+    //         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    //     }
 
-        // Check if initial stock exists
-        $existing = $this->stInitialModel->where('product_id', $productId)->first();
+    //     $data = [
+    //         'product_id' => $productId,
+    //         'quantity' => $this->request->getPost('quantity'),
+    //         'location_id' => $this->request->getPost('location_id')
+    //     ];
+
+    //     // Check if initial stock exists
+    //     $existing = $this->stInitialModel->where('product_id', $productId)->first();
         
-        if ($existing) {
-            $this->stInitialModel->where('id',$existing['id'])->set( $data)->update();
-        } else {
-            $this->stInitialModel->insert($data);
-        }
+    //     if ($existing) {
+    //         $this->stInitialModel->where('id',$existing['id'])->set( $data)->update();
+    //     } else {
+    //         $this->stInitialModel->insert($data);
+    //     }
 
-        // Add to current stock
+    //     // Add to current stock
 
 
-        return redirect()->to("/productstock/view/$productId")->with('message', 'Initial stock set successfully');
-    }
+    //     return redirect()->to("/productstock/view/$productId")->with('message', 'Initial stock set successfully');
+    // }
 
-    public function adjustStock($productId)
-    {
-        $rules = [
-            'adjustment_type' => 'required|in_list[in,out]',
-            'quantity' => 'required|numeric|greater_than[0]',
-            'location_id' => 'permit_empty|numeric',
-            'notes' => 'permit_empty|string',
-            'code' => 'permit_empty|string'
-        ];
+// public function adjustStock($productId)
+// {
+//     $rules = [
+//         'adjustment_type' => 'required|in_list[in,out]',
+//         'quantity' => 'required|numeric|greater_than[0]',
+//         'location_id' => 'permit_empty|numeric',
+//         'finishing_id' => 'permit_empty|numeric',
+//         'notes' => 'permit_empty|string',
+//         'code' => 'permit_empty|string'
+//     ];
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+//     if (!$this->validate($rules)) {
+//         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+//     }
 
-        $adjustmentType = $this->request->getPost('adjustment_type');
-        $quantity = $this->request->getPost('quantity');
-        $locationId = $this->request->getPost('location_id');
-        $notes = $this->request->getPost('notes');
-        $code = $this->request->getPost('code');
+//     $adjustmentType = $this->request->getPost('adjustment_type');
+//     $quantity = $this->request->getPost('quantity');
+//     $locationId = $this->request->getPost('location_id');
+//     $finishingId = $this->request->getPost('finishing_id') ?: null;
+//     $notes = $this->request->getPost('notes');
+//     $code = $this->request->getPost('code');
 
-        if ($adjustmentType === 'in') {
-            $stockData = [
-                'product_id' => $productId,
-                'quantity' => $quantity,
-                'location_id' => $locationId,
-                'label_code' => 'ADJ-' . date('YmdHis'),
-                'status' => 'available',
-                
-            ];
-            
-            $this->stProductModel->insert($stockData);
-        } else {
-            // For stock out, deduct from available stock
-            $available = $this->stProductModel->getAvailableStock($productId);
-            if ($available < $quantity) {
-                return redirect()->back()->with('error', 'Insufficient stock available');
-            }
-
-            // Deduct from oldest stock first (FIFO)
-            $batches = $this->stProductModel
-                ->where('product_id', $productId)
-                ->where('status', 'available')
-                ->orderBy('created_at', 'ASC')
-                ->findAll();
-
-            $remaining = $quantity;
-            
-            foreach ($batches as $batch) {
-                if ($remaining <= 0) break;
-                
-                $deduct = min($batch['quantity'], $remaining);
-                
-                $newQuantity = $batch['quantity'] - $deduct;
-                
-                if ($newQuantity > 0) {
-                    $this->stProductModel->update($batch['id'], ['quantity' => $newQuantity]);
-                } else {
-                    $this->stProductModel->delete($batch['id']);
-                }
-                
-                $remaining -= $deduct;
-            }
-        }
-
-        // Log movement
-        $movementData = [
-            'product_id' => $productId,
-            'quantity' => $quantity,
-            'movement_type' => $adjustmentType === 'in' ? 'in' : 'out',
-            'reference_type' => 'adjustment',
-            'to_location' => $adjustmentType === 'in' ? $locationId : null,
-            'from_location' => $adjustmentType === 'out' ? $locationId : null,
-            'notes' => $notes ?? 'Manual adjustment',
-            'code' => $code,
-            'created_by' => $_SESSION['auth']['id']
-        ];
+//     if ($adjustmentType === 'in') {
+//         $stockData = [
+//             'product_id' => $productId,
+//             'quantity' => $quantity,
+//             'location_id' => $locationId,
+//             'finishing_id' => $finishingId,
+//             'label_code' => 'ADJ-' . date('YmdHis'),
+//             'status' => 'available',
+//         ];
         
-        $this->stMovementModel->logMovement($movementData);
+//         $this->stProductModel->insert($stockData);
+//     } else {
+//         // For stock out, check available stock with finishing consideration
+//         $available = $this->stProductModel->getAvailableStockAtLocation($productId, $locationId, $finishingId);
+//         if ($available < $quantity) {
+//             return redirect()->back()->with('error', 'Insufficient stock available for this finishing type');
+//         }
 
-        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
-    }
+//         // Deduct from oldest stock first (FIFO) with finishing filter
+//         $batches = $this->stProductModel
+//             ->where('product_id', $productId)
+//             ->where('status', 'available')
+//             ->where('location_id', $locationId)
+//             ->where('finishing_id', $finishingId)
+//             ->orderBy('created_at', 'ASC')
+//             ->findAll();
+
+//         $remaining = $quantity;
+        
+//         foreach ($batches as $batch) {
+//             if ($remaining <= 0) break;
+            
+//             $deduct = min($batch['quantity'], $remaining);
+            
+//             $newQuantity = $batch['quantity'] - $deduct;
+            
+//             if ($newQuantity > 0) {
+//                 $this->stProductModel->update($batch['id'], ['quantity' => $newQuantity]);
+//             } else {
+//                 $this->stProductModel->delete($batch['id']);
+//             }
+            
+//             $remaining -= $deduct;
+//         }
+//     }
+//     $userInfo = $_SESSION['auth'];
+//     // Log movement with finishing information
+//     $movementData = [
+//         'product_id' => $productId,
+//         'quantity' => $quantity,
+//         'movement_type' => $adjustmentType === 'in' ? 'in' : 'out',
+//         'reference_type' => 'adjustment',
+//         'to_location' => $adjustmentType === 'in' ? $locationId : null,
+//         'from_location' => $adjustmentType === 'out' ? $locationId : null,
+//         'finishing_id' => $finishingId,
+//         'notes' => $notes ?? 'Manual adjustment',
+//         'code' => $code,
+//         'user_id' => $userInfo['id'],
+//     ];
+    
+//     $this->stMovementModel->logMovement($movementData);
+
+//     return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
+// }
       public function bookStock($productId)
     {
         $data = [
@@ -361,36 +470,36 @@ public function exportExcel()
     }
 
     // Process Booking
-public function processBooking($productId)
-{
-    $rules = [
-        'quantity' => 'required|numeric|greater_than[0]',
-        'pi_id' => 'required|numeric',
-        'location_id' => 'required|numeric', // Added location validation
-        'notes' => 'permit_empty|string|max_length[500]'
-    ];
+// public function processBooking($productId)
+// {
+//     $rules = [
+//         'quantity' => 'required|numeric|greater_than[0]',
+//         'pi_id' => 'required|numeric',
+//         'location_id' => 'required|numeric', // Added location validation
+//         'notes' => 'permit_empty|string|max_length[500]'
+//     ];
 
-    if (!$this->validate($rules)) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    }
+//     if (!$this->validate($rules)) {
+//         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+//     }
 
-    $quantity = $this->request->getPost('quantity');
-    $piId = $this->request->getPost('pi_id');
-    $locationId = $this->request->getPost('location_id'); // Get location ID
-    $notes = $this->request->getPost('notes');
+//     $quantity = $this->request->getPost('quantity');
+//     $piId = $this->request->getPost('pi_id');
+//     $locationId = $this->request->getPost('location_id'); // Get location ID
+//     $notes = $this->request->getPost('notes');
 
-    // Check available stock at SPECIFIC location
-    $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $locationId);
+//     // Check available stock at SPECIFIC location
+//     $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $locationId);
     
-    if ($available < $quantity) {
-        return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
-    }
+//     if ($available < $quantity) {
+//         return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
+//     }
 
-    // Pass location ID to bookStock
-    $this->stMovementModel->bookStock($productId, $quantity, $piId, $locationId, $notes);
+//     // Pass location ID to bookStock
+//     $this->stMovementModel->bookStock($productId, $quantity, $piId, $locationId, $notes);
 
-    return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
-}
+//     return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
+// }
     // Release Booked Stock
     public function releaseBooking($bookingId)
     {
@@ -422,38 +531,38 @@ public function processBooking($productId)
     }
 
     // Process Transfer
-public function processTransfer($productId)
-{
-    $rules = [
-        'from_location_id' => 'required|numeric',
-        'to_location_id' => 'required|numeric',
-        'quantity' => 'required|numeric|greater_than[0]',
-        'notes' => 'permit_empty|string|max_length[500]'
-    ];
+// public function processTransfer($productId)
+// {
+//     $rules = [
+//         'from_location_id' => 'required|numeric',
+//         'to_location_id' => 'required|numeric',
+//         'quantity' => 'required|numeric|greater_than[0]',
+//         'notes' => 'permit_empty|string|max_length[500]'
+//     ];
 
-    if (!$this->validate($rules)) {
-        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    }
+//     if (!$this->validate($rules)) {
+//         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+//     }
 
-    // Correct way to access POST data in CodeIgniter 4:
-    $fromLocationId = $this->request->getPost('from_location_id');
-    $toLocationId = $this->request->getPost('to_location_id');
-    $quantity = $this->request->getPost('quantity');
-    $notes = $this->request->getPost('notes');
+//     // Correct way to access POST data in CodeIgniter 4:
+//     $fromLocationId = $this->request->getPost('from_location_id');
+//     $toLocationId = $this->request->getPost('to_location_id');
+//     $quantity = $this->request->getPost('quantity');
+//     $notes = $this->request->getPost('notes');
 
-    $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $fromLocationId);
+//     $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $fromLocationId);
     
-    if ($available < $quantity) {
-        return redirect()->back()->withInput()->with('error', 'Not enough available stock at source location');
-    }
+//     if ($available < $quantity) {
+//         return redirect()->back()->withInput()->with('error', 'Not enough available stock at source location');
+//     }
 
-    try {
-        $transferIds = $this->stMovementModel->transferStock($productId, $fromLocationId, $toLocationId, $quantity, $notes);
-        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock transferred successfully');
-    } catch (\Exception $e) {
-        return redirect()->back()->withInput()->with('error', 'Transfer failed: ' . $e->getMessage());
-    }
-}
+//     try {
+//         $transferIds = $this->stMovementModel->transferStock($productId, $fromLocationId, $toLocationId, $quantity, $notes);
+//         return redirect()->to("/productstock/view/$productId")->with('message', 'Stock transferred successfully');
+//     } catch (\Exception $e) {
+//         return redirect()->back()->withInput()->with('error', 'Transfer failed: ' . $e->getMessage());
+//     }
+// }
 // Complete a booking
 public function completeBooking()
 {
@@ -706,4 +815,469 @@ private function parseCurrencyId($value)
     $intVal = (int)$value;
     return ($intVal > 0) ? $intVal : null;
 }
+// Add this method to get available stock via AJAX
+public function getAvailableStock()
+{
+    $productId = $this->request->getGet('product_id');
+    $finishingId = $this->request->getGet('finishing_id');
+    $locationId = $this->request->getGet('location_id');
+    
+    $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $locationId, $finishingId);
+    
+    return $this->response->setJSON(['available' => $available]);
+}
+
+// Update processTransfer method
+public function processTransfer($productId)
+{
+    $rules = [
+        'from_location_id' => 'required|numeric',
+        'to_location_id' => 'required|numeric',
+        'quantity' => 'required|numeric|greater_than[0]',
+        'finishing_id' => 'permit_empty|numeric',
+        'notes' => 'permit_empty|string|max_length[500]'
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    $fromLocationId = $this->request->getPost('from_location_id');
+    $toLocationId = $this->request->getPost('to_location_id');
+    $quantity = $this->request->getPost('quantity');
+    $finishingId = $this->request->getPost('finishing_id');
+    $notes = $this->request->getPost('notes');
+
+    $available = $this->stMovementModel->getAvailableStockAtLocation(
+        $productId, 
+        $fromLocationId,
+        $finishingId
+    );
+    
+    if ($available < $quantity) {
+        return redirect()->back()->withInput()->with('error', 'Not enough available stock at source location');
+    }
+
+    try {
+        $this->stMovementModel->transferStock(
+            $productId, 
+            $fromLocationId, 
+            $toLocationId, 
+            $quantity, 
+            $notes,
+            $finishingId
+        );
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock transferred successfully');
+    } catch (\Exception $e) {
+        return redirect()->back()->withInput()->with('error', 'Transfer failed: ' . $e->getMessage());
+    }
+}
+
+// Similarly update processBooking method
+public function processBooking($productId)
+{
+    $rules = [
+        'quantity' => 'required|numeric|greater_than[0]',
+        'pi_id' => 'required|numeric',
+        'location_id' => 'required|numeric',
+        'finishing_id' => 'permit_empty|numeric',
+        'notes' => 'permit_empty|string|max_length[500]'
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+    }
+
+    $quantity = $this->request->getPost('quantity');
+    $piId = $this->request->getPost('pi_id');
+    $locationId = $this->request->getPost('location_id');
+    $finishingId = $this->request->getPost('finishing_id');
+    $notes = $this->request->getPost('notes');
+
+    $available = $this->stMovementModel->getAvailableStockAtLocation(
+        $productId, 
+        $locationId,
+        $finishingId
+    );
+    
+    if ($available < $quantity) {
+        return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
+    }
+
+    $this->stMovementModel->bookStock(
+        $productId, 
+        $quantity, 
+        $piId, 
+        $locationId, 
+        $notes,
+        $finishingId
+    );
+
+    return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
+}
+ public function view($productId)
+    {
+        $product = $this->productModel->find($productId);
+        if (!$product) {
+            return redirect()->back()->with('error', 'Product not found');
+        }
+
+        // Get all finishing variants for this product
+        $finishings = $this->finishingModel->where('id_product', $productId)->findAll();
+
+        // Calculate stock data
+        $initialStock = $this->stInitialModel->getInitialStock($productId);
+        $available = $this->stProductModel->getAvailableStock($productId);
+        $booked = $this->stProductModel->getBookedStock($productId);
+        $total = $available + $booked;
+
+        // Prepare finishing stocks data
+        $finishingStocks = [];
+        foreach ($finishings as $finishing) {
+            $finishingId = $finishing['id'];
+            $finishingStocks[$finishingId] = [
+                'initial' => $this->stInitialModel->getInitialStock($productId, $finishingId)['quantity'] ?? 0,
+                'available' => $this->stProductModel->getAvailableStock($productId, $finishingId),
+                'booked' => $this->stProductModel->getBookedStock($productId, $finishingId),
+                'locations' => $this->getStockByLocationWithFinishing($productId, $finishingId)
+            ];
+        }
+
+        // Get standard stock by location
+        $stockData = $this->getStockByLocation($productId);
+
+        // Prepare data for view
+        $data = [
+            'title' => 'Stock Detail - ' . $product['nama'],
+            'product' => $product,
+            'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
+            'available' => $available,
+            'booked' => $booked,
+            'total' => $total,
+            'finishings' => $finishings,
+            'finishing_stocks' => $finishingStocks,
+            'stock_data' => $stockData,
+            'movement_history' => $this->getMovementHistory($productId),
+            'locations' => $this->locationModel->findAll()
+        ];
+
+        
+        $data['content'] = view('admin/content/product_stock_view',$data);
+        return view('admin/index', $data);
+    }
+
+protected function getStockByLocation($productId)
+{
+    $locations = $this->locationModel->findAll();
+    $finishings = $this->finishingModel->where('id_product', $productId)->findAll();
+    $stockData = [];
+
+    foreach ($locations as $location) {
+        $locationId = $location['id'];
+        
+        // Standard variant (no finishing)
+        $standardCurrent = (int)$this->stProductModel
+            ->where('product_id', $productId)
+            ->where('location_id', $locationId)
+            ->where('finishing_id IS NULL')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
+
+        $standardBooked = (int)$this->stMovementModel
+            ->where('product_id', $productId)
+            ->where('from_location', $locationId)
+            ->where('finishing_id IS NULL')
+            ->where('movement_type', 'booked')
+            ->where('status IS NULL OR status !=', 'completed')
+            ->selectSum('quantity')
+            ->get()
+            ->getRow()
+            ->quantity ?? 0;
+
+        $standardAvailable = max(0, $standardCurrent - $standardBooked);
+
+        if ($standardCurrent > 0 || $standardBooked > 0) {
+            $stockData[] = [
+                'location_id' => $locationId,
+                'location_name' => $location['name'],
+                'finishing_id' => null,
+                'finishing_name' => 'Standard',
+                'current_stock' => $standardCurrent,
+                'booked_stock' => $standardBooked,
+                'available_stock' => $standardAvailable
+            ];
+        }
+
+        // Finishing variants
+        foreach ($finishings as $finishing) {
+            $finishingId = $finishing['id'];
+            
+            $finishingCurrent = (int)$this->stProductModel
+                ->where('product_id', $productId)
+                ->where('location_id', $locationId)
+                ->where('finishing_id', $finishingId)
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
+
+            $finishingBooked = (int)$this->stMovementModel
+                ->where('product_id', $productId)
+                ->where('from_location', $locationId)
+                ->where('finishing_id', $finishingId)
+                ->where('movement_type', 'booked')
+                ->where('status IS NULL OR status !=', 'completed')
+                ->selectSum('quantity')
+                ->get()
+                ->getRow()
+                ->quantity ?? 0;
+
+            $finishingAvailable = max(0, $finishingCurrent - $finishingBooked);
+
+            if ($finishingCurrent > 0 || $finishingBooked > 0) {
+                $stockData[] = [
+                    'location_id' => $locationId,
+                    'location_name' => $location['name'],
+                    'finishing_id' => $finishingId,
+                    'finishing_name' => $finishing['name'],
+                    'current_stock' => $finishingCurrent,
+                    'booked_stock' => $finishingBooked,
+                    'available_stock' => $finishingAvailable
+                ];
+            }
+        }
+    }
+
+    return $stockData;
+}
+protected function getStockByLocationWithFinishing($productId, $finishingId)
+{
+    $locations = $this->locationModel->findAll();
+    $stockData = [];
+
+    foreach ($locations as $location) {
+        $locationId = $location['id'];
+        
+        // Ensure we get numeric values for calculations
+        $current = $this->stProductModel->getStockByLocation($productId, $locationId, $finishingId);
+        $booked = $this->stMovementModel->getBookedStockByLocation($productId, $locationId, $finishingId);
+        
+        // Convert to numeric if array is returned
+        $currentValue = is_array($current) ? ($current['quantity'] ?? 0) : ($current ?? 0);
+        $bookedValue = is_array($booked) ? ($booked['quantity'] ?? 0) : ($booked ?? 0);
+        
+        $available = max(0, $currentValue - $bookedValue);
+
+        $stockData[$locationId] = [
+            'current_stock' => $currentValue,
+            'booked_stock' => $bookedValue,
+            'available_stock' => $available
+        ];
+    }
+
+    return $stockData;
+}
+
+    protected function getMovementHistory($productId)
+    {
+        $history = $this->stMovementModel->getProductHistory($productId);
+        // var_dump($history);
+        // die();
+        // Enhance history data with location names
+        foreach ($history as &$record) {
+            if ($record['from_location']) {
+                $from = $this->locationModel->find($record['from_location']);
+                $record['from_location_name'] = $from ? $from['name'] : null;
+            }
+            if ($record['to_location']) {
+                $to = $this->locationModel->find($record['to_location']);
+                $record['to_location_name'] = $to ? $to['name'] : null;
+            }
+            
+            // Set default finishing name if empty
+            if (empty($record['finishing_name'])) {
+                $record['finishing_name'] = 'Standard';
+            }
+        }
+
+        return $history;
+    }
+
+    public function setInitialStock($productId)
+    {
+        $rules = [
+            'quantity' => 'required|numeric|greater_than[0]',
+            'location_id' => 'permit_empty|numeric',
+            'finishing_id' => 'permit_empty|numeric'
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $data = [
+            'product_id' => $productId,
+            'quantity' => $this->request->getPost('quantity'),
+            'location_id' => $this->request->getPost('location_id'),
+            'finishing_id' => $this->request->getPost('finishing_id') ?: null
+        ];
+
+        $existing = $this->stInitialModel->where([
+            'product_id' => $productId,
+            'location_id' => $data['location_id'],
+            'finishing_id' => $data['finishing_id']
+        ])->first();
+
+        if ($existing) {
+            $this->stInitialModel->update($existing['id'], $data);
+        } else {
+            $this->stInitialModel->insert($data);
+        }
+
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Initial stock set successfully');
+    }
+
+    public function adjustStock($productId)
+    {
+        $rules = [
+            'adjustment_type' => 'required|in_list[in,out]',
+            'quantity' => 'required|numeric|greater_than[0]',
+            'location_id' => 'permit_empty|numeric',
+            'finishing_id' => 'permit_empty|numeric',
+            'notes' => 'permit_empty|string',
+            'code' => 'permit_empty|string'
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $adjustmentType = $this->request->getPost('adjustment_type');
+        $quantity = $this->request->getPost('quantity');
+        $locationId = $this->request->getPost('location_id');
+        $finishingId = $this->request->getPost('finishing_id') ?: null;
+        $notes = $this->request->getPost('notes');
+        $code = $this->request->getPost('code');
+
+        if ($adjustmentType === 'in') {
+            $stockData = [
+                'product_id' => $productId,
+                'quantity' => $quantity,
+                'location_id' => $locationId,
+                'finishing_id' => $finishingId,
+                'label_code' => 'ADJ-' . date('YmdHis'),
+                'status' => 'available',
+            ];
+            
+            $this->stProductModel->insert($stockData);
+        } else {
+            $available = $this->stProductModel->getAvailableStockAtLocation($productId, $locationId, $finishingId);
+            if ($available < $quantity) {
+                return redirect()->back()->with('error', 'Insufficient stock available for this finishing type');
+            }
+
+            $batches = $this->stProductModel
+                ->where('product_id', $productId)
+                ->where('status', 'available')
+                ->where('location_id', $locationId)
+                ->where('finishing_id', $finishingId)
+                ->orderBy('created_at', 'ASC')
+                ->findAll();
+
+            $remaining = $quantity;
+            
+            foreach ($batches as $batch) {
+                if ($remaining <= 0) break;
+                
+                $deduct = min($batch['quantity'], $remaining);
+                $newQuantity = $batch['quantity'] - $deduct;
+                
+                if ($newQuantity > 0) {
+                    $this->stProductModel->update($batch['id'], ['quantity' => $newQuantity]);
+                } else {
+                    $this->stProductModel->delete($batch['id']);
+                }
+                
+                $remaining -= $deduct;
+            }
+        }
+
+        $userInfo = session()->get('auth');
+        $movementData = [
+            'product_id' => $productId,
+            'quantity' => $quantity,
+            'movement_type' => $adjustmentType === 'in' ? 'in' : 'out',
+            'reference_type' => 'adjustment',
+            'to_location' => $adjustmentType === 'in' ? $locationId : null,
+            'from_location' => $adjustmentType === 'out' ? $locationId : null,
+            'finishing_id' => $finishingId,
+            'notes' => $notes ?? 'Manual adjustment',
+            'code' => $code,
+            'user_id' => $userInfo['id'],
+        ];
+        
+        $this->stMovementModel->logMovement($movementData);
+
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
+    }
+
+    public function exportMovements($productId)
+    {
+        $product = $this->productModel->find($productId);
+        if (!$product) {
+            return redirect()->back()->with('error', 'Product not found');
+        }
+
+        $movements = $this->getMovementHistory($productId);
+
+        // Create spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set headers
+        $sheet->setCellValue('A1', 'Movement History - ' . $product['nama']);
+        $sheet->mergeCells('A1:J1');
+        $sheet->getStyle('A1')->getFont()->setBold(true);
+        
+        // Column headers
+        $headers = ['Date', 'Document', 'Variant', 'Type', 'Quantity', 'From', 'To', 'Notes', 'User', 'Status'];
+        $sheet->fromArray($headers, null, 'A3');
+
+        // Add data
+        $row = 4;
+        foreach ($movements as $movement) {
+            $sheet->setCellValue('A'.$row, date('d M Y H:i', strtotime($movement['created_at'])));
+            $sheet->setCellValue('B'.$row, $movement['code']);
+            $sheet->setCellValue('C'.$row, $movement['finishing_name']);
+            $sheet->setCellValue('D'.$row, ucfirst($movement['movement_type']));
+            $sheet->setCellValue('E'.$row, $movement['quantity']);
+            $sheet->setCellValue('F'.$row, $movement['from_location_name'] ?? '-');
+            $sheet->setCellValue('G'.$row, $movement['to_location_name'] ?? '-');
+            $sheet->setCellValue('H'.$row, $movement['notes']);
+            $sheet->setCellValue('I'.$row, $movement['username'] ?? 'System');
+            $sheet->setCellValue('J'.$row, ($movement['status'] ?? '') == 'completed' ? 'Completed' : '');
+            
+            $row++;
+        }
+
+        // Style the sheet
+        $sheet->getStyle('A3:J3')->getFont()->setBold(true);
+        $sheet->getStyle('A3:J'.$row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        foreach(range('A','J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Output the file
+        $filename = 'Movement_History_'.$product['nama'].'_'.date('Ymd_His').'.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
 }

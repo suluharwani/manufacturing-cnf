@@ -226,7 +226,7 @@ $('.posting').on('click',function(){
       confirmButtonText: 'Ya, Posting!'
   }).then((result) => {
       if (result.isConfirmed) {
-          $.ajax({
+          $.ajax({ 
               type: "POST",
               url: base_url + '/requisitionprogress/posting/' + id,
               data: {completion:completion},

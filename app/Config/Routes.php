@@ -558,6 +558,7 @@ $routes->group('productstock', function($routes) {
     
     // Route for deleting a movement record (GET request)
     $routes->post('delete-movement/(:num)', 'StockController::deleteMovement/$1');
+    $routes->get('get-available-stock', 'StockController::getAvailableStock');
 });
 $routes->group('location', function($routes) {
     $routes->get('/', 'Location::index');

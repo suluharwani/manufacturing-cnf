@@ -2,32 +2,45 @@
     <div class="row g-4">
         <div class="col-12">
             <div class="bg-light rounded h-100 p-4">
-                            <div class="card-body">
-                        <table class="table table-striped" border="1" cellpadding="8" cellspacing="0">
-                            <thead>
+                <div class="card-body">
+                    <table class="table table-striped" border="1" cellpadding="8" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>Finishing</th>
+                                <th>Current</th>
+                                <th>Booked</th>
+                                <th>Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                            $finishingModel = new \App\Models\FinishingModel();
+                            $finishings = $finishingModel->where('id_product', $product['id'])->findAll();
+                            
+                            foreach ($stockData as $item): ?>
                                 <tr>
-                                    <th>Location ID</th>
-                                    <th>Location Code</th>
-                                    <th>Location Name</th>
-                                    <th>Current Stock</th>
-                                    <th>Booked Quantity</th>
-                                    <th>Available Quantity</th>
+                                    <td><?= $item['location_name'] ?></td>
+                                    <td>Standard</td>
+                                    <td><?= $item['current_stock'] ?></td>
+                                    <td><?= $item['booked_stock'] ?></td>
+                                    <td><?= $item['current_stock'] - $item['booked_stock'] ?></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($stockData as $item): ?>
+                                <?php foreach ($finishings as $finishing): 
+                                    $finishingStock = $this->stMovementModel->getStockByProductAndLocation($product['id'], $item['location_id'], $finishing['id']); ?>
                                     <tr>
-                                        <td><?= $item['location_id'] ?></td>
-                                        <td><?= $item['location_code'] ?></td>
                                         <td><?= $item['location_name'] ?></td>
-                                        <td><?= $item['current_stock'] ?></td>
-                                        <td><?= $item['booked_stock'] ?></td>
-                                        <td><?= $item['current_stock'] - $item['booked_stock'] ?></td>
+                                        <td><?= $finishing['name'] ?></td>
+                                        <td><?= $finishingStock['current_stock'] ?? 0 ?></td>
+                                        <td><?= $finishingStock['booked_stock'] ?? 0 ?></td>
+                                        <td><?= ($finishingStock['current_stock'] ?? 0) - ($finishingStock['booked_stock'] ?? 0) ?></td>
                                     </tr>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
                 <h1 class="mb-4"><?= $title ?></h1>
                 
                 <?php if (session('error')): ?>
@@ -49,15 +62,20 @@
                             <input type="text" class="form-control" value="<?= esc($product['nama']) ?>" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Available Quantity</label>
-                            <input type="text" class="form-control" value="<?= $available ?>" readonly>
+                            <label class="form-label">Finishing</label>
+                            <select class="form-select" name="finishing_id" id="finishing_select">
+                                <option value="">- Standard -</option>
+                                <?php foreach ($finishings as $finishing): ?>
+                                    <option value="<?= $finishing['id'] ?>"><?= esc($finishing['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">From Location</label>
-                            <select class="form-select" name="from_location_id" required>
+                            <select class="form-select" name="from_location_id" id="from_location" required>
                                 <option value="">Select Source Location</option>
                                 <?php foreach ($locations as $loc): ?>
                                     <option value="<?= $loc['id'] ?>"><?= esc($loc['name']) ?></option>
@@ -75,9 +93,15 @@
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">Quantity to Transfer</label>
-                        <input type="number" class="form-control" name="quantity" min="0.01" step="0.01" required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Available Quantity</label>
+                            <input type="text" class="form-control" id="available_quantity" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Quantity to Transfer</label>
+                            <input type="number" class="form-control" name="quantity" min="0.01" step="0.01" required>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -92,3 +116,23 @@
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    $('#finishing_select, #from_location').change(function() {
+        var productId = <?= $product['id'] ?>;
+        var finishingId = $('#finishing_select').val();
+        var locationId = $('#from_location').val();
+        
+        if (locationId) {
+            $.get('/productstock/get-available-stock', {
+                product_id: productId,
+                finishing_id: finishingId,
+                location_id: locationId
+            }, function(data) {
+                $('#available_quantity').val(data.available);
+            });
+        }
+    });
+});
+</script>

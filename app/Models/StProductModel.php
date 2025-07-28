@@ -8,49 +8,64 @@ class StProductModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $useSoftDeletes = true;
-    protected $allowedFields = ['product_id', 'quantity', 'location_id', 'label_code', 'status', 'pi_id'];
+    protected $allowedFields = ['product_id', 'quantity', 'location_id', 'label_code', 'status', 'pi_id','finishing_id'];
     protected $useTimestamps = true;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
 
-    public function getAvailableStock($productId)
-    {
-        $initial = $this->db->table('st_initial')
+public function getAvailableStock($productId, $finishingId = null)
+{
+    $builder = $this->db->table('st_initial')
         ->selectSum('quantity')
-        ->where('product_id', $productId)
-        ->get()
-        ->getRow()->quantity;
+        ->where('product_id', $productId);
+    
+    if ($finishingId) {
+        $builder->where('finishing_id', $finishingId);
+    }
+    
+    $initial = $builder->get()->getRow()->quantity;
 
-    // Get total stock in (initial stock + stock in adjustments)
-    $stockIn = $this->db->table('st_movement')
+    // Get total stock in
+    $builder = $this->db->table('st_movement')
         ->selectSum('quantity')
         ->where('product_id', $productId)
-        ->where('movement_type', 'in')
-        ->get()
-        ->getRow()->quantity;
+        ->where('movement_type', 'in');
+    
+    if ($finishingId) {
+        $builder->where('finishing_id', $finishingId);
+    }
+    
+    $stockIn = $builder->get()->getRow()->quantity;
 
-    // Get total stock out (stock out adjustments)
-    $stockOut = $this->db->table('st_movement')
+    // Get total stock out
+    $builder = $this->db->table('st_movement')
         ->selectSum('quantity')
         ->where('product_id', $productId)
-        ->where('movement_type', 'out')
-        ->get()
-        ->getRow()->quantity;
+        ->where('movement_type', 'out');
+    
+    if ($finishingId) {
+        $builder->where('finishing_id', $finishingId);
+    }
+    
+    $stockOut = $builder->get()->getRow()->quantity;
 
     // Get total booked stock
-    $bookedStock = $this->db->table('st_movement')
+    $builder = $this->db->table('st_movement')
         ->selectSum('quantity')
         ->where('product_id', $productId)
-        ->where('status', 'booked')
-        ->get()
-        ->getRow()->quantity;
-
-    // Calculate available stock
-    $availableStock =($initial ?? 0)+ ($stockIn ?? 0) - ($stockOut ?? 0) - ($bookedStock ?? 0);
-
-    return max(0, $availableStock);
+        ->where('status', 'booked');
+    
+    if ($finishingId) {
+        $builder->where('finishing_id', $finishingId);
     }
+    
+    $bookedStock = $builder->get()->getRow()->quantity;
+
+    return max(0, ($initial ?? 0) + ($stockIn ?? 0) - ($stockOut ?? 0) - ($bookedStock ?? 0));
+}
+
+// Similarly update getBookedStock(), getStockByLocation(), etc.
     
     public function getBookedStock($productId)
     {
