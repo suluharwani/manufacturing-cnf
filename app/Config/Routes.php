@@ -609,3 +609,12 @@ $routes->group('supfinance', function($routes) {
     $routes->get('downloaddocument/(:num)', 'SupFinance::downloadDocument/$1');
     $routes->delete('deletetransaction/(:num)', 'SupFinance::deleteTransaction/$1');
 }); 
+$routes->group('custfinance',  function($routes) {
+    $routes->get('/', 'CustFinance::index');
+    $routes->get('manage/(:num)', 'CustFinance::manage/$1');
+    $routes->post('getAccounts', 'CustFinance::getAccounts');
+    $routes->post('addtransaction', 'CustFinance::addTransaction');
+    $routes->get('gettransactiondetails/(:num)', 'CustFinance::getTransactionDetails/$1');
+    $routes->get('downloaddocument/(:num)', 'CustFinance::downloadDocument/$1');
+    $routes->delete('deletetransaction/(:num)', 'CustFinance::deleteTransaction/$1');
+});

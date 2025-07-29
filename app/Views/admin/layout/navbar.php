@@ -93,16 +93,14 @@
                     <a href="<?= base_url('material_request') ?>" class="dropdown-item">PR</a>
                     <a href="<?= base_url('purchase_order') ?>" class="dropdown-item">PO</a>
                     <a href="<?= base_url('pembelian') ?>" class="dropdown-item">Goods Received Note</a>
-                    <a href="<?= base_url('supplierfinance') ?>" class="dropdown-item">Supplier Finance</a>
-                    <a href="<?= base_url('customerfinance') ?>" class="dropdown-item">Customers Finance</a>
                 </div>
             </div>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
-                        class="fa fa-file me-2"></i>Finance</a>
+                        class="fa fa-credit-card me-2"></i>Finance</a>
                 <div class="dropdown-menu bg-transparent border-0">
                     <a href="<?= base_url('supfinance') ?>" class="dropdown-item">Supplier Finance</a>
-                    <a href="<?= base_url('customerfinance') ?>" class="dropdown-item">Customers Finance</a>
+                    <a href="<?= base_url('custfinance') ?>" class="dropdown-item">Customers Finance</a>
                 </div>
             </div>
             <div class="nav-item dropdown">
