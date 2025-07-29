@@ -22,7 +22,7 @@
                     class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
             <a href="<?= base_url('productstock') ?>" class="nav-item nav-link"><i
                     class="fa fa-cubes me-2"></i>Product Stock</a>
-            <a href="<?= base_url('componentstock') ?>" class="nav-item nav-link"><i
+            <a href="<?= base_url('component') ?>" class="nav-item nav-link"><i
                     class="fa fa-table me-2"></i>Component Stock</a>
             <?php
             if (session()->has('auth')) {
@@ -93,6 +93,16 @@
                     <a href="<?= base_url('material_request') ?>" class="dropdown-item">PR</a>
                     <a href="<?= base_url('purchase_order') ?>" class="dropdown-item">PO</a>
                     <a href="<?= base_url('pembelian') ?>" class="dropdown-item">Goods Received Note</a>
+                    <a href="<?= base_url('supplierfinance') ?>" class="dropdown-item">Supplier Finance</a>
+                    <a href="<?= base_url('customerfinance') ?>" class="dropdown-item">Customers Finance</a>
+                </div>
+            </div>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i
+                        class="fa fa-file me-2"></i>Finance</a>
+                <div class="dropdown-menu bg-transparent border-0">
+                    <a href="<?= base_url('supfinance') ?>" class="dropdown-item">Supplier Finance</a>
+                    <a href="<?= base_url('customerfinance') ?>" class="dropdown-item">Customers Finance</a>
                 </div>
             </div>
             <div class="nav-item dropdown">

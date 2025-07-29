@@ -588,3 +588,24 @@ $routes->group('bc-export', function($routes) {
     $routes->post('process', 'BcExport::processImport');
     $routes->get('detail/(:num)', 'BcExport::detail/$1');
 });
+$routes->group('component', function($routes) {
+    $routes->get('/', 'Component::index');
+    $routes->post('getData', 'Component::getData');
+    $routes->post('save', 'Component::save');
+    $routes->get('get/(:num)', 'Component::get/$1');
+    $routes->get('delete/(:num)', 'Component::delete/$1');
+    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1');
+    $routes->post('addTransaction', 'Component::addTransaction');
+    $routes->get('getStock/(:num)', 'Component::getStock/$1'); // Get stock info
+    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1'); // Get transaction history
+    $routes->post('saveTransaction', 'Component::saveTransaction');
+});
+$routes->group('supfinance', function($routes) {
+    $routes->get('/', 'SupFinance::index');
+    $routes->post('getAccounts', 'SupFinance::getAccounts');
+    $routes->get('manage/(:num)', 'SupFinance::manage/$1');
+    $routes->post('addtransaction', 'SupFinance::addTransaction');
+    $routes->get('gettransactiondetails/(:num)', 'SupFinance::getTransactionDetails/$1');
+    $routes->get('downloaddocument/(:num)', 'SupFinance::downloadDocument/$1');
+    $routes->delete('deletetransaction/(:num)', 'SupFinance::deleteTransaction/$1');
+}); 
