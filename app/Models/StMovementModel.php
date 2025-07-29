@@ -697,4 +697,36 @@ public function getBookedStockByLocation(int $product_id, ?int $finishing_id = n
     
     return $formatted;
 }
+/**
+ * Get booked stock quantity for a product at a specific location
+ * 
+ * @param int $productId Product ID
+ * @param int $locationId Location ID
+ * @param int|null $finishingId Finishing ID (optional)
+ * @return float Booked quantity
+ */
+public function getBookedStockAtLocation(int $productId, int $locationId, ?int $finishingId = null): float
+{
+    $builder = $this->builder();
+    
+    $builder->selectSum('quantity');
+    $builder->where([
+        'product_id' => $productId,
+        'from_location' => $locationId,
+        'to_location' => $locationId, // Booked stock has same from/to location
+        'movement_type' => 'booked',
+        'status' => 'booked'
+    ]);
+    
+    // Handle finishing condition
+    if ($finishingId !== null) {
+        $builder->where('finishing_id', $finishingId);
+    } else {
+        $builder->where('finishing_id IS NULL');
+    }
+    
+    $result = $builder->get()->getRow();
+    
+    return (float)($result->quantity ?? 0);
+}
 }

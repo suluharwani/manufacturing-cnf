@@ -14,28 +14,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-                            $finishingModel = new \App\Models\FinishingModel();
-                            $finishings = $finishingModel->where('id_product', $product['id'])->findAll();
-                            
-                            foreach ($stockData as $item): ?>
+                            <?php foreach ($stockData as $item): ?>
                                 <tr>
-                                    <td><?= $item['location_name'] ?></td>
-                                    <td>Standard</td>
-                                    <td><?= $item['current_stock'] ?></td>
-                                    <td><?= $item['booked_stock'] ?></td>
-                                    <td><?= $item['current_stock'] - $item['booked_stock'] ?></td>
+                                    <td><?= esc($item['location_name']) ?></td>
+                                    <td><?= $item['finishing_id'] ? esc($item['finishing_name']) : 'Standard' ?></td>
+                                    <td><?= number_format($item['current_stock']) ?></td>
+                                    <td><?= number_format($item['booked_stock']) ?></td>
+                                    <td class="<?= ($item['current_stock'] - $item['booked_stock']) <= 0 ? 'text-danger' : '' ?>">
+                                        <?= number_format($item['current_stock'] - $item['booked_stock']) ?>
+                                    </td>
                                 </tr>
-                                <?php foreach ($finishings as $finishing): 
-                                    $finishingStock = $this->stMovementModel->getStockByProductAndLocation($product['id'], $item['location_id'], $finishing['id']); ?>
-                                    <tr>
-                                        <td><?= $item['location_name'] ?></td>
-                                        <td><?= $finishing['name'] ?></td>
-                                        <td><?= $finishingStock['current_stock'] ?? 0 ?></td>
-                                        <td><?= $finishingStock['booked_stock'] ?? 0 ?></td>
-                                        <td><?= ($finishingStock['current_stock'] ?? 0) - ($finishingStock['booked_stock'] ?? 0) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
                             <?php endforeach; ?>
                         </tbody>
                     </table>

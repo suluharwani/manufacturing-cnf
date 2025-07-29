@@ -94,4 +94,31 @@ public function getAvailableStock($productId, $finishingId = null)
                    ->where('product_id', $productId)
                    ->findAll();
     }
+    public function getStockAtLocation($productId, $locationId, $finishingId = null)
+{
+    $builder = $this->builder();
+    
+    $builder->select([
+        'COALESCE(SUM(quantity), 0) as total_stock',
+        'COALESCE(SUM(CASE WHEN status = "available" THEN quantity ELSE 0 END), 0) as available_stock',
+        'COALESCE(SUM(CASE WHEN status = "booked" THEN quantity ELSE 0 END), 0) as booked_stock'
+    ]);
+    
+    $builder->where('product_id', $productId);
+    $builder->where('location_id', $locationId);
+    
+    if ($finishingId !== null) {
+        $builder->where('finishing_id', $finishingId);
+    } else {
+        $builder->where('finishing_id IS NULL');
+    }
+    
+    $result = $builder->get()->getRowArray();
+    
+    return [
+        'total_stock' => (int)$result['total_stock'] ?? 0,
+        'available_stock' => (int)$result['available_stock'] ?? 0,
+        'booked_stock' => (int)$result['booked_stock'] ?? 0
+    ];
+}
 }

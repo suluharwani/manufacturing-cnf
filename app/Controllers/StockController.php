@@ -639,20 +639,144 @@ public function bookStock($productId)
     }
 
     // Transfer Stock Form
-    public function transferStock($productId)
-    {
-        $data = [
-            'title' => 'Transfer Stock',
-            'product' => $this->productModel->find($productId),
-            'locations' => $this->locationModel->findAll(),
-            'available' => $this->stMovementModel->getAvailableStock($productId),
-            'validation' => \Config\Services::validation(),
-            'stockData' => $this->stMovementModel->getStockByProduct($productId)
-        ];
-
-        $data['content'] = view('admin/content/product_stock_transfer',$data);
-        return view('admin/index', $data);
+public function transferStock($productId)
+{
+    // Validate product exists
+    $product = $this->productModel->find($productId);
+    if (!$product) {
+        return redirect()->back()->with('error', 'Product not found');
     }
+
+    // Prepare view data
+    $data = [
+        'title' => 'Transfer Stock - ' . $product['nama'],
+        'product' => $product,
+        'locations' => $this->getActiveWarehouses(),
+        'available' => $this->getAvailableStockData($productId),
+        'validation' => \Config\Services::validation(),
+        'stockData' => $this->getStockDataWithFinishing($productId),
+        'finishings' => $this->getProductFinishings($productId)
+    ];
+
+    return view('admin/index', [
+        'content' => view('admin/content/product_stock_transfer', $data)
+    ]);
+}
+
+// New helper methods (could be moved to models later):
+
+/**
+ * Get only active warehouse locations
+ */
+protected function getActiveWarehouses()
+{
+    return $this->locationModel
+        ->where('type', 'warehouse')
+        ->where('is_active', 1)
+        ->where('deleted_at', null)
+        ->findAll();
+}
+
+/**
+ * Get available stock data with finishing variations
+ */
+protected function getAvailableStockData($productId)
+{
+    return $this->stMovementModel->getAvailableStock($productId);
+}
+
+/**
+ * Get stock data grouped by location and finishing
+ */
+protected function getStockDataWithFinishing($productId)
+{
+    $stockData = [];
+    $locations = $this->getActiveWarehouses();
+    $finishings = $this->getProductFinishings($productId);
+
+    foreach ($locations as $location) {
+        // Standard stock (no finishing)
+        $standardStock = $this->getLocationStock($productId, $location['id']);
+        if ($standardStock) {
+            $stockData[] = $standardStock;
+        }
+
+        // Finishing variants
+        foreach ($finishings as $finishing) {
+            $finishingStock = $this->getLocationStock($productId, $location['id'], $finishing['id']);
+            if ($finishingStock) {
+                $stockData[] = $finishingStock;
+            }
+        }
+    }
+
+    return $stockData;
+}
+
+/**
+ * Get stock data for specific location and finishing
+ */
+protected function getLocationStock($productId, $locationId, $finishingId = null)
+{
+    // Standard variant (no finishing)
+    $current = (int)$this->stProductModel
+        ->where('product_id', $productId)
+        ->where('location_id', $locationId)
+        ->where($finishingId !== null ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->selectSum('quantity')
+        ->get()
+        ->getRow()
+        ->quantity ?? 0;
+
+    // Subtract outgoing stock movements (out and transfer out)
+    $outgoing = (int)$this->stMovementModel
+        ->where('product_id', $productId)
+        ->where('from_location', $locationId)
+        ->groupStart()
+            ->where('movement_type', 'out')
+            ->orWhere('movement_type', 'transfer')
+        ->groupEnd()
+        ->where($finishingId !== null ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->selectSum('quantity')
+        ->get()
+        ->getRow()
+        ->quantity ?? 0;
+
+    // Get booked stock
+    $booked = (int)$this->stMovementModel
+        ->where('product_id', $productId)
+        ->where('from_location', $locationId)
+        ->where('movement_type', 'booked')
+        ->where('status IS NULL OR status !=', 'completed')
+        ->where($finishingId !== null ? ['finishing_id' => $finishingId] : 'finishing_id IS NULL')
+        ->selectSum('quantity')
+        ->get()
+        ->getRow()
+        ->quantity ?? 0;
+
+    // Calculate available stock
+    $available = max(0, $current - $outgoing - $booked);
+
+    return [
+        'location_id' => $locationId,
+        'location_name' => $this->locationModel->find($locationId)['name'],
+        'finishing_id' => $finishingId,
+        'finishing_name' => $finishingId !== null ? $this->finishingModel->find($finishingId)['name'] : 'Standard',
+        'current_stock' => max(0, $current - $outgoing),
+        'booked_stock' => $booked,
+        'available_stock' => $available
+    ];
+}
+
+/**
+ * Get all finishing variations for a product
+ */
+protected function getProductFinishings($productId)
+{
+    return $this->finishingModel
+        ->where('id_product', $productId)
+        ->findAll();
+}
 
     // Process Transfer
 // public function processTransfer($productId)
