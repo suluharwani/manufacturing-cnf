@@ -599,6 +599,7 @@ $routes->group('component', function($routes) {
     $routes->get('getStock/(:num)', 'Component::getStock/$1'); // Get stock info
     $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1'); // Get transaction history
     $routes->post('saveTransaction', 'Component::saveTransaction');
+    $routes->post('ajax_list', 'Component::ajax_list');
 });
 $routes->group('supfinance', function($routes) {
     $routes->get('/', 'SupFinance::index');

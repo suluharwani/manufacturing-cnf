@@ -35,6 +35,7 @@ public function index()
         ->join('product p', 'p.id = c.product_id', 'left')
         ->join('component_stocks s', 's.component_id = c.id', 'left')
         ->orderBy('c.id', 'ASC')
+        ->groupBy('c.id')
         ->findAll();
 
     $data['products'] = $this->productModel->findAll();
@@ -44,7 +45,7 @@ public function index()
     $data['content'] = view('admin/content/component', $data);
     return view('admin/index', $data);
 }
-
+ 
 public function get($id)
 {
     $component = $this->componentModel

@@ -1,4 +1,8 @@
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <style>
     .select2-container--bootstrap-5 {
         width: 100% !important;
@@ -56,58 +60,82 @@
             </div>
         <?php endif; ?>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Product</th>
-                        <th>Stock</th>
-                        <th>Unit</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach($components as $index => $component): ?>
-                    <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><?= esc($component['kode']) ?></td>
-                        <td><?= esc($component['nama']) ?></td>
-                        <td><?= esc($component['product_name'] ?? '-') ?></td>
-                        <td class="text-center">
-                            <span class="badge <?= ($component['quantity'] < $component['minimum_stock']) ? 'bg-danger' : 'bg-success' ?>">
-                                <?= $component['quantity'] ?? 0 ?>
-                            </span>
-                        </td>
-                        <td class="text-center"><?= esc($component['satuan']) ?></td>
-                        <td class="text-center">
-                            <span class="badge <?= $component['aktif'] == 1 ? 'bg-success' : 'bg-danger' ?>">
-                                <?= $component['aktif'] == 1 ? 'Active' : 'Inactive' ?>
-                            </span>
-                        </td>
-                        <td class="text-center action-buttons">
-                             <button class="btn btn-sm btn-warning stock-btn" data-id="<?=$component['id']?>" title="Manage Stock"> <i class="fas fa-book"></i></button>
-                            <button class="btn btn-sm btn-info" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#componentModal"
-                                    onclick="editComponent(<?= $component['id'] ?>)">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <form action="<?= site_url('component/delete/'.$component['id']) ?>" method="post" class="d-inline">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+<div class="table-responsive">
+    <table id="componentTable" class="table table-bordered table-hover" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Product</th>
+                <th>Stock</th>
+                <th>Unit</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach($components as $index => $component): ?>
+            <tr>
+                <td><?= $index + 1 ?></td>
+                <td><?= esc($component['kode']) ?></td>
+                <td><?= esc($component['nama']) ?></td>
+                <td><?= esc($component['product_name'] ?? '-') ?></td>
+                <td class="text-center">
+                    <span class="badge <?= ($component['quantity'] < $component['minimum_stock']) ? 'bg-danger' : 'bg-success' ?>">
+                        <?= $component['quantity'] ?? 0 ?>
+                    </span>
+                </td>
+                <td class="text-center"><?= esc($component['satuan']) ?></td>
+                <td class="text-center">
+                    <span class="badge <?= $component['aktif'] == 1 ? 'bg-success' : 'bg-danger' ?>">
+                        <?= $component['aktif'] == 1 ? 'Active' : 'Inactive' ?>
+                    </span>
+                </td>
+                <td class="text-center action-buttons">
+                    <button class="btn btn-sm btn-warning stock-btn" data-id="<?=$component['id']?>" title="Manage Stock"> <i class="fas fa-book"></i></button>
+                    <button class="btn btn-sm btn-info" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#componentModal"
+                            onclick="editComponent(<?= $component['id'] ?>)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <form action="<?= site_url('component/delete/'.$component['id']) ?>" method="post" class="d-inline">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#componentTable').DataTable({
+            // Opsi untuk membuat tabel responsif
+            responsive: true,
+            // Opsi untuk mengubah bahasa (opsional)
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                zeroRecords: "Data tidak ditemukan",
+                info: "Menampilkan halaman _PAGE_ dari _PAGES_",
+                infoEmpty: "Tidak ada data yang tersedia",
+                infoFiltered: "(difilter dari _MAX_ total data)",
+                paginate: {
+                    first: "Pertama",
+                    last: "Terakhir",
+                    next: "Selanjutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    });
+</script>
     </div>
 </div>
 
