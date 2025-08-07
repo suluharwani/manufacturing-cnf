@@ -995,7 +995,7 @@ private function getTunjangan()
         $sheet1->setCellValue('F1', 'Kode Penggajian');
         $sheet1->setCellValue('G1', 'Tanggal Awal');
         $sheet1->setCellValue('H1', 'Tanggal Akhir');
-        $sheet1->setCellValue('I1', 'Total Gaji');
+        $sheet1->setCellValue('I1', 'Total Gaji (Take Home Pay)');
         $sheet1->setCellValue('J1', 'Jam Kerja Total');
         $sheet1->setCellValue('K1', 'Overtime 1');
         $sheet1->setCellValue('L1', 'Overtime 2');
@@ -1003,10 +1003,11 @@ private function getTunjangan()
         $sheet1->setCellValue('N1', 'Jam Kerja+Overtime');
         $sheet1->setCellValue('O1', 'Jam Sabtu');
         $sheet1->setCellValue('P1', 'Jam Minggu');
-        $sheet1->setCellValue('Q1', 'Overtime');
-        $sheet1->setCellValue('R1', 'Potongan');
-        $sheet1->setCellValue('S1', 'Tunjangan');
-        $sheet1->setCellValue('T1', 'Gaji Kotor');
+        $sheet1->setCellValue('Q1', 'Total Jam Kerja');
+        $sheet1->setCellValue('R1', 'Overtime');
+        $sheet1->setCellValue('S1', 'Potongan');
+        $sheet1->setCellValue('T1', 'Tunjangan');
+        $sheet1->setCellValue('U1', 'Gaji Kotor (Sebelum Potongan dan Tunjangan)');
 
     $rekapGaji = $this->getRekapGaji(); // Mengambil data rekap gaji dari database
     $row = 2;
@@ -1029,10 +1030,11 @@ private function getTunjangan()
             $sheet1->setCellValue('N' . $row, $data['all_work_hours']);
             $sheet1->setCellValue('O' . $row, $data['saturday_work_Hours']);
             $sheet1->setCellValue('P' . $row, $data['sunday_work_Hours']);
-            $sheet1->setCellValue('Q' . $row, $data['OVT_salary']);
-            $sheet1->setCellValue('R' . $row, $data['totalDeduction']);
-            $sheet1->setCellValue('S' . $row, $data['totalAllowance']);
-            $sheet1->setCellValue('T' . $row, $data['grossSalary']);
+            $sheet1->setCellValue('Q' . $row, $data['all_work_hours']+$data['saturday_work_Hours']+$data['sunday_work_Hours']);
+            $sheet1->setCellValue('R' . $row, $data['OVT_salary']);
+            $sheet1->setCellValue('S' . $row, $data['totalDeduction']);
+            $sheet1->setCellValue('T' . $row, $data['totalAllowance']);
+            $sheet1->setCellValue('U' . $row, $data['grossSalary']);
         $row++;
     }
 

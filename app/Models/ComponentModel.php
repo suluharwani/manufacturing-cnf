@@ -13,7 +13,7 @@ class ComponentModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
 
     public function getData(array $postData)
     {

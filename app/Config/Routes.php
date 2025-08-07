@@ -593,7 +593,7 @@ $routes->group('component', function($routes) {
     $routes->post('getData', 'Component::getData');
     $routes->post('save', 'Component::save');
     $routes->get('get/(:num)', 'Component::get/$1');
-    $routes->get('delete/(:num)', 'Component::delete/$1');
+    $routes->post('delete/(:num)', 'Component::delete/$1');
     $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1');
     $routes->post('addTransaction', 'Component::addTransaction');
     $routes->get('getStock/(:num)', 'Component::getStock/$1'); // Get stock info
