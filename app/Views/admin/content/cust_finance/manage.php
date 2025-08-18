@@ -42,7 +42,7 @@
                 </div>
                 
                 <div class="row mb-4">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="balance-card p-3 bg-white">
                             <h6 class="text-muted">Current Balance</h6>
                             <h3 class="<?= $account['balance'] >= 0 ? 'balance-positive' : 'balance-negative' ?>">
@@ -51,13 +51,8 @@
                             <small class="text-muted">Last updated: <?= date('d M Y H:i', strtotime($account['updated_at'] ?? 'now')) ?></small>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="balance-card p-3 bg-white">
-                            <h6 class="text-muted">Credit Limit</h6>
-                            <h3><?= number_format($account['credit_limit'] ?? 0, 2, ',', '.') ?></h3>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
+              
+                    <div class="col-md-6">
                         <div class="balance-card p-3 bg-white">
                             <h6 class="text-muted">Status</h6>
                             <h3><?= $account['status'] == 1 ? '<span class="text-success">Active</span>' : '<span class="text-danger">Inactive</span>' ?></h3>
