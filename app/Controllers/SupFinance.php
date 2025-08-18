@@ -99,10 +99,35 @@ public function addTransaction()
         ]);
     }
 
+    $accountId = $this->request->getPost('account_id');
+    $type = $this->request->getPost('type');
+    $amount = (float)$this->request->getPost('amount');
+    
+    // Dapatkan saldo saat ini
+    $currentAccount = $this->supFinanceModel->find($accountId);
+    $currentBalance = $currentAccount['balance'] ?? 0;
+
+    // Validasi jika transaksi adalah pembayaran dan melebihi hutang
+    if ($type === 'payment') {
+        if ($amount <= 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => ['amount' => 'Payment amount must be greater than 0']
+            ]);
+        }
+        
+        if ($amount > abs($currentBalance)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => ['amount' => 'Payment amount exceeds the current debt. Maximum payment allowed: ' . abs($currentBalance)]
+            ]);
+        }
+    }
+
     $data = [
-        'account_id' => $this->request->getPost('account_id'),
-        'type' => $this->request->getPost('type'),
-        'amount' => $this->request->getPost('amount'),
+        'account_id' => $accountId,
+        'type' => $type,
+        'amount' => $amount,
         'transaction_date' => $this->request->getPost('transaction_date'),
         'description' => $this->request->getPost('description'),
         'status' => 'completed',
@@ -139,7 +164,7 @@ public function addTransaction()
     }
 
     // Get updated account balance
-    $updatedAccount = $this->supFinanceModel->find($data['account_id']);
+    $updatedAccount = $this->supFinanceModel->find($accountId);
 
     return $this->response->setJSON([
         'status' => 'success',
