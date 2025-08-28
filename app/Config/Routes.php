@@ -609,6 +609,12 @@ $routes->group('supfinance', function($routes) {
     $routes->get('gettransactiondetails/(:num)', 'SupFinance::getTransactionDetails/$1');
     $routes->get('downloaddocument/(:num)', 'SupFinance::downloadDocument/$1');
     $routes->delete('deletetransaction/(:num)', 'SupFinance::deleteTransaction/$1');
+    
+    // Route untuk download rekap
+    $routes->get('downloadReport', 'SupFinance::downloadReport');
+    
+    // Route untuk mendapatkan daftar supplier
+    $routes->get('getSupplierList', 'SupFinance::getSupplierList');
 }); 
 $routes->group('custfinance',  function($routes) {
     $routes->get('/', 'CustFinance::index');
@@ -618,4 +624,10 @@ $routes->group('custfinance',  function($routes) {
     $routes->get('gettransactiondetails/(:num)', 'CustFinance::getTransactionDetails/$1');
     $routes->get('downloaddocument/(:num)', 'CustFinance::downloadDocument/$1');
     $routes->delete('deletetransaction/(:num)', 'CustFinance::deleteTransaction/$1');
+    
+    // Route untuk download rekap
+    $routes->get('downloadReport', 'CustFinance::downloadReport');
+    
+    // Route untuk mendapatkan daftar customer
+    $routes->get('getCustomerList', 'CustFinance::getCustomerList');
 });

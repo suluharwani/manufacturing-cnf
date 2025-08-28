@@ -307,4 +307,44 @@ class CustFinanceModel extends Model
 
         return $this->db->transStatus();
     }
+    public function getReportData($startDate, $endDate, $customerId = null)
+{
+    $builder = $this->db->table('customer c')
+        ->select('c.id as customer_id, c.customer_name, c.contact_name, c.contact_phone,
+                 a.balance as final_balance, a.credit_limit, a.status,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "sale" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_sale,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "payment" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_payment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "adjustment" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_adjustment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "sale" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_sale,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "payment" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_payment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM cust_finance_transaction 
+                  WHERE account_id = a.id AND type = "adjustment" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_adjustment')
+        ->join('cust_finance_account a', 'a.customer_id = c.id', 'left')
+        ->where('c.deleted_at', null);
+    
+    if ($customerId && $customerId !== 'all') {
+        $builder->where('c.id', $customerId);
+    }
+    
+    $results = $builder->get()->getResultArray();
+    
+    // Hitung saldo awal dan format data
+    foreach ($results as &$row) {
+        $row['initial_balance'] = ($row['initial_sale'] - $row['initial_payment'] + $row['initial_adjustment']);
+        unset($row['initial_sale'], $row['initial_payment'], $row['initial_adjustment']);
+    }
+    
+    return $results;
+}
 }
