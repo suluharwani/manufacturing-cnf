@@ -22,11 +22,12 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Supplier Finance Accounts</h6>
-            <div>
-                <button class="btn btn-primary" onclick="refreshTable()">Refresh</button>
-            </div>
-        </div>
+    <h6 class="mb-0">Supplier Finance Accounts</h6>
+    <div>
+        <button class="btn btn-success me-2" onclick="openReportModal()">Download Rekap</button>
+        <button class="btn btn-primary" onclick="refreshTable()">Refresh</button>
+    </div>
+</div>
         <div class="table-responsive">
             <table id="tabel_serverside" class="table table-bordered display text-left" cellspacing="0" width="100%">
                 <thead>
@@ -132,7 +133,49 @@
         </div>
     </div>
 </div>
-
+<!-- Modal untuk Download Rekap -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">Download Rekap Supplier Finance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Tanggal Mulai</label>
+                            <input type="date" class="form-control" name="start_date" id="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Tanggal Akhir</label>
+                            <input type="date" class="form-control" name="end_date" id="end_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="format" class="form-label">Format Laporan</label>
+                        <select class="form-select" name="format" id="format" required>
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="supplier_filter" class="form-label">Filter Supplier (Opsional)</label>
+                        <select class="form-select" name="supplier_filter" id="supplier_filter">
+                            <option value="all">Semua Supplier</option>
+                            <!-- Options akan di-load via AJAX -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="downloadReport()">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="<?= base_url('assets') ?>/datatables/datatables.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -281,4 +324,78 @@
             }
         });
     }
+    function openReportModal() {
+    // Set default date range (last month)
+    const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    
+    $('#start_date').val(lastMonth.toISOString().split('T')[0]);
+    $('#end_date').val(today.toISOString().split('T')[0]);
+    
+    $('#reportModal').modal('show');
+}
+
+function downloadReport() {
+    const formData = new FormData($('#reportForm')[0]);
+    const params = new URLSearchParams(formData);
+    
+    // Redirect ke URL download
+    window.location.href = `<?= base_url('supfinance/downloadReport') ?>?${params.toString()}`;
+    
+    // Tutup modal
+    $('#reportModal').modal('hide');
+}
+function openReportModal() {
+    // Set default date range (last month)
+    const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    
+    $('#start_date').val(lastMonth.toISOString().split('T')[0]);
+    $('#end_date').val(today.toISOString().split('T')[0]);
+    
+    // Load supplier list via AJAX
+    loadSupplierList();
+    
+    $('#reportModal').modal('show');
+}
+
+function loadSupplierList() {
+    $.ajax({
+        url: '<?= base_url('supfinance/getSupplierList') ?>',
+        type: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                var options = '<option value="all">Semua Supplier</option>';
+                response.data.forEach(function(supplier) {
+                    options += '<option value="' + supplier.id + '">' + supplier.supplier_name + '</option>';
+                });
+                $('#supplier_filter').html(options);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Gagal memuat daftar supplier'
+                });
+            }
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan saat memuat daftar supplier'
+            });
+        }
+    });
+}
+
+function downloadReport() {
+    const formData = new FormData($('#reportForm')[0]);
+    const params = new URLSearchParams(formData);
+    
+    // Redirect ke URL download
+    window.location.href = `<?= base_url('supfinance/downloadReport') ?>?${params.toString()}`;
+    
+    // Tutup modal
+    $('#reportModal').modal('hide');
+}
 </script>

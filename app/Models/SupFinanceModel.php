@@ -305,4 +305,44 @@ public function addTransaction($data)
 
     return $this->db->transStatus();
 }
+public function getReportData($startDate, $endDate, $supplierId = null)
+{
+    $builder = $this->db->table('supplier s')
+        ->select('s.id as supplier_id, s.supplier_name, s.contact_name, s.contact_phone,
+                 a.balance as final_balance, a.credit_limit, a.status,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "purchase" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_purchase,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "payment" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_payment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "adjustment" 
+                  AND transaction_date < "' . $startDate . '" AND deleted_at IS NULL) as initial_adjustment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "purchase" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_purchase,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "payment" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_payment,
+                 (SELECT COALESCE(SUM(amount), 0) FROM sup_finance_transaction 
+                  WHERE account_id = a.id AND type = "adjustment" 
+                  AND transaction_date BETWEEN "' . $startDate . '" AND "' . $endDate . '" AND deleted_at IS NULL) as total_adjustment')
+        ->join('sup_finance_account a', 'a.supplier_id = s.id', 'left')
+        ->where('s.deleted_at', null);
+    
+    if ($supplierId && $supplierId !== 'all') {
+        $builder->where('s.id', $supplierId);
+    }
+    
+    $results = $builder->get()->getResultArray();
+    
+    // Hitung saldo awal dan format data
+    foreach ($results as &$row) {
+        $row['initial_balance'] = ($row['initial_purchase'] - $row['initial_payment'] + $row['initial_adjustment']);
+        unset($row['initial_purchase'], $row['initial_payment'], $row['initial_adjustment']);
+    }
+    
+    return $results;
+}
 }
