@@ -1538,14 +1538,14 @@ protected function getStockByLocationWithFinishing($productId, $finishingId)
             $row++;
         }
 
-        // Style the sheet
+        // Style sheet
         $sheet->getStyle('A3:J3')->getFont()->setBold(true);
         $sheet->getStyle('A3:J'.$row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
         foreach(range('A','J') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
-        // Output the file
+        // Output file
         $filename = 'Movement_History_'.$product['nama'].'_'.date('Ymd_His').'.xlsx';
         
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
