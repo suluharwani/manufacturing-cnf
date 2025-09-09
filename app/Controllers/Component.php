@@ -30,13 +30,13 @@ class Component extends BaseController
 public function index()
 {
     $data['components'] = $this->componentModel
-        ->select('c.*, p.nama as product_name, s.quantity, s.minimum_stock')
-        ->from('component_components c')
-        ->join('product p', 'p.id = c.product_id', 'left')
-        ->join('component_stocks s', 's.component_id = c.id', 'left')
-        ->orderBy('c.id', 'ASC')
-        ->groupBy('c.id')
-        ->findAll();
+    ->select('c.*, CONCAT(p.kode, " - ", p.nama) as product_name, s.quantity, s.minimum_stock')
+    ->from('component_components c')
+    ->join('product p', 'p.id = c.product_id', 'left')
+    ->join('component_stocks s', 's.component_id = c.id', 'left')
+    ->orderBy('c.id', 'ASC')
+    ->groupBy('c.id')
+    ->findAll();
 
     $data['products'] = $this->productModel->findAll();
     $data['group'] = 'Component';

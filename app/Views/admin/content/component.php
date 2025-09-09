@@ -1,9 +1,29 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Menambahkan html2canvas untuk konversi QR ke gambar -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+    /* Perbaikan untuk dropdown Select2 di dalam modal */
+    .select2-container--open {
+        z-index: 9999 !important;
+    }
+    .select2-dropdown {
+        z-index: 9999 !important;
+    }
+    .select2-container {
+        z-index: 9999 !important;
+    }
+    
+    /* Style lainnya */
     .select2-container--bootstrap-5 {
         width: 100% !important;
     }
@@ -30,15 +50,148 @@
     .modal-content {
         border-radius: 0.5rem;
     }
+    /* QR Code Preview Styling */
+    #qrcode {
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+    }
+    /* Print-specific styles */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .qrcode-sheet, .qrcode-sheet * {
+            visibility: visible;
+        }
+        .qrcode-sheet {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .qrcode-container {
+            width: 100%;
+            text-align: center;
+        }
+        .qrcode-label {
+            font-size: 10px;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+        .no-print {
+            display: none !important;
+        }
+        /* Ensure QR codes are visible when printing */
+        #qrcodePrintArea, #qrcodePrintArea * {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* A4 page setup */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    }
+    /* Style for print template */
+    .qrcode-print-item {
+        width: 46mm; /* A8 width is 74mm but we need to fit 4 in a row with margins */
+        height: 36mm; /* A8 height is 52mm but we need to fit 4 in a column with margins */
+        display: inline-block;
+        text-align: center;
+        padding: 2mm;
+        box-sizing: border-box;
+        page-break-inside: avoid;
+        border: 1px dotted #ccc;
+        margin: 2mm;
+    }
+    .print-only {
+        display: none;
+    }
+    .a4-page {
+        width: 210mm;
+        height: 297mm;
+        padding: 5mm;
+        box-sizing: border-box;
+        page-break-after: always;
+        position: relative;
+    }
+    .qr-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        gap: 2mm;
+        width: 100%;
+        height: 100%;
+    }
+    .qr-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px dotted #ccc;
+        padding: 1mm;
+    }
+    /* Styling untuk QR Code A8 */
+    .a8-qrcode {
+        width: 74mm;
+        height: 52mm;
+        padding: 5mm;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #000;
+        background: white;
+        font-family: Arial, sans-serif;
+    }
+    .a8-qrcode canvas {
+        width: 45mm !important;
+        height: 45mm !important;
+    }
+    .a8-code {
+        font-size: 12px;
+        font-weight: bold;
+        margin-top: 2mm;
+        text-align: center;
+    }
+    .a8-name {
+        font-size: 10px;
+        text-align: center;
+        margin-top: 1mm;
+        max-width: 70mm;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .a8-product {
+        font-size: 9px;
+        text-align: center;
+        margin-top: 1mm;
+        max-width: 70mm;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #555;
+    }
 </style>
 
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Component Management</h6>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#componentModal">
-                <i class="fas fa-plus me-2"></i>Add Component
-            </button>
+            <div>
+                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#printQRModal">
+                    <i class="fas fa-qrcode me-2"></i>Print QR Codes
+                </button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#componentModal">
+                    <i class="fas fa-plus me-2"></i>Add Component
+                </button>
+            </div>
         </div>
         
         <!-- Success/Error Messages -->
@@ -60,82 +213,88 @@
             </div>
         <?php endif; ?>
 
-<div class="table-responsive">
-    <table id="componentTable" class="table table-bordered table-hover" style="width:100%">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Product</th>
-                <th>Stock</th>
-                <th>Unit</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach($components as $index => $component): ?>
-            <tr>
-                <td><?= $index + 1 ?></td>
-                <td><?= esc($component['kode']) ?></td>
-                <td><?= esc($component['nama']) ?></td>
-                <td><?= esc($component['product_name'] ?? '-') ?></td>
-                <td class="text-center">
-                    <span class="badge <?= ($component['quantity'] < $component['minimum_stock']) ? 'bg-danger' : 'bg-success' ?>">
-                        <?= $component['quantity'] ?? 0 ?>
-                    </span>
-                </td>
-                <td class="text-center"><?= esc($component['satuan']) ?></td>
-                <td class="text-center">
-                    <span class="badge <?= $component['aktif'] == 1 ? 'bg-success' : 'bg-danger' ?>">
-                        <?= $component['aktif'] == 1 ? 'Active' : 'Inactive' ?>
-                    </span>
-                </td>
-                <td class="text-center action-buttons">
-                    <button class="btn btn-sm btn-warning stock-btn" data-id="<?=$component['id']?>" title="Manage Stock"> <i class="fas fa-book"></i></button>
-                    <button class="btn btn-sm btn-info" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#componentModal"
-                            onclick="editComponent(<?= $component['id'] ?>)">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <form action="<?= site_url('component/delete/'.$component['id']) ?>" method="post" class="d-inline">
-                        <?= csrf_field() ?>
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+        <div class="table-responsive">
+            <table id="componentTable" class="table table-bordered table-hover" style="width:100%">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Product</th>
+                        <th>Stock</th>
+                        <th>Unit</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($components as $index => $component): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= esc($component['kode']) ?></td>
+                        <td><?= esc($component['nama']) ?></td>
+                        <td><?= esc($component['product_name'] ?? '-') ?></td>
+                        <td class="text-center">
+                            <span class="badge <?= ($component['quantity'] < $component['minimum_stock']) ? 'bg-danger' : 'bg-success' ?>">
+                                <?= $component['quantity'] ?? 0 ?>
+                            </span>
+                        </td>
+                        <td class="text-center"><?= esc($component['satuan']) ?></td>
+                        <td class="text-center">
+                            <span class="badge <?= $component['aktif'] == 1 ? 'bg-success' : 'bg-danger' ?>">
+                                <?= $component['aktif'] == 1 ? 'Active' : 'Inactive' ?>
+                            </span>
+                        </td>
+                        <td class="text-center action-buttons">
+                            <button class="btn btn-sm btn-warning stock-btn" data-id="<?=$component['id']?>" title="Manage Stock"> <i class="fas fa-book"></i></button>
+                            <button class="btn btn-sm btn-info" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#componentModal"
+                                    onclick="editComponent(<?= $component['id'] ?>)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary qr-btn" 
+                                    data-id="<?=$component['id']?>" 
+                                    data-code="<?=esc($component['kode'])?>" 
+                                    data-name="<?=esc($component['nama'])?>" 
+                                    data-product="<?=esc($component['product_name'] ?? '')?>"
+                                    title="Generate QR Code">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                            <form action="<?= site_url('component/delete/'.$component['id']) ?>" method="post" class="d-inline">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
-<script>
-    $(document).ready(function() {
-        $('#componentTable').DataTable({
-            // Opsi untuk membuat tabel responsif
-            responsive: true,
-            // Opsi untuk mengubah bahasa (opsional)
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Data tidak ditemukan",
-                info: "Menampilkan halaman _PAGE_ dari _PAGES_",
-                infoEmpty: "Tidak ada data yang tersedia",
-                infoFiltered: "(difilter dari _MAX_ total data)",
-                paginate: {
-                    first: "Pertama",
-                    last: "Terakhir",
-                    next: "Selanjutnya",
-                    previous: "Sebelumnya"
-                }
-            }
-        });
-    });
-</script>
+        <script>
+            $(document).ready(function() {
+                $('#componentTable').DataTable({
+                    responsive: true,
+                    language: {
+                        search: "Cari:",
+                        lengthMenu: "Tampilkan _MENU_ data per halaman",
+                        zeroRecords: "Data tidak ditemukan",
+                        info: "Menampilkan halaman _PAGE_ dari _PAGES_",
+                        infoEmpty: "Tidak ada data yang tersedia",
+                        infoFiltered: "(difilter dari _MAX_ total data)",
+                        paginate: {
+                            first: "Pertama",
+                            last: "Terakhir",
+                            next: "Selanjutnya",
+                            previous: "Sebelumnya"
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 </div>
 
@@ -220,7 +379,76 @@
         </div>
     </div>
 </div>
-<!-- Add this modal for stock management -->
+
+<!-- Print QR Code Modal -->
+<div class="modal fade" id="printQRModal" tabindex="-1" aria-labelledby="printQRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="printQRModalLabel">Print QR Codes</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="componentSelect" class="form-label">Select Component</label>
+                            <select class="form-select select2-print" id="componentSelect">
+                                <option value="">-- Select Component --</option>
+                                <?php foreach($components as $component): ?>
+                                    <option value="<?= $component['id'] ?>" 
+                                            data-code="<?= esc($component['kode']) ?>" 
+                                            data-name="<?= esc($component['nama']) ?>"
+                                            data-product="<?= esc($component['product_name'] ?? '') ?>">
+                                        <?= esc($component['kode']) ?> - <?= esc($component['nama']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="qtyInput" class="form-label">Number of QR Codes to Print</label>
+                            <input type="number" class="form-control" id="qtyInput" min="1" max="100" value="16">
+                        </div>
+                        <div class="mb-3">
+                            <label for="qrSize" class="form-label">QR Code Size (px)</label>
+                            <input type="number" class="form-control" id="qrSize" min="50" max="300" value="150">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="generateQRBtn">
+                            <i class="fas fa-qrcode me-2"></i>Generate QR Code
+                        </button>
+                        <button type="button" class="btn btn-success ms-2 no-print" id="printQRBtn" disabled>
+                            <i class="fas fa-print me-2"></i>Print QR Codes
+                        </button>
+                        <!-- Tombol Download QR Code sebagai JPG dengan ukuran A8 -->
+                        <button type="button" class="btn btn-info ms-2 no-print" id="downloadQRBtn" disabled>
+                            <i class="fas fa-download me-2"></i>Download A8 JPG
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">QR Code Preview</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div id="qrcode"></div>
+                                <div id="qrInfo" class="mt-2">
+                                    <p class="mb-1 fw-bold" id="qrCodeText"></p>
+                                    <p class="mb-0 text-muted" id="qrNameText"></p>
+                                    <p class="mb-0 text-muted" id="qrProductText"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Print Area (Hidden) -->
+<div id="qrcodePrintArea" class="d-none"></div>
+
+<!-- Stock Modal -->
 <div class="modal fade" id="stockModal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -290,18 +518,23 @@
         </div>
     </div>
 </div>
-<!-- JavaScript Libraries -->
-<script src="<?= base_url('assets') ?>/js/jquery-3.6.0.min.js"></script>
-<script src="<?= base_url('assets') ?>/js/bootstrap.bundle.min.js"></script>
-<script src="<?= base_url('assets') ?>/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 with Bootstrap 5 theme
-    $('.select2').select2({
+    // Initialize Select2 with Bootstrap 5 theme untuk modal component
+    $('#componentModal .select2').select2({
         theme: 'bootstrap-5',
         placeholder: 'Select an option',
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $('#componentModal')
+    });
+
+    // Initialize Select2 dengan class yang berbeda untuk modal print
+    $('.select2-print').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Select an option',
+        allowClear: true,
+        dropdownParent: $('#printQRModal')
     });
 
     // Clear form when modal is hidden for adding new
@@ -311,7 +544,397 @@ $(document).ready(function() {
             $('#product_id').val(null).trigger('change');
         }
     });
+
+    // QR Code Generation
+    $('#generateQRBtn').click(function() {
+        const componentId = $('#componentSelect').val();
+        const componentCode = $('#componentSelect option:selected').data('code');
+        const componentName = $('#componentSelect option:selected').data('name');
+        const componentProduct = $('#componentSelect option:selected').data('product');
+        const qrSize = $('#qrSize').val();
+        
+        if (!componentId) {
+            alert('Please select a component first');
+            return;
+        }
+        
+        // Generate QR code data (you can customize this)
+        const qrData = `${componentCode}`;
+        
+        // Clear previous QR code
+        $('#qrcode').empty();
+        
+        // Generate new QR code
+        new QRCode(document.getElementById("qrcode"), {
+            text: qrData,
+            width: parseInt(qrSize),
+            height: parseInt(qrSize),
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        
+        // Update info text
+        $('#qrCodeText').text(componentCode);
+        $('#qrNameText').text(componentName);
+        $('#qrProductText').text(componentProduct || 'No product assigned');
+        
+        // Enable print and download buttons
+        $('#printQRBtn').prop('disabled', false);
+        $('#downloadQRBtn').prop('disabled', false);
+    });
+    
+    // Print QR Codes
+    $('#printQRBtn').click(function() {
+        const componentId = $('#componentSelect').val();
+        const componentCode = $('#componentSelect option:selected').data('code');
+        const componentName = $('#componentSelect option:selected').data('name');
+        const componentProduct = $('#componentSelect option:selected').data('product');
+        const qty = $('#qtyInput').val();
+        
+        if (!componentId) {
+            alert('Please select a component first');
+            return;
+        }
+        
+        // Generate QR code data
+        const qrData = `${componentCode}`;
+        
+        // Prepare print area
+        const printArea = $('#qrcodePrintArea');
+        printArea.empty().removeClass('d-none');
+        
+        // Calculate how many A4 pages we need (16 QR codes per page)
+        const qrPerPage = 16;
+        const totalPages = Math.ceil(qty / qrPerPage);
+        
+        // Generate A4 pages with QR codes
+        for (let page = 0; page < totalPages; page++) {
+            const a4Page = $('<div>').addClass('a4-page');
+            const qrGrid = $('<div>').addClass('qr-grid');
+            
+            // Calculate how many QR codes to put on this page
+            const qrOnThisPage = Math.min(qrPerPage, qty - (page * qrPerPage));
+            
+            // Generate QR codes for this page
+            for (let i = 0; i < qrOnThisPage; i++) {
+                const qrItem = $('<div>').addClass('qr-item');
+                
+                // Create a unique container for each QR code
+                const qrContainerId = `qrcode-${page}-${i}`;
+                const qrDiv = $('<div>').attr('id', qrContainerId);
+                qrItem.append(qrDiv);
+                
+                const codeText = $('<div>').addClass('fw-bold mb-1').text(componentCode).css('font-size', '10px');
+                qrItem.append(codeText);
+                
+                const nameText = $('<div>').text(componentName).css('font-size', '8px');
+                qrItem.append(nameText);
+                
+                if (componentProduct) {
+                    const productText = $('<div>').text(componentProduct).css('font-size', '7px').css('color', '#555');
+                    qrItem.append(productText);
+                }
+                
+                qrGrid.append(qrItem);
+                
+                // Generate QR code after the element is added to the DOM
+                setTimeout(() => {
+                    try {
+                        new QRCode(document.getElementById(qrContainerId), {
+                            text: qrData,
+                            width: 80,
+                            height: 80,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
+                    } catch (error) {
+                        console.error("Error generating QR code:", error);
+                    }
+                }, 10);
+            }
+            
+            a4Page.append(qrGrid);
+            printArea.append(a4Page);
+        }
+        
+        // Tunggu sebentar untuk memastikan semua QR code tergenerate
+        setTimeout(() => {
+            // Store original document contents
+            const originalContents = document.body.innerHTML;
+            
+            // Show only the print area for printing
+            const printContents = printArea[0].innerHTML;
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print QR Codes</title>
+                    <meta charset="utf-8">
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                        }
+                        .a4-page {
+                            width: 210mm;
+                            height: 297mm;
+                            padding: 5mm;
+                            box-sizing: border-box;
+                            page-break-after: always;
+                        }
+                        .qr-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            grid-template-rows: repeat(4, 1fr);
+                            gap: 2mm;
+                            width: 100%;
+                            height: 100%;
+                        }
+                        .qr-item {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            border: 1px dotted #ccc;
+                            padding: 1mm;
+                        }
+                        .qr-item canvas, .qr-item img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                    </style>
+                </head>
+                <body>${printContents}</body>
+                </html>
+            `;
+            
+            // Print the page
+            window.print();
+            
+            // Restore original contents
+            document.body.innerHTML = originalContents;
+            
+            // Re-initialize event listeners
+            initializeEventListeners();
+            
+            // Hide the print area again
+            printArea.addClass('d-none');
+        }, 1000); // Tunggu 1 detik untuk memastikan semua QR code selesai digenerate
+    });
+
+    // Download QR Code as JPG dengan ukuran A8
+    $('#downloadQRBtn').click(function() {
+        const componentCode = $('#componentSelect option:selected').data('code');
+        const componentName = $('#componentSelect option:selected').data('name');
+        const componentProduct = $('#componentSelect option:selected').data('product');
+        
+        // Buat elemen untuk QR Code A8
+        const a8Element = document.createElement('div');
+        a8Element.className = 'a8-qrcode';
+        
+        // Tambahkan QR code ke elemen A8
+        const qrDiv = document.createElement('div');
+        qrDiv.id = 'a8-qrcode-container';
+        a8Element.appendChild(qrDiv);
+        
+        // Tambahkan teks kode, nama, dan product
+        const codeText = document.createElement('div');
+        codeText.className = 'a8-code';
+        codeText.textContent = componentCode;
+        a8Element.appendChild(codeText);
+        
+        const nameText = document.createElement('div');
+        nameText.className = 'a8-name';
+        nameText.textContent = componentName;
+        a8Element.appendChild(nameText);
+        
+        if (componentProduct) {
+            const productText = document.createElement('div');
+            productText.className = 'a8-product';
+            productText.textContent = componentProduct;
+            a8Element.appendChild(productText);
+        }
+        
+        // Sembunyikan elemen sementara dari viewport
+        a8Element.style.position = 'fixed';
+        a8Element.style.left = '-1000px';
+        a8Element.style.top = '-1000px';
+        document.body.appendChild(a8Element);
+        
+        // Generate QR code di dalam elemen A8
+        new QRCode(document.getElementById('a8-qrcode-container'), {
+            text: componentCode,
+            width: 100,
+            height: 100,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        // Tunggu sebentar untuk memastikan QR code tergenerate
+        setTimeout(() => {
+            // Gunakan html2canvas untuk mengonversi elemen A8 ke gambar
+            html2canvas(a8Element, {
+                scale: 3, // Skala tinggi untuk kualitas gambar yang baik
+                width: 74 * 3.78, // Konversi mm ke px (1mm = 3.78px)
+                height: 52 * 3.78, // Konversi mm ke px (1mm = 3.78px)
+                useCORS: true
+            }).then(canvas => {
+                // Konversi canvas ke JPG data URL
+                const dataURL = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Buat link sementara untuk mendownload
+                const link = document.createElement('a');
+                link.download = `QRCode_${componentCode}_A8.jpg`;
+                link.href = dataURL;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Hapus elemen A8 dari DOM
+                document.body.removeChild(a8Element);
+            });
+        }, 300);
+    });
 });
+
+// Re-initialize event listeners after printing
+function initializeEventListeners() {
+    $('#printQRBtn').click(function() {
+        const componentId = $('#componentSelect').val();
+        const componentCode = $('#componentSelect option:selected').data('code');
+        const componentName = $('#componentSelect option:selected').data('name');
+        const componentProduct = $('#componentSelect option:selected').data('product');
+        const qty = $('#qtyInput').val();
+        
+        if (!componentId) {
+            alert('Please select a component first');
+            return;
+        }
+        
+        const qrData = `${componentCode}`;
+        const printArea = $('#qrcodePrintArea');
+        printArea.empty().removeClass('d-none');
+        
+        const qrPerPage = 16;
+        const totalPages = Math.ceil(qty / qrPerPage);
+        
+        for (let page = 0; page < totalPages; page++) {
+            const a4Page = $('<div>').addClass('a4-page');
+            const qrGrid = $('<div>').addClass('qr-grid');
+            
+            const qrOnThisPage = Math.min(qrPerPage, qty - (page * qrPerPage));
+            
+            for (let i = 0; i < qrOnThisPage; i++) {
+                const qrItem = $('<div>').addClass('qr-item');
+                
+                const qrContainerId = `qrcode-${page}-${i}`;
+                const qrDiv = $('<div>').attr('id', qrContainerId);
+                qrItem.append(qrDiv);
+                
+                const codeText = $('<div>').addClass('fw-bold mb-1').text(componentCode).css('font-size', '10px');
+                qrItem.append(codeText);
+                
+                const nameText = $('<div>').text(componentName).css('font-size', '8px');
+                qrItem.append(nameText);
+                
+                if (componentProduct) {
+                    const productText = $('<div>').text(componentProduct).css('font-size', '7px').css('color', '#555');
+                    qrItem.append(productText);
+                }
+                
+                qrGrid.append(qrItem);
+                
+                // Generate QR code after the element is added to the DOM
+                setTimeout(() => {
+                    try {
+                        new QRCode(document.getElementById(qrContainerId), {
+                            text: qrData,
+                            width: 80,
+                            height: 80,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
+                    } catch (error) {
+                        console.error("Error generating QR code:", error);
+                    }
+                }, 100);
+            }
+            
+            a4Page.append(qrGrid);
+            printArea.append(a4Page);
+        }
+        
+        // Tunggu sebentar untuk memastikan semua QR code tergenerate
+        setTimeout(() => {
+            const originalContents = document.body.innerHTML;
+            const printContents = printArea[0].innerHTML;
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print QR Codes</title>
+                    <meta charset="utf-8">
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            font-family: Arial, sans-serif;
+                        }
+                        .a4-page {
+                            width: 210mm;
+                            height: 297mm;
+                            padding: 5mm;
+                            box-sizing: border-box;
+                            page-break-after: always;
+                        }
+                        .qr-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            grid-template-rows: repeat(4, 1fr);
+                            gap: 2mm;
+                            width: 100%;
+                            height: 100%;
+                        }
+                        .qr-item {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            border: 1px dotted #ccc;
+                            padding: 1mm;
+                        }
+                        .qr-item canvas, .qr-item img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                    </style>
+                </head>
+                <body>${printContents}</body>
+                </html>
+            `;
+            
+            window.print();
+            document.body.innerHTML = originalContents;
+            initializeEventListeners();
+            printArea.addClass('d-none');
+        }, 500);
+    });
+}
 
 // Function to load component data for editing
 function editComponent(id) {
@@ -338,10 +961,31 @@ function editComponent(id) {
             alert('Error loading component data');
         });
 }
+
 // Add this to your existing JavaScript
 $(document).on('click', '.stock-btn', function() {
     var id = $(this).data('id');
     showStockModal(id);
+});
+
+// Add this for individual QR code generation
+$(document).on('click', '.qr-btn', function() {
+    const id = $(this).data('id');
+    const code = $(this).data('code');
+    const name = $(this).data('name');
+    const product = $(this).data('product');
+    
+    // Set the values in the modal
+    $('#componentSelect').val(id).trigger('change');
+    $('#qtyInput').val(16); // Default to one A4 page
+    
+    // Open the modal
+    $('#printQRModal').modal('show');
+    
+    // Generate QR code immediately
+    setTimeout(function() {
+        $('#generateQRBtn').click();
+    }, 500);
 });
 
 function showStockModal(id) {
@@ -357,7 +1001,7 @@ function showStockModal(id) {
             // Load transaction history
             loadTransactionHistory(id);
         } else {
-            swal.fire('danger', response.message);
+            alert(response.message);
         }
     }, 'json');
     
@@ -398,7 +1042,7 @@ $('#stockForm').submit(function(e) {
     
     $.post("<?= site_url('component/saveTransaction') ?>", formData, function(response) {
         if (response.status) {
-            swal.fire('success', response.message);
+            alert(response.message);
             // Refresh stock info and history
             var componentId = $('#stock_component_id').val();
             loadTransactionHistory(componentId);
@@ -407,11 +1051,8 @@ $('#stockForm').submit(function(e) {
                     $('#current_stock').val(stockResponse.data.quantity);
                 }
             }, 'json');
-            
-            // Also refresh the main components table
-            loadComponents();
         } else {
-            swal.fire('danger', response.message);
+            alert(response.message);
         }
     }, 'json').always(function() {
         saveButton.prop('disabled', false);

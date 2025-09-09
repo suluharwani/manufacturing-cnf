@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/forbidden', 'Home::forbidden');
 $routes->get('/col/(:any)', 'Home::col/$1');
+$routes->get('/cctv', 'Home::cctv');
 $routes->get('/', 'Homepage::index');
 $routes->get('/inputbom/(:any)/(:any)', 'ProductController::inputbom/$1/$2',['filter' => 'accessControl:2']);
 $routes->get('/databom/(:any)/(:any)', 'ProductController::databom/$1/$2',['filter' => 'accessControl:2']);
