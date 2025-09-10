@@ -459,15 +459,15 @@ public function exportExcel()
         
         // Get transactions within date range
         $transactions = $this->transactionModel
-            ->select('ct.*, c.kode as component_code, c.nama as component_name, u.nama_depan')
-            ->from('component_transactions ct')
-            ->join('component_components c', 'c.id = ct.component_id')
-            ->join('users u', 'u.id = ct.created_by', 'left')
-            ->where('DATE(ct.created_at) >=', $startDate)
-            ->where('DATE(ct.created_at) <=', $endDate)
-            ->orderBy('ct.created_at', 'DESC')
-            ->findAll();
-        
+                        ->select('ct.*, c.kode as component_code, c.nama as component_name, CONCAT(u.nama_depan, " ", u.nama_belakang) as username')
+                        ->from('component_transactions ct')
+                        ->join('component_components c', 'c.id = ct.component_id')
+                        ->join('users u', 'u.id = ct.created_by', 'left')
+                        ->where('DATE(ct.created_at) >=', $startDate)
+                        ->where('DATE(ct.created_at) <=', $endDate)
+                        ->groupBy('ct.id') // Ganti dengan kolom primary key yang sesuai
+                        ->orderBy('ct.created_at', 'DESC')
+                        ->findAll();
         // Populate transaction data
         $tRow = 3;
         foreach ($transactions as $transaction) {
