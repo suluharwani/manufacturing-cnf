@@ -590,19 +590,19 @@ $routes->group('bc-export', function($routes) {
     $routes->get('detail/(:num)', 'BcExport::detail/$1');
 });
 $routes->group('component', function($routes) {
-    $routes->get('/', 'Component::index');
-    $routes->post('getData', 'Component::getData');
-    $routes->post('save', 'Component::save');
-    $routes->get('get/(:num)', 'Component::get/$1');
-    $routes->post('delete/(:num)', 'Component::delete/$1');
-    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1');
-    $routes->post('addTransaction', 'Component::addTransaction');
-    $routes->get('getStock/(:num)', 'Component::getStock/$1'); // Get stock info
-    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1'); // Get transaction history
-    $routes->post('saveTransaction', 'Component::saveTransaction');
-    $routes->post('ajax_list', 'Component::ajax_list');
-    $routes->post('deleteTransaction', 'Component::deleteTransaction');
-    $routes->post('exportExcel', 'Component::exportExcel');
+    $routes->get('/', 'Component::index',['filter' => 'accessControl:2']);
+    $routes->post('getData', 'Component::getData',['filter' => 'accessControl:2']);
+    $routes->post('save', 'Component::save',['filter' => 'accessControl:2']);
+    $routes->get('get/(:num)', 'Component::get/$1',['filter' => 'accessControl:2']);
+    $routes->post('delete/(:num)', 'Component::delete/$1',['filter' => 'accessControl:2']);
+    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1',['filter' => 'accessControl:2']);
+    $routes->post('addTransaction', 'Component::addTransaction',['filter' => 'accessControl:2']);
+    $routes->get('getStock/(:num)', 'Component::getStock/$1',['filter' => 'accessControl:2']); // Get stock info
+    $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1',['filter' => 'accessControl:2']); // Get transaction history
+    $routes->post('saveTransaction', 'Component::saveTransaction',['filter' => 'accessControl:2']);
+    $routes->post('ajax_list', 'Component::ajax_list',['filter' => 'accessControl:2']);
+    $routes->post('deleteTransaction', 'Component::deleteTransaction',['filter' => 'accessControl:2']);
+    $routes->post('exportExcel', 'Component::exportExcel',['filter' => 'accessControl:2']);
 });
 $routes->group('supfinance', function($routes) {
     $routes->get('/', 'SupFinance::index');
