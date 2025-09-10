@@ -183,16 +183,19 @@
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h6 class="mb-0">Component Management</h6>
-            <div>
-                <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#printQRModal">
-                    <i class="fas fa-qrcode me-2"></i>Print QR Codes
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#componentModal">
-                    <i class="fas fa-plus me-2"></i>Add Component
-                </button>
-            </div>
-        </div>
+    <h6 class="mb-0">Component Management</h6>
+    <div>
+        <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#exportModal">
+            <i class="fas fa-file-excel me-2"></i>Export Excel
+        </button>
+        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#printQRModal">
+            <i class="fas fa-qrcode me-2"></i>Print QR Codes
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#componentModal">
+            <i class="fas fa-plus me-2"></i>Add Component
+        </button>
+    </div>
+</div>
         
         <!-- Success/Error Messages -->
         <?php if(session()->getFlashdata('success')): ?>
@@ -499,10 +502,10 @@
                                     <th>Quantity</th>
                                     <th>Reference</th>
                                     <th>Notes</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Transaction history will be loaded here -->
                             </tbody>
                         </table>
                     </div>
@@ -518,6 +521,45 @@
         </div>
     </div>
 </div>
+
+<!-- Tambahkan di bagian atas file component.php, setelah styles -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="exportModalLabel">Export Stock Data</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="exportForm" action="<?= site_url('component/exportExcel') ?>" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="start_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="end_date" required>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="includeTransactions" name="include_transactions" checked>
+                        <label class="form-check-label" for="includeTransactions">
+                            Include Transaction History
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Export Excel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tambahkan tombol export di bagian header -->
+
+
+<!-- Perbaikan tabel riwayat transaksi di stockModal -->
 
 <script>
 $(document).ready(function() {
@@ -1020,11 +1062,16 @@ function loadTransactionHistory(componentId) {
                         <td>${transaction.quantity}</td>
                         <td>${transaction.reference || '-'}</td>
                         <td>${transaction.notes || '-'}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${transaction.id}, ${componentId})" title="Delete Transaction">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
         } else {
-            html = '<tr><td colspan="5" class="text-center">No transactions found</td></tr>';
+            html = '<tr><td colspan="6" class="text-center">No transactions found</td></tr>';
         }
         $('#transactionHistory tbody').html(html);
     }, 'json');
@@ -1058,5 +1105,50 @@ $('#stockForm').submit(function(e) {
         saveButton.prop('disabled', false);
         saveButton.find('.spinner-border').addClass('d-none');
     });
+});
+
+// Tambahkan fungsi untuk menghapus transaksi
+function deleteTransaction(transactionId, componentId) {
+    if (confirm('Are you sure you want to delete this transaction? This will reverse the stock change.')) {
+        $.post("<?= site_url('component/deleteTransaction') ?>", {
+            id: transactionId,
+            component_id: componentId,
+            _token: "<?= csrf_hash() ?>"
+        }, function(response) {
+            if (response.status) {
+                alert(response.message);
+                // Refresh stock info and history
+                loadTransactionHistory(componentId);
+                $.get("<?= site_url('component/getStock/') ?>" + componentId, function(stockResponse) {
+                    if (stockResponse.status) {
+                        $('#current_stock').val(stockResponse.data.quantity);
+                    }
+                }, 'json');
+            } else {
+                alert(response.message);
+            }
+        }, 'json');
+    }
+}
+
+// Perbarui fungsi loadTransactionHistory untuk menambahkan tombol delete
+
+$('#stockForm').on('submit', function(e) {
+    // Hanya submit jika tombol yang ditekan adalah tombol submit form
+    if (!$(e.originalEvent.submitter).hasClass('delete-transaction-btn')) {
+        return true;
+    }
+    e.preventDefault();
+    return false;
+});
+// Set tanggal default untuk form export
+$(document).ready(function() {
+    // Set tanggal awal ke awal bulan ini
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    $('#startDate').val(firstDay.toISOString().split('T')[0]);
+    $('#endDate').val(lastDay.toISOString().split('T')[0]);
 });
 </script>

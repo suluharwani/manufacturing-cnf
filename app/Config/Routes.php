@@ -601,6 +601,8 @@ $routes->group('component', function($routes) {
     $routes->get('getTransactions/(:num)', 'Component::getTransactions/$1'); // Get transaction history
     $routes->post('saveTransaction', 'Component::saveTransaction');
     $routes->post('ajax_list', 'Component::ajax_list');
+    $routes->post('deleteTransaction', 'Component::deleteTransaction');
+    $routes->post('exportExcel', 'Component::exportExcel');
 });
 $routes->group('supfinance', function($routes) {
     $routes->get('/', 'SupFinance::index');

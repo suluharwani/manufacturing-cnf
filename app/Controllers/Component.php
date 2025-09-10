@@ -327,4 +327,180 @@ public function saveTransaction()
         ]);
     }
 }
+public function deleteTransaction()
+{
+    $transactionId = $this->request->getPost('id');
+    $componentId = $this->request->getPost('component_id');
+    
+    $db = \Config\Database::connect();
+    $db->transStart();
+    
+    try {
+        // Get transaction details
+        $transaction = $this->transactionModel->find($transactionId);
+        
+        if (!$transaction) {
+            throw new \Exception('Transaction not found');
+        }
+        
+        // Get current stock
+        $stock = $this->stockModel->where('component_id', $componentId)->first();
+        
+        if (!$stock) {
+            throw new \Exception('Stock record not found');
+        }
+        
+        // Reverse the transaction effect
+        $newQuantity = ($transaction['type'] == 'in') 
+            ? $stock['quantity'] - $transaction['quantity']
+            : $stock['quantity'] + $transaction['quantity'];
+        
+        // Update stock
+        $this->stockModel->where('component_id', $componentId)
+                        ->set('quantity', $newQuantity)
+                        ->update();
+        
+        // Delete transaction
+        $this->transactionModel->delete($transactionId);
+        
+        $db->transComplete();
+        
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Transaction deleted successfully'
+        ]);
+        
+    } catch (\Exception $e) {
+        $db->transRollback();
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
+public function exportExcel()
+{
+    $startDate = $this->request->getPost('start_date');
+    $endDate = $this->request->getPost('end_date');
+    $includeTransactions = $this->request->getPost('include_transactions');
+    
+    // Load PHPExcel library
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    
+    // Sheet 1: Component Summary
+    $spreadsheet->setActiveSheetIndex(0);
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Component Summary');
+    
+    // Header for summary sheet
+    $sheet->setCellValue('A1', 'Component Summary - ' . date('Y-m-d'));
+    $sheet->setCellValue('A2', 'Code');
+    $sheet->setCellValue('B2', 'Name');
+    $sheet->setCellValue('C2', 'Product');
+    $sheet->setCellValue('D2', 'Current Stock');
+    $sheet->setCellValue('E2', 'Minimum Stock');
+    $sheet->setCellValue('F2', 'Unit');
+    $sheet->setCellValue('G2', 'Status');
+    
+    // Get all components with stock
+    $components = $this->componentModel
+        ->select('c.*, CONCAT(p.kode, " - ", p.nama) as product_name, s.quantity, s.minimum_stock')
+        ->from('component_components c')
+        ->join('product p', 'p.id = c.product_id', 'left')
+        ->join('component_stocks s', 's.component_id = c.id', 'left')
+        ->orderBy('c.id', 'ASC')
+        ->groupBy('c.id')
+        ->findAll();
+    
+    // Populate data
+    $row = 3;
+    foreach ($components as $component) {
+        $sheet->setCellValue('A' . $row, $component['kode']);
+        $sheet->setCellValue('B' . $row, $component['nama']);
+        $sheet->setCellValue('C' . $row, $component['product_name'] ?? '-');
+        $sheet->setCellValue('D' . $row, $component['quantity'] ?? 0);
+        $sheet->setCellValue('E' . $row, $component['minimum_stock'] ?? 0);
+        $sheet->setCellValue('F' . $row, $component['satuan']);
+        $sheet->setCellValue('G' . $row, $component['aktif'] == 1 ? 'Active' : 'Inactive');
+        $row++;
+    }
+    
+    // Auto size columns
+    foreach (range('A', 'G') as $column) {
+        $sheet->getColumnDimension($column)->setAutoSize(true);
+    }
+    
+    // Add styling to header
+    $headerStyle = [
+        'font' => ['bold' => true],
+        'fill' => [
+            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+            'startColor' => ['argb' => 'FFE0E0E0']
+        ]
+    ];
+    $sheet->getStyle('A2:G2')->applyFromArray($headerStyle);
+    
+    if ($includeTransactions) {
+        // Sheet 2: Transaction History
+        $transactionSheet = $spreadsheet->createSheet();
+        $transactionSheet->setTitle('Transaction History');
+        
+        // Header for transaction sheet
+        $transactionSheet->setCellValue('A1', 'Transaction History - ' . $startDate . ' to ' . $endDate);
+        $transactionSheet->setCellValue('A2', 'Date');
+        $transactionSheet->setCellValue('B2', 'Component Code');
+        $transactionSheet->setCellValue('C2', 'Component Name');
+        $transactionSheet->setCellValue('D2', 'Type');
+        $transactionSheet->setCellValue('E2', 'Quantity');
+        $transactionSheet->setCellValue('F2', 'Reference');
+        $transactionSheet->setCellValue('G2', 'Notes');
+        $transactionSheet->setCellValue('H2', 'Created By');
+        
+        // Get transactions within date range
+        $transactions = $this->transactionModel
+            ->select('ct.*, c.kode as component_code, c.nama as component_name, u.nama_depan')
+            ->from('component_transactions ct')
+            ->join('component_components c', 'c.id = ct.component_id')
+            ->join('users u', 'u.id = ct.created_by', 'left')
+            ->where('DATE(ct.created_at) >=', $startDate)
+            ->where('DATE(ct.created_at) <=', $endDate)
+            ->orderBy('ct.created_at', 'DESC')
+            ->findAll();
+        
+        // Populate transaction data
+        $tRow = 3;
+        foreach ($transactions as $transaction) {
+            $transactionSheet->setCellValue('A' . $tRow, $transaction['created_at']);
+            $transactionSheet->setCellValue('B' . $tRow, $transaction['component_code']);
+            $transactionSheet->setCellValue('C' . $tRow, $transaction['component_name']);
+            $transactionSheet->setCellValue('D' . $tRow, strtoupper($transaction['type']));
+            $transactionSheet->setCellValue('E' . $tRow, $transaction['quantity']);
+            $transactionSheet->setCellValue('F' . $tRow, $transaction['reference'] ?? '-');
+            $transactionSheet->setCellValue('G' . $tRow, $transaction['notes'] ?? '-');
+            $transactionSheet->setCellValue('H' . $tRow, $transaction['username'] ?? 'System');
+            $tRow++;
+        }
+        
+        // Auto size columns
+        foreach (range('A', 'H') as $column) {
+            $transactionSheet->getColumnDimension($column)->setAutoSize(true);
+        }
+        
+        // Add styling to header
+        $transactionSheet->getStyle('A2:H2')->applyFromArray($headerStyle);
+    }
+    
+    // Set the active sheet back to the first one
+    $spreadsheet->setActiveSheetIndex(0);
+    
+    // Set headers for download
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="component_stock_report_' . date('Y-m-d') . '.xlsx"');
+    header('Cache-Control: max-age=0');
+    
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save('php://output');
+    exit();
+}
 }
