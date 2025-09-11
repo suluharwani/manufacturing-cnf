@@ -220,6 +220,19 @@ $(document).ready(function () {
     // Menggabungkan menjadi format 'YYYY-MM-DD'
     return `${year}-${month}-${day}`;
   }
+  function checkHrdAuth(callback) {
+    $.ajax({
+        url: base_url + 'MasterPenggajianDetailController/checkHrdAuth',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            callback(response.authenticated);
+        },
+        error: function() {
+            callback(false);
+        }
+    });
+}
   function verifyHrdPassword(callback) {
     Swal.fire({
         title: 'Masukkan Password HRD',
@@ -1280,10 +1293,41 @@ $("#data-body").on("click", ".showPresensi", function() {
   //   return new Intl.NumberFormat('id-ID').format(num);
   // }
 
-  $(document).on("click", ".varTunjangan", function () {
+$(document).on("click", ".varTunjangan", function() {
     var pin = $(this).attr("pin");
     var id = $(this).attr("id");
     var name = $(this).attr("name");
+    
+    checkHrdAuth(function(isAuthenticated) {
+        if (isAuthenticated) {
+            openTunjanganModal(pin, id, name);
+        } else {
+            verifyHrdPassword(function(success) {
+                if (success) {
+                    openTunjanganModal(pin, id, name);
+                }
+            }, "mengakses tunjangan");
+        }
+    });
+});
+$(document).on("click", ".varPotongan", function() {
+    var pin = $(this).attr("pin");
+    var id = $(this).attr("id");
+    var name = $(this).attr("name");
+    
+    checkHrdAuth(function(isAuthenticated) {
+        if (isAuthenticated) {
+            openPotonganModal(pin, id, name);
+        } else {
+            verifyHrdPassword(function(success) {
+                if (success) {
+                    openPotonganModal(pin, id, name);
+                }
+            }, "mengakses potongan");
+        }
+    });
+});
+function openTunjanganModal(pin, id, name) {
     $("#AllowaceEmployeeName").val(name);
     $("#AllowaceEmployeeId").val(id);
     $("#AllowaceEmployeePin").val(pin);
@@ -1291,11 +1335,10 @@ $("#data-body").on("click", ".showPresensi", function() {
     fetchAllowanceOptions();
     fetchAllowancesUser(id);
     $("#tunjanganModal").modal("show");
-  });
-  $(document).on("click", ".varPotongan", function () {
-    var pin = $(this).attr("pin");
-    var id = $(this).attr("id");
-    var name = $(this).attr("name");
+}
+
+// Fungsi untuk membuka modal potongan
+function openPotonganModal(pin, id, name) {
     $("#DeductionEmployeeName").val(name);
     $("#DeductionEmployeeId").val(id);
     $("#DeductionEmployeePin").val(pin);
@@ -1303,7 +1346,7 @@ $("#data-body").on("click", ".showPresensi", function() {
     fetchDeductionOptions();
     fetchDeductionsUser(id);
     $("#potonganModal").modal("show");
-  });
+}
   function fetchAllowancesUser(id) {
     $("#allowanceTable tbody").empty();
     $.ajax({
