@@ -1116,4 +1116,49 @@ private function getTunjangan()
             ->where('employee_id', $employeeId)
             ->findAll();
     }
+    public function verifyHrdPassword()
+{
+    $request = \Config\Services::request();
+    $password = $request->getPost('password');
+    
+    // Ambil password HRD dari environment variable
+    $hrdPassword = $_ENV['hrdPass'] ?? getenv('hrdPass');
+    
+    if (!$hrdPassword) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Password HRD belum dikonfigurasi'
+        ]);
+    }
+    
+    if ($password === $hrdPassword) {
+        // Set session untuk menyimpan status autentikasi
+        session()->set('hrd_authenticated', true);
+        session()->set('hrd_authenticated_time', time());
+        
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Autentikasi berhasil'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Password HRD salah'
+        ]);
+    }
+}
+
+// Tambahkan method untuk memeriksa status autentikasi
+public function checkHrdAuth()
+{
+    $authenticated = session()->get('hrd_authenticated');
+    $authTime = session()->get('hrd_authenticated_time');
+    
+    // Autentikasi berlaku selama 1 jam (3600 detik)
+    $isValid = $authenticated && (time() - $authTime) < 3600;
+    
+    return $this->response->setJSON([
+        'authenticated' => $isValid
+    ]);
+}
 }

@@ -220,25 +220,58 @@ $(document).ready(function () {
     // Menggabungkan menjadi format 'YYYY-MM-DD'
     return `${year}-${month}-${day}`;
   }
-  $("#data-body").on("click", ".showPresensi", function () {
+  function verifyHrdPassword(callback) {
+    Swal.fire({
+        title: 'Masukkan Password HRD',
+        input: 'password',
+        inputAttributes: {
+            autocapitalize: 'off',
+            autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Verifikasi',
+        cancelButtonText: 'Batal',
+        showLoaderOnConfirm: true,
+        preConfirm: (password) => {
+            return $.ajax({
+                url: base_url + 'MasterPenggajianDetailController/verifyHrdPassword',
+                type: 'POST',
+                data: { password: password },
+                dataType: 'json'
+            }).then(response => {
+                if (!response.success) {
+                    throw new Error(response.message);
+                }
+                return response;
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
+            callback(true);
+        }
+    }).catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: error.message
+        });
+        callback(false);
+    });
+}
+$("#data-body").on("click", ".showPresensi", function() {
     let pin = $(this).attr("pinKaryawan");
     let id = $(this).attr("idKaryawan");
     let startDate = $(this).attr("tglAwal");
     let endDate = $(this).attr("tglAkhir");
-
-    // $('#dateSelectionModal').modal('show');
-
-    // $('#fetchPresensi').off('click').on('click', function() {
-    //   let startDate = $('#startDate').val();
-    //   let endDate = $('#endDate').val();
-
-    //   if (!startDate || !endDate) {
-    //     alert("Silakan pilih tanggal awal dan akhir.");
-    //     return;
-    //   }
-
-    refreshPopupContent(pin, id, startDate, endDate);
-  });
+    
+    // Verifikasi password HRD sebelum membuka presensi
+    verifyHrdPassword(function(success) {
+        if (success) {
+            refreshPopupContent(pin, id, startDate, endDate);
+        }
+    });
+});
 
   function refreshPopupContent(pin, id, startDate, endDate) {
     fetchEmployeeNameByPin(pin);

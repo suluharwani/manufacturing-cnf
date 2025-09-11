@@ -207,6 +207,7 @@ $routes->group('MasterPenggajianDetailController', function ($routes) {
     $routes->get('exportAllToExcel', 'MasterPenggajianDetailController::exportAllToExcel',['filter' => 'accessControl:2']);
     $routes->get('getTunjanganPrint', 'MasterPenggajianDetailController::getTunjanganPrint',['filter' => 'accessControl:2']);
     $routes->get('getPotonganPrint', 'MasterPenggajianDetailController::getPotonganPrint',['filter' => 'accessControl:2']);
+    $routes->post('verifyHrdPassword', 'MasterPenggajianDetailController::verifyHrdPassword',['filter' => 'accessControl:2']);
 });
 
 $routes->group('product', function ($routes) {
