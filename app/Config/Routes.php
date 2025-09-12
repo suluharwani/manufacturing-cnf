@@ -591,6 +591,7 @@ $routes->group('bc-export', function($routes) {
     $routes->get('detail/(:num)', 'BcExport::detail/$1');
 });
 $routes->group('component', function($routes) {
+    $routes->get('transaction', 'Component::transaction',['filter' => 'accessControl:2']);
     $routes->get('/', 'Component::index',['filter' => 'accessControl:2']);
     $routes->post('getData', 'Component::getData',['filter' => 'accessControl:2']);
     $routes->post('save', 'Component::save',['filter' => 'accessControl:2']);
@@ -604,6 +605,9 @@ $routes->group('component', function($routes) {
     $routes->post('ajax_list', 'Component::ajax_list',['filter' => 'accessControl:2']);
     $routes->post('deleteTransaction', 'Component::deleteTransaction',['filter' => 'accessControl:2']);
     $routes->post('exportExcel', 'Component::exportExcel',['filter' => 'accessControl:2']);
+    $routes->get('transactionList', 'Component::transactionList',['filter' => 'accessControl:2']);
+    $routes->post('getTransactionData', 'Component::getTransactionData',['filter' => 'accessControl:2']);
+    $routes->get('printTransaction/(:num)', 'Component::printTransaction/$1',['filter' => 'accessControl:2']);
 });
 $routes->group('supfinance', function($routes) {
     $routes->get('/', 'SupFinance::index');

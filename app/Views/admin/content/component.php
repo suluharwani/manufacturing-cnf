@@ -185,6 +185,8 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
     <h6 class="mb-0">Component Management</h6>
     <div>
+        <a href="/component/transactionList" class="btn btn-info me-2"> <i class="fas fa-file me-2"> Doc</i> </a>
+
         <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#exportModal">
             <i class="fas fa-file-excel me-2"></i>Export Excel
         </button>

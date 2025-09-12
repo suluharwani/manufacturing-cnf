@@ -45,6 +45,13 @@ public function index()
     $data['content'] = view('admin/content/component', $data);
     return view('admin/index', $data);
 }
+function transaction(){
+     $data['group'] = 'Component';
+    $data['title'] = 'Component Transaction';
+    
+    $data['content'] = view('admin/content/component_transaction', $data);
+    return view('admin/index', $data);
+}
  
 public function get($id)
 {
@@ -232,101 +239,7 @@ public function getStock($id)
 
 
 
-public function saveTransaction()
-{
-    $validation = \Config\Services::validation();
-    $validation->setRules([
-        'component_id' => 'required|numeric',
-        'type' => 'required|in_list[in,out]',
-        'quantity' => 'required|decimal',
-        'minimum_stock' => 'permit_empty|decimal',
-        'reference' => 'permit_empty|max_length[100]',
-        'notes' => 'permit_empty'
-    ]);
-    
-    if (!$validation->withRequest($this->request)->run()) {
-        return $this->response->setJSON([
-            'status' => false,
-            'message' => 'Validation failed',
-            'errors' => $validation->getErrors()
-        ]);
-    }
-    
-    $data = $this->request->getPost();
-    
-    // Start transaction
-    $db = \Config\Database::connect();
-    $db->transStart();
-    
-    try {
-        $stockModel = new \App\Models\ComponentStockModel();
-        $transactionModel = new \App\Models\ComponentTransactionModel();
-        
-        // Get stock record (ensure we get it as array)
-        $stock = $stockModel->where('component_id', $data['component_id'])->first();
-        
-        if (!$stock) {
-            // Create stock record if it doesn't exist
-            $stockId = $stockModel->insert([
-                'component_id' => $data['component_id'],
-                'quantity' => 0,
-                'minimum_stock' => $data['minimum_stock'] ?? 0,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            $stock = $stockModel->find($stockId);
-        }
-        
-        // Convert to array if it's an object
-        $stockArray = (array)$stock;
-        
-        // Get current quantity (with null coalescing as fallback)
-        $currentQuantity = $stockArray['quantity'] ?? 0;
-        $newQuantity = $currentQuantity;
-        $transactionQuantity = $data['quantity'];
-        
-        // Update quantity based on transaction type
-        if ($data['type'] === 'in') {
-            $newQuantity = $currentQuantity + $transactionQuantity;
-        } else {
-            $newQuantity = $currentQuantity - $transactionQuantity;
-            if ($newQuantity < 0) {
-                throw new \RuntimeException('Insufficient stock');
-            }
-        }
-        
-        // Update stock record
-        $stockModel->update($stockArray['id'], [
-            'quantity' => $newQuantity,
-            'minimum_stock' => $data['minimum_stock'] ?? ($stockArray['minimum_stock'] ?? 0),
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-        
-        // Create transaction record
-        $transactionModel->insert([
-            'component_id' => $data['component_id'],
-            'type' => $data['type'],
-            'quantity' => $transactionQuantity,
-            'reference' => $data['reference'] ?? null,
-            'notes' => $data['notes'] ?? null,
-            'created_by' => $_SESSION['auth']['id'] ?? null,
-        ]);
-        
-        $db->transComplete();
-        
-        return $this->response->setJSON([
-            'status' => true,
-            'message' => 'Transaction saved successfully'
-        ]);
-        
-    } catch (\Exception $e) {
-        $db->transRollback();
-        return $this->response->setJSON([
-            'status' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-}
+
 public function deleteTransaction()
 {
     $transactionId = $this->request->getPost('id');
@@ -502,5 +415,209 @@ public function exportExcel()
     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save('php://output');
     exit();
+}
+// Halaman list transaksi
+public function transactionList()
+{
+    $data['group'] = 'Component';
+    $data['title'] = 'Component Transaction List';
+    
+    $data['content'] = view('admin/content/component_transaction_list', $data);
+    return view('admin/index', $data);
+}
+
+// Get data untuk DataTables
+public function getTransactionData()
+{
+    $request = service('request');
+    $postData = $request->getPost();
+    
+    $draw = $postData['draw'];
+    $start = $postData['start'];
+    $rowperpage = $postData['length'];
+    $columnIndex = $postData['order'][0]['column'];
+    $columnName = $postData['columns'][$columnIndex]['data'];
+    $columnSortOrder = $postData['order'][0]['dir'];
+    $searchValue = $postData['search']['value'];
+    
+    // Total records
+    $totalRecords = $this->transactionModel->countAll();
+    
+    // Total records with filter
+    $totalRecordwithFilter = $this->transactionModel
+        ->select('component_transactions.*')
+        ->join('component_components c', 'c.id = component_transactions.component_id')
+        ->orLike('c.kode', $searchValue)
+        ->orLike('c.nama', $searchValue)
+        ->orLike('component_transactions.document_number', $searchValue)
+        ->orLike('component_transactions.responsible_person', $searchValue)
+        ->orLike('component_transactions.reference', $searchValue)
+        ->countAllResults();
+    
+    // Fetch records
+    $records = $this->transactionModel
+        ->select('component_transactions.*, c.kode as component_code, c.nama as component_name, 
+                 CONCAT(u.nama_depan, " ", u.nama_belakang) as created_by_name')
+        ->join('component_components c', 'c.id = component_transactions.component_id')
+        ->join('users u', 'u.id = component_transactions.created_by', 'left')
+        ->orLike('c.kode', $searchValue)
+        ->orLike('c.nama', $searchValue)
+        ->orLike('component_transactions.document_number', $searchValue)
+        ->orLike('component_transactions.responsible_person', $searchValue)
+        ->orLike('component_transactions.reference', $searchValue)
+        ->orderBy($columnName, $columnSortOrder)
+        ->findAll($rowperpage, $start);
+    
+    $data = array();
+    foreach($records as $record){
+        $data[] = array(
+            "id" => $record['id'],
+            "created_at" => date('d/m/Y H:i', strtotime($record['created_at'])),
+            "component_code" => $record['component_code'],
+            "component_name" => $record['component_name'],
+            "type" => strtoupper($record['type']),
+            "quantity" => $record['quantity'],
+            "document_number" => $record['document_number'] ?? '-',
+            "responsible_person" => $record['responsible_person'] ?? '-',
+            "reference" => $record['reference'] ?? '-',
+            "notes" => $record['notes'] ?? '-',
+            "created_by_name" => $record['created_by_name'] ?? 'System'
+        );
+    }
+    
+    $response = array(
+        "draw" => intval($draw),
+        "iTotalRecords" => $totalRecords,
+        "iTotalDisplayRecords" => $totalRecordwithFilter,
+        "aaData" => $data
+    );
+    
+    return $this->response->setJSON($response);
+}
+
+
+public function saveTransaction()
+{
+        $validation = \Config\Services::validation();
+    $validation->setRules([
+        'component_id' => 'required|numeric',
+        'type' => 'required|in_list[in,out]',
+        'quantity' => 'required|decimal',
+        'minimum_stock' => 'permit_empty|decimal',
+        'document_number' => 'permit_empty|max_length[100]',
+        'responsible_person' => 'permit_empty|max_length[100]',
+        'reference' => 'permit_empty|max_length[100]',
+        'notes' => 'permit_empty'
+    ]);
+    
+    if (!$validation->withRequest($this->request)->run()) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'Validation failed',
+            'errors' => $validation->getErrors()
+        ]);
+    }
+    
+    $data = $this->request->getPost();
+    
+    // Start transaction
+    $db = \Config\Database::connect();
+    $db->transStart();
+    
+    try {
+        $stockModel = new \App\Models\ComponentStockModel();
+        $transactionModel = new \App\Models\ComponentTransactionModel();
+        
+        // Get stock record (ensure we get it as array)
+        $stock = $stockModel->where('component_id', $data['component_id'])->first();
+        
+        if (!$stock) {
+            // Create stock record if it doesn't exist
+            $stockId = $stockModel->insert([
+                'component_id' => $data['component_id'],
+                'quantity' => 0,
+                'minimum_stock' => $data['minimum_stock'] ?? 0,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            $stock = $stockModel->find($stockId);
+        }
+        
+        // Convert to array if it's an object
+        $stockArray = (array)$stock;
+        
+        // Get current quantity (with null coalescing as fallback)
+        $currentQuantity = $stockArray['quantity'] ?? 0;
+        $newQuantity = $currentQuantity;
+        $transactionQuantity = $data['quantity'];
+        
+        // Update quantity based on transaction type
+        if ($data['type'] === 'in') {
+            $newQuantity = $currentQuantity + $transactionQuantity;
+        } else {
+            $newQuantity = $currentQuantity - $transactionQuantity;
+            if ($newQuantity < 0) {
+                throw new \RuntimeException('Insufficient stock');
+            }
+        }
+        
+        // Update stock record
+        $stockModel->update($stockArray['id'], [
+            'quantity' => $newQuantity,
+            'minimum_stock' => $data['minimum_stock'] ?? ($stockArray['minimum_stock'] ?? 0),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+        
+        // Create transaction record
+        $transactionModel->insert([
+        'component_id' => $data['component_id'],
+        'type' => $data['type'],
+        'quantity' => $transactionQuantity,
+        'document_number' => $data['document_number'] ?? null,
+        'responsible_person' => $data['responsible_person'] ?? null,
+        'reference' => $data['reference'] ?? null,
+        'notes' => $data['notes'] ?? null,
+        'created_by' => $_SESSION['auth']['id'] ?? null,
+    ]);
+        
+        $db->transComplete();
+        
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Transaction saved successfully'
+        ]);
+        
+    } catch (\Exception $e) {
+        $db->transRollback();
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+// Cetak PDF
+public function printTransaction($id)
+{
+    $transaction = $this->transactionModel
+        ->select('ct.*, c.kode as component_code, c.nama as component_name, 
+                 c.satuan, CONCAT(u.nama_depan, " ", u.nama_belakang) as created_by_name')
+        ->from('component_transactions ct')
+        ->join('component_components c', 'c.id = ct.component_id')
+        ->join('users u', 'u.id = ct.created_by', 'left')
+        ->where('ct.id', $id)
+        ->first();
+    
+    if (!$transaction) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException('Transaction not found');
+    }
+    
+    $data['transaction'] = $transaction;
+    
+    $dompdf = new \Dompdf\Dompdf();
+    $html = view('admin/content/component_transaction_pdf', $data);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $dompdf->stream('transaction_'.$transaction['document_number'].'.pdf', ['Attachment' => 0]);
 }
 }

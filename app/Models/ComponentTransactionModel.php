@@ -16,6 +16,8 @@ class ComponentTransactionModel extends Model
         'quantity', 
         'reference', 
         'notes', 
+        'document_number',  // Tambahkan ini
+        'responsible_person',  // Tambahkan ini
         'created_by',
         'created_at'
     ];
