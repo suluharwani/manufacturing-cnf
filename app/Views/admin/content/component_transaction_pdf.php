@@ -11,11 +11,18 @@
         .details td { padding: 5px; border: 1px solid #ddd; }
         .details td:first-child { font-weight: bold; width: 30%; }
         .footer { margin-top: 50px; text-align: right; }
+        .company-info { margin-bottom: 30px; text-align: center; }
+        .company-name { font-size: 24px; font-weight: bold; }
+        .report-title { font-size: 18px; margin: 10px 0; }
     </style>
 </head>
 <body>
+    <div class="company-info">
+        <div class="company-name">YOUR COMPANY NAME</div>
+        <div class="report-title">COMPONENT TRANSACTION REPORT</div>
+    </div>
+    
     <div class="header">
-        <h2>COMPONENT TRANSACTION</h2>
         <h3>Document: <?= $transaction['document_number'] ?></h3>
     </div>
     
@@ -26,11 +33,15 @@
                 <td><?= date('d/m/Y H:i', strtotime($transaction['created_at'])) ?></td>
             </tr>
             <tr>
-                <td>Component</td>
-                <td><?= $transaction['component_code'] ?> - <?= $transaction['component_name'] ?></td>
+                <td>Component Code</td>
+                <td><?= $transaction['component_code'] ?></td>
             </tr>
             <tr>
-                <td>Type</td>
+                <td>Component Name</td>
+                <td><?= $transaction['component_name'] ?></td>
+            </tr>
+            <tr>
+                <td>Transaction Type</td>
                 <td><?= strtoupper($transaction['type']) ?></td>
             </tr>
             <tr>

@@ -496,20 +496,21 @@ public function getTransactionData()
 }
 
 
+/**
+ * Save transaction with multiple items
+ */
 public function saveTransaction()
 {
-        $validation = \Config\Services::validation();
-    $validation->setRules([
-        'component_id' => 'required|numeric',
-        'type' => 'required|in_list[in,out]',
-        'quantity' => 'required|decimal',
-        'minimum_stock' => 'permit_empty|decimal',
-        'document_number' => 'permit_empty|max_length[100]',
-        'responsible_person' => 'permit_empty|max_length[100]',
-        'reference' => 'permit_empty|max_length[100]',
-        'notes' => 'permit_empty'
-    ]);
+    $validation = \Config\Services::validation();
     
+    // Validasi untuk header transaksi saja
+    $validation->setRules([
+        'document_number' => 'required|max_length[100]',
+        'responsible_person' => 'required|max_length[100]',
+        'type' => 'required|in_list[in,out]',
+        'items' => 'required'
+    ]);
+
     if (!$validation->withRequest($this->request)->run()) {
         return $this->response->setJSON([
             'status' => false,
@@ -517,78 +518,104 @@ public function saveTransaction()
             'errors' => $validation->getErrors()
         ]);
     }
+
+    $data = $this->request->getJSON(true);
     
-    $data = $this->request->getPost();
+    // Validasi manual untuk items
+    if (empty($data['items']) || !is_array($data['items'])) {
+        return $this->response->setJSON([
+            'status' => false,
+            'message' => 'No items provided for transaction'
+        ]);
+    }
+
+    foreach ($data['items'] as $index => $item) {
+        if (!isset($item['id']) || empty($item['id'])) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Item {$index}: Component ID is required"
+            ]);
+        }
+        
+        if (!isset($item['quantity']) || empty($item['quantity'])) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Item {$index}: Quantity is required"
+            ]);
+        }
+        
+        if ($item['quantity'] <= 0) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => "Item {$index}: Quantity must be greater than 0"
+            ]);
+        }
+    }
     
-    // Start transaction
+    // Start database transaction
     $db = \Config\Database::connect();
     $db->transStart();
-    
+
     try {
-        $stockModel = new \App\Models\ComponentStockModel();
-        $transactionModel = new \App\Models\ComponentTransactionModel();
-        
-        // Get stock record (ensure we get it as array)
-        $stock = $stockModel->where('component_id', $data['component_id'])->first();
-        
-        if (!$stock) {
-            // Create stock record if it doesn't exist
-            $stockId = $stockModel->insert([
-                'component_id' => $data['component_id'],
-                'quantity' => 0,
-                'minimum_stock' => $data['minimum_stock'] ?? 0,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            $stock = $stockModel->find($stockId);
-        }
-        
-        // Convert to array if it's an object
-        $stockArray = (array)$stock;
-        
-        // Get current quantity (with null coalescing as fallback)
-        $currentQuantity = $stockArray['quantity'] ?? 0;
-        $newQuantity = $currentQuantity;
-        $transactionQuantity = $data['quantity'];
-        
-        // Update quantity based on transaction type
-        if ($data['type'] === 'in') {
-            $newQuantity = $currentQuantity + $transactionQuantity;
-        } else {
-            $newQuantity = $currentQuantity - $transactionQuantity;
-            if ($newQuantity < 0) {
-                throw new \RuntimeException('Insufficient stock');
+        // Process each item
+        foreach ($data['items'] as $item) {
+            $componentId = $item['id'];
+            $quantity = (float)$item['quantity'];
+            
+            // Get current stock
+            $stock = $this->stockModel->where('component_id', $componentId)->first();
+            
+            if (!$stock) {
+                throw new \Exception("Stock record not found for component ID: {$componentId}");
             }
+            
+            $currentQuantity = (float)$stock['quantity'];
+            $newQuantity = $currentQuantity;
+            
+            // Update quantity based on transaction type
+            if ($data['type'] === 'in') {
+                $newQuantity = $currentQuantity + $quantity;
+            } else {
+                $newQuantity = $currentQuantity - $quantity;
+                
+                // Check if stock is sufficient for OUT transaction
+                if ($newQuantity < 0) {
+                    throw new \Exception("Insufficient stock for component: {$item['code']}. Current: {$currentQuantity}, Required: {$quantity}");
+                }
+            }
+            
+            // Update stock
+            $this->stockModel->where('component_id', $componentId)
+                           ->set('quantity', $newQuantity)
+                           ->set('updated_at', date('Y-m-d H:i:s'))
+                           ->update();
+            
+            // Create transaction record for this item
+            $itemTransaction = [
+                'component_id' => $componentId,
+                'type' => $data['type'],
+                'quantity' => $quantity,
+                'document_number' => $data['document_number'],
+                'responsible_person' => $data['responsible_person'],
+                'reference' => 'BATCH_TRANSACTION',
+                'notes' => 'Batch transaction - ' . $data['document_number'],
+                'created_by' => session()->get('user_id') ?? null,
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+            
+            $this->transactionModel->insert($itemTransaction);
         }
-        
-        // Update stock record
-        $stockModel->update($stockArray['id'], [
-            'quantity' => $newQuantity,
-            'minimum_stock' => $data['minimum_stock'] ?? ($stockArray['minimum_stock'] ?? 0),
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
-        
-        // Create transaction record
-        $transactionModel->insert([
-        'component_id' => $data['component_id'],
-        'type' => $data['type'],
-        'quantity' => $transactionQuantity,
-        'document_number' => $data['document_number'] ?? null,
-        'responsible_person' => $data['responsible_person'] ?? null,
-        'reference' => $data['reference'] ?? null,
-        'notes' => $data['notes'] ?? null,
-        'created_by' => $_SESSION['auth']['id'] ?? null,
-    ]);
         
         $db->transComplete();
         
         return $this->response->setJSON([
             'status' => true,
-            'message' => 'Transaction saved successfully'
+            'message' => 'Transaction completed successfully'
         ]);
         
     } catch (\Exception $e) {
         $db->transRollback();
+        
         return $this->response->setJSON([
             'status' => false,
             'message' => $e->getMessage()
@@ -620,4 +647,251 @@ public function printTransaction($id)
     $dompdf->render();
     $dompdf->stream('transaction_'.$transaction['document_number'].'.pdf', ['Attachment' => 0]);
 }
+ public function getByCode($code)
+    {
+        try {
+            $component = $this->componentModel
+                ->select('c.*, s.quantity, s.minimum_stock')
+                ->from('component_components c')
+                ->join('component_stocks s', 's.component_id = c.id', 'left')
+                ->where('c.kode', $code)
+                ->where('c.aktif', 1)
+                ->first();
+
+            if (!$component) {
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Component not found or inactive'
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status' => true,
+                'data' => $component
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Error fetching component: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Save transaction with multiple items
+     */
+    // public function saveTransaction()
+    // {
+    //     $validation = \Config\Services::validation();
+    //     $validation->setRules([
+    //         'document_number' => 'required|max_length[100]',
+    //         'responsible_person' => 'required|max_length[100]',
+    //         'type' => 'required|in_list[in,out]',
+    //         'items' => 'required'
+    //     ]);
+
+    //     if (!$validation->withRequest($this->request)->run()) {
+    //         return $this->response->setJSON([
+    //             'status' => false,
+    //             'message' => 'Validation failed',
+    //             'errors' => $validation->getErrors()
+    //         ]);
+    //     }
+
+    //     $data = $this->request->getJSON(true);
+        
+    //     // Start database transaction
+    //     $db = \Config\Database::connect();
+    //     $db->transStart();
+
+    //     try {
+    //         $transactionData = [
+    //             'document_number' => $data['document_number'],
+    //             'responsible_person' => $data['responsible_person'],
+    //             'type' => $data['type'],
+    //             'created_by' => session()->get('user_id') ?? null,
+    //             'created_at' => date('Y-m-d H:i:s')
+    //         ];
+
+    //         // Process each item
+    //         foreach ($data['items'] as $item) {
+    //             $componentId = $item['id'];
+    //             $quantity = (float)$item['quantity'];
+                
+    //             // Get current stock
+    //             $stock = $this->stockModel->where('component_id', $componentId)->first();
+                
+    //             if (!$stock) {
+    //                 throw new \Exception("Stock record not found for component ID: {$componentId}");
+    //             }
+                
+    //             $currentQuantity = (float)$stock['quantity'];
+    //             $newQuantity = $currentQuantity;
+                
+    //             // Update quantity based on transaction type
+    //             if ($data['type'] === 'in') {
+    //                 $newQuantity = $currentQuantity + $quantity;
+    //             } else {
+    //                 $newQuantity = $currentQuantity - $quantity;
+                    
+    //                 // Check if stock is sufficient for OUT transaction
+    //                 if ($newQuantity < 0) {
+    //                     throw new \Exception("Insufficient stock for component: {$item['code']}. Current: {$currentQuantity}, Required: {$quantity}");
+    //                 }
+    //             }
+                
+    //             // Update stock
+    //             $this->stockModel->where('component_id', $componentId)
+    //                            ->set('quantity', $newQuantity)
+    //                            ->set('updated_at', date('Y-m-d H:i:s'))
+    //                            ->update();
+                
+    //             // Create transaction record for this item
+    //             $itemTransaction = [
+    //                 'component_id' => $componentId,
+    //                 'type' => $data['type'],
+    //                 'quantity' => $quantity,
+    //                 'document_number' => $data['document_number'],
+    //                 'responsible_person' => $data['responsible_person'],
+    //                 'reference' => 'BATCH_TRANSACTION',
+    //                 'notes' => 'Batch transaction - ' . $data['document_number'],
+    //                 'created_by' => session()->get('user_id') ?? null,
+    //                 'created_at' => date('Y-m-d H:i:s')
+    //             ];
+                
+    //             $this->transactionModel->insert($itemTransaction);
+    //         }
+            
+    //         $db->transComplete();
+            
+    //         return $this->response->setJSON([
+    //             'status' => true,
+    //             'message' => 'Transaction completed successfully'
+    //         ]);
+            
+    //     } catch (\Exception $e) {
+    //         $db->transRollback();
+            
+    //         return $this->response->setJSON([
+    //             'status' => false,
+    //             'message' => $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
+    /**
+     * Get transaction list for DataTables
+     */
+    // public function getTransactionData()
+    // {
+    //     $request = service('request');
+    //     $postData = $request->getPost();
+        
+    //     $draw = $postData['draw'];
+    //     $start = $postData['start'];
+    //     $rowperpage = $postData['length'];
+    //     $columnIndex = $postData['order'][0]['column'];
+    //     $columnName = $postData['columns'][$columnIndex]['data'];
+    //     $columnSortOrder = $postData['order'][0]['dir'];
+    //     $searchValue = $postData['search']['value'];
+        
+    //     // Total records
+    //     $totalRecords = $this->transactionModel->countAll();
+        
+    //     // Total records with filter
+    //     $totalRecordwithFilter = $this->transactionModel
+    //         ->select('component_transactions.*')
+    //         ->join('component_components c', 'c.id = component_transactions.component_id')
+    //         ->groupStart()
+    //         ->orLike('c.kode', $searchValue)
+    //         ->orLike('c.nama', $searchValue)
+    //         ->orLike('component_transactions.document_number', $searchValue)
+    //         ->orLike('component_transactions.responsible_person', $searchValue)
+    //         ->orLike('component_transactions.reference', $searchValue)
+    //         ->groupEnd()
+    //         ->countAllResults();
+        
+    //     // Fetch records
+    //     $records = $this->transactionModel
+    //         ->select('component_transactions.*, c.kode as component_code, c.nama as component_name, 
+    //                  CONCAT(u.nama_depan, " ", u.nama_belakang) as created_by_name')
+    //         ->join('component_components c', 'c.id = component_transactions.component_id')
+    //         ->join('users u', 'u.id = component_transactions.created_by', 'left')
+    //         ->groupStart()
+    //         ->orLike('c.kode', $searchValue)
+    //         ->orLike('c.nama', $searchValue)
+    //         ->orLike('component_transactions.document_number', $searchValue)
+    //         ->orLike('component_transactions.responsible_person', $searchValue)
+    //         ->orLike('component_transactions.reference', $searchValue)
+    //         ->groupEnd()
+    //         ->orderBy($columnName, $columnSortOrder)
+    //         ->findAll($rowperpage, $start);
+        
+    //     $data = array();
+    //     foreach($records as $record){
+    //         $data[] = array(
+    //             "id" => $record['id'],
+    //             "created_at" => date('d/m/Y H:i', strtotime($record['created_at'])),
+    //             "component_code" => $record['component_code'],
+    //             "component_name" => $record['component_name'],
+    //             "type" => strtoupper($record['type']),
+    //             "quantity" => $record['quantity'],
+    //             "document_number" => $record['document_number'] ?? '-',
+    //             "responsible_person" => $record['responsible_person'] ?? '-',
+    //             "reference" => $record['reference'] ?? '-',
+    //             "notes" => $record['notes'] ?? '-',
+    //             "created_by_name" => $record['created_by_name'] ?? 'System'
+    //         );
+    //     }
+        
+    //     $response = array(
+    //         "draw" => intval($draw),
+    //         "iTotalRecords" => $totalRecords,
+    //         "iTotalDisplayRecords" => $totalRecordwithFilter,
+    //         "aaData" => $data
+    //     );
+        
+    //     return $this->response->setJSON($response);
+    // }
+
+    /**
+     * Print transaction as PDF
+     */
+    // public function printTransaction($id)
+    // {
+    //     $transaction = $this->transactionModel
+    //         ->select('ct.*, c.kode as component_code, c.nama as component_name, 
+    //                  c.satuan, CONCAT(u.nama_depan, " ", u.nama_belakang) as created_by_name')
+    //         ->from('component_transactions ct')
+    //         ->join('component_components c', 'c.id = ct.component_id')
+    //         ->join('users u', 'u.id = ct.created_by', 'left')
+    //         ->where('ct.id', $id)
+    //         ->first();
+        
+    //     if (!$transaction) {
+    //         throw new \CodeIgniter\Exceptions\PageNotFoundException('Transaction not found');
+    //     }
+        
+    //     $data['transaction'] = $transaction;
+        
+    //     $dompdf = new \Dompdf\Dompdf();
+    //     $html = view('admin/content/component_transaction_pdf', $data);
+    //     $dompdf->loadHtml($html);
+    //     $dompdf->setPaper('A4', 'portrait');
+    //     $dompdf->render();
+    //     $dompdf->stream('transaction_'.$transaction['document_number'].'.pdf', ['Attachment' => 0]);
+    // }
+
+    /**
+     * Halaman list transaksi
+     */
+    // public function transactionList()
+    // {
+    //     $data['group'] = 'Component';
+    //     $data['title'] = 'Component Transaction List';
+        
+    //     $data['content'] = view('admin/content/component_transaction_list', $data);
+    //     return view('admin/index', $data);
+    // }
 }
