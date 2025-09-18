@@ -248,24 +248,33 @@ function getPi($id_wo)
     $MdlPiDetail = new \App\Models\ProformaInvoiceDetail();
 
     // Get invoice_id based on work order id
-    $id_pi = $MdlWo->where('id', $id_wo)->get()->getResultArray()[0]['invoice_id'];
+    $woData = $MdlWo->where('id', $id_wo)->get()->getResultArray();
+    if (empty($woData)) {
+        return json_encode([]);
+    }
+    $id_pi = $woData[0]['invoice_id'];
 
-    // Query to get the proforma invoice details and calculate total quantity in work_order_detail
+    // Subquery untuk menghitung total quantity per product_id dalam work_order_detail yang terkait dengan invoice_id ini
+    $subquery = $this->db->table('work_order_detail')
+        ->select('product_id, SUM(quantity) as total_wo_qty')
+        ->join('work_order', 'work_order.id = work_order_detail.wo_id')
+        ->where('work_order.invoice_id', $id_pi) // Hanya WO yang terkait dengan invoice_id ini
+        ->groupBy('product_id');
+
+    // Query utama untuk mendapatkan detail proforma invoice dan hitung qty_wo dan qty_tersedia
     $data = $MdlPiDetail->select('proforma_invoice_details.*, 
-                                   COALESCE(SUM(work_order_detail.quantity), 0) as qty_wo, 
-                                   (proforma_invoice_details.quantity - COALESCE(SUM(work_order_detail.quantity), 0)) as qty_tersedia, 
+                                   COALESCE(wo_summary.total_wo_qty, 0) as qty_wo, 
+                                   (proforma_invoice_details.quantity - COALESCE(wo_summary.total_wo_qty, 0)) as qty_tersedia, 
                                    product.*, product.id as id_product')
-                        ->join('work_order_detail', 'work_order_detail.product_id = proforma_invoice_details.id_product', 'left')
+                        ->join('(' . $subquery->getCompiledSelect() . ') as wo_summary', 'wo_summary.product_id = proforma_invoice_details.id_product', 'left')
                         ->join('product', 'product.id = proforma_invoice_details.id_product', 'left')
-                        ->where('proforma_invoice_details.invoice_id', $id_pi) // Filter by invoice_id from proforma_invoice_details
-                        // ->where('work_order_detail.wo_id', $id_wo) // Filter by invoice_id from proforma_invoice_details
-                        ->groupBy('proforma_invoice_details.id_product') // Group by product_id from proforma_invoice_details
+                        ->where('proforma_invoice_details.invoice_id', $id_pi)
+                        ->groupBy('proforma_invoice_details.id')
                         ->get()
                         ->getResultArray();
 
     return json_encode($data);
 }
-
 public function addDetail()
 {
     // Ambil data dari POST request
