@@ -32,112 +32,91 @@ class MaterialController extends BaseController
         $check = new \App\Controllers\CheckAccess();
         $check->access($_SESSION['auth']['id'],$page);
         }
-    public function listdataMaterial(){
-        
-        $serverside_model = new \App\Models\Mdl_datatables();
-        $request = \Config\Services::request();
-        $list_data = $serverside_model;
-        $where = ['id !=' => 0, 'deleted_at'=>NULL];
-                //Column Order Harus Sesuai Urutan Kolom Pada Header Tabel di bagian View
-                //Awali nama kolom tabel dengan nama tabel->tanda titik->nama kolom seperti pengguna.nama
-        $column_order = array(NULL,'materials.nama','materials.kode','materials.id');
-        $column_search = array('materials.name','materials.kode');
-        $order = array('materials.id' => 'desc');
-        $list = $list_data->get_datatables('materials', $column_order, $column_search, $order, $where);
-        $data = array();
-        $no = $request->getPost("start");
-        foreach ($list as $lists) {
-          $no++;
-          $row    = array();
-          $row[] = $no;
-          $row[] = $lists->id;
-          $row[] = $lists->name;
-          $row[] = $lists->kode;
-        
-          $data[] = $row;
-      }
-      $output = array(
-          "draw" => $request->getPost("draw"),
-          "recordsTotal" => $list_data->count_all('materials', $where),
-          "recordsFiltered" => $list_data->count_filtered('materials', $column_order, $column_search, $order, $where),
-          "data" => $data,
-      );
-      
-      return json_encode($output);
-      }
-      public function listdataMaterialJoin()
-      {
-          
-          $serverside_model = new \App\Models\MdlDatatableJoin();
-          $request = \Config\Services::request();
-          
-          // Define the columns to select
-          $select_columns = 'materials.*, materials_detail.kite as kite, materials_detail.type_id as type_id, type.nama as nama_type, satuan.kode as kode_satuan, satuan.nama as satuan, materials_detail.hscode as hscode';  
-          
-          // Define the joins (you can add more joins as needed)
-          $joins = [
-              ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
-              ['type', 'type.id = materials_detail.type_id', 'left'],
-              ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
+public function listdataMaterialJoin()
+{
+    $serverside_model = new \App\Models\MdlDatatableJoin();
+    $request = \Config\Services::request();
+    
+    // Define the columns to select with COALESCE to handle NULL stock values
+    $select_columns = 'stock.*, materials.*, materials_detail.kite as kite, 
+                      materials_detail.type_id as type_id, type.nama as nama_type, 
+                      satuan.kode as kode_satuan, satuan.nama as satuan, 
+                      materials_detail.hscode as hscode,
+                      COALESCE(stock.stock_awal, 0) as stock_awal,
+                      COALESCE(stock.stock_masuk, 0) as stock_masuk,
+                      COALESCE(stock.stock_keluar, 0) as stock_keluar,
+                      COALESCE(stock.selisih_stock_opname, 0) as selisih_stock_opname';  
+    
+    // Define the joins
+    $joins = [
+        ['stock', 'stock.id_material = materials.id', 'right'],
+        ['materials_detail', 'materials_detail.material_id = materials.id', 'left'],
+        ['type', 'type.id = materials_detail.type_id', 'left'],
+        ['satuan', 'satuan.id = materials_detail.satuan_id', 'left'],
+    ];
 
-          ];
-  
-          $where = ['materials.id !=' => 0, 'materials.deleted_at' => NULL];
-  
-          // Column Order Must Match Header Columns in View
-          $column_order = array(
-              NULL, 
-              'materials.kode', 
-              'materials.name', 
-              'type.id',
-              'materials_detail.kite',
-              'materials.id',
-              'materials.id',
-              'materials.id',
-              'materials.id',
-              'materials.id',
-              'materials.id',
-              'materials.id'
-          );
-          $column_search = array(
-              'materials.name', 
-              'materials.kode', 
-              'materials_detail.hscode', 
-          );
-          $order = array('materials.id' => 'desc');
-  
-          // Call the method to get data with dynamic joins and select fields
-          $list = $serverside_model->get_datatables('materials', $select_columns, $joins, $column_order, $column_search, $order, $where);
-          
-          $data = array();
-          $no = $request->getPost("start");
-          foreach ($list as $lists) {
-              $no++;
-              $row = array();
-              $row[] = $no;
-              $row[] = $lists->id;
-              $row[] = $lists->name;
-              $row[] = $lists->kode;
-              $row[] = $lists->kite;
-              $row[] = $lists->nama_type;
-              $row[] = $lists->kode_satuan;
-              $row[] = $lists->satuan;
-              $row[] = $lists->hscode;
-// From joined suppliers table
-              $data[] = $row;
-          }
-  
-          $output = array(
-              "draw" => $request->getPost("draw"),
-              "recordsTotal" => $serverside_model->count_all('materials', $where),
-              "recordsFiltered" => $serverside_model->count_filtered('materials', $select_columns, $joins, $column_order, $column_search, $order, $where),
-              "data" => $data,
-          );
-  
-        //   return $this->response->setJSON($output);
+    $where = ['materials.id !=' => 0, 'materials.deleted_at' => NULL];
+
+    // Column Order Must Match Header Columns in View
+    $column_order = array(
+        NULL, 
+        'materials.kode', 
+        'materials.name', 
+        'type.id',
+        'materials_detail.kite',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id',
+        'materials.id'
+    );
+    
+    $column_search = array(
+        'materials.name', 
+        'materials.kode', 
+        'materials_detail.hscode', 
+    );
+    
+    $order = array('materials.id' => 'desc');
+
+    // Call the method to get data with dynamic joins and select fields
+    $list = $serverside_model->get_datatables('materials', $select_columns, $joins, $column_order, $column_search, $order, $where);
+    
+    $data = array();
+    $no = $request->getPost("start");
+    
+    foreach ($list as $lists) {
+        $no++;
+        $row = array();
+        $row[] = $no;
+        $row[] = $lists->id;
+        $row[] = $lists->name;
+        $row[] = $lists->kode;
+        $row[] = $lists->kite;
+        $row[] = $lists->nama_type;
+        $row[] = $lists->kode_satuan;
+        $row[] = $lists->satuan;
+        $row[] = $lists->hscode;
+        $row[] = $lists->stock_awal;
+        $row[] = $lists->stock_masuk;
+        $row[] = $lists->stock_keluar;
+        $row[] = $lists->selisih_stock_opname;
         
-          return json_encode($output);
-      }
+        $data[] = $row;
+    }
+
+    $output = array(
+        "draw" => $request->getPost("draw"),
+        "recordsTotal" => $serverside_model->count_all('materials', $where),
+        "recordsFiltered" => $serverside_model->count_filtered('materials', $select_columns, $joins, $column_order, $column_search, $order, $where),
+        "data" => $data,
+    );
+
+    return $this->response->setJSON($output);
+}
       function tambah_tipe(){
         
         $userInfo = $_SESSION['auth'];

@@ -111,13 +111,14 @@ class MaterialRequestController extends BaseController
     }
     function datamr($id_mr){
         $mdl = new \App\Models\MdlMaterialRequestList();
-        $data = $mdl->select('material_request.status, material_request_list.*, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep, satuan.kode as satuan, satuan.nama as nama_satuan, materials_detail.kite as kite,    materials_detail.hscode as hs_code')
+        $data = $mdl->select('stock.*,material_request.status, material_request_list.*, materials.name as material,materials.kode as code, proforma_invoice.invoice_number as pi, department.name as dep, satuan.kode as satuan, satuan.nama as nama_satuan, materials_detail.kite as kite,    materials_detail.hscode as hs_code')
                     ->join('materials', 'materials.id = material_request_list.id_material', 'left')
                     ->join('materials_detail', 'materials.id = materials_detail.material_id', 'left')
                     ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
                     ->join('proforma_invoice', 'proforma_invoice.id = material_request_list.id_pi', 'left')
                     ->join('department', 'department.id = material_request_list.id_dept', 'left')
                     ->join('material_request', 'material_request_list.id_mr = material_request.id', 'left')
+                    ->join('stock', 'materials.id = stock.id_material', 'left')
                     ->where('id_mr', $id_mr)->findAll();
         return json_encode($data);
 

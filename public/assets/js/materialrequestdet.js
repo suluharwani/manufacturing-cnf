@@ -64,6 +64,7 @@ $(document).ready(function () {
      {mRender: function (data, type, row) {
        return row[4]; 
      }},
+     
     {mRender: function (data, type, row) {
       return `(${row[6]}) ${row[7]}`; 
     }},
@@ -336,6 +337,7 @@ $('#tabel_serverside').on('click', '.addMR', function () {
                             <td>${item.material}</td>
                             <td>${item.pi}</td>
                             <td>${item.dep}</td>
+                            <td>${parseFloat(item.stock_awal)+parseFloat(item.stock_masuk)-parseFloat(item.stock_keluar)+parseFloat(item.selisih_stock_opname)}</td>
                             <td>${item.quantity} ${item.satuan}</td>
                            
                             <td>

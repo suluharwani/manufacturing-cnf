@@ -114,6 +114,9 @@
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h6 class="mb-0">Purchase Request List</h6>
             <div>
+            <button class="btn btn-secondary alokasiPI" target="_blank" onclick="window.location.href='<?= base_url('proformainvoice/printInvoiceNeed') ?>/<?= $mr['id_pi'] ?>'">
+    Alokasi Material
+</button>
             <button id="deleteAll" class="btn btn-danger">Delete All</button>
             <button id="importPI" class="btn btn-warning">Import PI</button>
             <?php
@@ -144,6 +147,7 @@
                     <th>Name</th>
                     <th>PI</th>
                     <th>Department</th>
+                    <th>Stock</th>
                     <th>Quantity</th>
                     <th>Action</th>
                 </tr>
