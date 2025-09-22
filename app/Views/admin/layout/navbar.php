@@ -150,6 +150,7 @@
                     <a href="<?= base_url('report/material') ?>" class="dropdown-item">Material</a>
                     <a href="<?= base_url('report/finished_good') ?>" class="dropdown-item">Finished Good</a>
                     <a href="<?= base_url('report/bea_cukai') ?>" class="dropdown-item">Bea Cukai</a>
+                    <a href="<?= base_url('tracking') ?>" class="dropdown-item">Tracking</a>
                     
                 </div>
             </div>

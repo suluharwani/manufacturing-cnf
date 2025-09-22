@@ -641,3 +641,7 @@ $routes->group('custfinance',  function($routes) {
     // Route untuk mendapatkan daftar customer
     $routes->get('getCustomerList', 'CustFinance::getCustomerList');
 });
+$routes->group('tracking',  function($routes) {
+    $routes->get('/', 'MaterialTracking::index');
+    $routes->get('/getTrackingData', 'MaterialTracking::getTrackingData');
+});
