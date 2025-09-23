@@ -10,6 +10,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\ProformaInvoice;
 use App\Models\ProformaInvoiceDetail;
 use App\Models\MdlCustomer;
+use App\Models\MdlWorkOrder;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 class ProformaInvoiceController extends BaseController
@@ -315,6 +316,7 @@ class ProformaInvoiceController extends BaseController
     {
         $Mdl = new ProformaInvoice();
         $MdlDetail = new ProformaInvoiceDetail();
+        $MdlWO = new MdlWorkOrder();
         $dataPembelian = $Mdl
             ->select('country_data.*, proforma_invoice.*, customer.id_currency as curr_id, currency.kode as curr_code, currency.nama as curr_name, customer.customer_name')
             ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
@@ -329,8 +331,10 @@ class ProformaInvoiceController extends BaseController
         //                     ->where('pembelian.id', $idPembelian)->find();
         // var_dump($dataPembelianDetail);
         // die();
+        $dataWO = $MdlWO->where('invoice_id', $id)->get()->getResultArray();
         $data['pi'] = $dataPembelian;
-
+        $data['wo'] = $dataWO;
+ 
         // var_dump($data['pi']);
         // die();
         $data['content'] = view('admin/content/form_pi_doc', $data);
@@ -405,6 +409,61 @@ class ProformaInvoiceController extends BaseController
                 'message' => 'File upload failed.'
             ]);
         }
+    }
+    public function woList($id)
+    {
+        $serverside_model = new \App\Models\MdlDatatableJoin();
+        $request = \Config\Services::request();
+
+        // Define the columns to select
+        $select_columns = 'work_order.*';
+
+        // Define the joins (you can add more joins as needed)
+        $joins = [
+        ];
+
+        $where = ['work_order.invoice_id ' => $id, 'work_order.deleted_at' => NULL];
+
+        // Column Order Must Match Header Columns in View
+        $column_order = array(
+            NULL,
+            'work_order.created_at',
+            'work_order.kode',
+            'work_order.id',
+        
+        );
+        $column_search = array(
+            'work_order.kode',
+        );
+        $order = array('work_order.id' => 'desc');
+
+        // Call the method to get data with dynamic joins and select fields
+        $list = $serverside_model->get_datatables('work_order', $select_columns, $joins, $column_order, $column_search, $order, $where);
+
+        $data = array();
+        $no = $request->getPost("start");
+        foreach ($list as $lists) {
+            $no++;
+            $row = array();
+            $row[] = $no;
+            $row[] = $lists->created_at;
+            $row[] = $lists->kode;
+            $row[] = $lists->id;
+
+
+            // From joined suppliers table
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $request->getPost("draw"),
+            "recordsTotal" => $serverside_model->count_all('work_order', $where),
+            "recordsFiltered" => $serverside_model->count_filtered('work_order', $select_columns, $joins, $column_order, $column_search, $order, $where),
+            "data" => $data,
+        );
+
+
+        return $this->response->setJSON($output);
     }
     public function file($id)
     {

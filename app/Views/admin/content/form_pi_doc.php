@@ -192,6 +192,35 @@ body {
     </div>
   </div>
 </div>
+<div class="container-fluid pt-4 px-4">
+  <div class="bg-light text-center rounded p-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h6 class="mb-0">Work Order</h6>
+    </div>
+    <div class="table-responsive">
+
+      <table id="tabel_serverside_wo" class="table table-bordered display text-left" cellspacing="0" width="100%">
+        <thead>
+
+          <tr class="text-center">
+            <th style=" text-align: center;">#</th>
+            <th style=" text-align: center;">Date</th>
+            <th style=" text-align: center;">Code</th>
+            <th style=" text-align: center;">Action</th>
+          </tr>
+        </thead>
+        <tfoot>
+        <tr class="text-center">
+            <th style=" text-align: center;">#</th>
+            <th style=" text-align: center;">Date</th>
+            <th style=" text-align: center;">Code</th>
+            <th style=" text-align: center;">Action</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
 <!-- Recent Sales End -->
 
 

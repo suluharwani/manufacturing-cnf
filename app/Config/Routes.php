@@ -350,6 +350,7 @@ $routes->group('proformainvoice', function ($routes) {
     $routes->get('printInvoiceNeed/(:num)', 'ProformaInvoiceController::printInvoiceNeed/$1',['filter' => 'accessControl:2']);
     $routes->get('printPi/(:num)', 'ProformaInvoiceController::printPi/$1',['filter' => 'accessControl:2']);
     $routes->post('update/(:num)', 'ProformaInvoiceController::update/$1',['filter' => 'accessControl:2']);
+    $routes->post('woList/(:num)', 'ProformaInvoiceController::woList/$1',['filter' => 'accessControl:2']);
    
     
 

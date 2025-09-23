@@ -250,6 +250,67 @@ $(document).ready(function() {
 
 });
 })
+    $('#tabel_serverside_wo').DataTable( {
+      "processing" : true,
+      "oLanguage": {
+        "sLengthMenu": "Tampilkan _MENU_ data per halaman",
+        "sSearch": "Pencarian: ",
+        "sZeroRecords": "Maaf, tidak ada data yang ditemukan",
+        "sInfo": "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+        "sInfoEmpty": "Menampilkan 0 s/d 0 dari 0 data",
+        "sInfoFiltered": "(di filter dari _MAX_ total data)",
+        "oPaginate": {
+          "sFirst": "<<",
+          "sLast": ">>",
+          "sPrevious": "<",
+          "sNext": ">"
+        }
+      },
+      "dom": 'Bfrtip',
+      "buttons": [
+      'csv'
+      ],
+      "order": [],
+      "ordering": true,
+      "info": true,
+      "serverSide": true,
+      "stateSave" : true,
+      "scrollX": true,
+      "ajax":{
+        "url" :base_url+"/proformainvoice/woList/"+getLastSegment() , // json datasource 
+        "type": "post",  // method  , by default get
+        // "async": false,
+        "dataType": 'json',
+        "data":{},
+      },
+  
+      columns: [
+      {},
+      {mRender: function (data, type, row) {
+          return row[1]
+      }},
+      {mRender: function (data, type, row) {
+          return row[2]
+      }},
+      {mRender: function (data, type, row) {
+          return`
+           <button class="btn btn-warning btn-sm viewWO" id = "${row[3]}">View</button>
+          `
+      }},
+    ],
+    "columnDefs": [{
+      "targets": [0],
+      "orderable": false
+    }],
+  
+    error: function(){  // error handling
+      $(".tabel_serverside-error").html("");
+      $("#tabel_serverside").append('<tbody class="tabel_serverside-error"><tr><th colspan="3">Data Tidak Ditemukan di Server</th></tr></tbody>');
+      $("#tabel_serverside_processing").css("display","none");
+  
+    }
+  
+  });
 function formatNumber(number, decimals = 2, decimalSeparator = ".", thousandSeparator = ",") {
     // Memastikan angka dalam format yang benar
     const num = parseFloat(number);
@@ -869,6 +930,10 @@ $(document).on('click', '.editBtnDoc', function() {
 $('#generateReportBtnProd').on('click', function () {
 
   
+});
+$(document).on('click', '.viewWO', function(e) {
+  var idWO =  $(this).attr('id');
+  window.open(base_url + "wo/" + idWO, '_blank');
 });
 $(document).on('click', '.viewProd', function(e) {
   e.preventDefault();
