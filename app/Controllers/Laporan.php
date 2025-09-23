@@ -169,7 +169,7 @@ protected function formatNumber($number)
     }
 
     // 4. Laporan Pengeluaran Hasil Produksi
- protected function getPengeluaranHasilProduksi($startDate, $endDate)
+protected function getPengeluaranHasilProduksi($startDate, $endDate)
 {
     $builder = $this->laporanModel->builder('laporan_pengeluaran_hasil_produksi');
     
@@ -182,6 +182,9 @@ protected function formatNumber($number)
         negara_tujuan,
         kode_barang,
         nama_barang,
+        nama_finishing,
+        id_product,
+        id_finishing,
         'PCS' as satuan,
         jumlah,
         mata_uang,
@@ -197,7 +200,22 @@ protected function formatNumber($number)
     $builder->where('created_at >=', $startDateFormatted);
     $builder->where('created_at <=', $endDateFormatted);
     
-    return $builder->get()->getResultArray();
+    $results = $builder->get()->getResultArray();
+    
+    // Modifikasi hasil untuk mengubah kode_barang menjadi link dan gabungkan nama_barang dengan nama_finishing
+    foreach ($results as &$row) {
+        $kodeBarang = $row['kode_barang'];
+        $idProduct = $row['id_product'];
+        $idFinishing = $row['id_finishing'];
+        
+        // Buat link untuk kode_barang dengan format tracking/kode_barang/id_finishing
+        $row['kode_barang'] = '<a href="tracking/' . $idProduct . '/' . $idFinishing . '">' . $kodeBarang . '</a>';
+        
+        // Gabungkan nama_barang dengan nama_finishing dipisahkan spasi
+        $row['nama_barang'] = $row['nama_barang'] . " | " . $row['nama_finishing'];
+    }
+    
+    return $results;
 }
 
     // 5. Laporan Mutasi Bahan Baku

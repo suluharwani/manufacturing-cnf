@@ -87,6 +87,7 @@ $routes->post('/material/delete', 'MaterialController::delete',['filter' => 'acc
 $routes->post('/material/materialUpdate', 'MaterialController::materialUpdate',['filter' => 'accessControl:2']);
 $routes->post('/material/satuanUpdate', 'MaterialController::satuanUpdate',['filter' => 'accessControl:2']);
 $routes->post('/material/typeUpdate', 'MaterialController::typeUpdate',['filter' => 'accessControl:2']);
+$routes->get('/material/get_last_material_id', 'MaterialController::get_last_material_id',['filter' => 'accessControl:2']);
 // $routes->post('/material/get_types', 'MaterialController::get_types',['filter' => 'accessControl:2']);
 // $routes->post('/material/get_satuan_ukuran', 'MaterialController::get_satuan_ukuran',['filter' => 'accessControl:2']);
 
@@ -390,8 +391,8 @@ $routes->group('purchase', function ($routes) {
 });
 
 $routes->group('report', function ($routes) {
-    // $routes->post('get_list', 'ProductController::get_list',['filter' => 'accessControl:2']); 
-
+    $routes->get('getPiHistoryByDate', 'ReportController::getPiHistoryByDate',['filter' => 'accessControl:2']); 
+    $routes->get('printBom/(:any)/(:any)', 'ReportController::printBom/$1/$2',['filter' => 'accessControl:2']);
     $routes->get('bea_cukai', 'ReportController::beacukai',['filter' => 'accessControl:2']); 
     $routes->get('activity', 'ReportController::activity',['filter' => 'accessControl:2']); 
     $routes->get('customer_order', 'ReportController::customer_order',['filter' => 'accessControl:2']); 
@@ -408,6 +409,7 @@ $routes->group('report', function ($routes) {
     $routes->post('searchProduct', 'ReportController::searchProduct',['filter' => 'accessControl:2']); 
     
     $routes->get('finishedGoodReport', 'ReportController::finishedGoodReport',['filter' => 'accessControl:2']); 
+    $routes->get('tracking/(:any)/(:any)', 'ReportController::tracking/$1/$2',['filter' => 'accessControl:2']); 
 
 });
 $routes->get('mr/(:any)', 'MaterialRequestController::mr/$1',['filter' => 'accessControl:2']); 
@@ -640,8 +642,4 @@ $routes->group('custfinance',  function($routes) {
     
     // Route untuk mendapatkan daftar customer
     $routes->get('getCustomerList', 'CustFinance::getCustomerList');
-});
-$routes->group('tracking',  function($routes) {
-    $routes->get('/', 'MaterialTracking::index');
-    $routes->get('/getTrackingData', 'MaterialTracking::getTrackingData');
 });

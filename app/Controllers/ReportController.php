@@ -16,10 +16,185 @@ class ReportController extends BaseController
         $this->form_validation = \Config\Services::validation();
 
     }
-    public function index()
-    {
-        //
+public function tracking($productId, $finishingId)
+{
+    // Load models
+    $productModel = new \App\Models\MdlProduct();
+    $proformaInvoiceModel = new \App\Models\ProformaInvoice();
+    
+    // Get product and finishing data
+    $productData = $productModel
+        ->select('product.*, finishing.name AS finishing_name, finishing.id AS finishing_id')
+        ->join('finishing', 'product.id = finishing.id_product', 'left')
+        ->where('product.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->first();
+
+    // Get Proforma Invoice history (tanpa filter tanggal di awal)
+    $piHistory = $proformaInvoiceModel
+        ->select('
+            proforma_invoice.id as invoice_id,
+            proforma_invoice.invoice_number,
+            proforma_invoice.invoice_date,
+            proforma_invoice.etd,
+            proforma_invoice.eta,
+            proforma_invoice.loading_date,
+            proforma_invoice.status,
+            proforma_invoice_details.quantity,
+            proforma_invoice_details.unit,
+            proforma_invoice_details.unit_price,
+            customer.customer_name
+        ')
+        ->join('proforma_invoice_details', 'proforma_invoice.id = proforma_invoice_details.invoice_id')
+        ->join('customer', 'proforma_invoice.customer_id = customer.id')
+        ->where('proforma_invoice_details.id_product', $productId)
+        ->where('proforma_invoice_details.finishing_id', $finishingId)
+        ->orderBy('proforma_invoice.invoice_date', 'DESC')
+        ->findAll();
+        
+    $data['group'] = 'tracking';
+    $data['title'] = 'Tracking Product - ' . ($productData['nama'].'|'.$productData['finishing_name']?? 'Unknown');
+    $data['productId'] = $productId;
+    $data['finishingId'] = $finishingId;
+    $data['productData'] = $productData;
+    $data['piHistory'] = $piHistory;
+    
+    $data['content'] = view('admin/content/report/trackProduct', $data);
+    return view('admin/index', $data);
+}
+
+public function printBom($productId, $finishingId)
+{
+    // Load models
+    $productModel = new \App\Models\MdlProduct();
+
+    // Get product and finishing data
+    $productData = $productModel
+        ->select('product.*, finishing.name AS finishing_name, finishing.id AS finishing_id')
+        ->join('finishing', 'product.id = finishing.id_product', 'left')
+        ->where('product.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->first();
+
+    // Get BOM data from billofmaterialfinishing
+    $bomData = $productModel
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(DISTINCT COALESCE(bom.penggunaan, 0)), 3) AS penggunaan, 
+            satuan.nama as satuan, 
+            type.nama as type, 
+            finishing.name AS finishing_name,
+            materials_detail.kite as kite
+        ')
+        ->from('product p')
+        ->join('billofmaterialfinishing bom', 'p.id = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->join('finishing', 'bom.id_modul = finishing.id', 'left')
+        ->where('p.id', $productId)
+        ->where('finishing.id', $finishingId)
+        ->groupBy('m.id, m.name, m.kode, satuan.nama, type.nama, finishing.name, materials_detail.kite')
+        ->orderBy('finishing.id, p.nama')
+        ->findAll();
+
+    // Get BOM data from billofmaterial (backup)
+    $bomDataBackup = $productModel
+        ->select('
+            m.id AS material_id, 
+            m.name AS material_name, 
+            m.kode AS material_code, 
+            FORMAT(SUM(COALESCE(bom.penggunaan, 0)), 3) AS penggunaan,
+            satuan.nama as satuan, 
+            type.nama as type,
+            modul.name AS modul_name,
+            materials_detail.kite as kite
+        ')
+        ->from('product p', true)
+        ->join('billofmaterial bom', 'p.id = bom.id_product', 'left')
+        ->join('materials m', 'bom.id_material = m.id')
+        ->join('materials_detail', 'materials_detail.material_id = bom.id_material', 'left')
+        ->join('satuan', 'satuan.id = materials_detail.satuan_id', 'left')
+        ->join('type', 'type.id = materials_detail.type_id', 'left')
+        ->join('modul', 'bom.id_modul = modul.id', 'left')
+        ->where('p.id', $productId)
+        ->groupBy('m.id, m.name, m.kode, satuan.nama, type.nama, modul.name, materials_detail.kite')
+        ->orderBy('modul.id, p.id')
+        ->findAll();
+
+    $data = [
+        'productData' => $productData,
+        'bomData' => !empty($bomData) ? $bomData : $bomDataBackup,
+        'productId' => $productId,
+        'finishingId' => $finishingId
+    ];
+
+    // Load view
+    $html = view('admin/content/printBOM', $data);
+
+    // Setup Dompdf
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isPhpEnabled', true);
+    $options->set('defaultFont', 'Helvetica');
+    
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    // Output PDF
+    $dompdf->stream("BOM_{$productId}_{$finishingId}.pdf", ["Attachment" => false]);
+}
+
+public function getPiHistoryByDate()
+{
+    $productId = $this->request->getGet('productId');
+    $finishingId = $this->request->getGet('finishingId');
+    $startDate = $this->request->getGet('startDate');
+    $endDate = $this->request->getGet('endDate');
+
+    $proformaInvoiceModel = new \App\Models\ProformaInvoice();
+
+    $query = $proformaInvoiceModel
+        ->select('
+            proforma_invoice.id as invoice_id,
+            proforma_invoice.invoice_number,
+            proforma_invoice.invoice_date,
+            proforma_invoice.etd,
+            proforma_invoice.eta,
+            proforma_invoice.loading_date,
+            proforma_invoice.status,
+            proforma_invoice_details.quantity,
+            proforma_invoice_details.unit,
+            proforma_invoice_details.unit_price,
+            customer.customer_name
+        ')
+        ->join('proforma_invoice_details', 'proforma_invoice.id = proforma_invoice_details.invoice_id')
+        ->join('customer', 'proforma_invoice.customer_id = customer.id')
+        ->where('proforma_invoice_details.id_product', $productId)
+        ->where('proforma_invoice_details.finishing_id', $finishingId);
+
+    if (!empty($startDate)) {
+        $query->where('proforma_invoice.invoice_date >=', $startDate);
     }
+
+    if (!empty($endDate)) {
+        $query->where('proforma_invoice.invoice_date <=', $endDate);
+    }
+
+    $query->orderBy('proforma_invoice.invoice_date', 'DESC');
+
+    $piHistory = $query->findAll();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $piHistory
+    ]);
+}
     public function material()
     {
 
