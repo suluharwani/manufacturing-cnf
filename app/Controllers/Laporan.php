@@ -202,20 +202,41 @@ protected function getPengeluaranHasilProduksi($startDate, $endDate)
     
     $results = $builder->get()->getResultArray();
     
+    // Array untuk menyimpan hasil akhir
+    $finalResults = [];
+    
     // Modifikasi hasil untuk mengubah kode_barang menjadi link dan gabungkan nama_barang dengan nama_finishing
-    foreach ($results as &$row) {
+    foreach ($results as $row) {
         $kodeBarang = $row['kode_barang'];
         $idProduct = $row['id_product'];
         $idFinishing = $row['id_finishing'];
         
         // Buat link untuk kode_barang dengan format tracking/kode_barang/id_finishing
-        $row['kode_barang'] = '<a href="tracking/' . $idProduct . '/' . $idFinishing . '">' . $kodeBarang . '</a>';
+        $kodeBarangLink = '<a href="tracking/' . $idProduct . '/' . $idFinishing . '">' . $kodeBarang . '</a>';
         
         // Gabungkan nama_barang dengan nama_finishing dipisahkan spasi
-        $row['nama_barang'] = $row['nama_barang'] . " | " . $row['nama_finishing'];
+        $namaBarangGabung = $row['nama_barang'] . " | " . $row['nama_finishing'];
+        
+        // Buat array hasil baru hanya dengan field yang diinginkan
+        $finalRow = [
+            'no_peb' => $row['no_peb'],
+            'tanggal_peb' => $row['tanggal_peb'],
+            'no_bukti_pengeluaran' => $row['no_bukti_pengeluaran'],
+            'tanggal_bukti' => $row['tanggal_bukti'],
+            'pembeli_penerima' => $row['pembeli_penerima'],
+            'negara_tujuan' => $row['negara_tujuan'],
+            'kode_barang' => $kodeBarangLink,
+            'nama_barang' => $namaBarangGabung,
+            'satuan' => 'PCS',
+            'jumlah' => $row['jumlah'],
+            'mata_uang' => $row['mata_uang'],
+            'nilai_uang' => $row['nilai_uang']
+        ];
+        
+        $finalResults[] = $finalRow;
     }
     
-    return $results;
+    return $finalResults;
 }
 
     // 5. Laporan Mutasi Bahan Baku
