@@ -169,7 +169,7 @@ protected function formatNumber($number)
     }
 
     // 4. Laporan Pengeluaran Hasil Produksi
- protected function getPengeluaranHasilProduksi($startDate, $endDate)
+protected function getPengeluaranHasilProduksi($startDate, $endDate)
 {
     $builder = $this->laporanModel->builder('laporan_pengeluaran_hasil_produksi');
     
@@ -182,6 +182,9 @@ protected function formatNumber($number)
         negara_tujuan,
         kode_barang,
         nama_barang,
+        nama_finishing,
+        id_product,
+        id_finishing,
         'PCS' as satuan,
         jumlah,
         mata_uang,
@@ -197,7 +200,43 @@ protected function formatNumber($number)
     $builder->where('created_at >=', $startDateFormatted);
     $builder->where('created_at <=', $endDateFormatted);
     
-    return $builder->get()->getResultArray();
+    $results = $builder->get()->getResultArray();
+    
+    // Array untuk menyimpan hasil akhir
+    $finalResults = [];
+    
+    // Modifikasi hasil untuk mengubah kode_barang menjadi link dan gabungkan nama_barang dengan nama_finishing
+    foreach ($results as $row) {
+        $kodeBarang = $row['kode_barang'];
+        $idProduct = $row['id_product'];
+        $idFinishing = $row['id_finishing'];
+        
+        // Buat link untuk kode_barang dengan format tracking/kode_barang/id_finishing
+        $kodeBarangLink = '<a href="tracking/' . $idProduct . '/' . $idFinishing . '">' . $kodeBarang . '</a>';
+        
+        // Gabungkan nama_barang dengan nama_finishing dipisahkan spasi
+        $namaBarangGabung = $row['nama_barang'] . " | " . $row['nama_finishing'];
+        
+        // Buat array hasil baru hanya dengan field yang diinginkan
+        $finalRow = [
+            'no_peb' => $row['no_peb'],
+            'tanggal_peb' => $row['tanggal_peb'],
+            'no_bukti_pengeluaran' => $row['no_bukti_pengeluaran'],
+            'tanggal_bukti' => $row['tanggal_bukti'],
+            'pembeli_penerima' => $row['pembeli_penerima'],
+            'negara_tujuan' => $row['negara_tujuan'],
+            'kode_barang' => $kodeBarangLink,
+            'nama_barang' => $namaBarangGabung,
+            'satuan' => 'PCS',
+            'jumlah' => $row['jumlah'],
+            'mata_uang' => $row['mata_uang'],
+            'nilai_uang' => $row['nilai_uang']
+        ];
+        
+        $finalResults[] = $finalRow;
+    }
+    
+    return $finalResults;
 }
 
     // 5. Laporan Mutasi Bahan Baku

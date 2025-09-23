@@ -364,7 +364,10 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
         c.customer_name AS pembeli_penerima,
         pi.port_discharge AS negara_tujuan,
         p.kode AS kode_barang,
+        sm.finishing_id as id_finishing,
+        sm.product_id as id_product,
         p.nama AS nama_barang,
+        f.name as nama_finishing,
         sm.quantity AS jumlah,
         (SELECT nama FROM currency WHERE id = pi.id_currency) AS mata_uang,
         (SELECT unit_price FROM proforma_invoice_details 
@@ -375,7 +378,8 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
     $builder->join('product p', 'sm.product_id = p.id', 'inner');
     $builder->join('proforma_invoice pi', 'sm.reference_id = pi.id', 'inner');
     $builder->join('customer c', 'pi.customer_id = c.id', 'left');
-    
+    $builder->join('finishing f','f.id = sm.finishing_id', 'left'); 
+
     $builder->where('sm.movement_type', 'out');
     $builder->where('sm.reference_type', 'proforma_invoice');
     $builder->where('sm.status', 'completed');

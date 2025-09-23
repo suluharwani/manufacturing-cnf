@@ -575,12 +575,38 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
         doc.setLineWidth(0.5);
         doc.line(10, 36, 280, 36);
         
+        // Function to strip HTML tags and extract text content
+        const stripHtmlTags = (htmlString) => {
+            if (!htmlString || typeof htmlString !== 'string') return htmlString || '-';
+            
+            // Create a temporary div element
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            
+            // Return the text content
+            return tempDiv.textContent || tempDiv.innerText || htmlString;
+        };
+        
+        // Function to process data and remove HTML tags
+        const processDataForPdf = (data) => {
+            return data.map(row => {
+                const processedRow = {};
+                Object.keys(row).forEach(key => {
+                    processedRow[key] = stripHtmlTags(row[key]);
+                });
+                return processedRow;
+            });
+        };
+        
         // Prepare table data
         const pdfData = [];
         
+        // Process data to remove HTML tags
+        const processedData = data && data.length > 0 ? processDataForPdf(data) : [];
+        
         // Add data rows with proper numbering
-        if (data && data.length > 0) {
-            data.forEach((row, index) => {
+        if (processedData.length > 0) {
+            processedData.forEach((row, index) => {
                 const rowData = [index + 1]; // Add row number
                 Object.values(row).forEach(val => rowData.push(val || '-'));
                 pdfData.push(rowData);
@@ -659,7 +685,15 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
             pageBreak: 'auto',
             showHead: 'everyPage',
             horizontalPageBreak: true,
-            horizontalPageBreakRepeat: 0 // Repeat header row on horizontal page breaks
+            horizontalPageBreakRepeat: 0, // Repeat header row on horizontal page breaks
+            // Handle long text content
+            didDrawCell: (data) => {
+                // Optional: Add custom formatting for specific cells
+                if (data.section === 'body' && data.column.index === 0) {
+                    // Style for the "No" column
+                    // doc.setFontStyle('bold');
+                }
+            }
         });
         
         // Footer

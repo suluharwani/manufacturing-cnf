@@ -191,11 +191,12 @@ public function listdataMaterialJoin()
 
 
 
-       function tambah_material() {
+     function tambah_material() {
     
     $userInfo = $_SESSION['auth'];
     $MdlMaterial = new \App\Models\MdlMaterial();
     $MdlMaterialDet = new \App\Models\MdlMaterialDet();
+    $MdlStock = new \App\Models\MdlStock(); // Tambahkan model stock
 
     // Cek jika kode sudah ada
     $existingMaterial = $MdlMaterial->where('kode', $_POST["kode"])->first();
@@ -213,15 +214,49 @@ public function listdataMaterialJoin()
 
     if ($MdlMaterial->insert($dataMaterial)) {
         $query = $MdlMaterial->orderBy('id', 'DESC')->first();
+        $material_id = $query['id'];
+        
         $materialDet = [
-            "material_id" => $query['id'],
+            "material_id" => $material_id,
             "type_id" => $_POST["type"],
             "satuan_id" => $_POST["satuanUkuran"],
             "kite" => $_POST["kite"]
         ];
+        
         if ($MdlMaterialDet->insert($materialDet)) {
-            $riwayat = "User " . $userInfo['nama_depan'] . " " . $userInfo['nama_belakang'] . " menambahkan material: " . $_POST['nama'] . "";
-            header('HTTP/1.1 200 OK');
+            // Insert data stock dengan jumlah 0
+            $dataStock = [
+                "id_material" => $material_id,
+                "stock_awal" => 0,
+                "stock_masuk" => 0,
+                "stock_keluar" => 0,
+                "selisih_stock_opname" => 0,
+                "price" => 0,
+            ];
+            
+            if ($MdlStock->insert($dataStock)) {
+                $riwayat = "User " . $userInfo['nama_depan'] . " " . $userInfo['nama_belakang'] . " menambahkan material: " . $_POST['nama'] . "";
+                header('HTTP/1.1 200 OK');
+                header('Content-Type: application/json; charset=UTF-8');
+                echo json_encode(array('message' => 'Data material berhasil ditambahkan.', 'code' => 1));
+            } else {
+                // Rollback jika insert stock gagal
+                $MdlMaterial->delete($material_id);
+                $MdlMaterialDet->where('material_id', $material_id)->delete();
+                
+                $riwayat = "User " . $userInfo['nama_depan'] . " gagal menambahkan material: " . $_POST['nama'] . " - Gagal membuat data stock";
+                header('HTTP/1.1 500 Internal Server Error');
+                header('Content-Type: application/json; charset=UTF-8');
+                die(json_encode(array('message' => 'Gagal membuat data stock.', 'code' => 3)));
+            }
+        } else {
+            // Rollback jika insert material detail gagal
+            $MdlMaterial->delete($material_id);
+            
+            $riwayat = "User " . $userInfo['nama_depan'] . " gagal menambahkan material: " . $_POST['nama'];
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(array('message' => 'Gagal menambahkan detail material.', 'code' => 3)));
         }
 
     } else {
@@ -250,24 +285,71 @@ public function listdataMaterialJoin()
 
     // Function to delete a material
 function delete(){
-        
-        $param = $_POST['param'];
-
-        $id = $param['id'];
-        $name = $param['name'];
-        $mdl = new \App\Models\MdlMaterial();
-        $mdl->where('id',$id);
-        $mdl->delete();
-        if ($mdl->affectedRows()!=0) {
-          $riwayat = "Menghapus material $name";
-          $this->changelog->riwayat($riwayat);
-          header('HTTP/1.1 200 OK');
-        }else {
-          header('HTTP/1.1 500 Internal Server Error');
-          header('Content-Type: application/json; charset=UTF-8');
-          die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => $param)));
+    $param = $_POST['param'];
+    $id = $param['id'];
+    $name = $param['name'];
+    
+    $mdlMaterial = new \App\Models\MdlMaterial();
+    $mdlStock = new \App\Models\MdlStock();
+    $mdlMaterialDet = new \App\Models\MdlMaterialDet();
+    
+    // Mulai transaction untuk memastikan konsistensi data
+    $db = \Config\Database::connect();
+    $db->transStart();
+    
+    try {
+        // Cek apakah material exists
+        $material = $mdlMaterial->find($id);
+        if (!$material) {
+            throw new \Exception('Data material tidak ditemukan');
         }
-       } 
+        
+        // Hapus data stock terkait material
+        $stockDeleted = $mdlStock->where('id_material', $id)->delete();
+        
+        // Hapus data materials_detail terkait material
+        $materialDetDeleted = $mdlMaterialDet->where('material_id', $id)->delete();
+        
+        // Hapus data material
+        $materialDeleted = $mdlMaterial->delete($id);
+        
+        $db->transComplete();
+        
+        if ($db->transStatus() === FALSE) {
+            throw new \Exception('Gagal menghapus data');
+        }
+        
+        if ($materialDeleted) {
+            $riwayat = "Menghapus material $name beserta data detail dan stocknya";
+            $this->changelog->riwayat($riwayat);
+            header('HTTP/1.1 200 OK');
+            header('Content-Type: application/json; charset=UTF-8');
+            echo json_encode(array(
+                'message' => 'Data material, detail, dan stock berhasil dihapus', 
+                'code' => 1,
+                'deleted_material' => $materialDeleted,
+                'deleted_stock' => $stockDeleted,
+                'deleted_material_detail' => $materialDetDeleted
+            ));
+        } else {
+            header('HTTP/1.1 500 Internal Server Error');
+            header('Content-Type: application/json; charset=UTF-8');
+            die(json_encode(array(
+                'message' => 'Gagal menghapus data material', 
+                'code' => 0
+            )));
+        }
+        
+    } catch (\Exception $e) {
+        $db->transRollback();
+        header('HTTP/1.1 500 Internal Server Error');
+        header('Content-Type: application/json; charset=UTF-8');
+        die(json_encode(array(
+            'message' => 'Gagal menghapus data: ' . $e->getMessage(), 
+            'code' => 0
+        )));
+    }
+}
     function satuanDelete(){
         
         $param = $_POST['param'];
@@ -378,5 +460,13 @@ function delete(){
           die(json_encode(array('message' => 'Tidak ada perubahan pada data', 'code' => 1)));
         }
     }
+    public function get_last_material_id() {
+    $MdlMaterial = new \App\Models\MdlMaterial();
+    $lastMaterial = $MdlMaterial->select('id')->orderBy('id', 'DESC')->first();
+    
+    $lastId = $lastMaterial ? $lastMaterial['id'] : 0;
+    
+    return $this->response->setJSON(['last_id' => $lastId]);
+}
 }
  
