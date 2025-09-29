@@ -6,14 +6,17 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Models\MdlBillOfMaterial;
 class ReportController extends BaseController
 {
+     protected $bomModel;
     public function __construct()
     {
         $this->db = \Config\Database::connect();
         $this->session = session();
         helper(['form', 'url']);
         $this->form_validation = \Config\Services::validation();
+        $this->bomModel = new MdlBillOfMaterial();
 
     }
 public function tracking($productId, $finishingId)
@@ -929,5 +932,86 @@ public function getPiHistoryByDate()
 
         $data['content'] = view('admin/content/report/beacukai');
         return view('admin/index', $data);
+    }
+     public function getCombinedBOM($id_product = null, $id_modul = null)
+    {
+        try {
+            // Validasi parameter
+            if ($id_product === null || $id_modul === null) {
+                return $this->failValidationErrors('Parameter id_product dan id_modul harus diisi');
+            }
+
+            // Validasi numeric
+            if (!is_numeric($id_product) || !is_numeric($id_modul)) {
+                return $this->failValidationErrors('Parameter harus berupa angka');
+            }
+
+            // Get data from model
+            $data = $this->bomModel->getCombinedBOM($id_product, $id_modul);
+
+            // Format response
+            $response = [
+                'status' => 'success',
+                'message' => 'Data BOM berhasil diambil',
+                'data' => [
+                    'id_product' => (int)$id_product,
+                    'id_modul' => (int)$id_modul,
+                    'total_items' => count($data),
+                    'items' => $data
+                ]
+            ];
+
+            return json_encode($response);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Error getting combined BOM: ' . $e->getMessage());
+            
+            return $this->failServerError('Terjadi kesalahan server: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get combined BOM via POST request
+     * URL: /bom/combined
+     */
+    public function getCombinedBOMPost()
+    {
+        try {
+            $validation = \Config\Services::validation();
+            
+            $rules = [
+                'id_product' => 'required|numeric',
+                'id_modul' => 'required|numeric'
+            ];
+
+            if (!$this->validate($rules)) {
+                return $this->failValidationErrors($validation->getErrors());
+            }
+
+            $id_product = $this->request->getPost('id_product');
+            $id_modul = $this->request->getPost('id_modul');
+
+            // Get data from model
+            $data = $this->bomModel->getCombinedBOM($id_product, $id_modul);
+
+            // Format response
+            $response = [
+                'status' => 'success',
+                'message' => 'Data BOM berhasil diambil',
+                'data' => [
+                    'id_product' => (int)$id_product,
+                    'id_modul' => (int)$id_modul,
+                    'total_items' => count($data),
+                    'items' => $data
+                ]
+            ];
+
+            return json_encode($response);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Error getting combined BOM: ' . $e->getMessage());
+            
+            return $this->failServerError('Terjadi kesalahan server: ' . $e->getMessage());
+        }
     }
 }

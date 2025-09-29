@@ -1,28 +1,19 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
 
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <!-- Menambahkan html2canvas untuk konversi QR ke gambar -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
     /* Perbaikan untuk dropdown Select2 di dalam modal */
-    .select2-container--open {
-        z-index: 9999 !important;
-    }
-    .select2-dropdown {
-        z-index: 9999 !important;
-    }
-    .select2-container {
-        z-index: 9999 !important;
-    }
-    
+
     /* Style lainnya */
     .select2-container--bootstrap-5 {
         width: 100% !important;
@@ -470,10 +461,10 @@
                             <input type="text" class="form-control" id="current_stock" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label for="document_number" class="form-label">Document Number</label>
+                            <label for="document_number" class="form-label">Document Number *</label>
                             <input type="text" class="form-control" id="document_number" name="document_number" step="0.01" min="0">
                         </div><div class="col-md-6">
-                            <label for="responsible_person" class="form-label">Document Author</label>
+                            <label for="responsible_person" class="form-label">Document Author *</label>
                             <input type="text" class="form-control" id="responsible_person" name="responsible_person" step="0.01" min="0">
                         </div>
                         <div class="col-md-6">
@@ -517,7 +508,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="saveStockButton">
+                    <button type="button" class="btn btn-primary" id="saveStockButton">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         Save Transaction
                     </button>
@@ -526,7 +517,6 @@
         </div>
     </div>
 </div>
-
 <!-- Tambahkan di bagian atas file component.php, setelah styles -->
 <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1068,7 +1058,7 @@ function loadTransactionHistory(componentId) {
                         <td>${transaction.reference || '-'}</td>
                         <td>${transaction.notes || '-'}</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${transaction.id}, ${componentId})" title="Delete Transaction">
+                            <button class="btn btn-sm btn-danger delete-transaction-btn" onclick="deleteTransaction(${transaction.id}, ${componentId})" title="Delete Transaction">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
@@ -1083,12 +1073,18 @@ function loadTransactionHistory(componentId) {
 }
 
 // Handle stock form submission
-$('#stockForm').submit(function(e) {
+$('#saveStockButton').on('click', function(e) {
     e.preventDefault();
     
-    var formData = $(this).serializeArray();
+    var formData = $('#stockForm').serializeArray();
     var componentId = $('#stock_component_id').val();
     var quantity = $('input[name="quantity"]').val();
+    
+    // Validasi form
+    if (!$('#stockForm')[0].checkValidity()) {
+        $('#stockForm')[0].reportValidity();
+        return;
+    }
     
     // Membuat array items dengan struktur yang diinginkan
     var requestData = {
@@ -1127,6 +1123,9 @@ $('#stockForm').submit(function(e) {
                         $('#current_stock').val(stockResponse.data.quantity);
                     }
                 }, 'json');
+                
+                // Reset form
+                $('#stockForm')[0].reset();
             } else {
                 alert(response.message);
             }
@@ -1139,6 +1138,14 @@ $('#stockForm').submit(function(e) {
             saveButton.find('.spinner-border').addClass('d-none');
         }
     });
+});
+
+// Optional: Tambahkan event handler untuk tombol Enter di form
+$('#stockForm').on('keypress', function(e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $('#saveStockButton').click();
+    }
 });
 
 // Tambahkan fungsi untuk menghapus transaksi

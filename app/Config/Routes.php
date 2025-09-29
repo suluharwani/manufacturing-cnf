@@ -411,6 +411,7 @@ $routes->group('report', function ($routes) {
     
     $routes->get('finishedGoodReport', 'ReportController::finishedGoodReport',['filter' => 'accessControl:2']); 
     $routes->get('tracking/(:any)/(:any)', 'ReportController::tracking/$1/$2',['filter' => 'accessControl:2']); 
+    $routes->get('material/(:any)/(:any)', 'ReportController::getCombinedBOM/$1/$2',['filter' => 'accessControl:2']); 
 
 });
 $routes->get('mr/(:any)', 'MaterialRequestController::mr/$1',['filter' => 'accessControl:2']); 
