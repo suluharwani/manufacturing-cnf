@@ -597,8 +597,8 @@ public function saveTransaction()
                 'quantity' => $quantity,
                 'document_number' => $data['document_number'],
                 'responsible_person' => $data['responsible_person'],
-                'reference' => 'BATCH_TRANSACTION',
-                'notes' => 'Batch transaction - ' . $data['document_number'],
+                'reference' => $data['reference'],
+                'notes' => 'transaction DOC:- ' . $data['document_number'],
                 'created_by' => session()->get('user_id') ?? null,
                 'created_at' => date('Y-m-d H:i:s')
             ];
