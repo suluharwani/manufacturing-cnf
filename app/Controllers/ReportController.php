@@ -46,7 +46,8 @@ public function tracking($productId, $finishingId)
             proforma_invoice_details.quantity,
             proforma_invoice_details.unit,
             proforma_invoice_details.unit_price,
-            customer.customer_name
+            customer.customer_name,
+            proforma_invoice.peb
         ')
         ->join('proforma_invoice_details', 'proforma_invoice.id = proforma_invoice_details.invoice_id')
         ->join('customer', 'proforma_invoice.customer_id = customer.id')
@@ -1014,4 +1015,21 @@ public function getPiHistoryByDate()
             return $this->failServerError('Terjadi kesalahan server: ' . $e->getMessage());
         }
     }
+   function materialhistory($id_material)
+{
+    $db = \Config\Database::connect();
+    
+    $builder = $db->table('pembelian_detail pd');
+    $builder->select('p.id, p.invoice, p.tanggal_nota, p.id_supplier, pd.jumlah, pd.harga, pd.diskon1, pd.diskon2, pd.diskon3, pd.pajak, pd.potongan, (pd.jumlah * pd.harga) as subtotal, p.posting, p.document, p.jenis_doc, p.created_at');
+    $builder->join('pembelian p', 'pd.id_pembelian = p.id');
+    $builder->where('pd.id_material', $id_material);
+    $builder->where('pd.deleted_at IS NULL', null, false);
+    $builder->where('p.deleted_at IS NULL', null, false);
+    $builder->orderBy('p.tanggal_nota', 'DESC');
+    $builder->orderBy('p.created_at', 'DESC');
+    
+    $query = $builder->get();
+    
+    return json_encode($query->getResultArray());
+}
 }

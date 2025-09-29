@@ -79,6 +79,7 @@
                         <tr>
                             <th>Invoice Number</th>
                             <th>Invoice Date</th>
+                            <th>PEB</th>
                             <th>Customer</th>
                             <th>Quantity</th>
                             <th>Unit Price</th>
@@ -92,12 +93,13 @@
                             <?php foreach ($piHistory as $pi): ?>
                                 <tr>
                                     <td>
-                                        <a href="<?= base_url('proformainvoice/piDoc/' . $pi['invoice_id']) ?>" 
+                                        <a href="<?= base_url('proformainvoice/printPi/' . $pi['invoice_id']) ?>" 
                                            target="_blank" class="text-primary">
                                             <?= $pi['invoice_number'] ?>
                                         </a>
                                     </td>
                                     <td><?= $pi['invoice_date'] ?></td>
+                                    <td><?= $pi['peb'] ?></td>
                                     <td><?= $pi['customer_name'] ?></td>
                                     <td><?= $pi['quantity'] ?> <?= $pi['unit'] ?></td>
                                     <td><?= number_format($pi['unit_price'], 2) ?></td>
@@ -270,70 +272,131 @@ $(document).ready(function() {
         });
     }
 
-    function viewMaterialHistory(materialId, materialName) {
-        // Show loading modal
-        const modal = $(`
-            <div class="modal fade" id="materialHistoryModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Material History - ${materialName}</h5>
-                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                                <p>Loading material history...</p>
+function viewMaterialHistory(materialId, materialName) {
+    // Show loading modal
+    const modal = $(`
+        <div class="modal fade" id="materialHistoryModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Material History - ${materialName}</h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="sr-only">Loading...</span>
                             </div>
+                            <p>Loading material history...</p>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
-        `);
-        
-        $('body').append(modal);
-        $('#materialHistoryModal').modal('show');
+        </div>
+    `);
+    
+    $('body').append(modal);
+    $('#materialHistoryModal').modal('show');
 
-        // Load material history via AJAX
-        $.get('<?= base_url('materialhistory/') ?>' + materialId, 
-        function(response) {
+    // Load material history via AJAX
+    $.get('<?= base_url('report/materialhistory/') ?>' + materialId, 
+    function(response) {
+        try {
+            let data = JSON.parse(response);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                $('#materialHistoryModal .modal-body').html(`
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i> 
+                        Tidak ada data history material untuk <strong>${materialName}</strong> (ID: ${materialId}).
+                    </div>
+                `);
+                return;
+            }
+
+            // Buat tabel dengan kolom sesuai permintaan
+            let table = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Invoice</th>
+                                <th>No. Dok. Bea Cukai</th>
+                                <th>Jenis Dok.</th>
+                                <th>Jumlah</th>
+                                <th>Tanggal Nota</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(row => {
+                table += `
+                    <tr>
+                        <td>${row.invoice}</td>
+                        <td>${row.document || '-'}</td>
+                        <td>${row.jenis_doc || '-'}</td>
+                        <td class="text-end">${row.jumlah}</td>
+                        <td>${row.tanggal_nota}</td>
+                        <td class="text-center">
+                            <a href="<?= base_url('pembelian/printGRN/') ?>${row.id}" class="btn btn-sm btn-primary" target="_blank">
+                                <i class="fas fa-edit"></i> Detail
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            table += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Inject ke modal
             $('#materialHistoryModal .modal-body').html(`
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle"></i> 
-                    Material history page for <strong>${materialName}</strong> (ID: ${materialId}) is under development.
+                    Material history page for <strong>${materialName}</strong> (ID: ${materialId}) 
                 </div>
-                <div class="text-center">
-                    <p>This feature will display the complete history of material usage, stock movements, and related transactions.</p>
-                    <a href="<?= base_url('materialhistory/') ?>${materialId}" class="btn btn-primary" target="_blank">
-                        <i class="fas fa-external-link-alt"></i> Go to Material History Page
-                    </a>
-                </div>
+                ${table}
             `);
-        }).fail(function(xhr, status, error) {
-            console.error('Error loading material history:', error);
+
+        } catch (e) {
+            console.error('JSON parse error:', e);
             $('#materialHistoryModal .modal-body').html(`
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-triangle"></i> 
-                    Failed to load material history data. Error: ${error}
-                </div>
-                <div class="text-center">
-                    <a href="<?= base_url('materialhistory/') ?>${materialId}" class="btn btn-primary" target="_blank">
-                        <i class="fas fa-external-link-alt"></i> Go to Material History Page
-                    </a>
+                    Gagal memproses data material history. Error: ${e.message}
                 </div>
             `);
-        });
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Error loading material history:', error);
+        $('#materialHistoryModal .modal-body').html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Failed to load material history data. Error: ${error}
+            </div>
+            <div class="text-center">
+                <a href="<?= base_url('materialhistory/') ?>${materialId}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Go to Material History Page
+                </a>
+            </div>
+        `);
+    });
 
-        // Clean up modal on close
-        $('#materialHistoryModal').on('hidden.bs.modal', function() {
-            $(this).remove();
-        });
-    }
+    // Clean up modal on close
+    $('#materialHistoryModal').on('hidden.bs.modal', function() {
+        $(this).remove();
+    });
+}
+
+
 
     function updatePiTable(data) {
         const tbody = $('#piTableBody');
@@ -349,7 +412,7 @@ $(document).ready(function() {
             const row = `
                 <tr>
                     <td>
-                        <a href="<?= base_url('proformainvoice/piDoc/') ?>${pi.invoice_id}" 
+                        <a href="<?= base_url('proformainvoice/printPi/') ?>${pi.invoice_id}" 
                            target="_blank" class="text-primary">
                             ${pi.invoice_number}
                         </a>
