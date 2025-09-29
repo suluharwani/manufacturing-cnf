@@ -470,8 +470,11 @@
                             <input type="text" class="form-control" id="current_stock" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label for="minimum_stock" class="form-label">Minimum Stock</label>
-                            <input type="number" class="form-control" id="minimum_stock" name="minimum_stock" step="0.01" min="0">
+                            <label for="document_number" class="form-label">Document Number</label>
+                            <input type="text" class="form-control" id="document_number" name="document_number" step="0.01" min="0">
+                        </div><div class="col-md-6">
+                            <label for="responsible_person" class="form-label">Document Author</label>
+                            <input type="text" class="form-control" id="responsible_person" name="responsible_person" step="0.01" min="0">
                         </div>
                         <div class="col-md-6">
                             <label for="transaction_type" class="form-label">Transaction Type *</label>
@@ -1083,35 +1086,67 @@ function loadTransactionHistory(componentId) {
 $('#stockForm').submit(function(e) {
     e.preventDefault();
     
-    var formData = $(this).serialize();
+    var formData = $(this).serializeArray();
+    var componentId = $('#stock_component_id').val();
+    var quantity = $('input[name="quantity"]').val();
+    
+    // Membuat array items dengan struktur yang diinginkan
+    var requestData = {
+        items: [
+            {
+                id: componentId,
+                quantity: quantity
+            }
+        ],
+        document_number: $('input[name="document_number"]').val(),
+        responsible_person: $('input[name="responsible_person"]').val(),
+        type: $('select[name="type"]').val(),
+        reference: $('input[name="reference"]').val(),
+        notes: $('textarea[name="notes"]').val()
+    };
+    
     var saveButton = $('#saveStockButton');
     
     saveButton.prop('disabled', true);
     saveButton.find('.spinner-border').removeClass('d-none');
     
-    $.post("<?= site_url('component/saveTransaction') ?>", formData, function(response) {
-        if (response.status) {
-            alert(response.message);
-            // Refresh stock info and history
-            var componentId = $('#stock_component_id').val();
-            loadTransactionHistory(componentId);
-            $.get("<?= site_url('component/getStock/') ?>" + componentId, function(stockResponse) {
-                if (stockResponse.status) {
-                    $('#current_stock').val(stockResponse.data.quantity);
-                }
-            }, 'json');
-        } else {
-            alert(response.message);
+    // Kirim sebagai JSON
+    $.ajax({
+        url: "<?= site_url('component/saveTransaction') ?>",
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(requestData),
+        dataType: 'json',
+        success: function(response) {
+            if (response.status) {
+                alert(response.message);
+                // Refresh stock info and history
+                loadTransactionHistory(componentId);
+                $.get("<?= site_url('component/getStock/') ?>" + componentId, function(stockResponse) {
+                    if (stockResponse.status) {
+                        $('#current_stock').val(stockResponse.data.quantity);
+                    }
+                }, 'json');
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('Error: ' + error);
+        },
+        complete: function() {
+            saveButton.prop('disabled', false);
+            saveButton.find('.spinner-border').addClass('d-none');
         }
-    }, 'json').always(function() {
-        saveButton.prop('disabled', false);
-        saveButton.find('.spinner-border').addClass('d-none');
     });
 });
 
 // Tambahkan fungsi untuk menghapus transaksi
 function deleteTransaction(transactionId, componentId) {
     if (confirm('Are you sure you want to delete this transaction? This will reverse the stock change.')) {
+        // Show loading state jika ada
+        $('.delete-btn[data-id="' + transactionId + '"]').prop('disabled', true).text('Deleting...');
+        
         $.post("<?= site_url('component/deleteTransaction') ?>", {
             id: transactionId,
             component_id: componentId,
@@ -1125,11 +1160,40 @@ function deleteTransaction(transactionId, componentId) {
                     if (stockResponse.status) {
                         $('#current_stock').val(stockResponse.data.quantity);
                     }
+                    // Optional: Show success message dengan toast/notification
+                    showNotification('Transaction deleted successfully', 'success');
                 }, 'json');
             } else {
                 alert(response.message);
+                // Optional: Show error message
+                showNotification(response.message, 'error');
             }
-        }, 'json');
+        }, 'json')
+        .fail(function(xhr, status, error) {
+            alert('Error: ' + error);
+            showNotification('Failed to delete transaction', 'error');
+        })
+        .always(function() {
+            // Reset button state
+            $('.delete-btn[data-id="' + transactionId + '"]').prop('disabled', false).text('Delete');
+        });
+    }
+}
+
+// Optional: Function untuk show notification yang lebih user friendly
+function showNotification(message, type = 'info') {
+    // Jika menggunakan Bootstrap toast
+    if (typeof bootstrap !== 'undefined') {
+        const toastEl = document.getElementById('notificationToast');
+        const toastBody = toastEl.querySelector('.toast-body');
+        const toast = new bootstrap.Toast(toastEl);
+        
+        toastBody.textContent = message;
+        toastEl.className = `toast ${type === 'success' ? 'bg-success text-white' : type === 'error' ? 'bg-danger text-white' : 'bg-info text-white'}`;
+        toast.show();
+    } else {
+        // Fallback ke alert biasa
+        console.log(`${type.toUpperCase()}: ${message}`);
     }
 }
 
