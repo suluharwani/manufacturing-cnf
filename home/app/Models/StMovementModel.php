@@ -148,7 +148,7 @@ public function getProductHistory($productId, $limit = 100)
                ->limit($limit)
                ->findAll();
 }
-public function bookStock($productId, $quantity, $piId, $locationId, $notes = '', $finishing_id)
+public function bookStock($productId, $quantity, $piId, $locationId, $finishing_id, $notes = '')
 {
     $this->db->transStart();
 
