@@ -1,0 +1,93 @@
+INFO - 2025-08-15 15:27:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-08-15 15:27:57 --> Error connecting to the database: mysqli_sql_exception: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond in C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:186
+Stack trace:
+#0 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(186): mysqli->real_connect('192.168.2.222', 'root', Object(SensitiveParameterValue), 'cnf', 3310, '', 0)
+#1 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#5 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#6 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#7 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#8 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond in C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#4 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#5 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#6 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#9 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-08-15 15:27:57 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+[Method: GET, Route: login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `users`', [], false)
+ 3 SYSTEMPATH\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+ 4 APPPATH\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->index()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-08-15 15:28:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-08-15 15:29:06 --> Error connecting to the database: mysqli_sql_exception: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond in C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:186
+Stack trace:
+#0 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(186): mysqli->real_connect('192.168.2.222', 'root', Object(SensitiveParameterValue), 'cnf', 3310, '', 0)
+#1 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#5 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#6 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#7 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#8 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond in C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#4 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#5 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#6 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#9 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\Users\Administrator\Documents\GITHUB\manufacturing-cnf\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-08-15 15:29:06 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+[Method: GET, Route: login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `users`', [], false)
+ 3 SYSTEMPATH\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+ 4 APPPATH\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->index()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-08-15 15:40:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
