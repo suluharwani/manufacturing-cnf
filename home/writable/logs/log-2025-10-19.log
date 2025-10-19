@@ -1,0 +1,47 @@
+INFO - 2025-10-19 21:02:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-19 21:02:42 --> Error connecting to the database: mysqli_sql_exception: The server requested authentication method unknown to the client [auth_gssapi_client] in C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:186
+Stack trace:
+#0 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(186): mysqli->real_connect('localhost', 'u375117440_sulu...', Object(SensitiveParameterValue), 'u375117440_cnfi...', 3306, '', 0)
+#1 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#5 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#6 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#7 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#8 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: The server requested authentication method unknown to the client [auth_gssapi_client] in C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#4 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#5 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#6 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#9 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\Users\Suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-10-19 21:02:42 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: The server requested authentication method unknown to the client [auth_gssapi_client]
+[Method: GET, Route: login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `users`', [], false)
+ 3 SYSTEMPATH\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+ 4 APPPATH\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->index()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-19 21:03:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
