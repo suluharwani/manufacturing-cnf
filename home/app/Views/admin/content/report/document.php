@@ -85,6 +85,43 @@
             background-color: #6c5ce7;
             color: white;
         }
+        /* Tambahkan di CSS yang sudah ada */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.toast {
+    z-index: 9999;
+}
+
+.btn-group-sm .dropdown-toggle-split {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Responsive table */
+.table-responsive {
+    border-radius: 8px;
+}
+
+.document-table th {
+    position: sticky;
+    top: 0;
+    background-color: #6c5ce7;
+    color: white;
+    z-index: 10;
+}
+
+/* Loading animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.table tbody tr {
+    animation: fadeIn 0.3s ease-in;
+}
     </style>
 </head>
 <body>
@@ -291,6 +328,7 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Nomor GRN</th>
+                                    <th>Document Import</th>
                                     <th>Tanggal</th>
                                     <th>Supplier</th>
                                     <th>Status</th>
@@ -536,37 +574,6 @@
     
     <script>
         // Data contoh untuk setiap jenis dokumen
-        const documentData = {
-            purchaseOrder: [
-                { id: 1, number: 'PO-2023-001', date: '2023-11-15', supplier: 'PT Supplier Jaya', status: 'Selesai' },
-                { id: 2, number: 'PO-2023-002', date: '2023-11-14', supplier: 'CV Barokah Abadi', status: 'Proses' },
-                { id: 3, number: 'PO-2023-003', date: '2023-11-10', supplier: 'UD Makmur Sentosa', status: 'Selesai' },
-                { id: 4, number: 'PO-2023-004', date: '2023-11-05', supplier: 'PT Global Sukses', status: 'Ditolak' },
-                { id: 5, number: 'PO-2023-005', date: '2023-11-01', supplier: 'CV Mandiri Jaya', status: 'Selesai' }
-            ],
-            grn: [
-                { id: 1, number: 'GRN-2023-045', date: '2023-11-14', supplier: 'PT Supplier Jaya', status: 'Selesai' },
-                { id: 2, number: 'GRN-2023-046', date: '2023-11-12', supplier: 'CV Barokah Abadi', status: 'Selesai' },
-                { id: 3, number: 'GRN-2023-047', date: '2023-11-08', supplier: 'UD Makmur Sentosa', status: 'Selesai' },
-                { id: 4, number: 'GRN-2023-048', date: '2023-11-03', supplier: 'PT Global Sukses', status: 'Selesai' }
-            ],
-            proforma: [
-                { id: 1, number: 'PRO-2023-101', date: '2023-11-13', client: 'PT Klien Utama', amount: 'Rp 5.250.000' },
-                { id: 2, number: 'PRO-2023-102', date: '2023-11-11', client: 'CV Mitra Kerja', amount: 'Rp 3.750.000' },
-                { id: 3, number: 'PRO-2023-103', date: '2023-11-07', client: 'UD Sumber Rejeki', amount: 'Rp 8.500.000' }
-            ],
-            workOrder: [
-                { id: 1, number: 'WO-2023-078', date: '2023-11-13', description: 'Pemeliharaan Mesin Produksi', status: 'Proses' },
-                { id: 2, number: 'WO-2023-079', date: '2023-11-09', description: 'Instalasi Sistem Baru', status: 'Selesai' },
-                { id: 3, number: 'WO-2023-080', date: '2023-11-06', description: 'Perbaikan Jaringan Listrik', status: 'Selesai' }
-            ],
-            purchaseRequest: [
-                { id: 1, number: 'PR-2023-201', date: '2023-11-12', department: 'Produksi', status: 'Disetujui' },
-                { id: 2, number: 'PR-2023-202', date: '2023-11-08', department: 'IT', status: 'Disetujui' },
-                { id: 3, number: 'PR-2023-203', date: '2023-11-04', department: 'HRD', status: 'Menunggu' },
-                { id: 4, number: 'PR-2023-204', date: '2023-11-02', department: 'Marketing', status: 'Disetujui' }
-            ]
-        };
 
         // Inisialisasi datepicker untuk semua input tanggal
         document.addEventListener('DOMContentLoaded', function() {
@@ -713,3 +720,4 @@
             // Contoh: window.print() atau window.open('print-page.html?id=' + documentId, '_blank');
         }
     </script>
+    <script src="<?= base_url('assets') ?>/js/docreport.js"></script>

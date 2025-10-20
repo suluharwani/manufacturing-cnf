@@ -10,62 +10,61 @@ class DocReport extends BaseController
     public function __construct()
     {
         $this->models = [
-            'mutasi_bahan_baku' => new \App\Models\LaporanMutasiBahanBakuModel(),
-            'mutasi_hasil_produksi' => new \App\Models\LaporanMutasiHasilProduksiModel(),
-            'pemakaian_bahan_baku' => new \App\Models\LaporanPemakaianBahanBakuModel(),
-            'pemasukan_bahan_baku' => new \App\Models\LaporanPemasukanBahanBakuModel(),
-            'pengeluaran_hasil_produksi' => new \App\Models\LaporanPengeluaranHasilProduksiModel(),
-            'waste_scrap' => new \App\Models\LaporanWasteScrapModel()
+            'purchase_order' => new \App\Models\MdlPurchaseOrder(),
+            'pembelian' => new \App\Models\MdlPembelian(), // Changed from good_received_note to pembelian
+            'proforma_invoice' => new \App\Models\ProformaInvoice(),
+            'work_order' => new \App\Models\MdlWorkOrder(),
+            'purchase_request' => new \App\Models\MdlMaterialRequest() // Assuming this is the correct model
         ];
     }
 
-    // ==================== HALAMAN UTAMA LAPORAN ====================
+    // ==================== HALAMAN UTAMA PRINT DOCUMENT ====================
     public function index()
     {
         $data = [
-            'title' => 'Sistem Laporan',
-            'breadcrumb' => ['Laporan'],
-            'laporan_list' => $this->getLaporanList()
+            'title' => 'Print Document System',
+            'breadcrumb' => ['Print Document']
         ];
-        return view('laporan/index', $data);
+        return view('print_document/index', $data);
     }
 
-    // ==================== LAPORAN MUTASI BAHAN BAKU ====================
-    public function mutasiBahanBaku()
+    // ==================== PURCHASE ORDER ====================
+    public function purchaseOrder()
     {
         $data = [
-            'title' => 'Laporan Mutasi Bahan Baku',
-            'breadcrumb' => ['Laporan', 'Mutasi Bahan Baku'],
-            'gudang_list' => $this->getGudangList()
+            'title' => 'Print Purchase Order',
+            'breadcrumb' => ['Print Document', 'Purchase Order']
         ];
-        return view('laporan/mutasi_bahan_baku', $data);
+        return view('print_document/purchase_order', $data);
     }
 
-    public function getMutasiBahanBaku()
+    public function getPurchaseOrder()
     {
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        $gudang = $this->request->getGet('gudang');
-        $kodeBarang = $this->request->getGet('kode_barang');
+        $status = $this->request->getGet('status');
+        $supplier = $this->request->getGet('supplier');
 
-        $builder = $this->models['mutasi_bahan_baku'];
+        $builder = $this->models['purchase_order'];
         
         // Filter data
         if ($startDate && $endDate) {
-            $builder->where('periode >=', $startDate)
-                   ->where('periode <=', $endDate);
+            $builder->where('date >=', $startDate)
+                   ->where('date <=', $endDate);
         }
 
-        if ($gudang) {
-            $builder->where('gudang', $gudang);
+        if ($status && $status != 'all') {
+            $builder->where('status', $status);
         }
 
-        if ($kodeBarang) {
-            $builder->where('kode_barang', $kodeBarang);
+        if ($supplier) {
+            $builder->where('supplier_id', $supplier);
         }
 
-        $data = $builder->orderBy('periode', 'DESC')
-                       ->orderBy('kode_barang', 'ASC')
+        $data = $builder->select('purchase_order.*, supplier.supplier_name')
+                       ->join('supplier', 'supplier.id = purchase_order.supplier_id')
+                       ->orderBy('purchase_order.date', 'DESC')
+                       ->orderBy('purchase_order.code', 'ASC')
                        ->findAll();
 
         return $this->response->setJSON([
@@ -75,41 +74,65 @@ class DocReport extends BaseController
         ]);
     }
 
-    // ==================== LAPORAN MUTASI HASIL PRODUKSI ====================
-    public function mutasiHasilProduksi()
+    public function printPurchaseOrder($id)
+    {
+        $purchaseOrder = $this->models['purchase_order']
+                            ->select('purchase_order.*, supplier.supplier_name, supplier.address, supplier.contact_name, supplier.contact_phone')
+                            ->join('supplier', 'supplier.id = purchase_order.supplier_id')
+                            ->find($id);
+
+        if (!$purchaseOrder) {
+            return redirect()->back()->with('error', 'Purchase Order tidak ditemukan');
+        }
+
+        $purchaseOrderItems = $this->models['purchase_order']->getItems($id);
+
+        $data = [
+            'purchase_order' => $purchaseOrder,
+            'items' => $purchaseOrderItems,
+            'title' => 'Purchase Order - ' . $purchaseOrder['code']
+        ];
+
+        return view('print_document/print/purchase_order', $data);
+    }
+
+    // ==================== GOOD RECEIVED NOTE (PEMBELIAN) ====================
+    public function goodReceivedNote()
     {
         $data = [
-            'title' => 'Laporan Mutasi Hasil Produksi',
-            'breadcrumb' => ['Laporan', 'Mutasi Hasil Produksi'],
-            'gudang_list' => $this->getGudangList()
+            'title' => 'Print Good Received Note',
+            'breadcrumb' => ['Print Document', 'Good Received Note']
         ];
-        return view('laporan/mutasi_hasil_produksi', $data);
+        return view('print_document/good_received_note', $data);
     }
 
-    public function getMutasiHasilProduksi()
+    public function getGoodReceivedNote()
     {
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        $gudang = $this->request->getGet('gudang');
-        $kodeBarang = $this->request->getGet('kode_barang');
+        $status = $this->request->getGet('status');
+        $supplier = $this->request->getGet('supplier');
 
-        $builder = $this->models['mutasi_hasil_produksi'];
+        $builder = $this->models['pembelian'];
         
         if ($startDate && $endDate) {
-            $builder->where('periode >=', $startDate)
-                   ->where('periode <=', $endDate);
+            $builder->where('tanggal_nota >=', $startDate)
+                   ->where('tanggal_nota <=', $endDate);
         }
 
-        if ($gudang) {
-            $builder->where('gudang', $gudang);
+        if ($status && $status != 'all') {
+            // Sesuaikan dengan field status di tabel pembelian
+            $builder->where('status_pembayaran', $status);
         }
 
-        if ($kodeBarang) {
-            $builder->where('kode_barang', $kodeBarang);
+        if ($supplier) {
+            $builder->where('id_supplier', $supplier);
         }
 
-        $data = $builder->orderBy('periode', 'DESC')
-                       ->orderBy('kode_barang', 'ASC')
+        $data = $builder->select('pembelian.*, supplier.supplier_name')
+                       ->join('supplier', 'supplier.id = pembelian.id_supplier')
+                       ->orderBy('pembelian.tanggal_nota', 'DESC')
+                       ->orderBy('pembelian.invoice', 'ASC')
                        ->findAll();
 
         return $this->response->setJSON([
@@ -119,40 +142,67 @@ class DocReport extends BaseController
         ]);
     }
 
-    // ==================== LAPORAN PEMAKAIAN BAHAN BAKU ====================
-    public function pemakaianBahanBaku()
+    public function printGoodReceivedNote($id)
+    {
+        $pembelian = $this->models['pembelian']
+                   ->select('pembelian.*, supplier.supplier_name, supplier.address, supplier.contact_name, supplier.contact_phone, currency.kode as currency_code')
+                   ->join('supplier', 'supplier.id = pembelian.id_supplier')
+                   ->join('currency', 'currency.id = pembelian.id_currency', 'left')
+                   ->find($id);
+
+        if (!$pembelian) {
+            return redirect()->back()->with('error', 'Good Received Note tidak ditemukan');
+        }
+
+        // Ambil items dari tabel pembelian_detail
+        $pembelianItems = $this->models['pembelian']->getItems($id);
+
+        $data = [
+            'pembelian' => $pembelian,
+            'items' => $pembelianItems,
+            'title' => 'Good Received Note - ' . $pembelian['invoice']
+        ];
+
+        return view('print_document/print/good_received_note', $data);
+    }
+
+    // ==================== PROFORMA INVOICE ====================
+    public function proformaInvoice()
     {
         $data = [
-            'title' => 'Laporan Pemakaian Bahan Baku',
-            'breadcrumb' => ['Laporan', 'Pemakaian Bahan Baku']
+            'title' => 'Print Proforma Invoice',
+            'breadcrumb' => ['Print Document', 'Proforma Invoice']
         ];
-        return view('laporan/pemakaian_bahan_baku', $data);
+        return view('print_document/proforma_invoice', $data);
     }
 
-    public function getPemakaianBahanBaku()
+    public function getProformaInvoice()
     {
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        $kodeBarang = $this->request->getGet('kode_barang');
-        $digunakan = $this->request->getGet('digunakan');
+        $customer = $this->request->getGet('customer');
+        $status = $this->request->getGet('status');
 
-        $builder = $this->models['pemakaian_bahan_baku'];
+        $builder = $this->models['proforma_invoice'];
         
         if ($startDate && $endDate) {
-            $builder->where('tanggal >=', $startDate)
-                   ->where('tanggal <=', $endDate);
+            $builder->where('invoice_date >=', $startDate)
+                   ->where('invoice_date <=', $endDate);
         }
 
-        if ($kodeBarang) {
-            $builder->where('kode_barang', $kodeBarang);
+        if ($customer) {
+            $builder->where('customer_id', $customer);
         }
 
-        if ($digunakan) {
-            $builder->like('digunakan', $digunakan);
+        if ($status && $status != 'all') {
+            $builder->where('status', $status);
         }
 
-        $data = $builder->orderBy('tanggal', 'DESC')
-                       ->orderBy('no_bukti_pengeluaran', 'ASC')
+        $data = $builder->select('proforma_invoice.*, customer.customer_name, currency.kode as currency_code')
+                       ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                       ->join('currency', 'currency.id = proforma_invoice.id_currency')
+                       ->orderBy('proforma_invoice.invoice_date', 'DESC')
+                       ->orderBy('proforma_invoice.invoice_number', 'ASC')
                        ->findAll();
 
         return $this->response->setJSON([
@@ -162,69 +212,66 @@ class DocReport extends BaseController
         ]);
     }
 
-    public function getSummaryPemakaianBahanBaku()
+    public function printProformaInvoice($id)
     {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
+        $proforma = $this->models['proforma_invoice']
+                        ->select('proforma_invoice.*, customer.customer_name, customer.address as customer_address, customer.contact_name, customer.contact_phone, currency.kode as currency_code, currency.nama as currency_name')
+                        ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                        ->join('currency', 'currency.id = proforma_invoice.id_currency')
+                        ->find($id);
 
-        $builder = $this->models['pemakaian_bahan_baku'];
-        
-        if ($startDate && $endDate) {
-            $builder->where('tanggal >=', $startDate)
-                   ->where('tanggal <=', $endDate);
+        if (!$proforma) {
+            return redirect()->back()->with('error', 'Proforma Invoice tidak ditemukan');
         }
 
-        $data = $builder->select('kode_barang, nama_barang, satuan, SUM(jumlah) as total_pemakaian')
-                       ->groupBy('kode_barang, nama_barang, satuan')
-                       ->orderBy('total_pemakaian', 'DESC')
-                       ->findAll();
+        $proformaItems = $this->models['proforma_invoice']->getItems($id);
 
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => $data
-        ]);
+        $data = [
+            'proforma' => $proforma,
+            'items' => $proformaItems,
+            'title' => 'Proforma Invoice - ' . $proforma['invoice_number']
+        ];
+
+        return view('print_document/print/proforma_invoice', $data);
     }
 
-    // ==================== LAPORAN PEMASUKAN BAHAN BAKU ====================
-    public function pemasukanBahanBaku()
+    // ==================== WORK ORDER ====================
+    public function workOrder()
     {
         $data = [
-            'title' => 'Laporan Pemasukan Bahan Baku',
-            'breadcrumb' => ['Laporan', 'Pemasukan Bahan Baku'],
-            'jenis_dokumen_list' => $this->getJenisDokumenList()
+            'title' => 'Print Work Order',
+            'breadcrumb' => ['Print Document', 'Work Order']
         ];
-        return view('laporan/pemasukan_bahan_baku', $data);
+        return view('print_document/work_order', $data);
     }
 
-    public function getPemasukanBahanBaku()
+    public function getWorkOrder()
     {
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        $jenisDokumen = $this->request->getGet('jenis_dokumen');
-        $kodeBarang = $this->request->getGet('kode_barang');
-        $gudang = $this->request->getGet('gudang');
+        $status = $this->request->getGet('status');
+        $invoice = $this->request->getGet('invoice');
 
-        $builder = $this->models['pemasukan_bahan_baku'];
+        $builder = $this->models['work_order'];
         
         if ($startDate && $endDate) {
-            $builder->where('tgl_rekam >=', $startDate)
-                   ->where('tgl_rekam <=', $endDate);
+            $builder->where('created_at >=', $startDate)
+                   ->where('created_at <=', $endDate);
         }
 
-        if ($jenisDokumen) {
-            $builder->where('jenis_dokumen', $jenisDokumen);
+        if ($status && $status != 'all') {
+            $builder->where('status', $status);
         }
 
-        if ($kodeBarang) {
-            $builder->where('kode_bb', $kodeBarang);
+        if ($invoice) {
+            $builder->where('invoice_id', $invoice);
         }
 
-        if ($gudang) {
-            $builder->where('gudang', $gudang);
-        }
-
-        $data = $builder->orderBy('tgl_rekam', 'DESC')
-                       ->orderBy('no', 'ASC')
+        $data = $builder->select('work_order.*, proforma_invoice.invoice_number, customer.customer_name')
+                       ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+                       ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                       ->orderBy('work_order.created_at', 'DESC')
+                       ->orderBy('work_order.kode', 'ASC')
                        ->findAll();
 
         return $this->response->setJSON([
@@ -234,69 +281,65 @@ class DocReport extends BaseController
         ]);
     }
 
-    public function getSummaryImport()
+    public function printWorkOrder($id)
     {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
+        $workOrder = $this->models['work_order']
+                         ->select('work_order.*, proforma_invoice.invoice_number, customer.customer_name, customer.address as customer_address')
+                         ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+                         ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                         ->find($id);
 
-        $builder = $this->models['pemasukan_bahan_baku'];
-        
-        if ($startDate && $endDate) {
-            $builder->where('tgl_rekam >=', $startDate)
-                   ->where('tgl_rekam <=', $endDate);
+        if (!$workOrder) {
+            return redirect()->back()->with('error', 'Work Order tidak ditemukan');
         }
 
-        $data = $builder->select('negara_asal_bb, COUNT(*) as total_transaksi, SUM(jumlah) as total_quantity, SUM(nilai_barang) as total_nilai')
-                       ->groupBy('negara_asal_bb')
-                       ->orderBy('total_nilai', 'DESC')
-                       ->findAll();
+        $workOrderItems = $this->models['work_order']->getItems($id);
 
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => $data
-        ]);
+        $data = [
+            'work_order' => $workOrder,
+            'items' => $workOrderItems,
+            'title' => 'Work Order - ' . $workOrder['kode']
+        ];
+
+        return view('print_document/print/work_order', $data);
     }
 
-    // ==================== LAPORAN PENGELUARAN HASIL PRODUKSI ====================
-    public function pengeluaranHasilProduksi()
+    // ==================== PURCHASE REQUEST ====================
+    public function purchaseRequest()
     {
         $data = [
-            'title' => 'Laporan Pengeluaran Hasil Produksi',
-            'breadcrumb' => ['Laporan', 'Pengeluaran Hasil Produksi'],
-            'negara_list' => $this->getNegaraList()
+            'title' => 'Print Purchase Request',
+            'breadcrumb' => ['Print Document', 'Purchase Request']
         ];
-        return view('laporan/pengeluaran_hasil_produksi', $data);
+        return view('print_document/purchase_request', $data);
     }
 
-    public function getPengeluaranHasilProduksi()
+    public function getPurchaseRequest()
     {
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
-        $negaraTujuan = $this->request->getGet('negara_tujuan');
-        $kodeBarang = $this->request->getGet('kode_barang');
-        $pembeli = $this->request->getGet('pembeli');
+        $status = $this->request->getGet('status');
+        $department = $this->request->getGet('department');
 
-        $builder = $this->models['pengeluaran_hasil_produksi'];
+        $builder = $this->models['purchase_request'];
         
         if ($startDate && $endDate) {
-            $builder->where('tanggal_peb >=', $startDate)
-                   ->where('tanggal_peb <=', $endDate);
+            $builder->where('created_at >=', $startDate)
+                   ->where('created_at <=', $endDate);
         }
 
-        if ($negaraTujuan) {
-            $builder->where('negara_tujuan', $negaraTujuan);
+        if ($status && $status != 'all') {
+            $builder->where('status', $status);
         }
 
-        if ($kodeBarang) {
-            $builder->where('kode_barang', $kodeBarang);
+        if ($department) {
+            $builder->where('dept_id', $department);
         }
 
-        if ($pembeli) {
-            $builder->like('pembeli_penerima', $pembeli);
-        }
-
-        $data = $builder->orderBy('tanggal_peb', 'DESC')
-                       ->orderBy('no_peb', 'ASC')
+        $data = $builder->select('material_request.*, department.name as department_name')
+                       ->join('department', 'department.id = material_request.dept_id', 'left')
+                       ->orderBy('material_request.created_at', 'DESC')
+                       ->orderBy('material_request.kode', 'ASC')
                        ->findAll();
 
         return $this->response->setJSON([
@@ -306,346 +349,358 @@ class DocReport extends BaseController
         ]);
     }
 
-    public function getSummaryExport()
+    public function printPurchaseRequest($id)
     {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
+        $purchaseRequest = $this->models['purchase_request']
+                              ->select('material_request.*, department.name as department_name')
+                              ->join('department', 'department.id = material_request.dept_id', 'left')
+                              ->find($id);
 
-        $builder = $this->models['pengeluaran_hasil_produksi'];
-        
-        if ($startDate && $endDate) {
-            $builder->where('tanggal_peb >=', $startDate)
-                   ->where('tanggal_peb <=', $endDate);
+        if (!$purchaseRequest) {
+            return redirect()->back()->with('error', 'Purchase Request tidak ditemukan');
         }
 
-        $data = $builder->select('negara_tujuan, COUNT(*) as total_peb, SUM(jumlah) as total_quantity, SUM(nilai_barang) as total_nilai')
-                       ->groupBy('negara_tujuan')
-                       ->orderBy('total_nilai', 'DESC')
-                       ->findAll();
+        $purchaseRequestItems = $this->models['purchase_request']->getItems($id);
 
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => $data
-        ]);
+        $data = [
+            'purchase_request' => $purchaseRequest,
+            'items' => $purchaseRequestItems,
+            'title' => 'Purchase Request - ' . $purchaseRequest['kode']
+        ];
+
+        return view('print_document/print/purchase_request', $data);
     }
 
-    // ==================== LAPORAN WASTE & SCRAP ====================
-    public function wasteScrap()
+    // ==================== DOKUMEN TERBARU ====================
+    public function recentDocuments()
     {
         $data = [
-            'title' => 'Laporan Waste & Scrap',
-            'breadcrumb' => ['Laporan', 'Waste & Scrap']
+            'title' => 'Dokumen Terbaru',
+            'breadcrumb' => ['Print Document', 'Dokumen Terbaru']
         ];
-        return view('laporan/waste_scrap', $data);
+        return view('print_document/recent_documents', $data);
     }
 
-    public function getWasteScrap()
+    public function getRecentDocuments()
     {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
-        $kodeBarang = $this->request->getGet('kode_barang');
+        $limit = $this->request->getGet('limit') ?? 10;
 
-        $builder = $this->models['waste_scrap'];
-        
-        if ($startDate && $endDate) {
-            $builder->where('tanggal >=', $startDate)
-                   ->where('tanggal <=', $endDate);
-        }
+        // Ambil dokumen terbaru dari berbagai tabel
+        $recentDocuments = [];
 
-        if ($kodeBarang) {
-            $builder->where('kode_barang', $kodeBarang);
-        }
+        // Purchase Order Terbaru
+        $purchaseOrders = $this->models['purchase_order']
+                             ->select("'Purchase Order' as document_type, code as document_number, date as document_date, status, id")
+                             ->orderBy('date', 'DESC')
+                             ->limit($limit)
+                             ->findAll();
 
-        $data = $builder->orderBy('tanggal', 'DESC')
-                       ->orderBy('kode_barang', 'ASC')
-                       ->findAll();
+        // Good Received Note Terbaru (dari tabel pembelian)
+        $grns = $this->models['pembelian']
+                   ->select("'Good Received Note' as document_type, invoice as document_number, tanggal_nota as document_date, status_pembayaran as status, id")
+                   ->orderBy('tanggal_nota', 'DESC')
+                   ->limit($limit)
+                   ->findAll();
+
+        // Proforma Invoice Terbaru
+        $proformas = $this->models['proforma_invoice']
+                        ->select("'Proforma Invoice' as document_type, invoice_number as document_number, invoice_date as document_date, status, id")
+                        ->orderBy('invoice_date', 'DESC')
+                        ->limit($limit)
+                        ->findAll();
+
+        // Work Order Terbaru
+        $workOrders = $this->models['work_order']
+                         ->select("'Work Order' as document_type, kode as document_number, created_at as document_date, status, id")
+                         ->orderBy('created_at', 'DESC')
+                         ->limit($limit)
+                         ->findAll();
+
+        // Gabungkan semua dokumen
+        $recentDocuments = array_merge($purchaseOrders, $grns, $proformas, $workOrders);
+
+        // Urutkan berdasarkan tanggal terbaru
+        usort($recentDocuments, function($a, $b) {
+            return strtotime($b['document_date']) - strtotime($a['document_date']);
+        });
+
+        // Ambil hanya $limit dokumen terbaru
+        $recentDocuments = array_slice($recentDocuments, 0, $limit);
 
         return $this->response->setJSON([
             'success' => true,
-            'data' => $data,
-            'total' => count($data)
+            'data' => $recentDocuments,
+            'total' => count($recentDocuments)
         ]);
     }
 
-    public function getSummaryWaste()
+    // ==================== PRINT MULTIPLE DOCUMENTS ====================
+    public function printMultipleDocuments()
     {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
+        $documentType = $this->request->getGet('document_type');
+        $documentIds = $this->request->getGet('document_ids');
 
-        $builder = $this->models['waste_scrap'];
-        
-        if ($startDate && $endDate) {
-            $builder->where('tanggal >=', $startDate)
-                   ->where('tanggal <=', $endDate);
+        if (!$documentType || !$documentIds) {
+            return redirect()->back()->with('error', 'Pilih dokumen yang akan dicetak');
         }
 
-        $data = $builder->select('kode_barang, nama_barang, satuan, SUM(jumlah) as total_waste, SUM(nilai) as total_nilai')
-                       ->groupBy('kode_barang, nama_barang, satuan')
-                       ->orderBy('total_waste', 'DESC')
-                       ->findAll();
+        $documentIds = explode(',', $documentIds);
 
-        return $this->response->setJSON([
-            'success' => true,
-            'data' => $data
-        ]);
-    }
-
-    // ==================== FUNGSI EKSPOR DATA ====================
-    public function exportExcel($jenisLaporan)
-    {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
-        $additionalParams = $this->request->getGet();
-
-        $data = $this->getDataForExport($jenisLaporan, $startDate, $endDate, $additionalParams);
-
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Set judul berdasarkan jenis laporan
-        $judulLaporan = $this->getJudulLaporan($jenisLaporan);
-        $sheet->setCellValue('A1', $judulLaporan);
-        $sheet->setCellValue('A2', 'Periode: ' . ($startDate ?? 'Semua') . ' - ' . ($endDate ?? 'Semua'));
-
-        // Set header kolom berdasarkan jenis laporan
-        $this->setExcelHeaders($sheet, $jenisLaporan);
-
-        // Isi data
-        $this->fillExcelData($sheet, $data, $jenisLaporan);
-
-        // Auto size columns
-        $this->autoSizeColumns($sheet, $jenisLaporan);
-
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $filename = 'laporan_' . $jenisLaporan . '_' . date('Ymd_His') . '.xlsx';
-        
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        
-        $writer->save('php://output');
-        exit;
-    }
-
-    public function printPdf($jenisLaporan)
-    {
-        $startDate = $this->request->getGet('start_date');
-        $endDate = $this->request->getGet('end_date');
-        $additionalParams = $this->request->getGet();
-
-        $data = $this->getDataForExport($jenisLaporan, $startDate, $endDate, $additionalParams);
-
-        $viewData = [
-            'data' => $data,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'judulLaporan' => $this->getJudulLaporan($jenisLaporan),
-            'additionalParams' => $additionalParams
-        ];
-
-        $dompdf = new \Dompdf\Dompdf();
-        $html = view('laporan/pdf/' . $jenisLaporan, $viewData);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-        $dompdf->stream("laporan_{$jenisLaporan}.pdf", array("Attachment" => false));
-    }
-
-    // ==================== FUNGSI HELPER ====================
-    private function getLaporanList()
-    {
-        return [
-            [
-                'nama' => 'Mutasi Bahan Baku',
-                'slug' => 'mutasi-bahan-baku',
-                'icon' => 'fas fa-exchange-alt',
-                'deskripsi' => 'Laporan pergerakan stok bahan baku'
-            ],
-            [
-                'nama' => 'Mutasi Hasil Produksi',
-                'slug' => 'mutasi-hasil-produksi',
-                'icon' => 'fas fa-boxes',
-                'deskripsi' => 'Laporan pergerakan stok hasil produksi'
-            ],
-            [
-                'nama' => 'Pemakaian Bahan Baku',
-                'slug' => 'pemakaian-bahan-baku',
-                'icon' => 'fas fa-tools',
-                'deskripsi' => 'Laporan penggunaan bahan baku untuk produksi'
-            ],
-            [
-                'nama' => 'Pemasukan Bahan Baku',
-                'slug' => 'pemasukan-bahan-baku',
-                'icon' => 'fas fa-arrow-down',
-                'deskripsi' => 'Laporan penerimaan bahan baku dari supplier'
-            ],
-            [
-                'nama' => 'Pengeluaran Hasil Produksi',
-                'slug' => 'pengeluaran-hasil-produksi',
-                'icon' => 'fas fa-arrow-up',
-                'deskripsi' => 'Laporan pengiriman hasil produksi ke customer'
-            ],
-            [
-                'nama' => 'Waste & Scrap',
-                'slug' => 'waste-scrap',
-                'icon' => 'fas fa-trash',
-                'deskripsi' => 'Laporan bahan sisa dan scrap produksi'
-            ]
-        ];
-    }
-
-    private function getGudangList()
-    {
-        // Ambil dari tabel warehouses atau locations
-        $warehouseModel = new \App\Models\WarehouseModel();
-        return $warehouseModel->findAll();
-    }
-
-    private function getJenisDokumenList()
-    {
-        return ['BC 2.0', 'BC 2.4', 'BC 2.5', 'BC 2.8'];
-    }
-
-    private function getNegaraList()
-    {
-        // Ambil dari tabel country_data
-        $countryModel = new \App\Models\CountryModel();
-        return $countryModel->findAll();
-    }
-
-    private function getDataForExport($jenisLaporan, $startDate, $endDate, $params)
-    {
-        $modelKey = str_replace('-', '_', $jenisLaporan);
-        $builder = $this->models[$modelKey];
-
-        // Terapkan filter berdasarkan parameter
-        if ($startDate && $endDate) {
-            $dateField = $this->getDateField($jenisLaporan);
-            $builder->where($dateField . ' >=', $startDate)
-                   ->where($dateField . ' <=', $endDate);
+        switch ($documentType) {
+            case 'purchase_order':
+                return $this->printMultiplePurchaseOrders($documentIds);
+            case 'good_received_note':
+                return $this->printMultipleGRNs($documentIds);
+            case 'proforma_invoice':
+                return $this->printMultipleProformas($documentIds);
+            case 'work_order':
+                return $this->printMultipleWorkOrders($documentIds);
+            case 'purchase_request':
+                return $this->printMultiplePurchaseRequests($documentIds);
+            default:
+                return redirect()->back()->with('error', 'Jenis dokumen tidak valid');
         }
+    }
 
-        // Terapkan filter tambahan
-        foreach ($params as $key => $value) {
-            if ($value && !in_array($key, ['start_date', 'end_date'])) {
-                $builder->where($key, $value);
+    private function printMultiplePurchaseOrders($ids)
+    {
+        $documents = [];
+        foreach ($ids as $id) {
+            $po = $this->models['purchase_order']
+                      ->select('purchase_order.*, supplier.supplier_name')
+                      ->join('supplier', 'supplier.id = purchase_order.supplier_id')
+                      ->find($id);
+            if ($po) {
+                $po['items'] = $this->models['purchase_order']->getItems($id);
+                $documents[] = $po;
             }
         }
 
-        return $builder->findAll();
-    }
-
-    private function getDateField($jenisLaporan)
-    {
-        $dateFields = [
-            'mutasi-bahan-baku' => 'periode',
-            'mutasi-hasil-produksi' => 'periode',
-            'pemakaian-bahan-baku' => 'tanggal',
-            'pemasukan-bahan-baku' => 'tgl_rekam',
-            'pengeluaran-hasil-produksi' => 'tanggal_peb',
-            'waste-scrap' => 'tanggal'
+        $data = [
+            'documents' => $documents,
+            'title' => 'Multiple Purchase Orders'
         ];
 
-        return $dateFields[$jenisLaporan] ?? 'created_at';
+        return view('print_document/print/multiple_purchase_orders', $data);
     }
 
-    private function getJudulLaporan($jenisLaporan)
+    // ==================== PRINT MULTIPLE GOOD RECEIVED NOTES (PEMBELIAN) ====================
+    private function printMultipleGRNs($ids)
     {
-        $judul = [
-            'mutasi-bahan-baku' => 'LAPORAN MUTASI BAHAN BAKU',
-            'mutasi-hasil-produksi' => 'LAPORAN MUTASI HASIL PRODUKSI',
-            'pemakaian-bahan-baku' => 'LAPORAN PEMAKAIAN BAHAN BAKU',
-            'pemasukan-bahan-baku' => 'LAPORAN PEMASUKAN BAHAN BAKU',
-            'pengeluaran-hasil-produksi' => 'LAPORAN PENGELUARAN HASIL PRODUKSI',
-            'waste-scrap' => 'LAPORAN WASTE & SCRAP'
-        ];
-
-        return $judul[$jenisLaporan] ?? 'LAPORAN';
-    }
-
-    private function setExcelHeaders($sheet, $jenisLaporan)
-    {
-        $headers = $this->getExcelHeaders($jenisLaporan);
-        $row = 4;
-        $col = 'A';
-
-        foreach ($headers as $header) {
-            $sheet->setCellValue($col . $row, $header);
-            $col++;
+        $documents = [];
+        foreach ($ids as $id) {
+            $pembelian = $this->models['pembelian']
+                       ->select('pembelian.*, supplier.supplier_name, currency.kode as currency_code')
+                       ->join('supplier', 'supplier.id = pembelian.id_supplier')
+                       ->join('currency', 'currency.id = pembelian.id_currency', 'left')
+                       ->find($id);
+            if ($pembelian) {
+                $pembelian['items'] = $this->models['pembelian']->getItems($id);
+                $documents[] = $pembelian;
+            }
         }
-    }
 
-    private function getExcelHeaders($jenisLaporan)
-    {
-        $headers = [
-            'mutasi-bahan-baku' => ['NO', 'KODE BARANG', 'NAMA BARANG', 'SATUAN', 'SALDO AWAL', 'PEMASUKAN', 'PENGELUARAN', 'SALDO AKHIR', 'GUDANG', 'PERIODE'],
-            'mutasi-hasil-produksi' => ['NO', 'KODE BARANG', 'NAMA BARANG', 'SATUAN', 'SALDO AWAL', 'PEMASUKAN', 'PENGELUARAN', 'SALDO AKHIR', 'GUDANG', 'PERIODE'],
-            'pemakaian-bahan-baku' => ['NO', 'NO BUKTI', 'TANGGAL', 'KODE BARANG', 'NAMA BARANG', 'SATUAN', 'JUMLAH', 'DIGUNAKAN UNTUK', 'SUBKONTRAK'],
-            'pemasukan-bahan-baku' => ['NO', 'TGL REKAM', 'JENIS DOKUMEN', 'NOMOR PABEAN', 'KODE HS', 'KODE BB', 'NAMA BARANG', 'SATUAN', 'JUMLAH', 'NILAI BARANG', 'GUDANG', 'NEGARA ASAL'],
-            'pengeluaran-hasil-produksi' => ['NO', 'NO PEB', 'TANGGAL PEB', 'PEMBELI', 'NEGARA TUJUAN', 'KODE BARANG', 'NAMA BARANG', 'SATUAN', 'JUMLAH', 'NILAI BARANG'],
-            'waste-scrap' => ['NO', 'NO BC24', 'TANGGAL', 'KODE BARANG', 'NAMA BARANG', 'SATUAN', 'JUMLAH', 'NILAI']
+        $data = [
+            'documents' => $documents,
+            'title' => 'Multiple Good Received Notes'
         ];
 
-        return $headers[$jenisLaporan] ?? ['NO', 'DATA'];
+        return view('print_document/print/multiple_grns', $data);
     }
 
-    private function fillExcelData($sheet, $data, $jenisLaporan)
+    // ==================== PRINT MULTIPLE PURCHASE REQUESTS ====================
+    private function printMultiplePurchaseRequests($ids)
     {
-        $row = 5;
-        $no = 1;
-
-        foreach ($data as $item) {
-            $col = 'A';
-            $sheet->setCellValue($col++ . $row, $no++);
-
-            // Isi data berdasarkan jenis laporan
-            $this->fillRowData($sheet, $col, $row, $item, $jenisLaporan);
-            $row++;
-        }
-    }
-
-    private function fillRowData($sheet, $col, $row, $item, $jenisLaporan)
-    {
-        switch ($jenisLaporan) {
-            case 'mutasi-bahan-baku':
-                $sheet->setCellValue($col++ . $row, $item['kode_barang']);
-                $sheet->setCellValue($col++ . $row, $item['nama_barang']);
-                $sheet->setCellValue($col++ . $row, $item['satuan']);
-                $sheet->setCellValue($col++ . $row, $item['saldo_awal']);
-                $sheet->setCellValue($col++ . $row, $item['pemasukan']);
-                $sheet->setCellValue($col++ . $row, $item['pengeluaran']);
-                $sheet->setCellValue($col++ . $row, $item['saldo_akhir']);
-                $sheet->setCellValue($col++ . $row, $item['gudang']);
-                $sheet->setCellValue($col++ . $row, $item['periode']);
-                break;
-
-            case 'pemakaian-bahan-baku':
-                $sheet->setCellValue($col++ . $row, $item['no_bukti_pengeluaran']);
-                $sheet->setCellValue($col++ . $row, $item['tanggal']);
-                $sheet->setCellValue($col++ . $row, $item['kode_barang']);
-                $sheet->setCellValue($col++ . $row, $item['nama_barang']);
-                $sheet->setCellValue($col++ . $row, $item['satuan']);
-                $sheet->setCellValue($col++ . $row, $item['jumlah']);
-                $sheet->setCellValue($col++ . $row, $item['digunakan']);
-                $sheet->setCellValue($col++ . $row, $item['disubkontrakkan']);
-                break;
-
-            // Tambahkan case untuk laporan lainnya...
+        $documents = [];
+        
+        foreach ($ids as $id) {
+            $purchaseRequest = $this->models['purchase_request']
+                                  ->select('material_request.*, department.name as department_name, users.nama_depan, users.nama_belakang')
+                                  ->join('department', 'department.id = material_request.dept_id', 'left')
+                                  ->join('users', 'users.id = material_request.id_user', 'left')
+                                  ->find($id);
             
-            default:
-                // Default fill for unknown report types
-                foreach ($item as $value) {
-                    $sheet->setCellValue($col++ . $row, $value);
+            if ($purchaseRequest) {
+                // Get items untuk purchase request ini
+                $purchaseRequestItems = $this->models['purchase_request']->getItems($id);
+                $purchaseRequest['items'] = $purchaseRequestItems;
+                
+                // Calculate totals
+                $purchaseRequest['total_items'] = 0;
+                $purchaseRequest['total_quantity'] = 0;
+                $purchaseRequest['total_value'] = 0;
+                
+                foreach ($purchaseRequestItems as $item) {
+                    $purchaseRequest['total_items']++;
+                    $purchaseRequest['total_quantity'] += $item['quantity'];
+                    if (isset($item['harga']) && $item['harga'] > 0) {
+                        $purchaseRequest['total_value'] += ($item['quantity'] * $item['harga']);
+                    }
                 }
-                break;
+                
+                // Format requester name
+                $purchaseRequest['requester_name'] = trim($purchaseRequest['nama_depan'] . ' ' . $purchaseRequest['nama_belakang']);
+                if (empty($purchaseRequest['requester_name'])) {
+                    $purchaseRequest['requester_name'] = $purchaseRequest['requestor'] ?? '-';
+                }
+                
+                // Format dates
+                $purchaseRequest['created_formatted'] = $purchaseRequest['created_at'] ? date('d M Y', strtotime($purchaseRequest['created_at'])) : '-';
+                
+                $documents[] = $purchaseRequest;
+            }
         }
+
+        if (empty($documents)) {
+            return redirect()->back()->with('error', 'Tidak ada Purchase Request yang ditemukan');
+        }
+
+        $data = [
+            'documents' => $documents,
+            'title' => 'Multiple Purchase Requests',
+            'print_date' => date('d F Y'),
+            'total_documents' => count($documents)
+        ];
+
+        return view('print_document/print/multiple_purchase_requests', $data);
     }
 
-    private function autoSizeColumns($sheet, $jenisLaporan)
+    private function printMultipleWorkOrders($ids)
     {
-        $columnCount = count($this->getExcelHeaders($jenisLaporan));
-        for ($i = 'A'; $i < chr(ord('A') + $columnCount); $i++) {
-            $sheet->getColumnDimension($i)->setAutoSize(true);
+        $documents = [];
+        
+        foreach ($ids as $id) {
+            $workOrder = $this->models['work_order']
+                             ->select('work_order.*, proforma_invoice.invoice_number, customer.customer_name, customer.address as customer_address, customer.contact_name, customer.contact_phone, customer.tax_number as customer_tax')
+                             ->join('proforma_invoice', 'proforma_invoice.id = work_order.invoice_id')
+                             ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                             ->find($id);
+            
+            if ($workOrder) {
+                // Get items untuk work order ini
+                $workOrderItems = $this->models['work_order']->getItems($id);
+                $workOrder['items'] = $workOrderItems;
+                
+                // Calculate totals
+                $workOrder['total_quantity'] = 0;
+                $workOrder['total_products'] = 0;
+                foreach ($workOrderItems as $item) {
+                    $workOrder['total_quantity'] += $item['quantity'];
+                    $workOrder['total_products']++;
+                }
+                
+                // Format dates
+                $workOrder['start_formatted'] = $workOrder['start'] ? date('d M Y', strtotime($workOrder['start'])) : '-';
+                $workOrder['end_formatted'] = $workOrder['end'] ? date('d M Y', strtotime($workOrder['end'])) : '-';
+                $workOrder['release_date_formatted'] = $workOrder['release_date'] ? date('d M Y', strtotime($workOrder['release_date'])) : '-';
+                $workOrder['manufacture_finishes_formatted'] = $workOrder['manufacture_finishes'] ? date('d M Y', strtotime($workOrder['manufacture_finishes'])) : '-';
+                $workOrder['loading_date_formatted'] = $workOrder['loading_date'] ? date('d M Y', strtotime($workOrder['loading_date'])) : '-';
+                
+                $documents[] = $workOrder;
+            }
         }
+
+        if (empty($documents)) {
+            return redirect()->back()->with('error', 'Tidak ada Work Order yang ditemukan');
+        }
+
+        $data = [
+            'documents' => $documents,
+            'title' => 'Multiple Work Orders',
+            'print_date' => date('d F Y'),
+            'total_documents' => count($documents)
+        ];
+
+        return view('print_document/print/multiple_work_orders', $data);
+    }
+
+    private function printMultipleProformas($ids)
+    {
+        $documents = [];
+        
+        foreach ($ids as $id) {
+            $proforma = $this->models['proforma_invoice']
+                            ->select('proforma_invoice.*, customer.customer_name, customer.address as customer_address, customer.contact_name, customer.contact_phone, customer.tax_number as customer_tax, currency.kode as currency_code, currency.nama as currency_name')
+                            ->join('customer', 'customer.id = proforma_invoice.customer_id')
+                            ->join('currency', 'currency.id = proforma_invoice.id_currency')
+                            ->find($id);
+            
+            if ($proforma) {
+                // Get items untuk proforma ini
+                $proformaItems = $this->models['proforma_invoice']->getItems($id);
+                $proforma['items'] = $proformaItems;
+                
+                // Calculate totals
+                $proforma['subtotal'] = 0;
+                $proforma['total_quantity'] = 0;
+                foreach ($proformaItems as $item) {
+                    $proforma['subtotal'] += $item['total_price'];
+                    $proforma['total_quantity'] += $item['quantity'];
+                }
+                
+                $documents[] = $proforma;
+            }
+        }
+
+        if (empty($documents)) {
+            return redirect()->back()->with('error', 'Tidak ada Proforma Invoice yang ditemukan');
+        }
+
+        $data = [
+            'documents' => $documents,
+            'title' => 'Multiple Proforma Invoices',
+            'print_date' => date('d F Y'),
+            'total_documents' => count($documents)
+        ];
+
+        return view('print_document/print/multiple_proformas', $data);
+    }
+
+    // ==================== GET OPTIONS FOR FILTERS ====================
+    public function getFilterOptions($type)
+    {
+        switch ($type) {
+            case 'suppliers':
+                $supplierModel = new \App\Models\MdlSupplier();
+                $data = $supplierModel->select('id, supplier_name as text')
+                                    ->where('status', 1)
+                                    ->orderBy('supplier_name', 'ASC')
+                                    ->findAll();
+                break;
+
+            case 'customers':
+                $customerModel = new \App\Models\MdlCustomer();
+                $data = $customerModel->select('id, customer_name as text')
+                                    ->where('status', 1)
+                                    ->orderBy('customer_name', 'ASC')
+                                    ->findAll();
+                break;
+
+            case 'departments':
+                $departmentModel = new \App\Models\MdlDepartment();
+                $data = $departmentModel->select('id, name as text')
+                                      ->orderBy('name', 'ASC')
+                                      ->findAll();
+                break;
+
+            case 'status':
+                $data = [
+                    ['value' => 'all', 'text' => 'Semua Status'],
+                    ['value' => 'pending', 'text' => 'Pending'],
+                    ['value' => 'approved', 'text' => 'Disetujui'],
+                    ['value' => 'completed', 'text' => 'Selesai'],
+                    ['value' => 'cancelled', 'text' => 'Dibatalkan']
+                ];
+                break;
+
+            default:
+                $data = [];
+                break;
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 }

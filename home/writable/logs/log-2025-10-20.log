@@ -1,0 +1,1781 @@
+INFO - 2025-10-20 08:43:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-10-20 08:43:05 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'u375117440_suluharwani'@'localhost' (using password: YES) in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:186
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(186): mysqli->real_connect('localhost', 'u375117440_sulu...', Object(SensitiveParameterValue), 'u375117440_cnfi...', 3306, '', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\Login->index()
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#11 {main}
+CRITICAL - 2025-10-20 08:43:05 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+[Method: GET, Route: login]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `users`', [], false)
+ 3 SYSTEMPATH\Model.php(678): CodeIgniter\Database\BaseBuilder->countAllResults(true)
+ 4 APPPATH\Controllers\Login.php(141): CodeIgniter\Model->countAllResults()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Login->index()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Login))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:43:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-20 08:43:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-20 08:43:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\WarehouseController::$db is deprecated in APPPATH\Controllers\WarehouseController.php on line 15.
+ 1 APPPATH\Controllers\Home.php(34): App\Controllers\WarehouseController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\WarehouseController::$session is deprecated in APPPATH\Controllers\WarehouseController.php on line 16.
+ 1 APPPATH\Controllers\Home.php(34): App\Controllers\WarehouseController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\WarehouseController::$uri is deprecated in APPPATH\Controllers\WarehouseController.php on line 17.
+ 1 APPPATH\Controllers\Home.php(34): App\Controllers\WarehouseController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\WarehouseController::$form_validation is deprecated in APPPATH\Controllers\WarehouseController.php on line 19.
+ 1 APPPATH\Controllers\Home.php(34): App\Controllers\WarehouseController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\WarehouseController::$userValidation is deprecated in APPPATH\Controllers\WarehouseController.php on line 20.
+ 1 APPPATH\Controllers\Home.php(34): App\Controllers\WarehouseController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\Home->index()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Home))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:43:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$db is deprecated in APPPATH\Controllers\DashboardController.php on line 14.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$session is deprecated in APPPATH\Controllers\DashboardController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$uri is deprecated in APPPATH\Controllers\DashboardController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$form_validation is deprecated in APPPATH\Controllers\DashboardController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$userValidation is deprecated in APPPATH\Controllers\DashboardController.php on line 19.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:43:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$db is deprecated in APPPATH\Controllers\DashboardController.php on line 14.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$session is deprecated in APPPATH\Controllers\DashboardController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$uri is deprecated in APPPATH\Controllers\DashboardController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$form_validation is deprecated in APPPATH\Controllers\DashboardController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:48 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$userValidation is deprecated in APPPATH\Controllers\DashboardController.php on line 19.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:43:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:43:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$db is deprecated in APPPATH\Controllers\DashboardController.php on line 14.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$session is deprecated in APPPATH\Controllers\DashboardController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$uri is deprecated in APPPATH\Controllers\DashboardController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$form_validation is deprecated in APPPATH\Controllers\DashboardController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:43:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\DashboardController::$userValidation is deprecated in APPPATH\Controllers\DashboardController.php on line 19.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\DashboardController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:43:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2025-10-20 08:43:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-10-20 08:45:57 --> ErrorException: Maximum execution time of 120 seconds exceeded
+[Method: GET, Route: productstock]
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2025-10-20 08:45:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:45:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:45:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:45:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:48:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:48:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:48:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:48:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:49:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:49:15 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:49:15 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:49:15 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:51:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:51:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:51:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:51:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 08:53:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 08:53:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:53:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 08:53:49 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:53:50 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:53:50 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:53:50 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:53:50 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:01 --> BadMethodCallException: Call to undefined method App\Models\MdlPurchaseOrder::getItems
+[Method: GET, Route: print/purchase-order/print/22]
+in SYSTEMPATH\Model.php on line 932.
+ 1 APPPATH\Controllers\DocReport.php(88): CodeIgniter\Model->__call('getItems', [...])
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->printPurchaseOrder('22')
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:14 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:14 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:14 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:14 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:14 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:14 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:14 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:14 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:26 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `materia...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `materia...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `materia...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `materia...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:26 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+[Method: GET, Route: print/purchase-request/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:26 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:26 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:26 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `materia...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `materia...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `materia...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `materia...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:26 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+[Method: GET, Route: print/purchase-request/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:26 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:26 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:27 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `materia...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `materia...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `materia...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `materia...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:27 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+[Method: GET, Route: print/purchase-request/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:27 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:27 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.material_request'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `material_request`.*, `department`.`name` as `department_name`
+FROM `purchase_order`
+LEFT JOIN `department` ON `department`.`id` = `material_request`.`dept_id`
+ORDER BY `material_request`.`created_at` DESC, `material_request`.`kode` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(340): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getPurchaseRequest()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:30 --> mysqli_sql_exception: Unknown column 'code' in 'SELECT' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT 'Good Re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT 'Good Re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT 'Good Re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 'Good Re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:30 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'code' in 'SELECT'
+[Method: GET, Route: print/recent-documents/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:30 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'code' in 'SELECT'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:30 --> [Caused by] mysqli_sql_exception: Unknown column 'code' in 'SELECT'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 08:54:30 --> mysqli_sql_exception: Unknown column 'code' in 'SELECT' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT 'Good Re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT 'Good Re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT 'Good Re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT 'Good Re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 08:54:30 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'code' in 'SELECT'
+[Method: GET, Route: print/recent-documents/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:30 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'code' in 'SELECT'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:54:30 --> [Caused by] mysqli_sql_exception: Unknown column 'code' in 'SELECT'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT \'Good Received Note\' as document_type, `code` as `document_number`, `received_date` as `document_date`, `status`, `id`
+FROM `pembelian`
+ORDER BY `received_date` DESC
+ LIMIT 10', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(400): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getRecentDocuments()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 08:59:02 --> BadMethodCallException: Call to undefined method App\Models\MdlPurchaseOrder::getItems
+[Method: GET, Route: print/purchase-order/print/22]
+in SYSTEMPATH\Model.php on line 932.
+ 1 APPPATH\Controllers\DocReport.php(88): CodeIgniter\Model->__call('getItems', [...])
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->printPurchaseOrder('22')
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:06 --> BadMethodCallException: Call to undefined method App\Models\MdlPurchaseOrder::getItems
+[Method: GET, Route: print/purchase-order/print/31]
+in SYSTEMPATH\Model.php on line 932.
+ 1 APPPATH\Controllers\DocReport.php(88): CodeIgniter\Model->__call('getItems', [...])
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->printPurchaseOrder('31')
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:08:15 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:08:15 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:15 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:15 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:08:15 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:08:15 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:15 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:15 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:08:25 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+ERROR - 2025-10-20 09:08:25 --> mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_re...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_re...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_re...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_re...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:08:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:25 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:25 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:25 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:08:25 --> [Caused by] mysqli_sql_exception: Unknown table 'u375117440_cnfinv.good_received_note'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `good_received_note`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `good_received_note`.`supplier_id`
+ORDER BY `good_received_note`.`received_date` DESC, `good_received_note`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 09:09:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 09:09:18 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 09:09:18 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 09:09:18 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:09:20 --> mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembeli...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembeli...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembeli...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembeli...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:09:20 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:20 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:20 --> [Caused by] mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:09:21 --> mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembeli...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembeli...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembeli...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembeli...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:09:21 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ERROR - 2025-10-20 09:09:21 --> mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON' in C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php:312
+Stack trace:
+#0 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembeli...', 0)
+#1 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembeli...')
+#2 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembeli...')
+#3 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembeli...', Array, false)
+#4 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+#5 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+#6 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\app\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+#7 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+#8 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+#9 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(325): CodeIgniter\CodeIgniter->run()
+#11 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\vendor\codeigniter4\framework\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 C:\Users\suluh\Documents\GitHub\manufacturing-cnf\home\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 {main}
+CRITICAL - 2025-10-20 09:09:21 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:21 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+[Method: GET, Route: print/good-received-note/data]
+in SYSTEMPATH\Database\BaseConnection.php on line 688.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 2 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 4 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 6 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 7 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 8 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 9 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+10 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:21 --> [Caused by] mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:21 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 317.
+ 1 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 2 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 4 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 6 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 8 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 9 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:09:21 --> [Caused by] mysqli_sql_exception: Unknown column 'pembelian.supplier_id' in 'ON'
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 312.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(312): mysqli->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(734): CodeIgniter\Database\MySQLi\Connection->execute('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 3 SYSTEMPATH\Database\BaseConnection.php(648): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1644): CodeIgniter\Database\BaseConnection->query('SELECT `pembelian`.*, `supplier`.`supplier_name`
+FROM `pembelian`
+JOIN `supplier` ON `supplier`.`id` = `pembelian`.`supplier_id`
+ORDER BY `pembelian`.`received_date` DESC, `pembelian`.`code` ASC', [], false)
+ 5 SYSTEMPATH\Model.php(286): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH\BaseModel.php(676): CodeIgniter\Model->doFindAll(0, 0)
+ 7 APPPATH\Controllers\DocReport.php(135): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->getGoodReceivedNote()
+ 9 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+10 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+11 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+13 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2025-10-20 09:18:30 --> BadMethodCallException: Call to undefined method App\Models\MdlPurchaseOrder::getItems
+[Method: GET, Route: print/purchase-order/print/31]
+in SYSTEMPATH\Model.php on line 932.
+ 1 APPPATH\Controllers\DocReport.php(88): CodeIgniter\Model->__call('getItems', [...])
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\DocReport->printPurchaseOrder('31')
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\DocReport))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 09:19:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 09:19:11 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 09:19:11 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 09:19:11 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:11:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:11:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:11:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:11:37 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:18:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:18:10 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:18:10 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:18:10 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:19:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:19:04 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:19:04 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:19:04 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:19:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:19:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:19:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:19:57 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:23:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:23:34 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:23:34 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:23:34 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:24:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:24:40 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:24:40 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:24:40 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+INFO - 2025-10-20 11:25:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+WARNING - 2025-10-20 11:25:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$db is deprecated in APPPATH\Controllers\ReportController.php on line 15.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:25:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$session is deprecated in APPPATH\Controllers\ReportController.php on line 16.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+WARNING - 2025-10-20 11:25:41 --> [DEPRECATED] Creation of dynamic property App\Controllers\ReportController::$form_validation is deprecated in APPPATH\Controllers\ReportController.php on line 18.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\ReportController->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(325): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
