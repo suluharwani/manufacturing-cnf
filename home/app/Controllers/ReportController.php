@@ -1032,4 +1032,9 @@ public function getPiHistoryByDate()
     
     return json_encode($query->getResultArray());
 }
+public function document(){
+    $data['title'] = "Document";
+    $data['content'] = view('admin/content/report/document', $data);
+    return view('admin/index', $data);
+}
 }

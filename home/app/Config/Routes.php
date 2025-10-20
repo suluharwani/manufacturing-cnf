@@ -399,6 +399,7 @@ $routes->group('report', function ($routes) {
     'as' => 'bea_cukai_report'
 ]);
     $routes->get('activity', 'ReportController::activity',['filter' => 'accessControl:2']); 
+    $routes->get('document', 'ReportController::document',['filter' => 'accessControl:2']); 
     $routes->get('customer_order', 'ReportController::customer_order',['filter' => 'accessControl:2']); 
     $routes->get('finished_good', 'ReportController::finished_good',['filter' => 'accessControl:2']); 
     $routes->get('material', 'ReportController::material',['filter' => 'accessControl:2']); 
@@ -648,4 +649,43 @@ $routes->group('custfinance',  function($routes) {
     
     // Route untuk mendapatkan daftar customer
     $routes->get('getCustomerList', 'CustFinance::getCustomerList');
+});
+$routes->group('print', function($routes) {
+    // Halaman utama print document
+    $routes->get('/', 'DocReport::index');
+    
+    // Purchase Order
+    $routes->get('purchase-order', 'DocReport::purchaseOrder');
+    $routes->get('purchase-order/data', 'DocReport::getPurchaseOrder');
+    $routes->get('purchase-order/print/(:num)', 'DocReport::printPurchaseOrder/$1');
+    
+    // Good Received Note
+    $routes->get('good-received-note', 'DocReport::goodReceivedNote');
+    $routes->get('good-received-note/data', 'DocReport::getGoodReceivedNote');
+    $routes->get('good-received-note/print/(:num)', 'DocReport::printGoodReceivedNote/$1');
+    
+    // Proforma Invoice
+    $routes->get('proforma-invoice', 'DocReport::proformaInvoice');
+    $routes->get('proforma-invoice/data', 'DocReport::getProformaInvoice');
+    $routes->get('proforma-invoice/print/(:num)', 'DocReport::printProformaInvoice/$1');
+    
+    // Work Order
+    $routes->get('work-order', 'DocReport::workOrder');
+    $routes->get('work-order/data', 'DocReport::getWorkOrder');
+    $routes->get('work-order/print/(:num)', 'DocReport::printWorkOrder/$1');
+    
+    // Purchase Request
+    $routes->get('purchase-request', 'DocReport::purchaseRequest');
+    $routes->get('purchase-request/data', 'DocReport::getPurchaseRequest');
+    $routes->get('purchase-request/print/(:num)', 'DocReport::printPurchaseRequest/$1');
+    
+    // Dokumen Terbaru
+    $routes->get('recent-documents', 'DocReport::recentDocuments');
+    $routes->get('recent-documents/data', 'DocReport::getRecentDocuments');
+    
+    // Print Multiple
+    $routes->get('print-multiple', 'DocReport::printMultipleDocuments');
+    
+    // Filter Options
+    $routes->get('filter-options/(:any)', 'DocReport::getFilterOptions/$1');
 });
