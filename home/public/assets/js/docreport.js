@@ -277,16 +277,13 @@ function generateTableRow(documentType, item, index) {
                 <td><span class="badge ${getStatusBadge(item.status)}">${getStatusText(item.status)}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('purchase-order', ${item.id})" title="Cetak">
+                        <button class="btn btn-print" onclick="printSingleDocument('purchase/printPo/', ${item.id})" title="Cetak">
                             <i class="fas fa-print"></i>
                         </button>
                         <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="printSingleDocument('purchase-order', ${item.id})"><i class="fas fa-print me-2"></i>Cetak</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="addToPrintQueue('purchase_order', ${item.id}, '${item.code}')"><i class="fas fa-list me-2"></i>Tambah ke Antrian</a></li>
-                        </ul>
+                        
                     </div>
                 </td>
             `;
@@ -301,13 +298,10 @@ function generateTableRow(documentType, item, index) {
                <td>${item.posting == 1 ? '<span class="badge bg-success">Posted</span>' : '<span class="badge bg-danger">Draft</span>'}</td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('good-received-note', ${item.id})" title="Cetak">
+                        <button class="btn btn-print" onclick="printSingleDocument('pembelian/printGRN/', ${item.id})" title="Cetak">
                             <i class="fas fa-print"></i>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="printSingleDocument('good-received-note', ${item.id})"><i class="fas fa-print me-2"></i>Cetak</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="addToPrintQueue('good_received_note', ${item.id}, '${item.code}')"><i class="fas fa-list me-2"></i>Tambah ke Antrian</a></li>
-                        </ul>
+
                     </div>
                 </td>
             `;
@@ -321,13 +315,10 @@ function generateTableRow(documentType, item, index) {
                 <td>${item.currency_code ? formatCurrency(item.grand_total, item.currency_code) : '-'}</td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('proforma-invoice', ${item.id})" title="Cetak">
+                        <button class="btn btn-print" onclick="printSingleDocument('proformainvoice/printPi/', ${item.id})" title="Cetak">
                             <i class="fas fa-print"></i>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="printSingleDocument('proforma-invoice', ${item.id})"><i class="fas fa-print me-2"></i>Cetak</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="addToPrintQueue('proforma_invoice', ${item.id}, '${item.invoice_number}')"><i class="fas fa-list me-2"></i>Tambah ke Antrian</a></li>
-                        </ul>
+                
                     </div>
                 </td>
             `;
@@ -341,13 +332,10 @@ function generateTableRow(documentType, item, index) {
                 <td><span class="badge ${getStatusBadge(item.status)}">${getStatusText(item.status)}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('work-order', ${item.id})" title="Cetak">
+                        <button class="btn btn-print" onclick="printSingleDocument('printWO', ${item.id})" title="Cetak">
                             <i class="fas fa-print"></i>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="printSingleDocument('work-order', ${item.id})"><i class="fas fa-print me-2"></i>Cetak</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="addToPrintQueue('work_order', ${item.id}, '${item.kode}')"><i class="fas fa-list me-2"></i>Tambah ke Antrian</a></li>
-                        </ul>
+                        
                     </div>
                 </td>
             `;
@@ -361,13 +349,10 @@ function generateTableRow(documentType, item, index) {
                 <td><span class="badge ${getStatusBadge(item.status)}">${getStatusText(item.status)}</span></td>
                 <td>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('purchase-request', ${item.id})" title="Cetak">
+                        <button class="btn btn-print" onclick="printSingleDocument('materialrequest/printPR', ${item.id})" title="Cetak">
                             <i class="fas fa-print"></i>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="printSingleDocument('purchase-request', ${item.id})"><i class="fas fa-print me-2"></i>Cetak</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="addToPrintQueue('purchase_request', ${item.id}, '${item.kode}')"><i class="fas fa-list me-2"></i>Tambah ke Antrian</a></li>
-                        </ul>
+                     
                     </div>
                 </td>
             `;
@@ -378,11 +363,6 @@ function generateTableRow(documentType, item, index) {
                 <td><strong>${item.document_number || '-'}</strong></td>
                 <td>${formatDate(item.document_date)}</td>
                 <td><span class="badge ${getStatusBadge(item.status)}">${getStatusText(item.status)}</span></td>
-                <td>
-                    <button class="btn btn-sm btn-print" onclick="printRecentDocument('${item.document_type}', ${item.id})" title="Cetak">
-                        <i class="fas fa-print"></i>
-                    </button>
-                </td>
             `;
 
         default:
@@ -422,14 +402,14 @@ function resetFilter(documentType) {
 
 // Fungsi untuk mencetak dokumen tunggal
 function printSingleDocument(documentType, id) {
-    const url = `${config.baseUrl}/${documentType}/print/${id}`;
+    const url = `${base_url}/${documentType}/${id}`;
     window.open(url, '_blank');
 }
 
 // Fungsi untuk mencetak dokumen recent
 function printRecentDocument(documentType, id) {
     const mapping = {
-        'Purchase Order': 'purchase-order',
+        'Purchase Order': 'purchase/printPo',
         'Good Received Note': 'good-received-note',
         'Proforma Invoice': 'proforma-invoice',
         'Work Order': 'work-order'

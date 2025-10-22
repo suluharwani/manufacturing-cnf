@@ -143,7 +143,7 @@ $(document).ready(function() {
         return row[3]
     }},
     {mRender: function (data, type, row) {
-        return row[9]
+        return `${row[9]} ${row[16]}`
     }},
     {mRender: function (data, type, row) {
         return `${formatNumber(row[4])} ${row[5]}`

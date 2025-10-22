@@ -139,7 +139,9 @@ return view('admin/index', $data);
                             currency.kode as kode_currency,
                             currency.nama as nama_currency,
                             currency.rate,
-                            pembelian.posting';
+                            pembelian.posting,
+                            satuan.kode as satuan,
+                            satuan.nama as nama_satuan';
 
         // Define joins
         $joins = [
@@ -147,7 +149,8 @@ return view('admin/index', $data);
             ['supplier', 'supplier.id = pembelian.id_supplier', 'left'],
             ["materials","materials.id = pembelian_detail.id_material", 'left'],
             ["currency","pembelian_detail.id_currency = currency.id", 'left'],
-            ["materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left']
+            ["materials_detail","materials_detail.material_id = pembelian_detail.id_material", 'left'],
+            ["satuan","materials_detail.satuan_id = satuan.id", 'left']
         ];
 
         $where = ['pembelian_detail.id !=' => 0, 'pembelian_detail.deleted_at' => NULL, 'pembelian_detail.id_pembelian'=>$idPembelian];
@@ -188,6 +191,8 @@ return view('admin/index', $data);
             $row[] = $lists->pajak;//13
             $row[] = $lists->potongan;//14
             $row[] = $lists->posting;//15
+            $row[] = $lists->satuan;//16
+            $row[] = $lists->nama_satuan;//15
 
         $data[] = $row;
 

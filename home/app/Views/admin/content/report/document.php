@@ -214,21 +214,6 @@
                 </div>
             </div>
 
-            <!-- Recent Documents -->
-            <div class="col-md-4 col-sm-6 mb-4">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <div class="card-icon">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <h5 class="card-title">Dokumen Terbaru</h5>
-                        <p class="card-text">Lihat dan cetak dokumen yang baru saja dibuat</p>
-                        <button class="btn btn-print" data-bs-toggle="modal" data-bs-target="#recentModal">
-                            <i class="fas fa-list me-1"></i> Lihat Dokumen
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Footer -->
@@ -513,64 +498,9 @@
         </div>
     </div>
 
-    <!-- Modal Recent Documents -->
-    <div class="modal fade" id="recentModal" tabindex="-1" aria-labelledby="recentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="recentModalLabel"><i class="fas fa-history me-2"></i>Dokumen Terbaru</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Jenis Dokumen</th>
-                                    <th>Nomor</th>
-                                    <th>Tanggal</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Purchase Order</td>
-                                    <td>PO-2023-001</td>
-                                    <td>15 Nov 2023</td>
-                                    <td><span class="badge bg-success">Selesai</span></td>
-                                    <td><button class="btn btn-sm btn-print"><i class="fas fa-print"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>Good Received Note</td>
-                                    <td>GRN-2023-045</td>
-                                    <td>14 Nov 2023</td>
-                                    <td><span class="badge bg-success">Selesai</span></td>
-                                    <td><button class="btn btn-sm btn-print"><i class="fas fa-print"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td>Work Order</td>
-                                    <td>WO-2023-078</td>
-                                    <td>13 Nov 2023</td>
-                                    <td><span class="badge bg-warning">Proses</span></td>
-                                    <td><button class="btn btn-sm btn-print"><i class="fas fa-print"></i></button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
+
+
     
     <script>
         // Data contoh untuk setiap jenis dokumen
