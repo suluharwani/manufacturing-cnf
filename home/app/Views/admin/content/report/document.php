@@ -122,7 +122,26 @@
 .table tbody tr {
     animation: fadeIn 0.3s ease-in;
 }
+
+.btn-excel {
+    background-color: #1d6f42;
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-excel:hover {
+    background-color: #165932;
+    color: white;
+}
+
+.d-grid.gap-2.d-md-flex.justify-content-md-end {
+    margin-top: 15px;
+}
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -248,6 +267,9 @@
                             <button class="btn btn-print" onclick="filterDocuments('purchaseOrder')">
                                 <i class="fas fa-filter me-1"></i> Filter Dokumen
                             </button>
+                            <button class="btn btn-success" onclick="exportToExcel('purchaseOrder')">
+        <i class="fas fa-file-excel me-1"></i> Export Excel
+    </button>
                         </div>
                     </div>
 
@@ -303,6 +325,9 @@
                             <button class="btn btn-print" onclick="filterDocuments('grn')">
                                 <i class="fas fa-filter me-1"></i> Filter Dokumen
                             </button>
+                             <button class="btn btn-success" onclick="exportToExcel('grn')">
+        <i class="fas fa-file-excel me-1"></i> Export Excel
+    </button>
                         </div>
                     </div>
 
@@ -359,6 +384,9 @@
                             <button class="btn btn-print" onclick="filterDocuments('proforma')">
                                 <i class="fas fa-filter me-1"></i> Filter Dokumen
                             </button>
+                              <button class="btn btn-success" onclick="exportToExcel('proforma')">
+        <i class="fas fa-file-excel me-1"></i> Export Excel
+    </button>
                         </div>
                     </div>
 
@@ -414,6 +442,9 @@
                             <button class="btn btn-print" onclick="filterDocuments('workOrder')">
                                 <i class="fas fa-filter me-1"></i> Filter Dokumen
                             </button>
+                            <button class="btn btn-success" onclick="exportToExcel('workOrder')">
+        <i class="fas fa-file-excel me-1"></i> Export Excel
+    </button>
                         </div>
                     </div>
 
@@ -469,6 +500,9 @@
                             <button class="btn btn-print" onclick="filterDocuments('purchaseRequest')">
                                 <i class="fas fa-filter me-1"></i> Filter Dokumen
                             </button>
+                            <button class="btn btn-success" onclick="exportToExcel('purchaseRequest')">
+        <i class="fas fa-file-excel me-1"></i> Export Excel
+    </button>
                         </div>
                     </div>
 

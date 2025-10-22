@@ -544,3 +544,207 @@ window.resetFilter = resetFilter;
 window.printSingleDocument = printSingleDocument;
 window.printRecentDocument = printRecentDocument;
 window.addToPrintQueue = addToPrintQueue;
+
+function exportToExcel(documentType) {
+    const configType = config.documentTypes[documentType];
+    if (!configType) return;
+
+    // Tampilkan loading
+    const tableBody = document.getElementById(configType.tableId);
+    const originalContent = tableBody.innerHTML;
+    
+    showLoading(documentType);
+
+    // Build query parameters (sama seperti filter)
+    const params = new URLSearchParams();
+    
+    // Add date filters
+    const startDate = document.getElementById(configType.startDateId)?.value;
+    const endDate = document.getElementById(configType.endDateId)?.value;
+    
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    
+    // Add status filter
+    const status = document.getElementById(configType.statusId)?.value;
+    if (status && status !== 'all') {
+        params.append('status', status);
+    }
+    
+    // Add other specific filters
+    if (configType.supplierId) {
+        const supplier = document.getElementById(configType.supplierId)?.value;
+        if (supplier) params.append('supplier', supplier);
+    }
+    
+    if (configType.customerId) {
+        const customer = document.getElementById(configType.customerId)?.value;
+        if (customer) params.append('customer', customer);
+    }
+    
+    if (configType.departmentId) {
+        const department = document.getElementById(configType.departmentId)?.value;
+        if (department) params.append('department', department);
+    }
+
+    // Request data untuk export
+    fetch(`${config.baseUrl}/${configType.endpoint}?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                generateExcel(documentType, data.data);
+            } else {
+                throw new Error(data.message || 'Failed to load data for export');
+            }
+        })
+        .catch(error => {
+            console.error(`Error exporting ${documentType}:`, error);
+            showToast('error', `Gagal mengekspor data: ${error.message}`);
+        })
+        .finally(() => {
+            // Kembalikan konten asli tabel
+            tableBody.innerHTML = originalContent;
+        });
+}
+
+// Fungsi untuk generate file Excel
+function generateExcel(documentType, data) {
+    // Import library SheetJS (pastikan sudah include di project)
+    if (typeof XLSX === 'undefined') {
+        showToast('error', 'Library Excel tidak tersedia. Pastikan SheetJS sudah diinclude.');
+        return;
+    }
+
+    const workbook = XLSX.utils.book_new();
+    const worksheetData = prepareExcelData(documentType, data);
+    
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, getSheetName(documentType));
+    
+    // Generate filename dengan timestamp
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    const filename = `${getDocumentTypeName(documentType)}_${timestamp}.xlsx`;
+    
+    // Export file
+    XLSX.writeFile(workbook, filename);
+    showToast('success', `File Excel berhasil diunduh: ${filename}`);
+}
+
+// Fungsi untuk menyiapkan data Excel berdasarkan jenis dokumen
+function prepareExcelData(documentType, data) {
+    const headers = getExcelHeaders(documentType);
+    const worksheetData = [headers];
+    
+    data.forEach((item, index) => {
+        const row = generateExcelRow(documentType, item, index);
+        worksheetData.push(row);
+    });
+    
+    return worksheetData;
+}
+
+function getExcelHeaders(documentType) {
+    switch(documentType) {
+        case 'purchaseOrder':
+            return ['No', 'Nomor PO', 'Tanggal', 'Supplier', 'Status'];
+        case 'grn':
+            return ['No', 'Nomor GRN', 'Document Import', 'Tanggal', 'Supplier', 'Status'];
+        case 'proforma':
+            return ['No', 'Nomor Proforma', 'Tanggal', 'Klien', 'Jumlah'];
+        case 'workOrder':
+            return ['No', 'Nomor WO', 'Tanggal', 'Deskripsi', 'Status'];
+        case 'purchaseRequest':
+            return ['No', 'Nomor PR', 'Tanggal', 'Departemen', 'Status'];
+        default:
+            return ['No', 'Dokumen', 'Tanggal', 'Status'];
+    }
+}
+
+function generateExcelRow(documentType, item, index) {
+    switch(documentType) {
+        case 'purchaseOrder':
+            return [
+                index + 1,
+                item.code || '-',
+                formatDate(item.date),
+                item.supplier_name || '-',
+                getStatusText(item.status)
+            ];
+            
+        case 'grn':
+            return [
+                index + 1,
+                item.invoice || '-',
+                item.document || '-',
+                formatDate(item.tanggal_nota),
+                item.supplier_name || '-',
+                item.posting == 1 ? 'Posted' : 'Draft'
+            ];
+            
+        case 'proforma':
+            return [
+                index + 1,
+                item.invoice_number || '-',
+                formatDate(item.invoice_date),
+                item.customer_name || '-',
+                item.grand_total ? formatCurrencyValue(item.grand_total) : '0'
+            ];
+            
+        case 'workOrder':
+            return [
+                index + 1,
+                item.kode || '-',
+                formatDate(item.created_at),
+                item.description || item.customer_name || '-',
+                getStatusText(item.status)
+            ];
+            
+        case 'purchaseRequest':
+            return [
+                index + 1,
+                item.kode || '-',
+                formatDate(item.created_at),
+                item.department_name || '-',
+                getStatusText(item.status)
+            ];
+            
+        default:
+            return [index + 1, 'Unknown', '-', '-'];
+    }
+}
+
+// Fungsi utility tambahan
+function getDocumentTypeName(documentType) {
+    const names = {
+        'purchaseOrder': 'Purchase_Order',
+        'grn': 'Good_Received_Note',
+        'proforma': 'Proforma_Invoice',
+        'workOrder': 'Work_Order',
+        'purchaseRequest': 'Purchase_Request'
+    };
+    return names[documentType] || 'Document';
+}
+
+function getSheetName(documentType) {
+    const names = {
+        'purchaseOrder': 'Purchase Order',
+        'grn': 'Good Received Note',
+        'proforma': 'Proforma Invoice',
+        'workOrder': 'Work Order',
+        'purchaseRequest': 'Purchase Request'
+    };
+    return names[documentType] || 'Sheet1';
+}
+
+function formatCurrencyValue(amount) {
+    if (!amount) return 0;
+    return typeof amount === 'string' ? parseFloat(amount.replace(/[^\d.-]/g, '')) : amount;
+}
+
+// Export function untuk global usage
+window.exportToExcel = exportToExcel;
