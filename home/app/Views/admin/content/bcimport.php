@@ -1,4 +1,3 @@
-
 <div class="container-fluid pt-4 px-4">
     <div class="bg-light rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
@@ -29,11 +28,14 @@
                 <thead class="table-dark">
                     <tr>
                         <th>No. Aju</th>
+                        <th>Tgl. Daftar</th>
+                        <th>No. Daftar</th>
                         <th>No. BC11</th>
                         <th>Tanggal BC11</th>
                         <th>Kantor</th>
                         <th>Jenis Impor</th>
-                        <th>Nilai Barang</th>
+                        <th>FOB</th>
+                        <th>Valuta</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -41,15 +43,18 @@
                     <?php foreach ($bc_data as $item): ?>
                     <tr>
                         <td><?= $item['nomor_aju'] ?></td>
+                        <td><?= $item['tanggal_daftar'] ?></td>
+                        <td><?= $item['nomor_daftar'] ?></td>
                         <td><?= $item['nomor_bc11'] ?></td>
                         <td><?= $item['tanggal_bc11'] ?></td>
                         <td><?= $item['kode_kantor'] ?></td>
                         <td><?= $item['kode_jenis_impor'] ?></td>
-                        <td class="text-end"><?= number_format($item['nilai_barang'], 2) ?></td>
+                        <td class="text-end"><?= number_format($item['fob'], 2) ?></td>
+                        <td><?= $item['kode_valuta'] ?></td>
                         <td class="text-center">
-                            <a href="<?= base_url('bc-import/detail/' . $item['id']) ?>" class="btn btn-sm btn-info">
-                                <i class="fa fa-eye"></i>
-                            </a>
+                            <a href="<?= base_url('bc-import/detail/' . $item['nomor_aju']) ?>" class="btn btn-info btn-sm">
+    <i class="fa fa-eye me-1"></i>Detail
+</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

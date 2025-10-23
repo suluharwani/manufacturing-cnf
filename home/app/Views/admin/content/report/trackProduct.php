@@ -324,7 +324,7 @@ function viewMaterialHistory(materialId, materialName) {
                         <thead class="table-dark">
                             <tr>
                                 <th>Invoice</th>
-                                <th>No. Dok. Bea Cukai</th>
+                                <th>No. Daftar PIB</th>
                                 <th>Jenis Dok.</th>
                                 <th>Jumlah</th>
                                 <th>Tanggal Nota</th>

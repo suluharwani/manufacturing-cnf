@@ -139,9 +139,9 @@ function getDocumentOptions() {
             type: 'GET',
             url: base_url + 'pembelian/getDocumentList',
             success: function(response) {
-                var options = '<option value="">Pilih Nomor Aju</option>';
+                var options = '<option value="">Pilih Nomor Daftar</option>';
                 response.forEach(function(doc) {
-                    options += `<option value="${doc.nomor_aju}">${doc.nomor_aju}</option>`;
+                    options += `<option value="${doc.nomor_daftar}">${doc.nomor_daftar}</option>`;
                 });
                 resolve(options);
             },

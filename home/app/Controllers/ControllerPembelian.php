@@ -811,7 +811,7 @@ public function generateGrnNumber($supplierId)
 public function getDocumentList()
 {
     $bcHeaderModel = new \App\Models\BcHeaderModel;
-    $documents = $bcHeaderModel->select('nomor_aju')->findAll();
+    $documents = $bcHeaderModel->select('nomor_daftar')->findAll();
     
     return $this->response->setJSON($documents);
 }
