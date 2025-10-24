@@ -100,7 +100,8 @@ public function detail($nomorAju)
             return redirect()->to('/bc-import')->with('error', 'Data tidak ditemukan');
         }
 
-        return view('admin/content/bcimport_detail', $data);
+        $dataview['content'] = view('admin/content/bcimport_detail', $data);
+        return view('admin/index', $dataview);
         
     } catch (\Exception $e) {
         log_message('error', 'Detail Error: ' . $e->getMessage());

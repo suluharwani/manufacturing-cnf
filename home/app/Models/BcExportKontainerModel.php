@@ -12,6 +12,8 @@ class BcExportKontainerModel extends Model
     ];
     
     protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
     
     // Get containers by nomor_aju
     public function getByNomorAju($nomorAju)
@@ -28,9 +30,22 @@ class BcExportKontainerModel extends Model
             '1' => 'Dry Container',
             '2' => 'Reefer Container',
             '3' => 'Open Top',
-            '4' => 'Flat Rack'
+            '4' => 'Flat Rack',
+            '8' => 'Standard Container'
         ];
         
         return $types[$code] ?? 'Lainnya';
+    }
+    
+    // Get container size
+    public function getContainerSize($code)
+    {
+        $sizes = [
+            '20' => '20 Feet',
+            '40' => '40 Feet',
+            '45' => '45 Feet'
+        ];
+        
+        return $sizes[$code] ?? $code . ' Feet';
     }
 }

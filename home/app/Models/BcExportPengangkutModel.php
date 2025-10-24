@@ -12,11 +12,14 @@ class BcExportPengangkutModel extends Model
     ];
     
     protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
     
-    // Get transport data by nomor_aju
+    // Get transport data by nomor_aju - PERBAIKAN: return array kosong jika tidak ada data
     public function getByNomorAju($nomorAju)
     {
-        return $this->where('nomor_aju', $nomorAju)->first();
+        $result = $this->where('nomor_aju', $nomorAju)->findAll();
+        return $result ? $result : [];
     }
     
     // Get transport method name
@@ -30,5 +33,11 @@ class BcExportPengangkutModel extends Model
         ];
         
         return $methods[$code] ?? 'Lainnya';
+    }
+    
+    // Get single transport data
+    public function getSingleByNomorAju($nomorAju)
+    {
+        return $this->where('nomor_aju', $nomorAju)->first();
     }
 }

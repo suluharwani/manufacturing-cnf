@@ -13,6 +13,8 @@ class BcExportTarifModel extends Model
     ];
     
     protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
     
     // Get tariffs by nomor_aju
     public function getByNomorAju($nomorAju)
@@ -28,9 +30,10 @@ class BcExportTarifModel extends Model
         $types = [
             'PPN' => 'PPN Ekspor',
             'PPH' => 'PPh Ekspor',
-            'BM' => 'Bea Masuk'
+            'BM' => 'Bea Masuk',
+            'PPNBM' => 'PPN Barang Mewah'
         ];
         
-        return $types[$code] ?? 'Lainnya';
+        return $types[$code] ?? $code;
     }
 }

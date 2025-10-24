@@ -11,6 +11,8 @@ class BcExportKemasanModel extends Model
     ];
     
     protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
     
     // Get packaging by nomor_aju
     public function getByNomorAju($nomorAju)
@@ -27,9 +29,11 @@ class BcExportKemasanModel extends Model
             'PK' => 'Kemasan Kayu',
             'PX' => 'Kemasan Karton',
             'DR' => 'Drum',
-            'BG' => 'Karung'
+            'BG' => 'Karung',
+            'CT' => 'Karton',
+            'CR' => 'Krat'
         ];
         
-        return $types[$code] ?? 'Lainnya';
+        return $types[$code] ?? $code;
     }
 }

@@ -12,27 +12,78 @@ class BcExportBarangModel extends Model
     ];
     
     protected $useTimestamps = true;
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
     
     // Get goods by nomor_aju
     public function getByNomorAju($nomorAju)
     {
-        return $this->where('nomor_aju', $nomorAju)
+        $result = $this->where('nomor_aju', $nomorAju)
                    ->orderBy('seri_barang', 'ASC')
                    ->findAll();
+        return $result ? $result : [];
     }
     
     // Format FOB value with thousand separators
-    public function formatFob($value)
+    public function formatFob($value, $currencyCode = 'USD')
     {
-        return number_format($value, 0, ',', '.');
+        if (!is_numeric($value) || $value == 0) {
+            return '-';
+        }
+        
+        $currencySymbols = [
+            'IDR' => 'Rp',
+            'USD' => '$',
+            'EUR' => '€',
+            'JPY' => '¥'
+        ];
+        
+        $symbol = $currencySymbols[$currencyCode] ?? '$';
+        $formattedValue = number_format($value, 2, ',', '.');
+        
+        return $symbol . ' ' . $formattedValue;
     }
     
     // Get total FOB for a shipment
     public function getTotalFob($nomorAju)
     {
-        return $this->selectSum('fob')
+        $result = $this->selectSum('fob')
                    ->where('nomor_aju', $nomorAju)
                    ->get()
-                   ->getRow()->fob;
+                   ->getRow();
+        
+        return $result ? $result->fob : 0;
+    }
+    
+    // Clean and validate data before insert
+    public function cleanBarangData($data)
+    {
+        // Ensure numeric fields are properly formatted
+        $numericFields = ['jumlah_satuan', 'netto', 'fob'];
+        
+        foreach ($numericFields as $field) {
+            if (isset($data[$field])) {
+                $data[$field] = $this->cleanNumericValue($data[$field]);
+            }
+        }
+        
+        return $data;
+    }
+    
+    protected function cleanNumericValue($value)
+    {
+        if (empty($value) || $value === '-') {
+            return 0;
+        }
+        
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        
+        // Remove non-numeric characters except dots and commas
+        $cleaned = preg_replace('/[^\d,.-]/', '', $value);
+        $cleaned = str_replace(',', '.', $cleaned);
+        
+        return (float) $cleaned;
     }
 }

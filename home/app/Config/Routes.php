@@ -598,6 +598,11 @@ $routes->group('bc-export', function($routes) {
     $routes->get('form', 'BcExport::importForm');
     $routes->post('process', 'BcExport::processImport');
     $routes->get('detail/(:num)', 'BcExport::detail/$1');
+    // app/Config/Routes.php
+
+    $routes->get('import', 'BcExport::importForm');
+    $routes->post('process', 'BcExport::processImport');
+    $routes->get('detail/(:num)', 'BcExport::detail/$1');
 });
 $routes->group('component', function($routes) {
     $routes->get('transaction', 'Component::transaction',['filter' => 'accessControl:2']);
