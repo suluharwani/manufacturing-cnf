@@ -29,7 +29,7 @@ public function create($id)
         'picture' => 'uploaded[picture]|is_image[picture]|max_size[picture,2048]',
     ];
 
-    if (!$this->validate(rules: $rules)) {
+    if (!$this->validate($rules)) {
         return $this->response->setJSON([
             'status' => false,
             'errors' => $validation->getErrors(),
@@ -37,8 +37,56 @@ public function create($id)
     }
 
     $file = $this->request->getFile('picture');
+    
+    // Validasi tambahan untuk memastikan file gambar valid
+    if (!$file->isValid()) {
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => ['picture' => 'File gambar tidak valid'],
+        ]);
+    }
+
     $fileName = $file->getRandomName();
-    $file->move('uploads/finishing', $fileName);
+    
+    // Pindahkan file ke direktori sementara untuk diproses
+    $tempPath = WRITEPATH . 'uploads/temp/' . $fileName;
+    $file->move(WRITEPATH . 'uploads/temp/', $fileName);
+
+    // Manipulasi gambar
+    try {
+        $image = \Config\Services::image();
+        
+        // Load gambar dari path sementara
+        $image->withFile($tempPath);
+        
+        // Resize gambar dengan tinggi 50px, menjaga aspect ratio
+        $image->resize(0, 50, true, 'height');
+        // Parameter: 
+        // - 0: width otomatis menyesuaikan aspect ratio
+        // - 50: target height
+        // - true: maintain ratio
+        // - 'height': master dimension
+        
+        // Path untuk menyimpan gambar hasil resize
+        $destinationPath = FCPATH . 'uploads/finishing/' . $fileName;
+        
+        // Simpan gambar yang sudah diresize
+        $image->save($destinationPath);
+        
+        // Hapus file temporary
+        unlink($tempPath);
+        
+    } catch (\Exception $e) {
+        // Jika terjadi error pada manipulasi gambar
+        if (file_exists($tempPath)) {
+            unlink($tempPath);
+        }
+        
+        return $this->response->setJSON([
+            'status' => false,
+            'errors' => ['picture' => 'Gagal memproses gambar: ' . $e->getMessage()],
+        ]);
+    }
 
     $data = [
         'name' => $this->request->getPost('name'),

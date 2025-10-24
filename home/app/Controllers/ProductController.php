@@ -127,7 +127,7 @@ class ProductController extends BaseController
       $image = \Config\Services::image();
           //thumbnail
       $image->withFile($imageFile)
-      ->resize(100, 100, true, 'height')
+      ->resize(50, 50, true, 'height')
       ->save( FCPATH .'assets/upload/thumb/'. $fileName);
       $image->withFile($imageFile)
       ->resize(1000, 1000, true, 'height')
