@@ -14,55 +14,52 @@ class StProductModel extends Model
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
 
+// Di StProductModel.php - Optimasi getAvailableStock
 public function getAvailableStock($productId, $finishingId = null)
 {
-    $builder = $this->db->table('st_initial')
-        ->selectSum('quantity')
-        ->where('product_id', $productId);
-    
-    if ($finishingId) {
-        $builder->where('finishing_id', $finishingId);
-    }
-    
-    $initial = $builder->get()->getRow()->quantity;
+    // Single query approach
+    $query = "
+        SELECT 
+            COALESCE(initial.initial_qty, 0) + 
+            COALESCE(movement_in.in_qty, 0) - 
+            COALESCE(movement_out.out_qty, 0) - 
+            COALESCE(booked.booked_qty, 0) as available_stock
+        FROM (SELECT ? as product_id) as p
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as initial_qty
+            FROM st_initial 
+            WHERE product_id = ?
+            " . ($finishingId ? " AND finishing_id = ?" : " AND finishing_id IS NULL") . "
+        ) initial ON initial.product_id = p.product_id
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as in_qty
+            FROM st_movement 
+            WHERE product_id = ? AND movement_type = 'in'
+            " . ($finishingId ? " AND finishing_id = ?" : " AND finishing_id IS NULL") . "
+        ) movement_in ON movement_in.product_id = p.product_id
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as out_qty
+            FROM st_movement 
+            WHERE product_id = ? AND movement_type = 'out'
+            " . ($finishingId ? " AND finishing_id = ?" : " AND finishing_id IS NULL") . "
+        ) movement_out ON movement_out.product_id = p.product_id
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as booked_qty
+            FROM st_movement 
+            WHERE product_id = ? AND status = 'booked'
+            " . ($finishingId ? " AND finishing_id = ?" : " AND finishing_id IS NULL") . "
+        ) booked ON booked.product_id = p.product_id
+    ";
 
-    // Get total stock in
-    $builder = $this->db->table('st_movement')
-        ->selectSum('quantity')
-        ->where('product_id', $productId)
-        ->where('movement_type', 'in');
-    
+    $params = [$productId, $productId];
     if ($finishingId) {
-        $builder->where('finishing_id', $finishingId);
+        $params = array_merge($params, [$finishingId, $productId, $finishingId, $productId, $finishingId, $productId, $finishingId]);
+    } else {
+        $params = array_merge($params, [$productId, $productId, $productId]);
     }
-    
-    $stockIn = $builder->get()->getRow()->quantity;
 
-    // Get total stock out
-    $builder = $this->db->table('st_movement')
-        ->selectSum('quantity')
-        ->where('product_id', $productId)
-        ->where('movement_type', 'out');
-    
-    if ($finishingId) {
-        $builder->where('finishing_id', $finishingId);
-    }
-    
-    $stockOut = $builder->get()->getRow()->quantity;
-
-    // Get total booked stock
-    $builder = $this->db->table('st_movement')
-        ->selectSum('quantity')
-        ->where('product_id', $productId)
-        ->where('status', 'booked');
-    
-    if ($finishingId) {
-        $builder->where('finishing_id', $finishingId);
-    }
-    
-    $bookedStock = $builder->get()->getRow()->quantity;
-
-    return max(0, ($initial ?? 0) + ($stockIn ?? 0) - ($stockOut ?? 0) - ($bookedStock ?? 0));
+    $result = $this->db->query($query, $params)->getRow();
+    return max(0, $result->available_stock ?? 0);
 }
 
 // Similarly update getBookedStock(), getStockByLocation(), etc.

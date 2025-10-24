@@ -77,37 +77,39 @@ class BcImport extends BaseController
         $dataview['content'] = view('admin/content/bcimport', $data);
         return view('admin/index', $dataview);
     }
-public function detail($nomorAju)
-{
-    try {
-        // Ambil data dari semua tabel terkait
-        $data = [
-            'header' => $this->bcHeaderModel->where('nomor_aju', $nomorAju)->first(),
-            'entitas' => $this->bcEntitasModel->where('nomor_aju', $nomorAju)->findAll(),
-            'dokumen' => $this->bcDokumenModel->where('nomor_aju', $nomorAju)->findAll(),
-            'barang' => $this->bcBarangModel->where('nomor_aju', $nomorAju)->findAll(),
-            'pengangkut' => $this->bcPengangkutModel->where('nomor_aju', $nomorAju)->findAll(),
-            'kemasan' => $this->bcKemasanModel->where('nomor_aju', $nomorAju)->findAll(),
-            'kontainer' => $this->bcKontainerModel->where('nomor_aju', $nomorAju)->findAll(),
-            'barang_tarif' => $this->bcBarangTarifModel->where('nomor_aju', $nomorAju)->findAll(),
-            'barang_dokumen' => $this->bcBarangDokumenModel->where('nomor_aju', $nomorAju)->findAll(),
-            'barang_entitas' => $this->bcBarangEntitasModel->where('nomor_aju', $nomorAju)->findAll(),
-            'barang_vd' => $this->bcBarangVdModel->where('nomor_aju', $nomorAju)->findAll(),
-            'pungutan' => $this->bcPungutanModel->where('nomor_aju', $nomorAju)->findAll(),
-        ];
 
-        if (!$data['header']) {
-            return redirect()->to('/bc-import')->with('error', 'Data tidak ditemukan');
+    public function detail($nomorAju)
+    {
+        try {
+            // Ambil data dari semua tabel terkait
+            $data = [
+                'header' => $this->bcHeaderModel->where('nomor_aju', $nomorAju)->first(),
+                'entitas' => $this->bcEntitasModel->where('nomor_aju', $nomorAju)->findAll(),
+                'dokumen' => $this->bcDokumenModel->where('nomor_aju', $nomorAju)->findAll(),
+                'barang' => $this->bcBarangModel->where('nomor_aju', $nomorAju)->findAll(),
+                'pengangkut' => $this->bcPengangkutModel->where('nomor_aju', $nomorAju)->findAll(),
+                'kemasan' => $this->bcKemasanModel->where('nomor_aju', $nomorAju)->findAll(),
+                'kontainer' => $this->bcKontainerModel->where('nomor_aju', $nomorAju)->findAll(),
+                'barang_tarif' => $this->bcBarangTarifModel->where('nomor_aju', $nomorAju)->findAll(),
+                'barang_dokumen' => $this->bcBarangDokumenModel->where('nomor_aju', $nomorAju)->findAll(),
+                'barang_entitas' => $this->bcBarangEntitasModel->where('nomor_aju', $nomorAju)->findAll(),
+                'barang_vd' => $this->bcBarangVdModel->where('nomor_aju', $nomorAju)->findAll(),
+                'pungutan' => $this->bcPungutanModel->where('nomor_aju', $nomorAju)->findAll(),
+            ];
+
+            if (!$data['header']) {
+                return redirect()->to('/bc-import')->with('error', 'Data tidak ditemukan');
+            }
+
+            $dataview['content'] = view('admin/content/bcimport_detail', $data);
+            return view('admin/index', $dataview);
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Detail Error: ' . $e->getMessage());
+            return redirect()->to('/bc-import')->with('error', 'Error loading detail: ' . $e->getMessage());
         }
-
-        $dataview['content'] = view('admin/content/bcimport_detail', $data);
-        return view('admin/index', $dataview);
-        
-    } catch (\Exception $e) {
-        log_message('error', 'Detail Error: ' . $e->getMessage());
-        return redirect()->to('/bc-import')->with('error', 'Error loading detail: ' . $e->getMessage());
     }
-}
+
     public function importForm()
     {
         try {
@@ -120,17 +122,29 @@ public function detail($nomorAju)
 
     public function processImport()
     {
+        // Set header JSON untuk AJAX response
+        if ($this->request->isAJAX()) {
+            header('Content-Type: application/json');
+        }
+
         $validation = $this->validate([
             'excel_file' => [
                 'rules' => 'uploaded[excel_file]|ext_in[excel_file,xlsx,xls]',
                 'errors' => [
-                    'uploaded' => 'Please select a file to upload',
-                    'ext_in' => 'Only Excel files are allowed'
+                    'uploaded' => 'Silakan pilih file untuk diupload',
+                    'ext_in' => 'Hanya file Excel yang diperbolehkan'
                 ]
             ]
         ]);
 
         if (!$validation) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Validation error',
+                    'errors' => $this->validator->getErrors()
+                ]);
+            }
             return redirect()->to('/bc-import')->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -167,9 +181,19 @@ public function detail($nomorAju)
             }
 
             // Prepare success message with import statistics
-            $successMessage = 'Data imported successfully!<br>Import Statistics:<br>';
+            $successMessage = 'Data BC Import berhasil diimport!<br>Statistik Import:<br>';
             foreach ($this->importCounters as $type => $count) {
-                $successMessage .= "- " . ucfirst(str_replace('_', ' ', $type)) . ": {$count} records<br>";
+                if ($count > 0) {
+                    $successMessage .= "- " . ucfirst(str_replace('_', ' ', $type)) . ": {$count} records<br>";
+                }
+            }
+
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => $successMessage,
+                    'redirect' => base_url('/bc-import')
+                ]);
             }
 
             return redirect()->to('/bc-import')->with('success', $successMessage);
@@ -178,20 +202,23 @@ public function detail($nomorAju)
             $this->db->transRollback();
             log_message('error', 'Import Error: ' . $e->getMessage());
             log_message('error', 'Import Trace: ' . $e->getTraceAsString());
+            
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Error importing data: ' . $e->getMessage()
+                ]);
+            }
             return redirect()->to('/bc-import/form')->with('error', 'Error importing data: ' . $e->getMessage());
         }
     }
 
     protected function processHeaderSheet($sheet)
     {
+        if (!$sheet) return;
+
         $nomorAju = $sheet->getCell('A2')->getValue();
-        
-        // Check if data already exists
-        $existing = $this->bcHeaderModel->where('nomor_aju', $nomorAju)->first();
-        if ($existing) {
-            // Update existing data instead of throwing error
-            $this->bcHeaderModel->where('nomor_aju', $nomorAju)->delete();
-        }
+        if (empty($nomorAju)) return;
 
         $data = [
             'nomor_aju' => $nomorAju,
@@ -212,15 +239,15 @@ public function detail($nomorAju)
             'nomor_pos' => $sheet->getCell('AL2')->getValue(),
             'nomor_sub_pos' => $sheet->getCell('AM2')->getValue(),
             'tanggal_tiba' => $this->convertExcelDate($sheet->getCell('AY2')->getValue()),
-            'nilai_barang' => $sheet->getCell('BL2')->getValue(),
-            'nilai_incoterm' => $sheet->getCell('BM2')->getValue(),
-            'asuransi' => $sheet->getCell('BJ2')->getValue(),
-            'freight' => $sheet->getCell('BP2')->getValue(),
-            'fob' => $sheet->getCell('BQ2')->getValue(),
-            'cif' => $sheet->getCell('BU2')->getValue(),
-            'ndpbm' => $sheet->getCell('BW2')->getValue(),
-            'bruto' => $sheet->getCell('CB2')->getValue(),
-            'netto' => $sheet->getCell('CC2')->getValue(),
+            'nilai_barang' => $this->cleanNumber($sheet->getCell('BL2')->getValue()),
+            'nilai_incoterm' => $this->cleanNumber($sheet->getCell('BM2')->getValue()),
+            'asuransi' => $this->cleanNumber($sheet->getCell('BJ2')->getValue()),
+            'freight' => $this->cleanNumber($sheet->getCell('BP2')->getValue()),
+            'fob' => $this->cleanNumber($sheet->getCell('BQ2')->getValue()),
+            'cif' => $this->cleanNumber($sheet->getCell('BU2')->getValue()),
+            'ndpbm' => $this->cleanNumber($sheet->getCell('BW2')->getValue()),
+            'bruto' => $this->cleanNumber($sheet->getCell('CB2')->getValue()),
+            'netto' => $this->cleanNumber($sheet->getCell('CC2')->getValue()),
             'kode_valuta' => $sheet->getCell('CI2')->getValue(),
             'kode_incoterm' => $sheet->getCell('CJ2')->getValue(),
             'kota_pernyataan' => $sheet->getCell('CE2')->getValue(),
@@ -228,7 +255,8 @@ public function detail($nomorAju)
             'nama_pernyataan' => $sheet->getCell('CH2')->getValue(),
             'jabatan_pernyataan' => $sheet->getCell('CP2')->getValue(),
             'nomor_daftar' => $sheet->getCell('CP2')->getValue(),
-            'tanggal_daftar' => $this->convertExcelDate($sheet->getCell('CQ2')->getValue())
+            'tanggal_daftar' => $this->convertExcelDate($sheet->getCell('CQ2')->getValue()),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
 
         // Validate required fields
@@ -236,9 +264,21 @@ public function detail($nomorAju)
             throw new \RuntimeException("Nomor AJU is required");
         }
 
-        $result = $this->bcHeaderModel->insert($data);
+        // Cek apakah data sudah ada
+        $existing = $this->bcHeaderModel->where('nomor_aju', $nomorAju)->first();
+        if ($existing) {
+            // Update existing data
+            $result = $this->bcHeaderModel->update($existing['id'], $data);
+            $action = 'updated';
+        } else {
+            // Insert new data
+            $data['created_at'] = date('Y-m-d H:i:s');
+            $result = $this->bcHeaderModel->insert($data);
+            $action = 'inserted';
+        }
+
         if (!$result) {
-            throw new \RuntimeException("Failed to insert header data: " . implode(', ', $this->bcHeaderModel->errors()));
+            throw new \RuntimeException("Failed to {$action} header data: " . implode(', ', $this->bcHeaderModel->errors()));
         }
         
         $this->importCounters['header']++;
@@ -246,6 +286,8 @@ public function detail($nomorAju)
 
     protected function processEntitasSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -256,9 +298,6 @@ public function detail($nomorAju)
             if (empty($nomorAju) || empty($seri)) {
                 continue;
             }
-
-            // Delete existing data for this nomor_aju and seri
-            $this->bcEntitasModel->where('nomor_aju', $nomorAju)->where('seri', $seri)->delete();
 
             $data = [
                 'nomor_aju' => $nomorAju,
@@ -274,9 +313,22 @@ public function detail($nomorAju)
                 'kode_negara' => $sheet->getCell('M' . $row)->getValue()
             ];
 
-            $result = $this->bcEntitasModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcEntitasModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcEntitasModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcEntitasModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert entitas data at row {$row}: " . implode(', ', $this->bcEntitasModel->errors()));
+                throw new \RuntimeException("Failed to {$action} entitas data at row {$row}: " . implode(', ', $this->bcEntitasModel->errors()));
             }
             
             $this->importCounters['entitas']++;
@@ -285,6 +337,8 @@ public function detail($nomorAju)
 
     protected function processDokumenSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -295,9 +349,6 @@ public function detail($nomorAju)
             if (empty($nomorAju) || empty($seri)) {
                 continue;
             }
-
-            // Delete existing data
-            $this->bcDokumenModel->where('nomor_aju', $nomorAju)->where('seri', $seri)->delete();
 
             $data = [
                 'nomor_aju' => $nomorAju,
@@ -309,9 +360,22 @@ public function detail($nomorAju)
                 'kode_ijin' => $sheet->getCell('G' . $row)->getValue()
             ];
 
-            $result = $this->bcDokumenModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcDokumenModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcDokumenModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcDokumenModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert dokumen data at row {$row}: " . implode(', ', $this->bcDokumenModel->errors()));
+                throw new \RuntimeException("Failed to {$action} dokumen data at row {$row}: " . implode(', ', $this->bcDokumenModel->errors()));
             }
             
             $this->importCounters['dokumen']++;
@@ -320,6 +384,8 @@ public function detail($nomorAju)
 
     protected function processPengangkutSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -330,9 +396,6 @@ public function detail($nomorAju)
             if (empty($nomorAju) || empty($seri)) {
                 continue;
             }
-
-            // Delete existing data
-            $this->bcPengangkutModel->where('nomor_aju', $nomorAju)->where('seri', $seri)->delete();
 
             $data = [
                 'nomor_aju' => $nomorAju,
@@ -344,9 +407,22 @@ public function detail($nomorAju)
                 'call_sign' => $sheet->getCell('G' . $row)->getValue()
             ];
 
-            $result = $this->bcPengangkutModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcPengangkutModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcPengangkutModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcPengangkutModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert pengangkut data at row {$row}: " . implode(', ', $this->bcPengangkutModel->errors()));
+                throw new \RuntimeException("Failed to {$action} pengangkut data at row {$row}: " . implode(', ', $this->bcPengangkutModel->errors()));
             }
             
             $this->importCounters['pengangkut']++;
@@ -355,6 +431,8 @@ public function detail($nomorAju)
 
     protected function processKemasanSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -366,20 +444,30 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcKemasanModel->where('nomor_aju', $nomorAju)->where('seri', $seri)->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri' => $seri,
                 'kode_kemasan' => $sheet->getCell('C' . $row)->getValue(),
-                'jumlah_kemasan' => $sheet->getCell('D' . $row)->getValue(),
+                'jumlah_kemasan' => $this->cleanNumber($sheet->getCell('D' . $row)->getValue()),
                 'merek' => $sheet->getCell('E' . $row)->getValue()
             ];
 
-            $result = $this->bcKemasanModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcKemasanModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcKemasanModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcKemasanModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert kemasan data at row {$row}: " . implode(', ', $this->bcKemasanModel->errors()));
+                throw new \RuntimeException("Failed to {$action} kemasan data at row {$row}: " . implode(', ', $this->bcKemasanModel->errors()));
             }
             
             $this->importCounters['kemasan']++;
@@ -388,6 +476,8 @@ public function detail($nomorAju)
 
     protected function processKontainerSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -400,9 +490,6 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcKontainerModel->where('nomor_aju', $nomorAju)->where('seri', $seri)->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri' => $seri,
@@ -412,9 +499,22 @@ public function detail($nomorAju)
                 'kode_tipe_kontainer' => $sheet->getCell('F' . $row)->getValue()
             ];
 
-            $result = $this->bcKontainerModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcKontainerModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcKontainerModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcKontainerModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert kontainer data at row {$row}: " . implode(', ', $this->bcKontainerModel->errors()));
+                throw new \RuntimeException("Failed to {$action} kontainer data at row {$row}: " . implode(', ', $this->bcKontainerModel->errors()));
             }
             
             $this->importCounters['kontainer']++;
@@ -423,6 +523,8 @@ public function detail($nomorAju)
 
     protected function processBarangSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -433,9 +535,6 @@ public function detail($nomorAju)
             if (empty($nomorAju) || empty($seriBarang)) {
                 continue;
             }
-
-            // Delete existing data
-            $this->bcBarangModel->where('nomor_aju', $nomorAju)->where('seri_barang', $seriBarang)->delete();
 
             $data = [
                 'nomor_aju' => $nomorAju,
@@ -448,25 +547,38 @@ public function detail($nomorAju)
                 'ukuran' => $sheet->getCell('H' . $row)->getValue(),
                 'spesifikasi_lain' => $sheet->getCell('I' . $row)->getValue(),
                 'kode_satuan' => $sheet->getCell('J' . $row)->getValue(),
-                'jumlah_satuan' => $sheet->getCell('K' . $row)->getValue(),
+                'jumlah_satuan' => $this->cleanNumber($sheet->getCell('K' . $row)->getValue()),
                 'kode_kemasan' => $sheet->getCell('L' . $row)->getValue(),
-                'jumlah_kemasan' => $sheet->getCell('M' . $row)->getValue(),
-                'netto' => $sheet->getCell('R' . $row)->getValue(),
-                'bruto' => $sheet->getCell('S' . $row)->getValue(),
-                'cif' => $sheet->getCell('W' . $row)->getValue(),
-                'cif_rupiah' => $sheet->getCell('X' . $row)->getValue(),
-                'ndpbm' => $sheet->getCell('Y' . $row)->getValue(),
-                'fob' => $sheet->getCell('Z' . $row)->getValue(),
-                'asuransi' => $sheet->getCell('AA' . $row)->getValue(),
-                'freight' => $sheet->getCell('AB' . $row)->getValue(),
+                'jumlah_kemasan' => $this->cleanNumber($sheet->getCell('M' . $row)->getValue()),
+                'netto' => $this->cleanNumber($sheet->getCell('R' . $row)->getValue()),
+                'bruto' => $this->cleanNumber($sheet->getCell('S' . $row)->getValue()),
+                'cif' => $this->cleanNumber($sheet->getCell('W' . $row)->getValue()),
+                'cif_rupiah' => $this->cleanNumber($sheet->getCell('X' . $row)->getValue()),
+                'ndpbm' => $this->cleanNumber($sheet->getCell('Y' . $row)->getValue()),
+                'fob' => $this->cleanNumber($sheet->getCell('Z' . $row)->getValue()),
+                'asuransi' => $this->cleanNumber($sheet->getCell('AA' . $row)->getValue()),
+                'freight' => $this->cleanNumber($sheet->getCell('AB' . $row)->getValue()),
                 'kode_negara_asal' => $sheet->getCell('AY' . $row)->getValue(),
                 'kode_jenis_nilai' => $sheet->getCell('AZ' . $row)->getValue(),
                 'kode_kondisi_barang' => $sheet->getCell('BA' . $row)->getValue()
             ];
 
-            $result = $this->bcBarangModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcBarangModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcBarangModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcBarangModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert barang data at row {$row}: " . implode(', ', $this->bcBarangModel->errors()));
+                throw new \RuntimeException("Failed to {$action} barang data at row {$row}: " . implode(', ', $this->bcBarangModel->errors()));
             }
             
             $this->importCounters['barang']++;
@@ -475,6 +587,8 @@ public function detail($nomorAju)
 
     protected function processBarangTarifSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -487,29 +601,37 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcBarangTarifModel->where('nomor_aju', $nomorAju)
-                                    ->where('seri_barang', $seriBarang)
-                                    ->where('kode_pungutan', $kodePungutan)
-                                    ->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri_barang' => $seriBarang,
                 'kode_pungutan' => $kodePungutan,
                 'kode_tarif' => $sheet->getCell('D' . $row)->getValue(),
-                'tarif' => $sheet->getCell('E' . $row)->getValue(),
+                'tarif' => $this->cleanNumber($sheet->getCell('E' . $row)->getValue()),
                 'kode_fasilitas' => $sheet->getCell('F' . $row)->getValue(),
-                'tarif_fasilitas' => $sheet->getCell('G' . $row)->getValue(),
-                'nilai_bayar' => $sheet->getCell('H' . $row)->getValue(),
-                'nilai_fasilitas' => $sheet->getCell('I' . $row)->getValue(),
+                'tarif_fasilitas' => $this->cleanNumber($sheet->getCell('G' . $row)->getValue()),
+                'nilai_bayar' => $this->cleanNumber($sheet->getCell('H' . $row)->getValue()),
+                'nilai_fasilitas' => $this->cleanNumber($sheet->getCell('I' . $row)->getValue()),
                 'kode_satuan' => $sheet->getCell('J' . $row)->getValue(),
-                'jumlah_satuan' => $sheet->getCell('K' . $row)->getValue()
+                'jumlah_satuan' => $this->cleanNumber($sheet->getCell('K' . $row)->getValue())
             ];
 
-            $result = $this->bcBarangTarifModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcBarangTarifModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->where('kode_pungutan', $kodePungutan)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcBarangTarifModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcBarangTarifModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert barang tarif data at row {$row}: " . implode(', ', $this->bcBarangTarifModel->errors()));
+                throw new \RuntimeException("Failed to {$action} barang tarif data at row {$row}: " . implode(', ', $this->bcBarangTarifModel->errors()));
             }
             
             $this->importCounters['barang_tarif']++;
@@ -518,6 +640,8 @@ public function detail($nomorAju)
 
     protected function processBarangDokumenSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -530,12 +654,6 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcBarangDokumenModel->where('nomor_aju', $nomorAju)
-                                      ->where('seri_barang', $seriBarang)
-                                      ->where('seri_dokumen', $seriDokumen)
-                                      ->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri_barang' => $seriBarang,
@@ -543,9 +661,23 @@ public function detail($nomorAju)
                 'seri_izin' => $sheet->getCell('D' . $row)->getValue()
             ];
 
-            $result = $this->bcBarangDokumenModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcBarangDokumenModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->where('seri_dokumen', $seriDokumen)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcBarangDokumenModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcBarangDokumenModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert barang dokumen data at row {$row}: " . implode(', ', $this->bcBarangDokumenModel->errors()));
+                throw new \RuntimeException("Failed to {$action} barang dokumen data at row {$row}: " . implode(', ', $this->bcBarangDokumenModel->errors()));
             }
             
             $this->importCounters['barang_dokumen']++;
@@ -554,6 +686,8 @@ public function detail($nomorAju)
 
     protected function processBarangEntitasSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -566,21 +700,29 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcBarangEntitasModel->where('nomor_aju', $nomorAju)
-                                      ->where('seri_barang', $seriBarang)
-                                      ->where('seri_entitas', $seriEntitas)
-                                      ->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri_barang' => $seriBarang,
                 'seri_entitas' => $seriEntitas
             ];
 
-            $result = $this->bcBarangEntitasModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcBarangEntitasModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->where('seri_entitas', $seriEntitas)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcBarangEntitasModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcBarangEntitasModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert barang entitas data at row {$row}: " . implode(', ', $this->bcBarangEntitasModel->errors()));
+                throw new \RuntimeException("Failed to {$action} barang entitas data at row {$row}: " . implode(', ', $this->bcBarangEntitasModel->errors()));
             }
             
             $this->importCounters['barang_entitas']++;
@@ -589,6 +731,8 @@ public function detail($nomorAju)
 
     protected function processBarangVdSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -601,25 +745,33 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcBarangVdModel->where('nomor_aju', $nomorAju)
-                                 ->where('seri_barang', $seriBarang)
-                                 ->where('kode_vd', $kodeVd)
-                                 ->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'seri_barang' => $seriBarang,
                 'kode_vd' => $kodeVd,
-                'nilai_barang' => $sheet->getCell('D' . $row)->getValue(),
-                'biaya_tambahan' => $sheet->getCell('E' . $row)->getValue(),
-                'biaya_pengurang' => $sheet->getCell('F' . $row)->getValue(),
+                'nilai_barang' => $this->cleanNumber($sheet->getCell('D' . $row)->getValue()),
+                'biaya_tambahan' => $this->cleanNumber($sheet->getCell('E' . $row)->getValue()),
+                'biaya_pengurang' => $this->cleanNumber($sheet->getCell('F' . $row)->getValue()),
                 'jatuh_tempo' => $this->convertExcelDate($sheet->getCell('G' . $row)->getValue())
             ];
 
-            $result = $this->bcBarangVdModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcBarangVdModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->where('kode_vd', $kodeVd)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcBarangVdModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcBarangVdModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert barang VD data at row {$row}: " . implode(', ', $this->bcBarangVdModel->errors()));
+                throw new \RuntimeException("Failed to {$action} barang VD data at row {$row}: " . implode(', ', $this->bcBarangVdModel->errors()));
             }
             
             $this->importCounters['barang_vd']++;
@@ -628,6 +780,8 @@ public function detail($nomorAju)
 
     protected function processPungutanSheet($sheet)
     {
+        if (!$sheet) return;
+
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 2; $row <= $highestRow; $row++) {
@@ -639,26 +793,60 @@ public function detail($nomorAju)
                 continue;
             }
 
-            // Delete existing data
-            $this->bcPungutanModel->where('nomor_aju', $nomorAju)
-                                 ->where('kode_jenis_pungutan', $kodeJenisPungutan)
-                                 ->delete();
-
             $data = [
                 'nomor_aju' => $nomorAju,
                 'kode_fasilitas_tarif' => $sheet->getCell('B' . $row)->getValue(),
                 'kode_jenis_pungutan' => $kodeJenisPungutan,
-                'nilai_pungutan' => $sheet->getCell('D' . $row)->getValue(),
+                'nilai_pungutan' => $this->cleanNumber($sheet->getCell('D' . $row)->getValue()),
                 'npwp_billing' => $sheet->getCell('E' . $row)->getValue()
             ];
 
-            $result = $this->bcPungutanModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcPungutanModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('kode_jenis_pungutan', $kodeJenisPungutan)
+                ->first();
+
+            if ($existing) {
+                $result = $this->bcPungutanModel->update($existing['id'], $data);
+                $action = 'updated';
+            } else {
+                $result = $this->bcPungutanModel->insert($data);
+                $action = 'inserted';
+            }
+
             if (!$result) {
-                throw new \RuntimeException("Failed to insert pungutan data at row {$row}: " . implode(', ', $this->bcPungutanModel->errors()));
+                throw new \RuntimeException("Failed to {$action} pungutan data at row {$row}: " . implode(', ', $this->bcPungutanModel->errors()));
             }
             
             $this->importCounters['pungutan']++;
         }
+    }
+
+    // Tambahkan method helper untuk membersihkan angka
+    protected function cleanNumber($value)
+    {
+        if (empty($value) || $value === '-') {
+            return 0;
+        }
+        
+        // Jika sudah numeric, langsung return
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        
+        // Hapus karakter non-numeric kecuali titik dan koma
+        $cleaned = preg_replace('/[^\d,.-]/', '', $value);
+        
+        // Ganti koma dengan titik untuk format decimal
+        $cleaned = str_replace(',', '.', $cleaned);
+        
+        // Hapus multiple dots
+        if (substr_count($cleaned, '.') > 1) {
+            $cleaned = str_replace('.', '', $cleaned);
+        }
+        
+        return (float) $cleaned;
     }
 
     protected function convertExcelDate($excelDate)

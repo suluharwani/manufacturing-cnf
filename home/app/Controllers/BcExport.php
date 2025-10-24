@@ -70,9 +70,6 @@ class BcExport extends BaseController
             'pungutan' => $this->bcExportPungutanModel->getByNomorAju($nomorAju) ?? []
         ];
 
-        // Debug: Cek tipe data
-        // var_dump(gettype($data['pengangkut'])); die();
-
         $dataview['content'] = view('admin/content/bc_export/detail', $data);
         return view('admin/index', $dataview);
     }
@@ -88,6 +85,11 @@ class BcExport extends BaseController
 
     public function processImport()
     {
+        // Set header JSON untuk AJAX response
+        if ($this->request->isAJAX()) {
+            header('Content-Type: application/json');
+        }
+
         $validation = $this->validate([
             'excel_file' => [
                 'rules' => 'uploaded[excel_file]|ext_in[excel_file,xlsx,xls]',
@@ -99,6 +101,13 @@ class BcExport extends BaseController
         ]);
 
         if (!$validation) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Validation error',
+                    'errors' => $this->validator->getErrors()
+                ]);
+            }
             return redirect()->to('/bc-export/import')->withInput()->with('errors', $this->validator->getErrors());
         }
 
@@ -128,8 +137,22 @@ class BcExport extends BaseController
                 throw new \RuntimeException('Database transaction failed');
             }
 
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'success',
+                    'message' => 'Data BC Export berhasil diimport',
+                    'redirect' => base_url('/bc-export')
+                ]);
+            }
+
             return redirect()->to('/bc-export')->with('success', 'Data BC Export berhasil diimport');
         } catch (\Exception $e) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'Error importing data: ' . $e->getMessage()
+                ]);
+            }
             return redirect()->to('/bc-export/import')->with('error', 'Error importing data: ' . $e->getMessage());
         }
     }
@@ -139,12 +162,7 @@ class BcExport extends BaseController
         if (!$sheet) return;
 
         $nomorAju = $sheet->getCell('A2')->getValue();
-        
-        // Cek apakah data sudah ada
-        $existing = $this->bcExportModel->where('nomor_aju', $nomorAju)->first();
-        if ($existing) {
-            throw new \Exception("Data dengan nomor AJU {$nomorAju} sudah ada");
-        }
+        if (empty($nomorAju)) return;
 
         $data = [
             'nomor_aju' => $nomorAju,
@@ -169,10 +187,20 @@ class BcExport extends BaseController
             'netto' => $sheet->getCell('CC2')->getValue() ?: 0,
             'kota_pernyataan' => $sheet->getCell('CM2')->getValue(),
             'tanggal_pernyataan' => $this->convertExcelDate($sheet->getCell('CN2')->getValue()),
-            'nama_pernyataan' => $sheet->getCell('CO2')->getValue()
+            'nama_pernyataan' => $sheet->getCell('CO2')->getValue(),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        $this->bcExportModel->insert($data);
+        // Cek apakah data sudah ada
+        $existing = $this->bcExportModel->where('nomor_aju', $nomorAju)->first();
+        if ($existing) {
+            // Update data yang sudah ada
+            $this->bcExportModel->update($existing['id'], $data);
+        } else {
+            // Insert data baru
+            $data['created_at'] = date('Y-m-d H:i:s');
+            $this->bcExportModel->insert($data);
+        }
     }
 
     protected function processEntitasSheet($sheet)
@@ -185,9 +213,11 @@ class BcExport extends BaseController
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seri = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri' => $sheet->getCell('B' . $row)->getValue(),
+                'seri' => $seri,
                 'kode_entitas' => $sheet->getCell('C' . $row)->getValue(),
                 'kode_jenis_identitas' => $sheet->getCell('D' . $row)->getValue(),
                 'nomor_identitas' => $sheet->getCell('E' . $row)->getValue(),
@@ -196,7 +226,17 @@ class BcExport extends BaseController
                 'kode_negara' => $sheet->getCell('M' . $row)->getValue()
             ];
 
-            $this->bcExportEntitasModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportEntitasModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportEntitasModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportEntitasModel->insert($data);
+            }
         }
     }
 
@@ -210,87 +250,70 @@ class BcExport extends BaseController
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seri = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri' => $sheet->getCell('B' . $row)->getValue(),
+                'seri' => $seri,
                 'kode_dokumen' => $sheet->getCell('C' . $row)->getValue(),
                 'nomor_dokumen' => $sheet->getCell('D' . $row)->getValue(),
                 'tanggal_dokumen' => $this->convertExcelDate($sheet->getCell('E' . $row)->getValue())
             ];
 
-            $this->bcExportDokumenModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportDokumenModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportDokumenModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportDokumenModel->insert($data);
+            }
         }
     }
 
-protected function processBarangSheet($sheet)
-{
-    if (!$sheet) return;
+    protected function processBarangSheet($sheet)
+    {
+        if (!$sheet) return;
 
-    $highestRow = $sheet->getHighestRow();
+        $highestRow = $sheet->getHighestRow();
 
-    for ($row = 2; $row <= $highestRow; $row++) {
-        $nomorAju = $sheet->getCell('A' . $row)->getValue();
-        if (empty($nomorAju)) continue;
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $nomorAju = $sheet->getCell('A' . $row)->getValue();
+            if (empty($nomorAju)) continue;
 
-        // Debug: Tampilkan data untuk row tertentu
-        if ($row <= 5) { // Hanya debug untuk 5 baris pertama
-            $debugData = [
-                'row' => $row,
+            $seriBarang = $sheet->getCell('B' . $row)->getValue();
+
+            $data = [
                 'nomor_aju' => $nomorAju,
-                'seri_barang' => $sheet->getCell('B' . $row)->getValue(),
+                'seri_barang' => $seriBarang,
                 'hs' => $sheet->getCell('C' . $row)->getValue(),
                 'uraian' => $sheet->getCell('E' . $row)->getValue(),
-                'netto' => $sheet->getCell('R' . $row)->getValue(),
-                'fob' => $sheet->getCell('Z' . $row)->getValue(),
-                'negara_tujuan' => $sheet->getCell('AY' . $row)->getValue()
+                'kode_satuan' => $sheet->getCell('J' . $row)->getValue(),
+                'jumlah_satuan' => $this->cleanNumber($sheet->getCell('K' . $row)->getValue()),
+                'netto' => $this->cleanNumber($sheet->getCell('T' . $row)->getValue()),
+                'fob' => $this->cleanNumber($sheet->getCell('AC' . $row)->getValue()),
+                'kode_negara_asal' => $sheet->getCell('AY' . $row)->getValue()
             ];
-            // log_message('debug', 'Barang Data: ' . print_r($debugData, true));
-        }
 
-        $data = [
-            'nomor_aju' => $nomorAju,
-            'seri_barang' => $sheet->getCell('B' . $row)->getValue(),
-            'hs' => $sheet->getCell('C' . $row)->getValue(),
-            'uraian' => $sheet->getCell('E' . $row)->getValue(),
-            'kode_satuan' => $sheet->getCell('J' . $row)->getValue(),
-            'jumlah_satuan' => $this->cleanNumber($sheet->getCell('K' . $row)->getValue()),
-            'netto' => $this->cleanNumber($sheet->getCell('T' . $row)->getValue()),
-            'fob' => $this->cleanNumber($sheet->getCell('AC' . $row)->getValue()),
-            'kode_negara_asal' => $sheet->getCell('AY' . $row)->getValue()
-        ];
+            // Validasi data sebelum insert/update
+            if (!empty($data['seri_barang']) && !empty($data['uraian'])) {
+                // Cek apakah data sudah ada
+                $existing = $this->bcExportBarangModel
+                    ->where('nomor_aju', $nomorAju)
+                    ->where('seri_barang', $seriBarang)
+                    ->first();
 
-        // Validasi data sebelum insert
-        if (!empty($data['seri_barang']) && !empty($data['uraian'])) {
-            $this->bcExportBarangModel->insert($data);
+                if ($existing) {
+                    $this->bcExportBarangModel->update($existing['id'], $data);
+                } else {
+                    $this->bcExportBarangModel->insert($data);
+                }
+            }
         }
     }
-}
-
-// Tambahkan method helper untuk membersihkan angka
-protected function cleanNumber($value)
-{
-    if (empty($value) || $value === '-') {
-        return 0;
-    }
-    
-    // Jika sudah numeric, langsung return
-    if (is_numeric($value)) {
-        return (float) $value;
-    }
-    
-    // Hapus karakter non-numeric kecuali titik dan koma
-    $cleaned = preg_replace('/[^\d,.-]/', '', $value);
-    
-    // Ganti koma dengan titik untuk format decimal
-    $cleaned = str_replace(',', '.', $cleaned);
-    
-    // Hapus multiple dots
-    if (substr_count($cleaned, '.') > 1) {
-        $cleaned = str_replace('.', '', $cleaned);
-    }
-    
-    return (float) $cleaned;
-}
 
     protected function processPengangkutSheet($sheet)
     {
@@ -302,16 +325,28 @@ protected function cleanNumber($value)
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seri = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri' => $sheet->getCell('B' . $row)->getValue(),
+                'seri' => $seri,
                 'kode_cara_angkut' => $sheet->getCell('C' . $row)->getValue(),
                 'nama_pengangkut' => $sheet->getCell('D' . $row)->getValue(),
                 'nomor_pengangkut' => $sheet->getCell('E' . $row)->getValue(),
                 'kode_bendera' => $sheet->getCell('F' . $row)->getValue()
             ];
 
-            $this->bcExportPengangkutModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportPengangkutModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportPengangkutModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportPengangkutModel->insert($data);
+            }
         }
     }
 
@@ -325,16 +360,28 @@ protected function cleanNumber($value)
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seri = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri' => $sheet->getCell('B' . $row)->getValue(),
+                'seri' => $seri,
                 'nomor_kontainer' => $sheet->getCell('C' . $row)->getValue(),
                 'kode_ukuran_kontainer' => $sheet->getCell('D' . $row)->getValue(),
                 'kode_jenis_kontainer' => $sheet->getCell('E' . $row)->getValue(),
                 'kode_tipe_kontainer' => $sheet->getCell('F' . $row)->getValue()
             ];
 
-            $this->bcExportKontainerModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportKontainerModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportKontainerModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportKontainerModel->insert($data);
+            }
         }
     }
 
@@ -348,15 +395,27 @@ protected function cleanNumber($value)
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seri = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri' => $sheet->getCell('B' . $row)->getValue(),
+                'seri' => $seri,
                 'kode_kemasan' => $sheet->getCell('C' . $row)->getValue(),
                 'jumlah_kemasan' => $sheet->getCell('D' . $row)->getValue() ?: 0,
                 'merek' => $sheet->getCell('E' . $row)->getValue()
             ];
 
-            $this->bcExportKemasanModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportKemasanModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri', $seri)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportKemasanModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportKemasanModel->insert($data);
+            }
         }
     }
 
@@ -370,9 +429,11 @@ protected function cleanNumber($value)
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $seriBarang = $sheet->getCell('B' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'seri_barang' => $sheet->getCell('B' . $row)->getValue(),
+                'seri_barang' => $seriBarang,
                 'kode_pungutan' => $sheet->getCell('C' . $row)->getValue(),
                 'kode_tarif' => $sheet->getCell('D' . $row)->getValue(),
                 'tarif' => $sheet->getCell('E' . $row)->getValue() ?: 0,
@@ -384,7 +445,17 @@ protected function cleanNumber($value)
                 'jumlah_satuan' => $sheet->getCell('K' . $row)->getValue() ?: 0
             ];
 
-            $this->bcExportTarifModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportTarifModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('seri_barang', $seriBarang)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportTarifModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportTarifModel->insert($data);
+            }
         }
     }
 
@@ -398,16 +469,56 @@ protected function cleanNumber($value)
             $nomorAju = $sheet->getCell('A' . $row)->getValue();
             if (empty($nomorAju)) continue;
 
+            $kodeFasilitasTarif = $sheet->getCell('B' . $row)->getValue();
+            $kodeJenisPungutan = $sheet->getCell('C' . $row)->getValue();
+            
             $data = [
                 'nomor_aju' => $nomorAju,
-                'kode_fasilitas_tarif' => $sheet->getCell('B' . $row)->getValue(),
-                'kode_jenis_pungutan' => $sheet->getCell('C' . $row)->getValue(),
+                'kode_fasilitas_tarif' => $kodeFasilitasTarif,
+                'kode_jenis_pungutan' => $kodeJenisPungutan,
                 'nilai_pungutan' => $sheet->getCell('D' . $row)->getValue() ?: 0,
                 'npwp_billing' => $sheet->getCell('E' . $row)->getValue()
             ];
 
-            $this->bcExportPungutanModel->insert($data);
+            // Cek apakah data sudah ada
+            $existing = $this->bcExportPungutanModel
+                ->where('nomor_aju', $nomorAju)
+                ->where('kode_fasilitas_tarif', $kodeFasilitasTarif)
+                ->where('kode_jenis_pungutan', $kodeJenisPungutan)
+                ->first();
+
+            if ($existing) {
+                $this->bcExportPungutanModel->update($existing['id'], $data);
+            } else {
+                $this->bcExportPungutanModel->insert($data);
+            }
         }
+    }
+
+    // Tambahkan method helper untuk membersihkan angka
+    protected function cleanNumber($value)
+    {
+        if (empty($value) || $value === '-') {
+            return 0;
+        }
+        
+        // Jika sudah numeric, langsung return
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        
+        // Hapus karakter non-numeric kecuali titik dan koma
+        $cleaned = preg_replace('/[^\d,.-]/', '', $value);
+        
+        // Ganti koma dengan titik untuk format decimal
+        $cleaned = str_replace(',', '.', $cleaned);
+        
+        // Hapus multiple dots
+        if (substr_count($cleaned, '.') > 1) {
+            $cleaned = str_replace('.', '', $cleaned);
+        }
+        
+        return (float) $cleaned;
     }
 
     protected function convertExcelDate($excelDate)

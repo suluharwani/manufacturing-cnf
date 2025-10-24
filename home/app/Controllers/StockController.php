@@ -134,62 +134,60 @@ public function exportExcel()
 
 protected function getStockOpnameDataWithFinishing()
 {
-    $builder = $this->db->table('product p');
-    $builder->select("
-        p.id AS product_id,
-        p.kode AS kode_produk,
-        p.nama AS nama_produk,
-        f.id AS finishing_id,
-        f.name AS finishing_name,
-        l.id AS location_id,
-        l.code AS kode_gudang,
-        l.name AS nama_gudang,
-        (SELECT COALESCE(SUM(si.quantity), 0) 
-            FROM st_initial si 
-            WHERE si.product_id = p.id 
-            AND si.location_id = l.id 
-            AND (si.finishing_id = f.id OR (si.finishing_id IS NULL AND f.id IS NULL))) AS stok_awal,
-        (SELECT COALESCE(SUM(sm.quantity), 0) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.to_location = l.id 
-            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
-            AND sm.movement_type IN ('in', 'transfer')) AS total_pemasukan,
-        (SELECT COALESCE(SUM(sm.quantity), 0) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.from_location = l.id 
-            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
-            AND sm.movement_type IN ('out', 'transfer')) AS total_pengeluaran,
-        ((SELECT COALESCE(SUM(si.quantity), 0) 
-            FROM st_initial si 
-            WHERE si.product_id = p.id 
-            AND si.location_id = l.id
-            AND (si.finishing_id = f.id OR (si.finishing_id IS NULL AND f.id IS NULL))) +
-        (SELECT COALESCE(SUM(sm.quantity), 0) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.to_location = l.id
-            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
-            AND sm.movement_type IN ('in', 'transfer')) -
-        (SELECT COALESCE(SUM(sm.quantity), 0) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.from_location = l.id
-            AND (sm.finishing_id = f.id OR (sm.finishing_id IS NULL AND f.id IS NULL))
-            AND sm.movement_type IN ('out', 'transfer'))) AS stok_akhir
-    ");
-    
-    $builder->join('locations l', 'l.type = "warehouse" AND l.deleted_at IS NULL AND l.is_active = 1', 'CROSS');
-    $builder->join('finishing f', 'f.id_product = p.id', 'left');
-    $builder->where('p.deleted_at IS NULL');
-    $builder->groupStart()
-        ->where('EXISTS (SELECT 1 FROM st_initial si WHERE si.product_id = p.id AND si.location_id = l.id)')
-        ->orWhere('EXISTS (SELECT 1 FROM st_movement sm WHERE sm.product_id = p.id AND (sm.from_location = l.id OR sm.to_location = l.id))')
-    ->groupEnd();
-    $builder->orderBy('p.kode, f.name, l.code');
-    
-    return $builder->get()->getResultArray();
+    // Gunakan temporary table atau subquery yang lebih efisien
+    $query = "
+        WITH stock_summary AS (
+            SELECT 
+                p.id AS product_id,
+                p.kode AS kode_produk,
+                p.nama AS nama_produk,
+                f.id AS finishing_id,
+                f.name AS finishing_name,
+                l.id AS location_id,
+                l.code AS kode_gudang,
+                l.name AS nama_gudang,
+                COALESCE(si.initial_qty, 0) AS stok_awal,
+                COALESCE(sm_in.in_qty, 0) AS total_pemasukan,
+                COALESCE(sm_out.out_qty, 0) AS total_pengeluaran,
+                (COALESCE(si.initial_qty, 0) + COALESCE(sm_in.in_qty, 0) - COALESCE(sm_out.out_qty, 0)) AS stok_akhir
+            FROM product p
+            CROSS JOIN locations l 
+            LEFT JOIN finishing f ON f.id_product = p.id
+            LEFT JOIN (
+                SELECT product_id, location_id, finishing_id, SUM(quantity) as initial_qty
+                FROM st_initial 
+                GROUP BY product_id, location_id, finishing_id
+            ) si ON si.product_id = p.id AND si.location_id = l.id 
+                AND (si.finishing_id = f.id OR (si.finishing_id IS NULL AND f.id IS NULL))
+            LEFT JOIN (
+                SELECT product_id, to_location as location_id, finishing_id, SUM(quantity) as in_qty
+                FROM st_movement 
+                WHERE movement_type IN ('in', 'transfer')
+                GROUP BY product_id, to_location, finishing_id
+            ) sm_in ON sm_in.product_id = p.id AND sm_in.location_id = l.id 
+                AND (sm_in.finishing_id = f.id OR (sm_in.finishing_id IS NULL AND f.id IS NULL))
+            LEFT JOIN (
+                SELECT product_id, from_location as location_id, finishing_id, SUM(quantity) as out_qty
+                FROM st_movement 
+                WHERE movement_type IN ('out', 'transfer')
+                GROUP BY product_id, from_location, finishing_id
+            ) sm_out ON sm_out.product_id = p.id AND sm_out.location_id = l.id 
+                AND (sm_out.finishing_id = f.id OR (sm_out.finishing_id IS NULL AND f.id IS NULL))
+            WHERE l.type = 'warehouse' 
+                AND l.deleted_at IS NULL 
+                AND l.is_active = 1
+                AND p.deleted_at IS NULL
+                AND (
+                    si.initial_qty IS NOT NULL 
+                    OR sm_in.in_qty IS NOT NULL 
+                    OR sm_out.out_qty IS NOT NULL
+                )
+        )
+        SELECT * FROM stock_summary 
+        ORDER BY kode_produk, finishing_name, kode_gudang
+    ";
+
+    return $this->db->query($query)->getResultArray();
 }
     
     protected function getStockOpnameData()
@@ -237,42 +235,61 @@ protected function getStockOpnameDataWithFinishing()
         return $builder->get()->getResultArray();
     }
 public function index() {
-    $products = $this->productModel->findAll();
-    $finishingModel = new FinishingModel();
-    
-    // Prepare stock data for each product
-    $productsWithStock = [];
-    foreach ($products as $product) {
-        $finishings = $finishingModel->where('id_product', $product['id'])->findAll();
-        
-        if (empty($finishings)) {
-            // Product without finishing variations
-            $productsWithStock[] = [
-                'id' => $product['id'],
-                'code' => $product['kode'],
-                'name' => $product['nama'],
-                'finishing_id' => null,
-                'finishing_name' => 'Standard',
-                'available' => $this->stProductModel->getAvailableStock($product['id']),
-                'booked' => $this->stProductModel->getBookedStock($product['id']),
-                'total' => $this->stProductModel->getAvailableStock($product['id']) + $this->stProductModel->getBookedStock($product['id'])
-            ];
-        } else {
-            // Product with finishing variations
-            foreach ($finishings as $finishing) {
-                $productsWithStock[] = [
-                    'id' => $product['id'],
-                    'code' => $product['kode'],
-                    'name' => $product['nama'],
-                    'finishing_id' => $finishing['id'],
-                    'finishing_name' => $finishing['name'],
-                    'available' => $this->stProductModel->getAvailableStock($product['id'], $finishing['id']),
-                    'booked' => $this->stProductModel->getBookedStock($product['id'], $finishing['id']),
-                    'total' => $this->stProductModel->getAvailableStock($product['id'], $finishing['id']) + 
-                              $this->stProductModel->getBookedStock($product['id'], $finishing['id'])
-                ];
-            }
-        }
+    // Query tunggal untuk mendapatkan semua data produk dengan stok dan finishing
+    $query = "
+        SELECT 
+            p.id,
+            p.kode as code,
+            p.nama as name,
+            f.id as finishing_id,
+            COALESCE(f.name, 'Standard') as finishing_name,
+            COALESCE(initial.initial_qty, 0) + 
+            COALESCE(movement_in.in_qty, 0) - 
+            COALESCE(movement_out.out_qty, 0) - 
+            COALESCE(booked.booked_qty, 0) as available,
+            COALESCE(booked.booked_qty, 0) as booked,
+            (COALESCE(initial.initial_qty, 0) + 
+             COALESCE(movement_in.in_qty, 0) - 
+             COALESCE(movement_out.out_qty, 0)) as total
+        FROM product p
+        LEFT JOIN finishing f ON f.id_product = p.id
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as initial_qty
+            FROM st_initial 
+            GROUP BY product_id, finishing_id
+        ) initial ON initial.product_id = p.id 
+            AND (initial.finishing_id = f.id OR (initial.finishing_id IS NULL AND f.id IS NULL))
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as in_qty
+            FROM st_movement 
+            WHERE movement_type = 'in'
+            GROUP BY product_id, finishing_id
+        ) movement_in ON movement_in.product_id = p.id 
+            AND (movement_in.finishing_id = f.id OR (movement_in.finishing_id IS NULL AND f.id IS NULL))
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as out_qty
+            FROM st_movement 
+            WHERE movement_type = 'out'
+            GROUP BY product_id, finishing_id
+        ) movement_out ON movement_out.product_id = p.id 
+            AND (movement_out.finishing_id = f.id OR (movement_out.finishing_id IS NULL AND f.id IS NULL))
+        LEFT JOIN (
+            SELECT product_id, finishing_id, SUM(quantity) as booked_qty
+            FROM st_movement 
+            WHERE status = 'booked'
+            GROUP BY product_id, finishing_id
+        ) booked ON booked.product_id = p.id 
+            AND (booked.finishing_id = f.id OR (booked.finishing_id IS NULL AND f.id IS NULL))
+        WHERE p.deleted_at IS NULL
+        ORDER BY p.kode, f.name
+    ";
+
+    $productsWithStock = $this->db->query($query)->getResultArray();
+
+    // Pastikan nilai available tidak negatif
+    foreach ($productsWithStock as &$product) {
+        $product['available'] = max(0, $product['available']);
+        $product['total'] = max(0, $product['total']);
     }
 
     $data = [
@@ -280,180 +297,10 @@ public function index() {
         'products' => $productsWithStock
     ];
 
-    $data['content'] = view('admin/content/product_stock',$data);
+    $data['content'] = view('admin/content/product_stock', $data);
     return view('admin/index', $data);
 }
-    // public function index()
-    // {
-    //     $data['title'] = 'Stock Management';
-    //     $data['products'] = $this->productModel->findAll();
-    //     $data['content'] = view('admin/content/product_stock',$data);
-    //     return view('admin/index', $data);
-    // }
-
-// public function view($productId)
-// {
-//     $product = $this->productModel->find($productId);
-//     if (!$product) {
-//         return redirect()->back()->with('error', 'Product not found');
-//     }
-
-//     // Get basic stock data
-//     $initialStock = $this->stInitialModel->getInitialStock($productId);
-//     $available = $this->stMovementModel->getAvailableStock($productId);
-//     $booked = $this->stMovementModel->getBookedStock($productId);
-
-//     // Get finishing variations
-//     $finishings = $this->finishingModel->where('id_product', $productId)->findAll();
-//     $finishingStocks = [];
-    
-//     foreach ($finishings as $finishing) {
-//         $finishingStocks[$finishing['id']] = [
-//             'initial' => $this->stInitialModel->getInitialStock($productId, $finishing['id'])['quantity'] ?? 0,
-//             'available' => $this->stMovementModel->getAvailableStock($productId, $finishing['id']),
-//             'booked' => $this->stMovementModel->getBookedStock($productId, $finishing['id']),
-//             'locations' => $this->stMovementModel->getStockByProduct($productId, $finishing['id'])
-//         ];
-//     }
-
-//     // Prepare data for view
-//     $data = [
-//         'title' => 'Stock Detail - ' . $product['nama'],
-//         'product' => $product,
-//         'productId' => $productId,
-//         'initial_stock' => $initialStock ? $initialStock['quantity'] : 0,
-//         'available' => $available,
-//         'booked' => $booked,
-//         'total' => $available + $booked,
-//         'finishings' => $finishings,
-//         'finishing_stocks' => $finishingStocks,
-//         'stock_data' => $this->stMovementModel->getStockByProduct($productId),
-//         'movement_history' => $this->stMovementModel->getProductHistory($productId),
-//         'locations' => $this->locationModel->findAll()
-//     ];
-
-//     $data['content'] = view('admin/content/product_stock_view',$data);
-//         return view('admin/index', $data);
-// }
-
-    // public function setInitialStock($productId)
-    // {
-    //     $rules = [
-    //         'quantity' => 'required|numeric|greater_than[0]',
-    //         'location_id' => 'permit_empty|numeric'
-    //     ];
-
-    //     if (!$this->validate($rules)) {
-    //         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-    //     }
-
-    //     $data = [
-    //         'product_id' => $productId,
-    //         'quantity' => $this->request->getPost('quantity'),
-    //         'location_id' => $this->request->getPost('location_id')
-    //     ];
-
-    //     // Check if initial stock exists
-    //     $existing = $this->stInitialModel->where('product_id', $productId)->first();
-        
-    //     if ($existing) {
-    //         $this->stInitialModel->where('id',$existing['id'])->set( $data)->update();
-    //     } else {
-    //         $this->stInitialModel->insert($data);
-    //     }
-
-    //     // Add to current stock
-
-
-    //     return redirect()->to("/productstock/view/$productId")->with('message', 'Initial stock set successfully');
-    // }
-
-// public function adjustStock($productId)
-// {
-//     $rules = [
-//         'adjustment_type' => 'required|in_list[in,out]',
-//         'quantity' => 'required|numeric|greater_than[0]',
-//         'location_id' => 'permit_empty|numeric',
-//         'finishing_id' => 'permit_empty|numeric',
-//         'notes' => 'permit_empty|string',
-//         'code' => 'permit_empty|string'
-//     ];
-
-//     if (!$this->validate($rules)) {
-//         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-//     }
-
-//     $adjustmentType = $this->request->getPost('adjustment_type');
-//     $quantity = $this->request->getPost('quantity');
-//     $locationId = $this->request->getPost('location_id');
-//     $finishingId = $this->request->getPost('finishing_id') ?: null;
-//     $notes = $this->request->getPost('notes');
-//     $code = $this->request->getPost('code');
-
-//     if ($adjustmentType === 'in') {
-//         $stockData = [
-//             'product_id' => $productId,
-//             'quantity' => $quantity,
-//             'location_id' => $locationId,
-//             'finishing_id' => $finishingId,
-//             'label_code' => 'ADJ-' . date('YmdHis'),
-//             'status' => 'available',
-//         ];
-        
-//         $this->stProductModel->insert($stockData);
-//     } else {
-//         // For stock out, check available stock with finishing consideration
-//         $available = $this->stProductModel->getAvailableStockAtLocation($productId, $locationId, $finishingId);
-//         if ($available < $quantity) {
-//             return redirect()->back()->with('error', 'Insufficient stock available for this finishing type');
-//         }
-
-//         // Deduct from oldest stock first (FIFO) with finishing filter
-//         $batches = $this->stProductModel
-//             ->where('product_id', $productId)
-//             ->where('status', 'available')
-//             ->where('location_id', $locationId)
-//             ->where('finishing_id', $finishingId)
-//             ->orderBy('created_at', 'ASC')
-//             ->findAll();
-
-//         $remaining = $quantity;
-        
-//         foreach ($batches as $batch) {
-//             if ($remaining <= 0) break;
-            
-//             $deduct = min($batch['quantity'], $remaining);
-            
-//             $newQuantity = $batch['quantity'] - $deduct;
-            
-//             if ($newQuantity > 0) {
-//                 $this->stProductModel->update($batch['id'], ['quantity' => $newQuantity]);
-//             } else {
-//                 $this->stProductModel->delete($batch['id']);
-//             }
-            
-//             $remaining -= $deduct;
-//         }
-//     }
-//     $userInfo = $_SESSION['auth'];
-//     // Log movement with finishing information
-//     $movementData = [
-//         'product_id' => $productId,
-//         'quantity' => $quantity,
-//         'movement_type' => $adjustmentType === 'in' ? 'in' : 'out',
-//         'reference_type' => 'adjustment',
-//         'to_location' => $adjustmentType === 'in' ? $locationId : null,
-//         'from_location' => $adjustmentType === 'out' ? $locationId : null,
-//         'finishing_id' => $finishingId,
-//         'notes' => $notes ?? 'Manual adjustment',
-//         'code' => $code,
-//         'user_id' => $userInfo['id'],
-//     ];
-    
-//     $this->stMovementModel->logMovement($movementData);
-
-//     return redirect()->to("/productstock/view/$productId")->with('message', 'Stock adjusted successfully');
-// }
+   
 public function bookStock($productId)
 {
     // Load models
@@ -1216,117 +1063,51 @@ public function processBooking($productId)
 
 protected function getStockByLocation($productId)
 {
-    $locations = $this->locationModel->findAll();
-    $finishings = $this->finishingModel->where('id_product', $productId)->findAll();
-    $stockData = [];
+    // Query yang lebih efisien dengan mengurangi jumlah subquery
+    $query = "
+        WITH location_stock AS (
+            SELECT 
+                l.id as location_id,
+                l.name as location_name,
+                sp.finishing_id,
+                COALESCE(f.name, 'Standard') as finishing_name,
+                COALESCE(SUM(sp.quantity), 0) as current_stock,
+                COALESCE(SUM(CASE 
+                    WHEN sm.movement_type IN ('out', 'transfer') AND sm.from_location = l.id 
+                    THEN sm.quantity ELSE 0 
+                END), 0) as outgoing_stock,
+                COALESCE(SUM(CASE 
+                    WHEN sm.movement_type = 'booked' 
+                    AND (sm.status IS NULL OR sm.status != 'completed')
+                    AND sm.from_location = l.id
+                    THEN sm.quantity ELSE 0 
+                END), 0) as booked_stock
+            FROM locations l
+            CROSS JOIN (SELECT DISTINCT finishing_id FROM st_product WHERE product_id = ?) AS variants
+            LEFT JOIN st_product sp ON sp.location_id = l.id 
+                AND sp.product_id = ? 
+                AND sp.finishing_id = variants.finishing_id
+            LEFT JOIN st_movement sm ON sm.product_id = ? 
+                AND (sm.from_location = l.id OR sm.to_location = l.id)
+                AND sm.finishing_id = variants.finishing_id
+            LEFT JOIN finishing f ON f.id = variants.finishing_id
+            WHERE l.deleted_at IS NULL
+            GROUP BY l.id, l.name, sp.finishing_id, f.name
+        )
+        SELECT 
+            location_id,
+            location_name,
+            finishing_id,
+            finishing_name,
+            current_stock - outgoing_stock as current_stock,
+            booked_stock,
+            GREATEST(0, current_stock - outgoing_stock - booked_stock) as available_stock
+        FROM location_stock
+        WHERE current_stock > 0 OR booked_stock > 0 OR outgoing_stock > 0
+        ORDER BY location_name, finishing_name
+    ";
 
-    foreach ($locations as $location) {
-        $locationId = $location['id'];
-        
-        // Standard variant (no finishing)
-        $standardCurrent = (int)$this->stProductModel
-            ->where('product_id', $productId)
-            ->where('location_id', $locationId)
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        // Subtract outgoing stock movements (out and transfer out)
-        $outgoingStandard = (int)$this->stMovementModel
-            ->where('product_id', $productId)
-            ->where('from_location', $locationId)
-            ->groupStart()
-                ->where('movement_type', 'out')
-                ->orWhere('movement_type', 'transfer')
-            ->groupEnd()
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        $standardBooked = (int)$this->stMovementModel
-            ->where('product_id', $productId)
-            ->where('from_location', $locationId)
-            ->where('movement_type', 'booked')
-            ->where('status IS NULL OR status !=', 'completed')
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        $standardAvailable = max(0, $standardCurrent - $outgoingStandard - $standardBooked);
-
-        if ($standardCurrent > 0 || $standardBooked > 0 || $outgoingStandard > 0) {
-            $stockData[] = [
-                'location_id' => $locationId,
-                'location_name' => $location['name'],
-                'finishing_id' => null,
-                'finishing_name' => 'Standard',
-                'current_stock' => max(0, $standardCurrent - $outgoingStandard),
-                'booked_stock' => $standardBooked,
-                'available_stock' => $standardAvailable
-            ];
-        }
-
-        // Finishing variants
-        foreach ($finishings as $finishing) {
-            $finishingId = $finishing['id'];
-            
-            $finishingCurrent = (int)$this->stProductModel
-                ->where('product_id', $productId)
-                ->where('location_id', $locationId)
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            // Subtract outgoing stock movements for finishing
-            $outgoingFinishing = (int)$this->stMovementModel
-                ->where('product_id', $productId)
-                ->where('from_location', $locationId)
-                ->groupStart()
-                    ->where('movement_type', 'out')
-                    ->orWhere('movement_type', 'transfer')
-                ->groupEnd()
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            $finishingBooked = (int)$this->stMovementModel
-                ->where('product_id', $productId)
-                ->where('from_location', $locationId)
-                ->where('movement_type', 'booked')
-                ->where('status IS NULL OR status !=', 'completed')
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            $finishingAvailable = max(0, $finishingCurrent - $outgoingFinishing - $finishingBooked);
-
-            if ($finishingCurrent > 0 || $finishingBooked > 0 || $outgoingFinishing > 0) {
-                $stockData[] = [
-                    'location_id' => $locationId,
-                    'location_name' => $location['name'],
-                    'finishing_id' => $finishingId,
-                    'finishing_name' => $finishing['name'],
-                    'current_stock' => max(0, $finishingCurrent - $outgoingFinishing),
-                    'booked_stock' => $finishingBooked,
-                    'available_stock' => $finishingAvailable
-                ];
-            }
-        }
-    }
-
-    return $stockData;
+    return $this->db->query($query, [$productId, $productId, $productId])->getResultArray();
 }
 protected function getStockByLocationWithFinishing($productId, $finishingId)
 {

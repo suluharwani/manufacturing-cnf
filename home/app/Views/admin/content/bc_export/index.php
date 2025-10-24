@@ -73,10 +73,11 @@
                     <input class="form-control" type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls" required>
                     <div class="form-text">Format file harus .xlsx atau .xls</div>
                 </div>
+                <div id="importMessage" class="alert d-none"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="importButton">
                     <span id="importButtonText">Import</span>
                     <span id="importSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
@@ -92,9 +93,13 @@
         $('#importForm').submit(function(e) {
             e.preventDefault();
             
+            // Reset message
+            $('#importMessage').addClass('d-none').removeClass('alert-success alert-danger');
+            
             // Show loading state
             $('#importButtonText').text('Memproses...');
             $('#importSpinner').removeClass('d-none');
+            $('#importButton').prop('disabled', true);
             
             // Submit form via AJAX
             $.ajax({
@@ -103,15 +108,40 @@
                 data: new FormData(this),
                 processData: false,
                 contentType: false,
+                dataType: 'json',
                 success: function(response) {
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
+                    if (response.status === 'success') {
+                        $('#importMessage').removeClass('d-none').addClass('alert-success').html(
+                            '<i class="fa fa-check-circle me-2"></i>' + response.message
+                        );
+                        
+                        // Redirect setelah 2 detik
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 2000);
+                    } else {
+                        $('#importMessage').removeClass('d-none').addClass('alert-danger').html(
+                            '<i class="fa fa-exclamation-circle me-2"></i>' + response.message
+                        );
+                        resetButtonState();
                     }
                 },
-                error: function(xhr) {
-                    alert('Terjadi kesalahan: ' + xhr.responseText);
-                    $('#importButtonText').text('Import');
-                    $('#importSpinner').addClass('d-none');
+                error: function(xhr, status, error) {
+                    let errorMessage = 'Terjadi kesalahan saat mengupload file';
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        // Jika response bukan JSON, gunakan default message
+                    }
+                    
+                    $('#importMessage').removeClass('d-none').addClass('alert-danger').html(
+                        '<i class="fa fa-exclamation-circle me-2"></i>' + errorMessage
+                    );
+                    resetButtonState();
                 }
             });
         });
@@ -119,8 +149,14 @@
         // Reset form when modal is closed
         $('#importModal').on('hidden.bs.modal', function() {
             $('#importForm')[0].reset();
+            $('#importMessage').addClass('d-none');
+            resetButtonState();
+        });
+        
+        function resetButtonState() {
             $('#importButtonText').text('Import');
             $('#importSpinner').addClass('d-none');
-        });
+            $('#importButton').prop('disabled', false);
+        }
     });
 </script>
