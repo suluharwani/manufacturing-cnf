@@ -199,8 +199,8 @@ class DocReport extends BaseController
         }
 
         $data = $builder->select('proforma_invoice.*, customer.customer_name, currency.kode as currency_code')
-                       ->join('customer', 'customer.id = proforma_invoice.customer_id')
-                       ->join('currency', 'currency.id = proforma_invoice.id_currency')
+                       ->join('customer', 'customer.id = proforma_invoice.customer_id', 'left')
+                       ->join('currency', 'currency.id = proforma_invoice.id_currency', 'left')
                        ->orderBy('proforma_invoice.invoice_date', 'DESC')
                        ->orderBy('proforma_invoice.invoice_number', 'ASC')
                        ->findAll();
