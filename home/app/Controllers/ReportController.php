@@ -57,7 +57,7 @@ public function tracking($productId, $finishingId)
         ->findAll();
         
     $data['group'] = 'tracking';
-    $data['title'] = 'Tracking Product - ' . ($productData['nama'].'|'.$productData['finishing_name']?? 'Unknown');
+    $data['title'] = 'Tracking Product - ' . (($productData['nama'] ?? 'Unknown') . '|' . ($productData['finishing_name'] ?? 'Unknown'));
     $data['productId'] = $productId;
     $data['finishingId'] = $finishingId;
     $data['productData'] = $productData;

@@ -560,7 +560,7 @@ $routes->group('productstock', function($routes) {
     $routes->post('set-initial/(:num)', 'StockController::setInitialStock/$1',['filter' => 'accessControl:2']);
     $routes->post('adjust/(:num)', 'StockController::adjustStock/$1',['filter' => 'accessControl:2']);
     $routes->get('book/(:num)', 'StockController::bookStock/$1',['filter' => 'accessControl:2']);
-    $routes->post('process-booking/(:num)', 'StockController::processBooking/$1',['filter' => 'accessControl:2']);
+    $routes->post('process-booking/(:any)/(:any)', 'StockController::processBooking/$1/$2',['filter' => 'accessControl:2']);
     $routes->get('release/(:num)', 'StockController::releaseBooking/$1',['filter' => 'accessControl:2']);
     $routes->get('transfer/(:num)', 'StockController::transferStock/$1',['filter' => 'accessControl:2']);
     $routes->post('process-transfer/(:num)', 'StockController::processTransfer/$1',['filter' => 'accessControl:2']);

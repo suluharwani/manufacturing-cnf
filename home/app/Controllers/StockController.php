@@ -305,7 +305,6 @@ public function bookStock($productId)
 {
     // Load models
     $finishingModel = new \App\Models\FinishingModel();
-    $stMovementModel = new \App\Models\StMovementModel();
     
     // Get product data
     $product = $this->productModel->find($productId);
@@ -318,160 +317,83 @@ public function bookStock($productId)
     $locations = $this->locationModel->findAll();
     $proformaInvoices = $this->PiModel->findAll();
     
-    // Prepare stock data with proper calculations
+    // Query langsung dari st_product dengan finishing_id
+    $db = \Config\Database::connect();
+    
     $stockData = [];
-    foreach ($locations as $location) {
-        $locationId = $location['id'];
+    
+    $stockQuery = $db->query("
+        SELECT 
+            sp.location_id,
+            sp.finishing_id,
+            sp.quantity,
+            l.name as location_name,
+            f.name as finishing_name
+        FROM st_product sp
+        LEFT JOIN locations l ON sp.location_id = l.id
+        LEFT JOIN finishing f ON sp.finishing_id = f.id
+        WHERE sp.product_id = ?
+        AND sp.finishing_id IS NOT NULL
+        AND sp.quantity > 0
+    ", [$productId]);
+    
+    $existingStocks = $stockQuery->getResultArray();
+    
+    foreach ($existingStocks as $stock) {
+        $locationId = $stock['location_id'];
+        $finishingId = $stock['finishing_id'];
+        $finishingName = $stock['finishing_name'];
         
-        // Standard variant (no finishing)
-        $standardCurrent = (int)$this->stProductModel
-            ->where('product_id', $productId)
-            ->where('location_id', $locationId)
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        // Subtract outgoing stock movements (out and transfer out)
-        $outgoingStandard = (int)$this->stMovementModel
-            ->where('product_id', $productId)
-            ->where('from_location', $locationId)
-            ->groupStart()
-                ->where('movement_type', 'out')
-                ->orWhere('movement_type', 'transfer')
-            ->groupEnd()
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        $standardBooked = (int)$this->stMovementModel
-            ->where('product_id', $productId)
-            ->where('from_location', $locationId)
-            ->where('movement_type', 'booked')
-            ->where('status IS NULL OR status !=', 'completed')
-            ->where('finishing_id IS NULL')
-            ->selectSum('quantity')
-            ->get()
-            ->getRow()
-            ->quantity ?? 0;
-
-        $standardAvailable = max(0, $standardCurrent - $outgoingStandard - $standardBooked);
-
-        if ($standardCurrent > 0 || $standardBooked > 0 || $outgoingStandard > 0) {
-            $stockData[] = [
-                'location_id' => $locationId,
-                'location_name' => $location['name'],
-                'finishing_id' => null,
-                'finishing_name' => 'Standard',
-                'current_stock' => max(0, $standardCurrent - $outgoingStandard),
-                'booked_stock' => $standardBooked,
-                'available_stock' => $standardAvailable
-            ];
+        // Skip jika finishing_name kosong
+        if (empty($finishingName)) {
+            continue;
         }
+        
+        $currentStock = (int)$stock['quantity'];
+        
+        // Hitung outgoing stock
+        $outgoingQuery = $db->query("
+            SELECT COALESCE(SUM(quantity), 0) as outgoing_stock 
+            FROM st_movement 
+            WHERE product_id = ? 
+            AND from_location = ? 
+            AND finishing_id = ?
+            AND movement_type IN ('out', 'transfer')
+        ", [$productId, $locationId, $finishingId]);
+        
+        $outgoingStock = (int)$outgoingQuery->getRow()->outgoing_stock;
+        
+        // Hitung booked stock
+        $bookedQuery = $db->query("
+            SELECT COALESCE(SUM(quantity), 0) as booked_stock 
+            FROM st_movement 
+            WHERE product_id = ? 
+            AND from_location = ? 
+            AND finishing_id = ?
+            AND movement_type = 'booked'
+            AND (status IS NULL OR status != 'completed')
+        ", [$productId, $locationId, $finishingId]);
+        
+        $bookedStock = (int)$bookedQuery->getRow()->booked_stock;
+        
+        $netCurrentStock = max(0, $currentStock - $outgoingStock);
+        $availableStock = max(0, $netCurrentStock - $bookedStock);
+        
 
-        // Finishing variants
-        foreach ($finishings as $finishing) {
-            $finishingId = $finishing['id'];
-            
-            $finishingCurrent = (int)$this->stProductModel
-                ->where('product_id', $productId)
-                ->where('location_id', $locationId)
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            // Subtract outgoing stock movements for finishing
-            $outgoingFinishing = (int)$this->stMovementModel
-                ->where('product_id', $productId)
-                ->where('from_location', $locationId)
-                ->groupStart()
-                    ->where('movement_type', 'out')
-                    ->orWhere('movement_type', 'transfer')
-                ->groupEnd()
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            $finishingBooked = (int)$this->stMovementModel
-                ->where('product_id', $productId)
-                ->where('from_location', $locationId)
-                ->where('movement_type', 'booked')
-                ->where('status IS NULL OR status !=', 'completed')
-                ->where('finishing_id', $finishingId)
-                ->selectSum('quantity')
-                ->get()
-                ->getRow()
-                ->quantity ?? 0;
-
-            $finishingAvailable = max(0, $finishingCurrent - $outgoingFinishing - $finishingBooked);
-
-            if ($finishingCurrent > 0 || $finishingBooked > 0 || $outgoingFinishing > 0) {
-                $stockData[] = [
-                    'location_id' => $locationId,
-                    'location_name' => $location['name'],
-                    'finishing_id' => $finishingId,
-                    'finishing_name' => $finishing['name'],
-                    'current_stock' => max(0, $finishingCurrent - $outgoingFinishing),
-                    'booked_stock' => $finishingBooked,
-                    'available_stock' => $finishingAvailable
-                ];
-            }
-        }
     }
 
     $data = [
-        'title' => 'Book Stock',
+        'title' => 'Book Stock - ' . ($product['nama'] ?? 'Unknown Product'),
         'product' => $product,
         'finishings' => $finishings,
         'locations' => $locations,
         'proformaInvoices' => $proformaInvoices,
-        'stockData' => $stockData,
         'validation' => \Config\Services::validation()
     ];
 
     $data['content'] = view('admin/content/product_stock_book', $data);
     return view('admin/index', $data);
 }
-
-    // Process Booking
-// public function processBooking($productId)
-// {
-//     $rules = [
-//         'quantity' => 'required|numeric|greater_than[0]',
-//         'pi_id' => 'required|numeric',
-//         'location_id' => 'required|numeric', // Added location validation
-//         'notes' => 'permit_empty|string|max_length[500]'
-//     ];
-
-//     if (!$this->validate($rules)) {
-//         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-//     }
-
-//     $quantity = $this->request->getPost('quantity');
-//     $piId = $this->request->getPost('pi_id');
-//     $locationId = $this->request->getPost('location_id'); // Get location ID
-//     $notes = $this->request->getPost('notes');
-
-//     // Check available stock at SPECIFIC location
-//     $available = $this->stMovementModel->getAvailableStockAtLocation($productId, $locationId);
-    
-//     if ($available < $quantity) {
-//         return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
-//     }
-
-//     // Pass location ID to bookStock
-//     $this->stMovementModel->bookStock($productId, $quantity, $piId, $locationId, $notes);
-
-//     return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
-// }
-    // Release Booked Stock
     public function releaseBooking($bookingId)
     {
         $booking = $this->stMovementModel->find($bookingId);
@@ -969,26 +891,35 @@ public function processTransfer($productId)
 }
 
 // Similarly update processBooking method
-public function processBooking($productId)
+public function processBooking($productId, $finishingId = 0)
 {
+    // Validasi input
     $rules = [
         'quantity' => 'required|numeric|greater_than[0]',
         'pi_id' => 'required|numeric',
         'location_id' => 'required|numeric',
-        'finishing_id' => 'permit_empty|numeric',
         'notes' => 'permit_empty|string|max_length[500]'
     ];
 
     if (!$this->validate($rules)) {
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
         return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
     }
 
     $quantity = $this->request->getPost('quantity');
     $piId = $this->request->getPost('pi_id');
     $locationId = $this->request->getPost('location_id');
-    $finishingId = $this->request->getPost('finishing_id');
     $notes = $this->request->getPost('notes');
+    
+    // Konversi finishingId ke null jika 0
+    $finishingId = $finishingId == 0 ? null : $finishingId;
 
+    // Cek ketersediaan stock
     $available = $this->stMovementModel->getAvailableStockAtLocation(
         $productId, 
         $locationId,
@@ -996,19 +927,48 @@ public function processBooking($productId)
     );
     
     if ($available < $quantity) {
-        return redirect()->back()->withInput()->with('error', 'Not enough available stock at selected location');
+        $errorMessage = 'Not enough available stock at selected location. Available: ' . $available;
+        
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => [$errorMessage]
+            ]);
+        }
+        return redirect()->back()->withInput()->with('error', $errorMessage);
     }
 
-    $this->stMovementModel->bookStock(
-        $productId, 
-        $quantity, 
-        $piId, 
-        $locationId, 
-        $notes,
-        $finishingId
-    );
+    try {
+        // Proses booking
+        $this->stMovementModel->bookStock(
+            $productId,  
+            $quantity, 
+            $piId, 
+            $locationId, 
+            $finishingId,
+            $notes
+        );
 
-    return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Stock booked successfully'
+            ]);
+        }
+
+        return redirect()->to("/productstock/view/$productId")->with('message', 'Stock booked successfully');
+        
+    } catch (\Exception $e) {
+        $errorMessage = 'Booking failed: ' . $e->getMessage();
+        
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'errors' => [$errorMessage]
+            ]);
+        }
+        return redirect()->back()->withInput()->with('error', $errorMessage);
+    }
 }
  public function view($productId)
     {
