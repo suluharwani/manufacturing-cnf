@@ -712,7 +712,8 @@ function exportToPdf(reportType, startDate, endDate, column, data) {
 }
 // Fungsi untuk export ke Excel
 
-function exportToExcel(reportType, startDate, endDate,column, data) {
+// Fungsi untuk export ke Excel
+function exportToExcel(reportType, startDate, endDate, column, data) {
     // Define columns for each report type
     const columns = {
         1: ['No','Tgl Rekam', 'Jenis Dokumen BC 2.0 BC 2.4 BC 2.5 BC 2.8','Pabean Nomor','Tanggal','Kode HS','Nomor Seri Barang','Bukti Penerimaan Nomor','Tanggal','Kode BB', 'Nama Barang','Satuan','Jumlah','Mata Uang','Nilai Barang','Gudang','Penerima Subkontrak', 'Negara Asal BB'],
@@ -740,7 +741,28 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
     const fileName = `${title}_${startDate}_to_${endDate}.xlsx`;
     const reportColumns = columns[reportType];
     
-    // Siapkan data
+    // Fungsi untuk menghilangkan tag HTML
+    const stripHtmlTags = (htmlString) => {
+        if (!htmlString || typeof htmlString !== 'string') return htmlString || '-';
+        
+        // Create a temporary div element
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlString;
+        
+        // Return the text content
+        return tempDiv.textContent || tempDiv.innerText || htmlString;
+    };
+    
+    // Process data to remove HTML tags
+    const processedData = data && data.length > 0 ? data.map(row => {
+        const processedRow = {};
+        Object.keys(row).forEach(key => {
+            processedRow[key] = stripHtmlTags(row[key]);
+        });
+        return processedRow;
+    }) : [];
+    
+    // Siapkan data untuk Excel
     const excelData = [
         ['KEMENTERIAN KEUANGAN REPUBLIK INDONESIA'],
         ['DIREKTORAT JENDERAL BEA DAN CUKAI'],
@@ -748,16 +770,19 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
         [`Periode: ${startDate} s/d ${endDate}`],
         ['Berdasarkan PER-5/BC/2023 tentang Tata Laksana Monitoring dan Evaluasi'],
         [''],
-        reportColumns // Use the columns we defined
+        reportColumns // Header kolom
     ];
     
-    // Add data rows
-    if (data && data.length > 0) {
-        data.forEach((row, index) => {
-            const rowData = [index + 1];
+    // Add data rows yang sudah diproses (tanpa HTML)
+    if (processedData.length > 0) {
+        processedData.forEach((row, index) => {
+            const rowData = [index + 1]; // Nomor urut
             Object.values(row).forEach(val => rowData.push(val || '-'));
             excelData.push(rowData);
         });
+    } else {
+        // Jika tidak ada data
+        excelData.push(['Tidak ada data untuk periode ini']);
     }
     
     // Buat worksheet
@@ -776,7 +801,7 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
         { s: { r: 4, c: 0 }, e: { r: 4, c: reportColumns.length - 1 } }
     ];
     
-    // Style header row
+    // Style header row (baris ke-6 karena ada 6 baris header sebelumnya)
     for (let i = 0; i < reportColumns.length; i++) {
         const cellAddress = XLSX.utils.encode_cell({ r: 6, c: i });
         if (!ws[cellAddress]) continue;
@@ -786,6 +811,22 @@ function exportToExcel(reportType, startDate, endDate,column, data) {
             alignment: { horizontal: 'center' }
         };
     }
+    
+    // Style untuk judul
+    const titleCells = [
+        { r: 0, c: 0 }, { r: 1, c: 0 }, { r: 2, c: 0 }, 
+        { r: 3, c: 0 }, { r: 4, c: 0 }
+    ];
+    
+    titleCells.forEach(cellPos => {
+        const cellAddress = XLSX.utils.encode_cell(cellPos);
+        if (ws[cellAddress]) {
+            ws[cellAddress].s = {
+                font: { bold: true },
+                alignment: { horizontal: 'center' }
+            };
+        }
+    });
     
     // Buat workbook
     const wb = XLSX.utils.book_new();
