@@ -209,7 +209,11 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
         pd.jumlah AS jumlah,
         c.kode AS mata_uang,
         (pd.harga * pd.jumlah) AS nilai_barang,
-        'Gudang Utama' AS gudang,
+        CASE 
+            WHEN md.kite = 'KITE' THEN 'Gudang Kite'
+            WHEN md.kite = 'NON KITE' THEN 'Gudang Lokal'
+            ELSE 'Gudang Utama'
+        END AS gudang,
         NULL AS penerima_subkontrak,
         country.country_name AS negara_asal_bb
     ");
@@ -312,7 +316,7 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
         sm.quantity as jumlah,
         'Produksi' as dari_produksi,
         'Tidak' as dari_subkontrak,
-        'Gudang Utama' as gudang,
+        'Finished Goods Storage' as gudang,
     ");
     
     $builder->join('product p', 'sm.product_id = p.id', 'inner');
@@ -451,7 +455,7 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
                 'pemasukan' => $saldomasuk,
                 'pengeluaran' => $saldokeluar,
                 'saldo_akhir' => $saldoAkhir,
-                'gudang' => 'Logistik',
+                'gudang' => 'Gudang Kite',
                 'periode' => $periode
             ];
         }
