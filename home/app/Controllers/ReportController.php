@@ -47,10 +47,13 @@ public function tracking($productId, $finishingId)
             proforma_invoice_details.unit,
             proforma_invoice_details.unit_price,
             customer.customer_name,
-            proforma_invoice.peb
+            proforma_invoice.peb,
+            bc_e_header.nomor_daftar,
+            bc_e_header.id as bc_e_id,
         ')
         ->join('proforma_invoice_details', 'proforma_invoice.id = proforma_invoice_details.invoice_id')
         ->join('customer', 'proforma_invoice.customer_id = customer.id')
+        ->join('bc_e_header', 'bc_e_header.nomor_daftar = proforma_invoice.peb', 'left')
         ->where('proforma_invoice_details.id_product', $productId)
         ->where('proforma_invoice_details.finishing_id', $finishingId)
         ->orderBy('proforma_invoice.invoice_date', 'DESC')
@@ -1020,8 +1023,9 @@ public function getPiHistoryByDate()
     $db = \Config\Database::connect();
     
     $builder = $db->table('pembelian_detail pd');
-    $builder->select('p.id, p.invoice, p.tanggal_nota, p.id_supplier, pd.jumlah, pd.harga, pd.diskon1, pd.diskon2, pd.diskon3, pd.pajak, pd.potongan, (pd.jumlah * pd.harga) as subtotal, p.posting, p.document, p.jenis_doc, p.created_at');
+    $builder->select('p.id, p.invoice, p.tanggal_nota, p.id_supplier, pd.jumlah, pd.harga, pd.diskon1, pd.diskon2, pd.diskon3, pd.pajak, pd.potongan, (pd.jumlah * pd.harga) as subtotal, p.posting, p.document, p.jenis_doc, p.created_at, bc_i_header.nomor_aju');
     $builder->join('pembelian p', 'pd.id_pembelian = p.id');
+    $builder->join('bc_i_header', 'bc_i_header.nomor_daftar = p.document', 'left');
     $builder->where('pd.id_material', $id_material);
     $builder->where('pd.deleted_at IS NULL', null, false);
     $builder->where('p.deleted_at IS NULL', null, false);

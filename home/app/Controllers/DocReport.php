@@ -129,8 +129,9 @@ class DocReport extends BaseController
             $builder->where('id_supplier', $supplier);
         }
 
-        $data = $builder->select('pembelian.*, supplier.supplier_name')
+        $data = $builder->select('pembelian.*, supplier.supplier_name, bc_i_header.nomor_aju')
                        ->join('supplier', 'supplier.id = pembelian.id_supplier')
+                       ->join('bc_i_header', 'bc_i_header.nomor_daftar = pembelian.document', 'left')
                        ->orderBy('pembelian.tanggal_nota', 'DESC')
                        ->orderBy('pembelian.invoice', 'ASC')
                        ->findAll();

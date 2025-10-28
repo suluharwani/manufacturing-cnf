@@ -61,9 +61,9 @@
             <!-- Header dengan judul dan tombol kembali -->
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="mb-0">Detail BC Import - <?= $header['nomor_aju'] ?? 'N/A' ?></h4>
-                <a href="<?= base_url('bc-import') ?>" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Kembali ke Daftar
-                </a>
+                <a href="javascript:void(0);" onclick="history.back()" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Kembali
+</a>
             </div>
 
             <!-- Alert untuk error -->
@@ -462,9 +462,9 @@
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="d-flex justify-content-end">
-                        <a href="<?= base_url('bc-import') ?>" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Daftar
-                        </a>
+                        <a href="javascript:void(0);" onclick="history.back()" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Kembali
+</a>
                     </div>
                 </div>
             </div>

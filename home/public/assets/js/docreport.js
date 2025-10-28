@@ -290,21 +290,20 @@ function generateTableRow(documentType, item, index) {
 
         case 'grn':
             return `
-                <td>${index + 1}</td>
-                <td><strong>${item.invoice || '-'}</strong></td>
-                <td><strong>${item.document || '-'}</strong></td>
-                <td>${formatDate(item.tanggal_nota)}</td>
-                <td>${item.supplier_name || '-'}</td>
-               <td>${item.posting == 1 ? '<span class="badge bg-success">Posted</span>' : '<span class="badge bg-danger">Draft</span>'}</td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-print" onclick="printSingleDocument('pembelian/printGRN/', ${item.id})" title="Cetak">
-                            <i class="fas fa-print"></i>
-                        </button>
-
-                    </div>
-                </td>
-            `;
+    <td>${index + 1}</td>
+    <td><strong>${item.invoice || '-'}</strong></td>
+    <td><strong><a href="${base_url}/bc-import/detail/${item.nomor_aju}">${item.document || '-'}</a></strong></td>
+    <td>${formatDate(item.tanggal_nota)}</td>
+    <td>${item.supplier_name || '-'}</td>
+    <td>${item.posting == 1 ? '<span class="badge bg-success">Posted</span>' : '<span class="badge bg-danger">Draft</span>'}</td>
+    <td>
+        <div class="btn-group btn-group-sm">
+            <button class="btn btn-print" onclick="printSingleDocument('pembelian/printGRN/', ${item.id})" title="Cetak">
+                <i class="fas fa-print"></i>
+            </button>
+        </div>
+    </td>
+`;
 
         case 'proforma':
             return `

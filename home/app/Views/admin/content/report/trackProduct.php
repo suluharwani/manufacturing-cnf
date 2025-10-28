@@ -99,7 +99,7 @@
                                         </a>
                                     </td>
                                     <td><?= $pi['invoice_date'] ?></td>
-                                    <td><?= $pi['peb'] ?></td>
+                                    <td><a href="<?=base_url('bc-export/detail/').$pi['bc_e_id']?>"><?= $pi['peb'] ?></a></td>
                                     <td><?= $pi['customer_name'] ?></td>
                                     <td><?= $pi['quantity'] ?> <?= $pi['unit'] ?></td>
                                     <td><?= number_format($pi['unit_price'], 2) ?></td>
@@ -335,21 +335,21 @@ function viewMaterialHistory(materialId, materialName) {
             `;
 
             data.forEach(row => {
-                table += `
-                    <tr>
-                        <td>${row.invoice}</td>
-                        <td>${row.document || '-'}</td>
-                        <td>${row.jenis_doc || '-'}</td>
-                        <td class="text-end">${row.jumlah}</td>
-                        <td>${row.tanggal_nota}</td>
-                        <td class="text-center">
-                            <a href="<?= base_url('pembelian/printGRN/') ?>${row.id}" class="btn btn-sm btn-primary" target="_blank">
-                                <i class="fas fa-edit"></i> Detail
-                            </a>
-                        </td>
-                    </tr>
-                `;
-            });
+    table += `
+        <tr>
+            <td>${row.invoice}</td>
+            <td><a href="<?=base_url("bc-import/detail")?>/${row.nomor_aju}">${row.document}</a></td>
+            <td>${row.jenis_doc || '-'}</td>
+            <td class="text-end">${row.jumlah}</td>
+            <td>${row.tanggal_nota}</td>
+            <td class="text-center">
+                <a href="<?= base_url('pembelian/printGRN/') ?>${row.id}" class="btn btn-sm btn-primary" target="_blank">
+                    <i class="fas fa-edit"></i> Detail
+                </a>
+            </td>
+        </tr>
+    `;
+});
 
             table += `
                         </tbody>
