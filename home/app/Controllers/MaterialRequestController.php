@@ -238,6 +238,14 @@ class MaterialRequestController extends BaseController
         }
     }
     public function printPR($id){
+        while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Set headers explicitly
+    header('Content-Type: application/pdf');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    
         // Konfigurasi opsi Dompdf
         $mdl = new \App\Models\MdlMaterialRequest();
         $data['pr'] = $mdl->select('department.name as department, material_request.*,proforma_invoice.invoice_number as pi, work_order.kode as wo')
