@@ -241,7 +241,14 @@ public function mr(){
     return view('admin/index', $data);
 }    
 public function printPo($id){
-    // Konfigurasi opsi Dompdf
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // Set headers explicitly
+    header('Content-Type: application/pdf');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+        // Konfigurasi opsi Dompdf
     $mdl = new \App\Models\MdlPurchaseOrder();
     $data['po'] = $mdl->select('
         purchase_order.*,
