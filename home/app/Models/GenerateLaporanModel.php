@@ -10,7 +10,7 @@ class GenerateLaporanModel extends Model
     public function generateAllLaporan($p, $end)
     {
         // Format periode untuk laporan harian dan bulanan
-        $periode = $end;
+        $periode = $p;
         $startDate = $p;
         $endDate = $end;
     
@@ -29,7 +29,7 @@ class GenerateLaporanModel extends Model
         $results['pengeluaran_hasil_produksi'] = $this->generatePengeluaranHasilProduksiWithCheck($startDate, $endDate);
 
         // 5. Mutasi Bahan Baku (periode bulanan)
-        $results['mutasi_bahan_baku'] = $this->generateMutasiBahanBakuWithCheck($periode,$startDate, $endDate);
+        $results['mutasi_bahan_baku'] = $this->generateMutasiBahanBakuWithCheck($startDate, $endDate);
 
         // 6. Mutasi Hasil Produksi (periode bulanan)
         $results['mutasi_hasil_produksi'] = $this->generateMutasiHasilProduksiWithCheck($periode, $startDate, $endDate);
@@ -123,25 +123,14 @@ class GenerateLaporanModel extends Model
         ];
     }
 
-    public function generateMutasiBahanBakuWithCheck($periode,$startDate, $endDate)
+    public function generateMutasiBahanBakuWithCheck($startDate, $endDate)
     {
-        $exists = $this->db->table('laporan_mutasi_bahan_baku')
-            ->where('periode', $periode)
-            ->countAllResults();
 
-        if ($exists > 0) {
-            return [
-                'status' => 'skipped',
-                'message' => 'Data laporan mutasi bahan baku untuk periode ini sudah ada',
-                'count' => 0
-            ];
-        }
-
-        $count = $this->generateMutasiBahanBaku($periode,$startDate, $endDate);
+        $this->generateMutasiBahanBaku($startDate, $endDate);
         return [
             'status' => 'generated',
             'message' => 'Berhasil generate laporan mutasi bahan baku',
-            'count' => $count
+   
         ];
     }
 
@@ -419,55 +408,146 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
 }
 
     // Model untuk laporan mutasi bahan baku
-    public function generateMutasiBahanBaku($periode,$startDate, $endDate)
-    {
-        // Pertama, hapus data lama untuk periode yang sama
-        $this->db->table('laporan_mutasi_bahan_baku')->where('periode', $periode)->delete();
+public function generateMutasiBahanBaku($startDate, $endDate)
+{
+    // Pertama, hapus data lama untuk periode yang sama
+    $this->db->table('laporan_mutasi_bahan_baku')
+        ->where('periode >=', $startDate)
+        ->where('periode <=', $endDate)
+        ->delete();
 
-        // Ambil semua material
-        $materials = $this->db->table('materials')
-            ->select('materials.id as material_id, materials.kode as kode, materials.name as name')
-            ->join('materials_detail md', 'md.material_id = materials.id', 'left')
-            ->where('md.kite', 'KITE')
-            ->get()
-            ->getResultArray();
-
-        $records = [];
- 
-
-        foreach ($materials as $material) {
-            // Hitung saldo awal (dari bulan sebelumnya)
-            $saldo = $this->getSaldoBahanBaku($material['material_id']);
-            // Hitung saldo akhir
-            $saldoawal = $saldo['stock_awal'] ?? 0;
-            $saldomasuk = $saldo['stock_masuk'] ?? 0;
-            $saldokeluar = $saldo['stock_keluar'] ?? 0;
+    // Query untuk mengambil semua riwayat IN dan OUT
+    $query = "
+        SELECT 
+            NULL as id, 
+            material_id,
+            kode_barang,
+            nama_barang,
+            satuan,
+            CAST(0.00 as DECIMAL(12,2)) as saldo_awal,
+            CAST(CASE WHEN jenis = 'IN' THEN jumlah ELSE 0.00 END as DECIMAL(12,2)) as pemasukan,
+            CAST(CASE WHEN jenis = 'OUT' THEN jumlah ELSE 0.00 END as DECIMAL(12,2)) as pengeluaran,
+            CAST(0.00 as DECIMAL(12,2)) as saldo_akhir,
+            gudang,
+            ? as periode,
+            CURRENT_TIMESTAMP as created_at,
+            jenis,
+            tanggal_transaksi,
+            CAST(jumlah as DECIMAL(20,6)) as jumlah
+        FROM (
+            -- DATA IN dari PEMBELIAN
+            SELECT 
+                pd.id_material as material_id,
+                m.kode as kode_barang,
+                m.name as nama_barang,
+                COALESCE(sat.kode) as satuan,
+                'IN' as jenis,
+                pd.created_at as tanggal_transaksi,
+                pd.jumlah as jumlah,
+                'Gudang Kite' as gudang,
+                'PEMBELIAN' as sumber
+            FROM pembelian_detail pd
+            JOIN materials m ON pd.id_material = m.id
+            JOIN materials_detail md ON md.material_id = m.id
+            JOIN satuan sat ON md.satuan_id = sat.id
+            WHERE pd.created_at BETWEEN ? AND ?
+            AND md.kite = 'KITE'
+            AND pd.jumlah > 0
             
-            $saldoAkhir = $saldoawal + $saldomasuk - $saldokeluar;
+            UNION ALL
             
+            SELECT 
+                s.id_material as material_id,
+                m.kode as kode_barang,
+                m.name as nama_barang,
+                COALESCE(sat.kode) as satuan,
+                'IN' as jenis,
+                COALESCE(s.tanggal_stock_awal, s.created_at) as tanggal_transaksi,
+                s.stock_awal as jumlah,
+                'Gudang Kite' as gudang,
+                'STOCK_AWAL' as sumber
+            FROM stock s
+            JOIN materials m ON s.id_material = m.id
+            JOIN materials_detail md ON md.material_id = m.id
+            JOIN satuan sat ON md.satuan_id = sat.id
+            WHERE (s.created_at BETWEEN ? AND ?
+               OR s.tanggal_stock_awal BETWEEN ? AND ?)
+            AND md.kite = 'KITE'
+            AND s.stock_awal > 0
+            
+            UNION ALL
+            SELECT 
+                mrp.id_material as material_id,
+                m.kode as kode_barang,
+                m.name as nama_barang,
+                COALESCE(sat.kode, 'PCS') as satuan,
+                'OUT' as jenis,
+                mrp.created_at as tanggal_transaksi,
+                mrp.jumlah as jumlah,
+                'Gudang Kite' as gudang,
+                'PENGELUARAN' as sumber
+            FROM material_requisition_progress mrp
+            JOIN materials m ON mrp.id_material = m.id
+            JOIN materials_detail md ON md.material_id = m.id
+            JOIN satuan sat ON md.satuan_id = sat.id
+            WHERE mrp.created_at BETWEEN ? AND ?
+            AND md.kite = 'KITE'
+            AND mrp.jumlah > 0
+        ) AS riwayat_mutasi
+        ORDER BY material_id, tanggal_transaksi, jenis
+    ";
 
-            $records[] = [
-                'material_id' => $material['material_id'],
-                'kode_barang' => $material['kode'],
-                'nama_barang' => $material['name'],
-                'satuan' => $satuan['nama'] ?? 'PCS',
-                'saldo_awal' => $saldoawal,
-                'pemasukan' => $saldomasuk,
-                'pengeluaran' => $saldokeluar,
-                'saldo_akhir' => $saldoAkhir,
-                'gudang' => 'Gudang Kite',
-                'periode' => $periode
-            ];
-        }
-        // var_dump($records);
-        // die();
-        if (!empty($records)) {
-            $this->db->table('laporan_mutasi_bahan_baku')->insertBatch($records);
-            return count($records);
-        }
+    // Parameter untuk binding
+    $endDateTime = $endDate . ' 23:59:59';
+    $params = [
+        $startDate,                    // periode
+        $startDate, $endDateTime,      // pembelian_detail
+        $startDate, $endDateTime,      // stock created_at
+        $startDate, $endDateTime,      // stock tanggal_stock_awal  
+        $startDate, $endDateTime       // material_requisition_progress
+    ];
 
-        return 0;
+    // Eksekusi query
+    $result = $this->db->query($query, $params)->getResultArray();
+
+    // Debug: Tampilkan hasil query
+    echo "=== DEBUG: HASIL QUERY ===\n";
+    echo "Jumlah records: " . count($result) . "\n";
+    if (!empty($result)) {
+        echo "Sample data:\n";
+        foreach (array_slice($result, 0, 5) as $index => $row) {
+            echo ($index + 1) . ". {$row['kode_barang']} - {$row['nama_barang']} [{$row['jenis']}]: {$row['jumlah']} pada {$row['tanggal_transaksi']}\n";
+        }
     }
+
+    if (!empty($result)) {
+        // Insert batch ke tabel laporan_mutasi_bahan_baku
+        $this->db->table('laporan_mutasi_bahan_baku')->insertBatch($result);
+        
+        // Juga buat summary record untuk setiap material
+        
+        return count($result);
+    }
+
+    return 0;
+}
+
+
+// Fungsi helper untuk mendapatkan saldo bahan baku berdasarkan periode
+private function getSaldoBahanBaku1($materialId, $startDate)
+{
+    // Ambil saldo akhir dari periode sebelumnya
+    $previousPeriod = date('Y-m-d', strtotime($startDate . ' -1 month'));
+    
+    return $this->db->table('stock')
+        ->select('stock_awal, stock_masuk, stock_keluar')
+        ->where('id_material', $materialId)
+        ->where('DATE(created_at) <', $startDate)
+        ->orderBy('created_at', 'DESC')
+        ->limit(1)
+        ->get()
+        ->getRowArray();
+}
     private function getSaldoBahanBaku($materialId)
     {
 

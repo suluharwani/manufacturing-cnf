@@ -12,7 +12,7 @@ class MdlStock extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','id_material','stock_awal','stock_masuk','stock_keluar','selisih_stock_opname','price','id_currency','created_at','updated_at','deleted_at'];
+    protected $allowedFields    = ['id','id_material','stock_awal','stock_masuk','stock_keluar','selisih_stock_opname','price','id_currency','created_at','updated_at','deleted_at','tanggal_stock_awal'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

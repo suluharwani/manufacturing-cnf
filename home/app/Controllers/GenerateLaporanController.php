@@ -86,7 +86,7 @@ public function generateAll()
     $end = $this->request->getPost('end');
     
     $results = $this->generateLaporanModel->generateAllLaporan($periode,$end);
-    
+
     // Format hasil untuk ditampilkan
     $messages = [];
     $totalGenerated = 0;
@@ -94,12 +94,11 @@ public function generateAll()
     foreach ($results as $key => $result) {
         $messages[] = [
             'type' => $result['status'] === 'generated' ? 'success' : 'info',
-            'message' => ucwords(str_replace('_', ' ', $key)) . ': ' . $result['message'] . 
-                        ($result['count'] > 0 ? ' (' . $result['count'] . ' records)' : '')
+           
         ];
         
         if ($result['status'] === 'generated') {
-            $totalGenerated += $result['count'];
+ 
         }
     }
     
@@ -150,7 +149,7 @@ public function generateAll()
                 break;
                 
             case 'mutasi_bahan_baku':
-                $count = $this->generateLaporanModel->generateMutasiBahanBaku($startDate);
+                $count = $this->generateLaporanModel->generateMutasiBahanBaku($startDate, $endDate);
                 $message = "Berhasil generate $count data laporan mutasi bahan baku untuk periode $startDate";
                 break;
                 

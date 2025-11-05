@@ -789,7 +789,8 @@ public function deleteMovement($id)
                 'stock_keluar' => 0,
                 'selisih_stock_opname' => 0,
                 'id_currency' => $currencyId,
-                'updated_at' => date('Y-m-d H:i:s')
+                'updated_at' => date('Y-m-d H:i:s'),
+                'tanggal_stock_awal' => date('Y-m-d H:i:s'),
             ];
 
             if ($existingStock) {
