@@ -284,6 +284,9 @@ protected function getMutasiBahanBaku($startDate, $endDate)
         
         // Buat kode_barang menjadi link tracking
         $row['kode_barang'] = '<a href="trackmaterial/' . $row['material_id'] . '/' . $startDate . '/' . $endDate . '">' . $row['kode_barang'] . '</a>';
+        
+        // Hapus material_id dari hasil
+        unset($row['material_id']);
     }
     
     return $results;
