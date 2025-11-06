@@ -1041,4 +1041,24 @@ public function document(){
     $data['content'] = view('admin/content/report/document', $data);
     return view('admin/index', $data);
 }
+public function trackmaterial($id_material, $start_date, $end_date){
+    // Format start_date jam 00:00:00 dan end_date jam 23:59:59
+    $params['material_id'] = $id_material;
+    $params['start_date']  = date('Y-m-d 00:00:00', strtotime($start_date));
+    $params['end_date']    = date('Y-m-d 23:59:59', strtotime($end_date));
+
+    $data['params'] = $params;
+    $data['opening_balance'] = $this->openingBalance($params);
+    $data['balance_before'] = $this->balanceBefore($params);
+    $data['destruction'] = $this->materialDestruction($params);
+    $data['pembelian'] = $this->materialPurchase($params);
+    $data['return'] = $this->materialReturn($params);
+    $data['stock_opname'] = $this->materialStockOpname($params);
+    $data['material_requisition'] = $this->materialRequisition($params);
+    $data['merge'] = $this->sortByDate(array_merge($data['opening_balance'], $data['pembelian'], $data['material_requisition'], $data['return'], $data['destruction'], $data['stock_opname']));
+    $data['title'] = "Report Material Tracking";
+    $data['content'] = view('admin/content/report/trackmaterial', $data);
+    
+    return view('admin/index', $data);
+}
 }

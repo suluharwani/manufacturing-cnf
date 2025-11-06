@@ -99,7 +99,10 @@ protected function getPemasukanBahanBaku($startDate, $endDate)
          penerima_subkontrak, 
          negara_asal_bb
     ");
+    $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
     
+    // Format end date to include time (23:59:59)
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
     $builder->where('bukti_penerimaan_tanggal >=', $startDate);
     $builder->where('bukti_penerimaan_tanggal <=', $endDate);
     
@@ -139,7 +142,10 @@ protected function formatNumber($number)
             null,
             '-'
         ");
-        
+        $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
+    
+    // Format end date to include time (23:59:59)
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
         $builder->where('tanggal >=', $startDate);
         $builder->where('tanggal <=', $endDate);
         
@@ -161,7 +167,10 @@ protected function formatNumber($number)
             '0' as dari_subkontrak,
             gudang
         ");
-        
+        $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
+    
+    // Format end date to include time (23:59:59)
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
         $builder->where('tanggal >=', $startDate);
         $builder->where('tanggal <=', $endDate);
         
@@ -240,27 +249,64 @@ protected function getPengeluaranHasilProduksi($startDate, $endDate)
 }
 
     // 5. Laporan Mutasi Bahan Baku
-    protected function getMutasiBahanBaku($startDate, $endDate)
-    {
-        $builder = $this->laporanModel->builder('laporan_mutasi_bahan_baku');
+protected function getMutasiBahanBaku($startDate, $endDate)
+{
+    $builder = $this->laporanModel->builder('laporan_mutasi_bahan_baku');
+    
+    $builder->select("
+        material_id,
+        kode_barang,
+        nama_barang,
+        satuan,
+        SUM(CASE WHEN jenis = 'INIT' THEN jumlah ELSE 0 END) as saldo_awal,
+        SUM(CASE WHEN jenis = 'IN' THEN jumlah ELSE 0 END) as pemasukan,
+        SUM(CASE WHEN jenis = 'OUT' THEN jumlah ELSE 0 END) as pengeluaran,
+        (SUM(CASE WHEN jenis = 'INIT' THEN jumlah ELSE 0 END) + 
+         SUM(CASE WHEN jenis = 'IN' THEN jumlah ELSE 0 END) - 
+         SUM(CASE WHEN jenis = 'OUT' THEN jumlah ELSE 0 END)) as saldo_akhir,
+        gudang
+    ");
+    
+    $builder->where('tanggal_transaksi >=', $startDate);
+    // Tambahkan waktu hingga 23:59:59 untuk endDate
+    $builder->where('tanggal_transaksi <=', $endDate . ' 23:59:59');
+    $builder->groupBy('material_id, kode_barang, nama_barang, satuan, gudang');
+    $builder->having('saldo_akhir !=', 0);
+    
+    $results = $builder->get()->getResultArray();
+    
+    // Format angka untuk menghilangkan 0 di belakang koma dan buat kode_barang menjadi link
+    foreach ($results as &$row) {
+        $row['saldo_awal'] = $this->formatAngka($row['saldo_awal']);
+        $row['pemasukan'] = $this->formatAngka($row['pemasukan']);
+        $row['pengeluaran'] = $this->formatAngka($row['pengeluaran']);
+        $row['saldo_akhir'] = $this->formatAngka($row['saldo_akhir']);
         
-        $builder->select("
-            kode_barang,
-            nama_barang,
-            satuan,
-            saldo_awal,
-            pemasukan,
-            pengeluaran,
-            saldo_akhir,
-            gudang
-        ");
-        
-        $builder->where('periode >=', $startDate);
-        $builder->where('periode <=', $endDate);
-        $builder->where('saldo_akhir !=', 0);
-        
-        return $builder->get()->getResultArray();
+        // Buat kode_barang menjadi link tracking
+        $row['kode_barang'] = '<a href="trackmaterial/' . $row['material_id'] . '/' . $startDate . '/' . $endDate . '">' . $row['kode_barang'] . '</a>';
     }
+    
+    return $results;
+}
+// Fungsi helper untuk format angka
+private function formatAngka($value)
+{
+    if ($value === null || $value === '') {
+        return $value;
+    }
+    
+    // Konversi ke float untuk memastikan format yang benar
+    $floatValue = floatval($value);
+    
+    // Jika angka bulat, tampilkan tanpa desimal
+    if ($floatValue == intval($floatValue)) {
+        return number_format($floatValue, 0, ',', '.');
+    }
+    
+    // Jika ada desimal, tampilkan dengan maksimal 2 digit desimal
+    // dan hilangkan 0 di belakang koma
+    return rtrim(rtrim(number_format($floatValue, 2, ',', '.'), '0'), ',');
+}
 
     // 6. Laporan Mutasi Hasil Produksi
 protected function getMutasiHasilProduksi($startDate, $endDate)
@@ -304,7 +350,10 @@ protected function getMutasiHasilProduksi($startDate, $endDate)
             jumlah,
             nilai
         ");
-        
+        $startDate = date('Y-m-d 00:00:00', strtotime($startDate));
+    
+    // Format end date to include time (23:59:59)
+    $endDate = date('Y-m-d 23:59:59', strtotime($endDate));
         $builder->where('tanggal >=', $startDate);
         $builder->where('tanggal <=', $endDate);
         

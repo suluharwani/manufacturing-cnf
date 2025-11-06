@@ -184,7 +184,7 @@ public function generatePemasukanBahanBaku($startDate, $endDate)
     $builder = $this->db->table('pembelian_detail pd');
     $builder->select("
         ROW_NUMBER() OVER (ORDER BY p.tanggal_nota) AS no,
-        CURRENT_DATE() AS tgl_rekam,
+        p.tanggal_nota AS tgl_rekam,
         p.jenis_doc AS jenis_dokumen,
         p.document AS pabean_nomor,
         p.tanggal_nota AS pabean_tanggal,
@@ -456,12 +456,13 @@ public function generateMutasiBahanBaku($startDate, $endDate)
             
             UNION ALL
             
+            -- DATA STOCK AWAL dengan jenis 'INIT'
             SELECT 
                 s.id_material as material_id,
                 m.kode as kode_barang,
                 m.name as nama_barang,
                 COALESCE(sat.kode) as satuan,
-                'IN' as jenis,
+                'INIT' as jenis,  -- Diubah dari 'IN' menjadi 'INIT'
                 COALESCE(s.tanggal_stock_awal, s.created_at) as tanggal_transaksi,
                 s.stock_awal as jumlah,
                 'Gudang Kite' as gudang,
@@ -476,6 +477,8 @@ public function generateMutasiBahanBaku($startDate, $endDate)
             AND s.stock_awal > 0
             
             UNION ALL
+            
+            -- DATA OUT untuk PENGELUARAN
             SELECT 
                 mrp.id_material as material_id,
                 m.kode as kode_barang,

@@ -392,6 +392,7 @@ $routes->group('purchase', function ($routes) {
 });
 
 $routes->group('report', function ($routes) {
+    $routes->get('trackmaterial/(:any)/(:any)/(:any)', 'ReportController::trackmaterial/$1/$2/$3',['filter' => 'accessControl:2']); 
     $routes->get('getPiHistoryByDate', 'ReportController::getPiHistoryByDate',['filter' => 'accessControl:2']); 
     $routes->get('printBom/(:any)/(:any)', 'ReportController::printBom/$1/$2',['filter' => 'accessControl:2']);
     $routes->get('bea_cukai', 'ReportController::beacukai', [
