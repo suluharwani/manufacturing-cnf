@@ -1,4 +1,3 @@
-
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Product Tracking</h3>
@@ -43,6 +42,31 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">Usage Summary</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>Total Quantity in Proforma Invoices:</strong>
+                                <span id="totalQuantity" class="badge badge-primary ml-2">0</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Total Material Usage:</strong>
+                                <span id="totalMaterialUsage" class="badge badge-success ml-2">0</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Last Updated:</strong>
+                                <span id="lastUpdated" class="badge badge-info ml-2">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -135,7 +159,7 @@
         <!-- Tabel 3: Material Information -->
         <div class="row mt-4">
             <div class="col-md-12">
-                <h4>Material</h4>
+                <h4>Material Usage</h4>
                 <table class="table table-bordered table-striped" id="materialTable">
                     <thead>
                         <tr>
@@ -145,16 +169,25 @@
                             <th>Module</th>
                             <th>Kite</th>
                             <th>Unit</th>
-                            <th>Usage</th>
+                            <th>Usage per Unit</th>
+                            <th>Total Usage</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="materialTableBody">
                         <!-- Data akan diisi via AJAX -->
                         <tr>
-                            <td colspan="8" class="text-center">Loading materials...</td>
+                            <td colspan="9" class="text-center">Loading materials...</td>
                         </tr>
                     </tbody>
+                    <tfoot id="materialTableFooter" style="display: none;">
+                        <!-- <tr class="table-info">
+                            <td colspan="6" class="text-right"><strong>Total:</strong></td>
+                            <td id="totalUsagePerUnit" class="text-right"><strong>0</strong></td>
+                            <td id="totalUsageOverall" class="text-right"><strong>0</strong></td>
+                            <td></td>
+                        </tr> -->
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -163,7 +196,21 @@
 
 <script>
 $(document).ready(function() {
+    let totalQuantity = 0;
+    
+    // Hitung total quantity dari PI history
+    function calculateTotalQuantity() {
+        totalQuantity = 0;
+        <?php if (!empty($piHistory)): ?>
+            <?php foreach ($piHistory as $pi): ?>
+                totalQuantity += parseFloat(<?= $pi['quantity'] ?>) || 0;
+            <?php endforeach; ?>
+        <?php endif; ?>
+        $('#totalQuantity').text(totalQuantity.toLocaleString());
+    }
+
     // Load material data on page load
+    calculateTotalQuantity();
     loadMaterialData();
 
     // Filter functionality for PI history
@@ -174,7 +221,7 @@ $(document).ready(function() {
         const finishingId = '<?= $finishingId ?>';
 
         // Show loading
-        $('#piTableBody').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
+        $('#piTableBody').html('<tr><td colspan="9" class="text-center">Loading...</td></tr>');
 
         $.get('<?= base_url('report/getPiHistoryByDate') ?>', {
             productId: productId,
@@ -184,13 +231,25 @@ $(document).ready(function() {
         }, function(response) {
             if (response.status === 'success') {
                 updatePiTable(response.data);
+                calculateTotalQuantityFromData(response.data);
+                loadMaterialData(); // Reload material data dengan quantity terbaru
             } else {
-                $('#piTableBody').html('<tr><td colspan="8" class="text-center">Error loading data</td></tr>');
+                $('#piTableBody').html('<tr><td colspan="9" class="text-center">Error loading data</td></tr>');
             }
         }).fail(function() {
-            $('#piTableBody').html('<tr><td colspan="8" class="text-center">Error loading data</td></tr>');
+            $('#piTableBody').html('<tr><td colspan="9" class="text-center">Error loading data</td></tr>');
         });
     });
+
+    // Hitung total quantity dari data response
+    function calculateTotalQuantityFromData(data) {
+        totalQuantity = 0;
+        data.forEach(function(pi) {
+            totalQuantity += parseFloat(pi.quantity) || 0;
+        });
+        $('#totalQuantity').text(totalQuantity.toLocaleString());
+        $('#lastUpdated').text('Just now');
+    }
 
     // Reset filter
     $('#resetBtn').click(function() {
@@ -201,44 +260,53 @@ $(document).ready(function() {
 
     // Function to load material data
     function loadMaterialData() {
-    const productId = '<?= $productId ?>';
-    const finishingId = '<?= $finishingId ?>';
+        const productId = '<?= $productId ?>';
+        const finishingId = '<?= $finishingId ?>';
 
-    $.get('<?= base_url('report/material/') ?>' + productId + '/' + finishingId, 
-    function(response) {
-        console.log('Raw Material response:', response); // Debug log raw response
-        
-        try {
-            // Parse response menjadi JSON object
-            const jsonResponse = JSON.parse(response);
-            console.log('Parsed Material response:', jsonResponse); // Debug log parsed response
+        $.get('<?= base_url('report/material/') ?>' + productId + '/' + finishingId, 
+        function(response) {
+            console.log('Raw Material response:', response);
             
-            if (jsonResponse.status === 'success') {
-                updateMaterialTable(jsonResponse.data);
-            } else {
-                $('#materialTableBody').html('<tr><td colspan="8" class="text-center">Error: ' + (jsonResponse.message || 'Unknown error') + '</td></tr>');
+            try {
+                const jsonResponse = JSON.parse(response);
+                console.log('Parsed Material response:', jsonResponse);
+                
+                if (jsonResponse.status === 'success') {
+                    updateMaterialTable(jsonResponse.data);
+                } else {
+                    $('#materialTableBody').html('<tr><td colspan="9" class="text-center">Error: ' + (jsonResponse.message || 'Unknown error') + '</td></tr>');
+                }
+            } catch (e) {
+                console.error('Error parsing JSON:', e);
+                $('#materialTableBody').html('<tr><td colspan="9" class="text-center">Error parsing response data</td></tr>');
             }
-        } catch (e) {
-            console.error('Error parsing JSON:', e);
-            $('#materialTableBody').html('<tr><td colspan="8" class="text-center">Error parsing response data</td></tr>');
-        }
-    }).fail(function(xhr, status, error) {
-        console.error('Error loading material data:', error);
-        $('#materialTableBody').html('<tr><td colspan="8" class="text-center">Error loading material data: ' + error + '</td></tr>');
-    });
-}
+        }).fail(function(xhr, status, error) {
+            console.error('Error loading material data:', error);
+            $('#materialTableBody').html('<tr><td colspan="9" class="text-center">Error loading material data: ' + error + '</td></tr>');
+        });
+    }
 
     function updateMaterialTable(data) {
         const tbody = $('#materialTableBody');
         tbody.empty();
 
         if (!data.items || data.items.length === 0) {
-            tbody.append('<tr><td colspan="8" class="text-center">No material data found</td></tr>');
+            tbody.append('<tr><td colspan="9" class="text-center">No material data found</td></tr>');
+            $('#materialTableFooter').hide();
             return;
         }
 
+        let totalUsagePerUnit = 0;
+        let totalUsageOverall = 0;
+
         // Add material rows
         data.items.forEach(function(material, index) {
+            const usagePerUnit = parseFloat(material.penggunaan) || 0;
+            const totalUsage = usagePerUnit * totalQuantity;
+            
+            totalUsagePerUnit += usagePerUnit;
+            totalUsageOverall += totalUsage;
+
             const row = `
 <tr>
     <td>${index + 1}</td>
@@ -251,7 +319,12 @@ $(document).ready(function() {
         </span>
     </td>
     <td>${material.satuan_nama || 'N/A'}</td>
-    <td>${material.penggunaan || '0'}</td>
+    <td class="text-right">${formatNumber(usagePerUnit)}</td>
+    <td class="text-right">
+        <strong>${formatNumber(totalUsage)}</strong>
+        <br>
+        <small class="text-muted">(${formatNumber(usagePerUnit)} × ${formatNumber(totalQuantity)})</small>
+    </td>
     <td>
         <button type="button" class="btn btn-sm btn-info view-material-history" 
                 data-material-id="${material.id_material}" 
@@ -264,6 +337,14 @@ $(document).ready(function() {
             tbody.append(row);
         });
 
+        // Update footer totals
+        $('#totalUsagePerUnit').html('<strong>' + formatNumber(totalUsagePerUnit) + '</strong>');
+        $('#totalUsageOverall').html('<strong>' + formatNumber(totalUsageOverall) + '</strong>');
+        $('#materialTableFooter').show();
+
+        // Update summary
+        $('#totalMaterialUsage').text(formatNumber(totalUsageOverall));
+
         // Add click event for view history buttons
         $('.view-material-history').click(function() {
             const materialId = $(this).data('material-id');
@@ -272,138 +353,144 @@ $(document).ready(function() {
         });
     }
 
-function viewMaterialHistory(materialId, materialName) {
-    // Show loading modal
-    const modal = $(`
-        <div class="modal fade" id="materialHistoryModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Material History - ${materialName}</h5>
-                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center">
-                            <div class="spinner-border" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                            <p>Loading material history...</p>
+    // Format number dengan thousand separator
+    function formatNumber(number) {
+        return parseFloat(number).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 4
+        });
+    }
+
+    function viewMaterialHistory(materialId, materialName) {
+        // Show loading modal
+        const modal = $(`
+            <div class="modal fade" id="materialHistoryModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Material History - ${materialName}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <p>Loading material history...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    `);
-    
-    $('body').append(modal);
-    $('#materialHistoryModal').modal('show');
+        `);
+        
+        $('body').append(modal);
+        $('#materialHistoryModal').modal('show');
 
-    // Load material history via AJAX
-    $.get('<?= base_url('report/materialhistory/') ?>' + materialId, 
-    function(response) {
-        try {
-            let data = JSON.parse(response);
+        // Load material history via AJAX
+        $.get('<?= base_url('report/materialhistory/') ?>' + materialId, 
+        function(response) {
+            try {
+                let data = JSON.parse(response);
 
-            if (!Array.isArray(data) || data.length === 0) {
+                if (!Array.isArray(data) || data.length === 0) {
+                    $('#materialHistoryModal .modal-body').html(`
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Tidak ada data history material untuk <strong>${materialName}</strong> (ID: ${materialId}).
+                        </div>
+                    `);
+                    return;
+                }
+
+                // Buat tabel dengan kolom sesuai permintaan
+                let table = `
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Invoice</th>
+                                    <th>No. Daftar PIB</th>
+                                    <th>Jenis Dok.</th>
+                                    <th>Jumlah</th>
+                                    <th>Tanggal Nota</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                data.forEach(row => {
+                    table += `
+                        <tr>
+                            <td>${row.invoice}</td>
+                            <td><a href="<?=base_url("bc-import/detail")?>/${row.nomor_aju}">${row.document}</a></td>
+                            <td>${row.jenis_doc || '-'}</td>
+                            <td class="text-end">${row.jumlah}</td>
+                            <td>${row.tanggal_nota}</td>
+                            <td class="text-center">
+                                <a href="<?= base_url('pembelian/printGRN/') ?>${row.id}" class="btn btn-sm btn-primary" target="_blank">
+                                    <i class="fas fa-edit"></i> Detail
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                table += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                // Inject ke modal
                 $('#materialHistoryModal .modal-body').html(`
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-circle"></i> 
-                        Tidak ada data history material untuk <strong>${materialName}</strong> (ID: ${materialId}).
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Material history page for <strong>${materialName}</strong> (ID: ${materialId}) 
+                    </div>
+                    ${table}
+                `);
+
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                $('#materialHistoryModal .modal-body').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Gagal memproses data material history. Error: ${e.message}
                     </div>
                 `);
-                return;
             }
-
-            // Buat tabel dengan kolom sesuai permintaan
-            let table = `
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Invoice</th>
-                                <th>No. Daftar PIB</th>
-                                <th>Jenis Dok.</th>
-                                <th>Jumlah</th>
-                                <th>Tanggal Nota</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            data.forEach(row => {
-    table += `
-        <tr>
-            <td>${row.invoice}</td>
-            <td><a href="<?=base_url("bc-import/detail")?>/${row.nomor_aju}">${row.document}</a></td>
-            <td>${row.jenis_doc || '-'}</td>
-            <td class="text-end">${row.jumlah}</td>
-            <td>${row.tanggal_nota}</td>
-            <td class="text-center">
-                <a href="<?= base_url('pembelian/printGRN/') ?>${row.id}" class="btn btn-sm btn-primary" target="_blank">
-                    <i class="fas fa-edit"></i> Detail
-                </a>
-            </td>
-        </tr>
-    `;
-});
-
-            table += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            // Inject ke modal
-            $('#materialHistoryModal .modal-body').html(`
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> 
-                    Material history page for <strong>${materialName}</strong> (ID: ${materialId}) 
-                </div>
-                ${table}
-            `);
-
-        } catch (e) {
-            console.error('JSON parse error:', e);
+        }).fail(function(xhr, status, error) {
+            console.error('Error loading material history:', error);
             $('#materialHistoryModal .modal-body').html(`
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-triangle"></i> 
-                    Gagal memproses data material history. Error: ${e.message}
+                    Failed to load material history data. Error: ${error}
+                </div>
+                <div class="text-center">
+                    <a href="<?= base_url('materialhistory/') ?>${materialId}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Go to Material History Page
+                    </a>
                 </div>
             `);
-        }
-    }).fail(function(xhr, status, error) {
-        console.error('Error loading material history:', error);
-        $('#materialHistoryModal .modal-body').html(`
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> 
-                Failed to load material history data. Error: ${error}
-            </div>
-            <div class="text-center">
-                <a href="<?= base_url('materialhistory/') ?>${materialId}" class="btn btn-primary" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> Go to Material History Page
-                </a>
-            </div>
-        `);
-    });
+        });
 
-    // Clean up modal on close
-    $('#materialHistoryModal').on('hidden.bs.modal', function() {
-        $(this).remove();
-    });
-}
-
-
+        // Clean up modal on close
+        $('#materialHistoryModal').on('hidden.bs.modal', function() {
+            $(this).remove();
+        });
+    }
 
     function updatePiTable(data) {
         const tbody = $('#piTableBody');
         tbody.empty();
 
         if (data.length === 0) {
-            tbody.append('<tr><td colspan="8" class="text-center">No data found for the selected date range</td></tr>');
+            tbody.append('<tr><td colspan="9" class="text-center">No data found for the selected date range</td></tr>');
             return;
         }
 
