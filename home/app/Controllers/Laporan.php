@@ -318,13 +318,13 @@ protected function getMutasiHasilProduksi($startDate, $endDate)
     
     $builder->select("
         kode_barang,
-        nama_barang,
+        CONCAT(nama_barang, ' - ', COALESCE(finishing_name, '-')) as nama_barang,
         satuan,
-        saldo_awal,
-        pemasukan,
-        pengeluaran,
-        saldo_akhir,
-        gudang
+        SUM(saldo_awal) as saldo_awal,
+        SUM(pemasukan) as pemasukan,
+        SUM(pengeluaran) as pengeluaran,
+        (SUM(saldo_awal) + SUM(pemasukan) - SUM(pengeluaran)) as saldo_akhir,
+        gudang,
     ");
     
     // Format start date to include time (00:00:00)
@@ -335,6 +335,10 @@ protected function getMutasiHasilProduksi($startDate, $endDate)
     
     $builder->where('tanggal >=', $startDate);
     $builder->where('tanggal <=', $endDate);
+    
+    $builder->groupBy('kode_barang');
+    $builder->groupBy('finishing_id');
+    $builder->groupBy('gudang');
     
     return $builder->get()->getResultArray();
 }

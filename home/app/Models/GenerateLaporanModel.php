@@ -32,7 +32,7 @@ class GenerateLaporanModel extends Model
         $results['mutasi_bahan_baku'] = $this->generateMutasiBahanBakuWithCheck($startDate, $endDate);
 
         // 6. Mutasi Hasil Produksi (periode bulanan)
-        $results['mutasi_hasil_produksi'] = $this->generateMutasiHasilProduksiWithCheck($periode, $startDate, $endDate);
+        $results['mutasi_hasil_produksi'] = $this->generateMutasiHasilProduksiWithCheck($startDate, $endDate);
 
         // 7. Waste/Scrap
         $results['waste_scrap'] = $this->generateWasteScrapWithCheck($startDate, $endDate);
@@ -134,10 +134,9 @@ class GenerateLaporanModel extends Model
         ];
     }
 
-    public function generateMutasiHasilProduksiWithCheck($periode,$startDate, $endDate)
+    public function generateMutasiHasilProduksiWithCheck($startDate, $endDate)
     {
         $exists = $this->db->table('laporan_mutasi_hasil_produksi')
-            ->where('periode', $periode)
             ->countAllResults();
 
         if ($exists > 0) {
@@ -148,7 +147,7 @@ class GenerateLaporanModel extends Model
             ];
         }
 
-        $count = $this->generateMutasiHasilProduksi($periode,$startDate, $endDate);
+        $count = $this->generateMutasiHasilProduksi($startDate, $endDate);
         return [
             'status' => 'generated',
             'message' => 'Berhasil generate laporan mutasi hasil produksi',
@@ -566,19 +565,16 @@ private function getSaldoBahanBaku1($materialId, $startDate)
         return $saldo;
     }
     // Model untuk laporan mutasi hasil produksi
-public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
+public function generateMutasiHasilProduksi($startDate, $endDate)
 {
-    // Check if data already exists for this period
-    $existingData = $this->db->table('laporan_mutasi_hasil_produksi')
-        ->where('periode', $periode)
-        ->countAllResults();
-    
-    if ($existingData > 0) {
-        return 0; // Skip generation as data already exists
-    }
+    // Hapus data lama dalam rentang tanggal yang sama untuk menghindari duplikasi
+    $this->db->table('laporan_mutasi_hasil_produksi')
+        ->where('tanggal >=', $startDate)
+        ->where('tanggal <=', $endDate)
+        ->delete();
 
-    // Build the complete query with parameterized dates
-    $query = "
+    // 1. Data dari st_initial (saldo awal)
+    $queryInitial = "
     INSERT INTO laporan_mutasi_hasil_produksi (
         kode_barang, 
         nama_barang, 
@@ -586,107 +582,146 @@ public function generateMutasiHasilProduksi($periode, $startDate, $endDate)
         saldo_awal, 
         pemasukan, 
         pengeluaran, 
-        saldo_akhir, 
         gudang, 
         gudang_kode, 
-        periode, 
-        tanggal
+        tanggal,
+        movement_type,
+        reference_id,
+        reference_type,
+        finishing_id,
+        finishing_name
     )
     SELECT 
         p.kode COLLATE utf8mb4_uca1400_ai_ci AS kode_barang,
         p.nama COLLATE utf8mb4_uca1400_ai_ci AS nama_barang,
         'pcs' AS satuan,
-        COALESCE((
-            SELECT si.quantity 
-            FROM st_initial si 
-            WHERE si.product_id = p.id 
-            AND si.location_id = l.id
-        ), 0) AS saldo_awal,
-
-        COALESCE((
-            SELECT SUM(sm.quantity) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.to_location = l.id 
-            AND (sm.movement_type = 'in' OR sm.movement_type = 'transfer')
-            AND DATE(sm.created_at) BETWEEN ? AND ?
-        ), 0) AS pemasukan,
-        
-        COALESCE((
-            SELECT SUM(sm.quantity) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.from_location = l.id 
-            AND (sm.movement_type = 'out' OR sm.movement_type = 'transfer')
-            AND DATE(sm.created_at) BETWEEN ? AND ?
-        ), 0) AS pengeluaran,
-        
-        (COALESCE((
-            SELECT si.quantity 
-            FROM st_initial si 
-            WHERE si.product_id = p.id 
-            AND si.location_id = l.id
-        ), 0) +
-        COALESCE((
-            SELECT SUM(sm.quantity) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.to_location = l.id 
-            AND (sm.movement_type = 'in' OR sm.movement_type = 'transfer')
-            AND DATE(sm.created_at) BETWEEN ? AND ?
-        ), 0) -
-        COALESCE((
-            SELECT SUM(sm.quantity) 
-            FROM st_movement sm 
-            WHERE sm.product_id = p.id 
-            AND sm.from_location = l.id 
-            AND (sm.movement_type = 'out' OR sm.movement_type = 'transfer')
-            AND DATE(sm.created_at) BETWEEN ? AND ?
-        ), 0)) AS saldo_akhir,
+        si.quantity AS saldo_awal,
+        0 AS pemasukan,
+        0 AS pengeluaran,
         l.name AS gudang,
         l.code COLLATE utf8mb4_uca1400_ai_ci AS gudang_kode,
-        ? AS periode,
-        NOW() AS tanggal
+        si.created_at AS tanggal,
+        'initial' AS movement_type,
+        si.id AS reference_id,
+        'st_initial' AS reference_type,
+        si.finishing_id AS finishing_id,
+        COALESCE(f.name, '-') AS finishing_name
     FROM 
-        product p
-    CROSS JOIN 
-        locations l
-    LEFT JOIN 
-        laporan_mutasi_hasil_produksi existing 
-        ON existing.kode_barang = p.kode COLLATE utf8mb4_uca1400_ai_ci
-        AND existing.gudang_kode = l.code COLLATE utf8mb4_uca1400_ai_ci
-        AND existing.periode = ?
+        st_initial si
+    JOIN 
+        product p ON si.product_id = p.id
+    JOIN 
+        locations l ON si.location_id = l.id
+    LEFT JOIN
+        finishing f ON si.finishing_id = f.id
     WHERE 
         l.type = 'warehouse' 
         AND l.deleted_at IS NULL
         AND p.deleted_at IS NULL
-        AND existing.id IS NULL -- Skip if already exists
-        AND (
-            EXISTS (
-                SELECT 1 FROM st_initial si 
-                WHERE si.product_id = p.id 
-                AND si.location_id = l.id
-            )
-            OR EXISTS (
-                SELECT 1 FROM st_movement sm 
-                WHERE sm.product_id = p.id 
-                AND (sm.from_location = l.id OR sm.to_location = l.id)
-                AND DATE(sm.created_at) BETWEEN ? AND ?
-            )
-        )";
+        AND DATE(si.created_at) BETWEEN ? AND ?";
 
-    // Execute the query with parameters
-    $result = $this->db->query($query, [
-        $startDate, $endDate,    // pemasukan date range
-        $startDate, $endDate,    // pengeluaran date range
-        $startDate, $endDate,    // saldo_akhir pemasukan
-        $startDate, $endDate,    // saldo_akhir pengeluaran
-        $periode,                // periode value
-        $periode,               // existing check periode
-        $startDate, $endDate     // EXISTS check date range
-    ]);
+    $this->db->query($queryInitial, [$startDate, $endDate]);
 
-    // Return number of affected rows
+    // 2. Data dari st_movement (pemasukan)
+    $queryPemasukan = "
+    INSERT INTO laporan_mutasi_hasil_produksi (
+        kode_barang, 
+        nama_barang, 
+        satuan, 
+        saldo_awal, 
+        pemasukan, 
+        pengeluaran, 
+        gudang, 
+        gudang_kode, 
+        tanggal,
+        movement_type,
+        reference_id,
+        reference_type,
+        finishing_id,
+        finishing_name
+    )
+    SELECT 
+        p.kode COLLATE utf8mb4_uca1400_ai_ci AS kode_barang,
+        p.nama COLLATE utf8mb4_uca1400_ai_ci AS nama_barang,
+        'pcs' AS satuan,
+        0 AS saldo_awal,
+        sm.quantity AS pemasukan,
+        0 AS pengeluaran,
+        l.name AS gudang,
+        l.code COLLATE utf8mb4_uca1400_ai_ci AS gudang_kode,
+        sm.created_at AS tanggal,
+        sm.movement_type AS movement_type,
+        sm.id AS reference_id,
+        sm.reference_type AS reference_type,
+        sm.finishing_id AS finishing_id,
+        COALESCE(f.name, '-') AS finishing_name
+    FROM 
+        st_movement sm
+    JOIN 
+        product p ON sm.product_id = p.id
+    JOIN 
+        locations l ON sm.to_location = l.id
+    LEFT JOIN
+        finishing f ON sm.finishing_id = f.id
+    WHERE 
+        l.type = 'warehouse' 
+        AND l.deleted_at IS NULL
+        AND p.deleted_at IS NULL
+        AND (sm.movement_type = 'in' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) BETWEEN ? AND ?";
+
+    $this->db->query($queryPemasukan, [$startDate, $endDate]);
+
+    // 3. Data dari st_movement (pengeluaran)
+    $queryPengeluaran = "
+    INSERT INTO laporan_mutasi_hasil_produksi (
+        kode_barang, 
+        nama_barang, 
+        satuan, 
+        saldo_awal, 
+        pemasukan, 
+        pengeluaran, 
+        gudang, 
+        gudang_kode, 
+        tanggal,
+        movement_type,
+        reference_id,
+        reference_type,
+        finishing_id,
+        finishing_name
+    )
+    SELECT 
+        p.kode COLLATE utf8mb4_uca1400_ai_ci AS kode_barang,
+        p.nama COLLATE utf8mb4_uca1400_ai_ci AS nama_barang,
+        'pcs' AS satuan,
+        0 AS saldo_awal,
+        0 AS pemasukan,
+        sm.quantity AS pengeluaran,
+        l.name AS gudang,
+        l.code COLLATE utf8mb4_uca1400_ai_ci AS gudang_kode,
+        sm.created_at AS tanggal,
+        sm.movement_type AS movement_type,
+        sm.id AS reference_id,
+        sm.reference_type AS reference_type,
+        sm.finishing_id AS finishing_id,
+        COALESCE(f.name, '-') AS finishing_name
+    FROM 
+        st_movement sm
+    JOIN 
+        product p ON sm.product_id = p.id
+    JOIN 
+        locations l ON sm.from_location = l.id
+    LEFT JOIN
+        finishing f ON sm.finishing_id = f.id
+    WHERE 
+        l.type = 'warehouse' 
+        AND l.deleted_at IS NULL
+        AND p.deleted_at IS NULL
+        AND (sm.movement_type = 'out' OR sm.movement_type = 'transfer')
+        AND DATE(sm.created_at) BETWEEN ? AND ?";
+
+    $this->db->query($queryPengeluaran, [$startDate, $endDate]);
+
     return $this->db->affectedRows();
 }
 
