@@ -206,8 +206,8 @@ protected function getPengeluaranHasilProduksi($startDate, $endDate)
     // Format end date dengan waktu 23:59:59
     $endDateFormatted = date('Y-m-d 23:59:59', strtotime($endDate));
     
-    $builder->where('created_at >=', $startDateFormatted);
-    $builder->where('created_at <=', $endDateFormatted);
+    $builder->where('tanggal_bukti >=', $startDateFormatted);
+    $builder->where('tanggal_bukti <=', $endDateFormatted);
     
     $results = $builder->get()->getResultArray();
     
