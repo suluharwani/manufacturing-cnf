@@ -354,7 +354,7 @@ public function generatePengeluaranHasilProduksi($startDate, $endDate)
         pi.invoice_number AS no_bukti_pengeluaran,
         sm.created_at AS tanggal_bukti,
         c.customer_name AS pembeli_penerima,
-        pi.port_discharge AS negara_tujuan,
+        c.state AS negara_tujuan,
         p.kode AS kode_barang,
         sm.finishing_id as id_finishing,
         sm.product_id as id_product,
